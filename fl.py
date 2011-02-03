@@ -1,11 +1,12 @@
 #!/usr/bin/python
-'''
+"""
 file manipulator
 
 History
   2006.0306     tpb   0.9    add functions add_cr, rm_cr
   2009.1025     tpb   0.10   convert to python
-
+  2011.0202     tpb   0.11   add -L trick
+  
   fl [-n/--noexec] {save|diff|revert} file1 file2 file3 ...
   fl [-n/--noexec] [--nopreserve] {apply|backout} filename
 
@@ -111,9 +112,10 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-'''
+"""
 
 import os
+import pdb
 import random
 import re
 import stat
@@ -133,14 +135,14 @@ def main(args):
 
 # ---------------------------------------------------------------------------
 def fl_help(args):
-    '''help - show this list
+    """help - show this list
 
     usage: fl help [function-name]
 
     If a function name is given, show the __doc__ member of the function.
     Otherwise, show a list of functions based on the first line of
     each __doc__ member.
-    '''
+    """
     global d
 
     p = OptionParser()
@@ -161,37 +163,37 @@ def fl_help(args):
 
 # ---------------------------------------------------------------------------
 def fl_set_atime_to_mtime(args):
-    '''set_atime_to_mtime
+    """set_atime_to_mtime - atime <= mtime
 
     usage: fl set_atime_to_mtime file file file ...
 
     For each file listed, set the file's atime to be the same as its
     mtime value.
-    '''
+    """
     for filename in args:
         s = os.stat(filename)
         os.utime(filename, (s[stat.ST_MTIME], s[stat.ST_MTIME]))
 
 # ---------------------------------------------------------------------------
 def fl_set_mtime_to_atime(args):
-    '''set_mtime_to_atime
+    """set_mtime_to_atime - mtime <= atime
 
     usage: fl set_mtime_to_atime file file file ...
 
     For each file listed, set the file's mtime to be the same as its
     atime value.
-    '''
+    """
     for filename in args:
         s = os.stat(filename)
         os.utime(filename, (s[stat.ST_ATIME], s[stat.ST_ATIME]))
 
 # ---------------------------------------------------------------------------
 def fl_diff(args):
-    '''diff - compare file to its most recently 'saved' version
+    """diff - compare file to its most recently 'saved' version
 
     usage: fl diff file1 file2 file3 ...
 
-    '''
+    """
     p = OptionParser()
     p.add_option('-n', '--noexec',
                  default=True, action='store_false', dest='xable',
@@ -212,12 +214,12 @@ def fl_diff(args):
     
 # ---------------------------------------------------------------------------
 def fl_revert(args):
-    '''revert - revert <file> back to its most recent saved version
+    """revert - revert <file> back to its most recent saved version
 
     usage: fl revert file file file ...
 
     
-    '''
+    """
     p = OptionParser()
     p.add_option('-n', '--noexec',
                  default=True, action='store_false', dest='xable',
@@ -235,10 +237,10 @@ def fl_revert(args):
         
 # ---------------------------------------------------------------------------
 def most_recent_prefix_match(dir, filename):
-    '''
+    """
     Return the path of the newest file in dir that prefix-matches filename
     but does not match exactly (filename is not a path, only a filename).
-    '''
+    """
     list = os.listdir(dir)
     if os.path.exists('%s/old' % dir):
         list.extend(['old/%s' % x for x in os.listdir('%s/old' % dir)])
@@ -283,8 +285,9 @@ class FLTests(unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_most_recent_prefix_match(self):
-        # if not os.path.exists('old'):
-        #      os.mkdir('./old')
+        """
+        Test the routine most_recent_prefix_match()
+        """
         tpbtools.writefile('mrpm1', ['this is a test file'])
         tpbtools.writefile('mrpm2', ['this is another test file'])
         os.system('cp mrpm1 mrpm1.2009-10-01')
@@ -298,8 +301,9 @@ class FLTests(unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_diff(self):
-#         if not os.path.exists('old'):
-#             os.mkdir('./old')
+        """
+        Test diff
+        """
         tpbtools.writefile('mrpm1', ['this is a test file\n'])
         tpbtools.writefile('mrpm2', ['this is another test file\n'])
         tpbtools.writefile('mrpm1.2009-10-01', ['copy of test file\n'])
@@ -328,8 +332,9 @@ class FLTests(unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_revert(self):
-#         if not os.path.exists('old'):
-#             os.mkdir('./old')
+        """
+        Test revert
+        """
         tpbtools.writefile('mrpm1', ['this is a test file\n'])
         tpbtools.writefile('mrpm2', ['this is another test file\n'])
         tpbtools.writefile('mrpm1.2009-10-01', ['reverted\n'])
@@ -350,6 +355,9 @@ class FLTests(unittest.TestCase):
 
     # -----------------------------------------------------------------------
     def test_atom(self):
+        """
+        Test set_atime_to_mtime
+        """
         filename = 'atom'
         open(filename, 'w').close()
         os.utime(filename, (time.time() - random.randint(1000, 2000),
@@ -362,6 +370,9 @@ class FLTests(unittest.TestCase):
 
     # -----------------------------------------------------------------------
     def test_mtoa(self):
+        """
+        Test set_mtime_to_atime
+        """
         filename = 'mtoa'
         open(filename, 'w').close()
         os.utime(filename, (time.time() - random.randint(1000, 2000),
@@ -375,7 +386,15 @@ class FLTests(unittest.TestCase):
 # ---------------------------------------------------------------------------
 global d
 d = dir()
-if __name__ == '__main__':
+        
+sname = sys.argv[0]
+if sname.endswith('.py') and '-L' in sys.argv:
+    pname = re.sub('.py$', '', sname)
+    print("creating symlink: %s -> %s" % (pname, sname))
+    os.symlink(sname, pname)
+elif sname.endswith('.py') and __name__ == '__main__':
     if not testhelp.main(sys.argv):
         cleanup_tests()
-        
+elif not sname.endswith('.py'):
+    main(sys.argv)
+                                
