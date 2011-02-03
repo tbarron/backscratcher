@@ -1,5 +1,5 @@
 #!/usr/bin/python
-'''
+"""
 hexdump a file or data stream
 
 Display the contents of <filename> in mixed hexadecimal / alphanumeric
@@ -28,8 +28,9 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-'''
-
+"""
+import os
+import re
 import sys
 import unittest
 
@@ -83,9 +84,19 @@ def hexdump(input):
             sys.stdout.write(" ")
         sys.stdout.write("\n")
         
+# ---------------------------------------------------------------------------
 class HdTest(unittest.TestCase):
     def test_example(self):
         pass
 
-if __name__ == '__main__':
-    unittest.main()
+# ---------------------------------------------------------------------------
+sname = sys.argv[0]
+if sname.endswith('.py') and '-L' in sys.argv:
+    pname = re.sub('.py$', '', sname)
+    print("creating symlink: %s -> %s" % (pname, sname))
+    os.symlink(sname, pname)
+elif sname.endswith('.py') and __name__ == '__main__':
+    if not testhelp.main(sys.argv):
+        cleanup_tests()
+elif not sname.endswith('.py'):
+    main(sys.argv)
