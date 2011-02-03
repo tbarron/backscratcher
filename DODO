@@ -1,11 +1,4 @@
 
-- [2009-02-10] fx
-   > 2009-02-10 21:58: add license info
-   > 2009-02-10 21:58: write python version
-   > 2009-02-10 21:58: add to svn repo
-   > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
-      as a separate file (see fl.py for example)
-
 - [2009-02-10] hd
    + 2009-02-10 21:58: add license info
    > 2009-02-10 21:58: write python version
@@ -145,6 +138,12 @@
    > 2011-02-02 21:06: write fl_unreadable
 
 - === DONE ===============================================
++ [2009-02-10] fx
+   + 2009-02-10 21:58: add license info
+   + 2009-02-10 21:58: write python version
+   + 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
+      as a separate file (see fl.py for example)
+
 + [2009-10-24] rename tidy to ptidy
 
 + [2009-02-10] chron

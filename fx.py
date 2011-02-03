@@ -1,5 +1,5 @@
 #!/usr/bin/python
-'''
+"""
 commnd effects
 
 The simplest use is to apply a command to a sequence of files. For example,
@@ -79,7 +79,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-'''
+"""
 import glob
 import os
 import pdb
@@ -93,9 +93,9 @@ from optparse import *
 
 # ---------------------------------------------------------------------------
 def main(argv = None):
-    '''
+    """
     Select the function to apply based on the command line options.
-    '''
+    """
     if argv == None:
         argv = sys.argv
 
@@ -141,30 +141,30 @@ def main(argv = None):
 
 # ---------------------------------------------------------------------------
 def expand(cmd):
-    '''
+    """
     Expand environment variables and user notation in a command string.
-    '''
+    """
     return os.path.expandvars(os.path.expanduser(cmd))
 
 # ---------------------------------------------------------------------------
 def BatchCommand(options, arglist):
-    '''
+    """
     Bundle arguments into command lines similarly to xargs.
 
     Unlink xargs, this version allows for static values following the
     list of arguments on each command line.
-    '''
+    """
     for cmd in xargs_wrap(options.cmd, sys.stdin):
         psys(cmd, options)
 
 # ---------------------------------------------------------------------------
 def IterateCommand(options, arglist):
-    '''
+    """
     Run a command once for each of a sequence of numbers.
 
     Possible enhancements would be to handle low/high/step tuples, and
     to handle an arbitrary comma delimited list of values.
-    '''
+    """
     (low, high) = options.irange.split(':')
     for idx in range(int(low), int(high)):
         cmd = expand(re.sub('%', str(idx), options.cmd))
@@ -172,14 +172,14 @@ def IterateCommand(options, arglist):
 
 # ---------------------------------------------------------------------------
 def psys(cmd, options):
-    '''
+    """
     Handle a command subject to the dryrun and quiet members of options.
 
     !dryrun & !quiet: Display the command, then run it
     !dryrun & quiet: Run the command without running it
     dryrun & !quiet: Display the command without running it
     dryrun & quiet: Display the command without running it
-    '''
+    """
     # print("psys: cmd = '%s', dryrun = %s, quiet = %s"
     #       % (cmd, options.dryrun, options.quiet))
     if options.dryrun:
@@ -198,18 +198,18 @@ def psys(cmd, options):
         
 # ---------------------------------------------------------------------------
 def SubstCommand(options, arglist):
-    '''
+    """
     Run the command for each filename in arglist.
-    '''
+    """
     for filename in arglist:
         cmd = expand(re.sub('%', filename, options.cmd))
         psys(cmd, options)
         
 # ---------------------------------------------------------------------------
 def SubstRename(options, arglist):
-    '''
+    """
     Create and run a rename command based on a s/old/new/ expression.
-    '''
+    """
     p = options.edit
     s = p.split(p[1])
     for filename in arglist:
@@ -220,9 +220,9 @@ def SubstRename(options, arglist):
         
 # ---------------------------------------------------------------------------
 def Usage():
-    '''
+    """
     Report program usage.
-    '''
+    """
     print
     print('  fx [-n] -c <command> <files> (% in the command becomes filename)')
     print('          -e s/old/new/ <files> (rename file old to new name)')
@@ -231,10 +231,10 @@ def Usage():
     
 # ---------------------------------------------------------------------------
 def xargs_wrap(cmd, input):
-    '''
+    """
     Do xargs wrapping to cmd, distributing args from file input across
     command lines.
-    '''
+    """
     tcmd = cmd
     rval = []
     for line in input:
@@ -255,14 +255,14 @@ def xargs_wrap(cmd, input):
 
 # ---------------------------------------------------------------------------
 class FxTest(unittest.TestCase):
-    '''
+    """
     Tests for code in fx.py.
-    '''
+    """
     # -----------------------------------------------------------------------
     def test_usage(self):
-        '''
+        """
         Test the Usage routine.
-        '''
+        """
         self.redirect()
         Usage()
         exp = '\n'
@@ -278,9 +278,9 @@ class FxTest(unittest.TestCase):
   
     # -----------------------------------------------------------------------
     def test_expand(self):
-        '''
+        """
         Test the expand routine.
-        '''
+        """
         home = os.environ['HOME']
         input = '~/$PWD'
         expected = '%s/%s' % (home, os.environ['PWD'])
@@ -289,9 +289,9 @@ class FxTest(unittest.TestCase):
 
     # -----------------------------------------------------------------------
     def test_psys_neither(self):
-        '''
+        """
         Test routine psys with dryrun False and quiet False.
-        '''
+        """
         self.redirect()
         v = Values({'dryrun': False, 'quiet': False})
         psys('ls -d ../fx.py', v)
@@ -301,9 +301,9 @@ class FxTest(unittest.TestCase):
 
     # -----------------------------------------------------------------------
     def test_psys_dryrun(self):
-        '''
+        """
         Test routine psys with dryrun True and quiet False.
-        '''
+        """
         self.redirect()
         v = Values({'dryrun': True, 'quiet': False})
         psys('ls -d nosuchfile', v)
@@ -313,9 +313,9 @@ class FxTest(unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def test_psys_quiet(self):
-        '''
+        """
         Test routine psys with dryrun False and quiet True.
-        '''
+        """
         self.redirect()
         v = Values({'dryrun': False, 'quiet': True})
         psys('ls -d ../fx.py', v)
@@ -325,9 +325,9 @@ class FxTest(unittest.TestCase):
 
     # -----------------------------------------------------------------------
     def test_psys_both(self):
-        '''
+        """
         Test routine psys with dryrun True and quiet True.
-        '''
+        """
         self.redirect()
         v = Values({'dryrun': True, 'quiet': True})
         psys('ls -d fx.py', v)
@@ -337,9 +337,9 @@ class FxTest(unittest.TestCase):
 
     # -----------------------------------------------------------------------
     def test_BatchCommand_neither(self):
-        '''
+        """
         Test BatchCommand with dryrun and quiet both False.
-        '''
+        """
         self.into_testdir()
         inlist = range(1, 250)
         f = open('tmpfile', 'w')
@@ -366,9 +366,9 @@ class FxTest(unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_BatchCommand_quiet(self):
-        '''
+        """
         Test BatchCommand with dryrun False and quiet True.
-        '''
+        """
         self.into_testdir()
         inlist = range(1, 250)
         f = open('tmpfile', 'w')
@@ -395,9 +395,9 @@ class FxTest(unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_BatchCommand_dryrun(self):
-        '''
+        """
         Test BatchCommand with dryrun True and quiet False.
-        '''
+        """
         self.into_testdir()
         inlist = range(1, 250)
         f = open('tmpfile', 'w')
@@ -423,9 +423,9 @@ class FxTest(unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_BatchCommand_both(self):
-        '''
+        """
         Test BatchCommand with dryrun True and quiet True.
-        '''
+        """
         self.into_testdir()
         inlist = range(1, 250)
         f = open('tmpfile', 'w')
@@ -451,9 +451,9 @@ class FxTest(unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_IterateCommand_neither(self):
-        '''
+        """
         Test IterateCommand() with dryrun False and quiet False.
-        '''
+        """
         self.into_testdir()
         v = Values({'dryrun': False, 'quiet': False,
                     'cmd': 'echo %',
@@ -467,9 +467,9 @@ class FxTest(unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def test_IterateCommand_quiet(self):
-        '''
+        """
         Test IterateCommand() with dryrun False and quiet True.
-        '''
+        """
         # pdb.set_trace()
         self.into_testdir()
         v = Values({'dryrun': False, 'quiet': True,
@@ -484,9 +484,9 @@ class FxTest(unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def test_IterateCommand_dryrun(self):
-        '''
+        """
         Test IterateCommand() with dryrun True and quiet False.
-        '''
+        """
         self.into_testdir()
         v = Values({'dryrun': True, 'quiet': False,
                     'cmd': 'echo %',
@@ -501,9 +501,9 @@ class FxTest(unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def test_IterateCommand_both(self):
-        '''
+        """
         Test IterateCommand() with dryrun True and quiet True.
-        '''
+        """
         self.into_testdir()
         v = Values({'dryrun': True, 'quiet': True,
                     'cmd': 'echo %',
@@ -518,9 +518,9 @@ class FxTest(unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_SubstCommand_neither(self):
-        '''
+        """
         Test SubstCommand() with dryrun False and quiet False.
-        '''
+        """
         self.into_testdir()
         v = Values({'dryrun': False, 'quiet': False, 'cmd': 'ls %'})
         a = ['a.pl', 'b.pl', 'c.pl']
@@ -535,9 +535,9 @@ class FxTest(unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_SubstCommand_dryrun(self):
-        '''
+        """
         Test SubstCommand() with dryrun True and quiet False.
-        '''
+        """
         self.into_testdir()
         v = Values({'dryrun': True, 'quiet': False, 'cmd': 'ls %'})
         a = ['a.pl', 'b.pl', 'c.pl']
@@ -552,9 +552,9 @@ class FxTest(unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def test_SubstCommand_quiet(self):
-        '''
+        """
         Test SubstCommand() with dryrun False and quiet True.
-        '''
+        """
         self.into_testdir()
         v = Values({'dryrun': False, 'quiet': True, 'cmd': 'ls %'})
         a = ['a.pl', 'b.pl', 'c.pl']
@@ -569,9 +569,9 @@ class FxTest(unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def test_SubstCommand_both(self):
-        '''
+        """
         Test SubstCommand() with dryrun True and quiet True.
-        '''
+        """
         self.into_testdir()
         v = Values({'dryrun': True, 'quiet': True, 'cmd': 'ls %'})
         a = ['a.pl', 'b.pl', 'c.pl']
@@ -586,9 +586,9 @@ class FxTest(unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_SubstRename_neither(self):
-        '''
+        """
         Test SubstRename() with dryrun False and quiet False.
-        '''
+        """
         self.into_testdir()
         arglist = ['a.pl', 'b.pl', 'c.pl']
         for a in arglist:
@@ -610,9 +610,9 @@ class FxTest(unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_SubstRename_dryrun(self):
-        '''
+        """
         Test SubstRename() with dryrun True and quiet False.
-        '''
+        """
         self.into_testdir()
         arglist = ['a.pl', 'b.pl', 'c.pl']
         for a in arglist:
@@ -634,9 +634,9 @@ class FxTest(unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_SubstRename_quiet(self):
-        '''
+        """
         Test SubstRename() with dryrun False and quiet True.
-        '''
+        """
         self.into_testdir()
         arglist = ['a.pl', 'b.pl', 'c.pl']
         for a in arglist:
@@ -662,9 +662,9 @@ class FxTest(unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_SubstRename_both(self):
-        '''
+        """
         Test SubstRename() with dryrun True and quiet True.
-        '''
+        """
         self.into_testdir()
         arglist = ['a.pl', 'b.pl', 'c.pl']
         for a in arglist:
@@ -686,23 +686,23 @@ class FxTest(unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def check_result(self, expr, expected, actual):
-        '''
+        """
         Calling this is similar to saying 'assert(expected == actual)'.
 
         If it fails, we report expected and actual. Otherwise, just return.
-        '''
+        """
         if not expr:
             raise AssertionError("'''\n%s\n''' != '''\n%s\n'''"
                                  % (expected, actual))
 
     # -----------------------------------------------------------------------
     def into_testdir(self):
-        '''
+        """
         Make sure we're in the test directory.
 
         Create it if necessary, then step down into it unless we're
         already there.
-        '''
+        """
         x = os.getcwd()
         if os.path.basename(x) != 'fx_test':
             if not os.path.exists('fx_test'):
@@ -711,25 +711,25 @@ class FxTest(unittest.TestCase):
             
     # -----------------------------------------------------------------------
     def indirect(self, filename):
-        '''
+        """
         Arrange stdin to read from filename.
-        '''
+        """
         self.stdin = sys.stdin
         sys.stdin = open(filename, 'r')
         
     # -----------------------------------------------------------------------
     def redirect(self):
-        '''
+        """
         Aim stdout at a memory string so we can capture a function's output.
-        '''
+        """
         self.stdout = sys.stdout
         sys.stdout = StringIO.StringIO()
 
     # -----------------------------------------------------------------------
     def touch(self, touchables):
-        '''
+        """
         Touch the file or files named in touchables (string or list).
-        '''
+        """
         if type(touchables) == list:
             for f in touchables:
                 open(f, 'a').close()
@@ -740,9 +740,9 @@ class FxTest(unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def undirect(self):
-        '''
+        """
         Reset stdout (and stdin if needed) back to the terminal.
-        '''
+        """
         rval = sys.stdout.getvalue()
         sys.stdout.close()
         sys.stdout = self.stdout
@@ -753,9 +753,9 @@ class FxTest(unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def unlink(self, args):
-        '''
+        """
         Unlink the file or files named in args (may be string or list).
-        '''
+        """
         if type(args) == list:
             for f in args:
                 if os.path.exists(f):
@@ -767,5 +767,12 @@ class FxTest(unittest.TestCase):
             raise StandardError('argument must be list or string')
         
 # ---------------------------------------------------------------------------
-if __name__ == '__main__':
+sname = sys.argv[0]
+if sname.endswith('.py') and '-L' in sys.argv:
+    pname = re.sub('.py$', '', sname)
+    print("creating symlink: %s -> %s" % (pname, sname))
+    os.symlink(sname, pname)
+elif sname.endswith('.py') and __name__ == '__main__':
     unittest.main()
+elif not sname.endswith('.py'):
+    main(sys.argv)
