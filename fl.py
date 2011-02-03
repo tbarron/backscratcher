@@ -6,7 +6,8 @@ History
   2006.0306     tpb   0.9    add functions add_cr, rm_cr
   2009.1025     tpb   0.10   convert to python
   2011.0202     tpb   0.11   add -L trick
-  
+                             add stubs for future routines
+                             
   fl [-n/--noexec] {save|diff|revert} file1 file2 file3 ...
   fl [-n/--noexec] [--nopreserve] {apply|backout} filename
 
@@ -50,19 +51,6 @@ Subfunctions
 
 In alphabetical order, each of the subfunctions are
 described below:
-
-apply
-
-   From the current directory, copy the files listed in <filename> to
-   the appropriate places, preserving the original files before
-   copying new ones. Each line in <filename> should contain the
-   complete path of the file to be installed. The new copy of each
-   file should be in the current directory.
-
-backout
-
-   Revert files listed in <filename> from the original copies saved by
-   apply.
 
 diff
 
@@ -162,32 +150,6 @@ def fl_help(args):
             print '   %s' % f
 
 # ---------------------------------------------------------------------------
-def fl_set_atime_to_mtime(args):
-    """set_atime_to_mtime - atime <= mtime
-
-    usage: fl set_atime_to_mtime file file file ...
-
-    For each file listed, set the file's atime to be the same as its
-    mtime value.
-    """
-    for filename in args:
-        s = os.stat(filename)
-        os.utime(filename, (s[stat.ST_MTIME], s[stat.ST_MTIME]))
-
-# ---------------------------------------------------------------------------
-def fl_set_mtime_to_atime(args):
-    """set_mtime_to_atime - mtime <= atime
-
-    usage: fl set_mtime_to_atime file file file ...
-
-    For each file listed, set the file's mtime to be the same as its
-    atime value.
-    """
-    for filename in args:
-        s = os.stat(filename)
-        os.utime(filename, (s[stat.ST_ATIME], s[stat.ST_ATIME]))
-
-# ---------------------------------------------------------------------------
 def fl_diff(args):
     """diff - compare file to its most recently 'saved' version
 
@@ -216,9 +178,10 @@ def fl_diff(args):
 def fl_revert(args):
     """revert - revert <file> back to its most recent saved version
 
-    usage: fl revert file file file ...
+    usage: fl revert <file> <file> <file> ...
 
-    
+    For each file listed in the command line, look for 'save'd version
+    and bring it back. The current file is renamed <file>.new.
     """
     p = OptionParser()
     p.add_option('-n', '--noexec',
@@ -235,6 +198,85 @@ def fl_revert(args):
         tpbtools.run('mv %s %s.new' % (f, f), o.xable)
         tpbtools.run('mv %s %s' % (counterpath, f), o.xable)
         
+# ---------------------------------------------------------------------------
+def fl_rm_cr(args):
+    """rm_cr - remove carriage returns from file
+
+    usage: fl rm_cr file file file ...
+
+    Filter out CR charaters from a file.
+    """
+    for filename in args:
+        f = open(filename, 'r')
+        d = f.readlines()
+        f.close()
+
+        r = [x.replace('\r', '') for x in d]
+
+        wname = "%s.%d" % (filename, os.getpid())
+        f = open(wname, 'w')
+        f.writelines(r)
+        f.close()
+
+        os.rename(filename, "%s~" % filename)
+        os.rename(wname, filename)
+        
+# ---------------------------------------------------------------------------
+def fl_save(args):
+    """save - snapshot a file with a timestamp in the name
+
+    usage: fl save file file file
+
+    For each file, create file.YYYY.mmdd.
+    """
+    print("under construction")
+
+# ---------------------------------------------------------------------------
+def fl_set_atime_to_mtime(args):
+    """set_atime_to_mtime - atime <= mtime
+
+    usage: fl set_atime_to_mtime file file file ...
+
+    For each file listed, set the file's atime to be the same as its
+    mtime value.
+    """
+    for filename in args:
+        s = os.stat(filename)
+        os.utime(filename, (s[stat.ST_MTIME], s[stat.ST_MTIME]))
+
+# ---------------------------------------------------------------------------
+def fl_set_mtime_to_atime(args):
+    """set_mtime_to_atime - mtime <= atime
+
+    usage: fl set_mtime_to_atime file file file ...
+
+    For each file listed, set the file's mtime to be the same as its
+    atime value.
+    """
+    for filename in args:
+        s = os.stat(filename)
+        os.utime(filename, (s[stat.ST_ATIME], s[stat.ST_ATIME]))
+
+# ---------------------------------------------------------------------------
+def fl_times(args):
+    """times - report the times associated with a file
+
+    usage: fl times file file file ...
+
+    For each file, report the access, mod, and create times.
+    """
+    print("under construction")
+
+# ---------------------------------------------------------------------------
+def fl_unreadable(args):
+    """unreadable - descend a tree and report unreadable files
+
+    usage: fl unreadable <root>
+
+    Descend the directory at <root> and report unreadable files.
+    """
+    print("under construction")
+
 # ---------------------------------------------------------------------------
 def most_recent_prefix_match(dir, filename):
     """

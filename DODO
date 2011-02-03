@@ -1,18 +1,10 @@
 
-- [2009-02-10] fl
-   + 2009-02-10 21:58: add license info
-   + 2009-02-10 21:58: write python version
-   + 2009-02-10 21:58: add to svn repo
-   > 2009-10-25 21:50: develop tests in fl.py
-   > 2009-10-25 21:50: complete the python version
-   > 2010-11-27 12:33: add -L code to link fl -> fl.py, get rid of fl
-
 - [2009-02-10] fx
    > 2009-02-10 21:58: add license info
    > 2009-02-10 21:58: write python version
    > 2009-02-10 21:58: add to svn repo
    > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
-      as a separate file
+      as a separate file (see fl.py for example)
 
 - [2009-02-10] hd
    + 2009-02-10 21:58: add license info
@@ -138,6 +130,19 @@
 
 - [2009-10-24] consider renaming tpbtools.py to something more
    general. perhaps util.py for example.
+
+- [2009-02-10] fl
+   + 2009-02-10 21:58: add license info
+   + 2009-02-10 21:58: write python version
+   + 2009-02-10 21:58: add to svn repo
+   + 2009-10-25 21:50: develop tests in fl.py
+   + 2010-11-27 12:33: add -L code to link fl -> fl.py, get rid of fl
+   > 2011-02-02 21:02: update the Subfunctions section of the doc
+      string
+   > 2011-02-02 21:05: write a test for fl_rm_cr
+   > 2011-02-02 21:06: write fl_save
+   > 2011-02-02 21:06: write fl_times
+   > 2011-02-02 21:06: write fl_unreadable
 
 - === DONE ===============================================
 + [2009-10-24] rename tidy to ptidy
