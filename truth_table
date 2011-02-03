@@ -1,0 +1,206 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+truth_table - generate a truth table describing a set of predicates
+
+=head1 SYNOPSIS
+
+ truth_table <input_file>
+
+=head1 DESCRIPTION
+
+The file <input_file> must contain lines of the form
+
+   predicate: value1, value2, ...
+
+For example:
+
+   sunny: true, false
+   cold: true, false
+
+will produce the following truth table:
+
+   sunny   cold
+   true    true
+   true    false
+   false   true
+   false   false
+
+=head1 LICENSE
+
+Copyright (C) 1995 - <the end of time>  Tom Barron
+  tom.barron@comcast.net
+  177 Crossroads Blvd
+  Oak Ridge, TN  37830
+
+This software is licensed under the CC-GNU GPL. For the full text of
+the license, see http://creativecommons.org/licenses/GPL/2.0/
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+=cut
+
+$filename = $ARGV[0];
+
+open(IN, "< $filename");
+while ($line = <IN>)
+{
+   chomp($line);
+   ($variable, $value_list) = split(/\s*:\s*/, $line);
+   push(@{$ds{'!order!'}}, $variable);
+   @{$ds{$variable}} = split(/\s*,\s*/, $value_list);
+}
+close(IN);
+
+show_heading(\%ds);
+
+$count = count_rows(\%ds);
+@row = first_row(\%ds);
+for ($idx = 0 ; $idx < $count ; $idx++)
+{
+   size_row(@row);
+   @row = next_row(\%ds, @row);
+}
+
+@row = first_row(\%ds);
+for ($idx = 0 ; $idx < $count ; $idx++)
+{
+   show_row(@row);
+   @row = next_row(\%ds, @row);
+}
+
+
+{
+   my (@width);
+
+# ===========================================================================
+sub size_row
+{
+   my ($i);
+
+   for ($i = 0 ; $i < @_ ; $i++)
+   {
+      $width[$i] = max($width[$i], length($_[$i]));
+   }
+}
+
+# ===========================================================================
+sub show_heading
+{
+   my ($i, $k, $r);
+
+   ($r) = @_;
+
+   $last = 1;
+   foreach $k (@{$r->{'!order!'}})
+   {
+      printf("%s ", $k);
+      $width[$i++] = max($width[$i], $last);
+      $last = length($k) - 1;
+   }  
+   print("\n");
+}
+
+# ===========================================================================
+sub show_row
+{
+   # print(join("   ", @_), "\n");
+   for ($i = 0 ; $i < @_ ; $i++)
+   {
+      printf("  %*s", $width[$i], $_[$i]);
+   }
+   print("\n");
+}
+}
+
+# ===========================================================================
+sub count_rows
+{
+   my ($d, $k, $rval);
+
+   ($d) = @_;
+
+   $rval = 1;
+   foreach $k (grep(!/!order!/, keys(%{$d})))
+   {
+      $rval *= scalar(@{$d->{$k}});
+   }
+   return $rval;
+}
+
+# ===========================================================================
+sub max
+{
+   @s = reverse(sort(@_));
+   return $s[0];
+}
+
+{
+   my @idx;
+
+# ===========================================================================
+sub first_row
+{
+   my ($d, $k, @row);
+
+   ($d) = @_;
+
+   foreach $k (@{$d->{'!order!'}})
+   {
+      push(@idx, 0);
+   }
+
+   return set_row($d);
+}
+
+# ===========================================================================
+sub next_row
+{
+   my ($carry, $d, $j, @o);
+
+   ($d) = @_;
+
+   @o = @{$d->{'!order!'}};
+   $carry = 1;
+   for ($j = @idx - 1 ; 0 <= $j ; $j--)
+   {
+      $idx[$j]++ if $carry;
+      if (@{$d->{$o[$j]}} <= $idx[$j])
+      {
+         $idx[$j] = 0;
+         $carry = 1;
+      }
+      else
+      {
+         $carry = 0;
+      }
+   }
+
+   return set_row($d);
+}
+
+# ===========================================================================
+sub set_row
+{
+   my ($d, $j, @row);
+
+   ($d) = @_;
+
+   for ($j = 0 ; $j < @idx ; $j++)
+   {
+      push(@row, $d->{$d->{'!order!'}->[$j]}->[$idx[$j]]);
+   }
+   return @row;
+}
+}
+
+

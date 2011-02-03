@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+
+$path = $ENV{'PATH'};
+
+# print("$path\n");
+foreach $dir (split(/:/, $path))
+{
+   # print("scanning $dir\n");
+   print("   $dir/$ARGV[0]\n") if (-e "$dir/$ARGV[0]");
+}
+
+__END__
+
+=head1 NAME
+
+scanpath - find all occurences of an executable in $PATH
+
+=head1 SYNOPSIS
+
+ scanpath <executable>
+
+=head1 DESCRIPTION
+
+Look in all the directories listed in $PATH and report all the places
+<executable> is found. The normal which(1) command only reports the
+first executable found since that's the one that will be run.
+Sometimes it's also useful to know about executables with the same
+name hiding lower in the $PATH sequence.
+
+=head1 LICENSE
+
+Copyright (C) 1995 - <the end of time>  Tom Barron
+  tom.barron@comcast.net
+  177 Crossroads Blvd
+  Oak Ridge, TN  37830
+
+This software is licensed under the CC-GNU GPL. For the full text of
+the license, see http://creativecommons.org/licenses/GPL/2.0/
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+=cut

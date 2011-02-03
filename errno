@@ -1,0 +1,83 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+errno - translate error numbers into their corresponding text messages
+
+=head1 SYNOPSIS
+
+ errno <number>
+
+=head1 DESCRIPTION
+
+The indicated error number is looked up and the corresponding text
+message is reported.
+
+=head1 LICENSE
+
+Copyright (C) 1995 - <the end of time>  Tom Barron
+  tom.barron@comcast.net
+  177 Crossroads Blvd
+  Oak Ridge, TN  37830
+
+This software is licensed under the CC-GNU GPL. For the full text of
+the license, see http://creativecommons.org/licenses/GPL/2.0/
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+=cut
+
+# ---------------------------------------------------------------------------
+sub main
+{
+   open(IN, "find /usr/include -name errno.h |") ||
+       fatal("find failed: $!");
+   @errno = <IN>;
+   close(IN);
+
+   foreach $filename (@errno)
+   {
+      open(ERRNO, "< $filename");
+
+      while ($line = <ERRNO>)
+      {
+         next if ($line !~ /^\#define/);
+
+         ($var, $num) = ($line =~ /\#define\s+(\S+)\s+(\d+)/);
+         $errno{$var} = $num;
+         $errno{$num} = $var;
+      }
+
+      close(ERRNO);
+   }
+
+   foreach $err (@ARGV)
+   {
+      if ($err !~ /^\d+$/)
+      {
+         $err = $errno{$err};
+      }
+      $! = $err;
+      $def = $errno{$err};
+      print "$def ($err): $!\n";
+   }
+}
+
+# ---------------------------------------------------------------------------
+sub fatal
+{
+   print STDERR @!, "\n";
+}
+
+# ---------------------------------------------------------------------------
+main();
+
+

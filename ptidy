@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+# ========================================================================
+# tidy
+#   Copyright 1997 Tom Barron
+#
+# @(#) misc ad hoc code
+#
+# Syntax:
+#   
+#   
+# History:
+#  97-12-21    tb    created
+#
+# Notes:
+#
+# ========================================================================
+require "getopts.pl";
+
+# -r: recursive
+Getopts("r");
+Doit(".");
+print("\n");
+
+# ========================================================================
+sub Doit
+{
+   local($dir) = @_;
+   local($filename, @list);
+
+   opendir(DIR, $dir);
+   @list = grep(!/^\.\.?$/, readdir(DIR));
+   closedir(DIR);
+
+   for $filename (@list)
+   {
+      $filename = "$dir/$filename";
+      if (($opt_r) && (-d $filename))
+      {
+         Doit("$filename");
+      }
+      elsif (($filename =~ /~$/) || ($filename =~ /\.bak$/))
+      {
+         chomp( $filename );
+         print( "$filename " );
+         unlink( "$filename" );
+      }
+   }
+   # print( "\n" );
+}

@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+
+while (1)
+{
+   print("Regex? [$rgx] > ");
+   chomp($str = <STDIN>);
+   if ($str ne "")
+   {
+      $rgx = $str;
+   }
+
+   print("Target? [$target] > ");
+   chomp($str = <STDIN>);
+   if ($str ne "")
+   {
+      $target = $str;
+   }
+
+   $cmd = "\$target =~ m#$rgx#";
+   print("'$cmd' -> ");
+   @result = eval($cmd);
+   print("'", join(':', @result), "'\n\n");
+}
+
+__END__
+
+=head1 NAME
+
+rxlab - play with regular expressions
+
+=head1 DESCRIPTION
+
+  $ rxlab
+  Regex? [] > ^\d
+  Target? [] > abcd
+  '$target =~ m#^\d#' -> ''
+
+  Regex? [^\d] > 
+  Target? [abcd] > 9uxd
+  '$target =~ m#^\d#' -> '1'
+
+  Regex? [^\d] > ^C
+
+=head1 LICENSE
+
+Copyright (C) 1995 - <the end of time>  Tom Barron
+  tom.barron@comcast.net
+  177 Crossroads Blvd
+  Oak Ridge, TN  37830
+
+This software is licensed under the CC-GNU GPL. For the full text of
+the license, see http://creativecommons.org/licenses/GPL/2.0/
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+=cut
+

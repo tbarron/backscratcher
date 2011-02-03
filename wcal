@@ -1,0 +1,173 @@
+#!/usr/bin/perl
+use POSIX;
+
+my ($month, $year) = @ARGV;
+if (@ARGV < 1)
+{
+   my ($sec,$min,$hour,$mday,$mon,$yr) = localtime();
+   $month = $mon+1;
+   $year = $yr + 1900;
+}
+
+if (($month < 1) || (12 < $month))
+{
+   print("  usage: wcal <month> [<year>]\n");
+   exit;
+}
+
+if (! defined($year))
+{
+   $year = this_year();
+}
+
+%DATA = ("left.HANDLE" => "LEFT",
+         "left.VAR" => \$left,
+         "left.SUB" => \&last_month,
+
+         "mid.HANDLE" => "MID",
+         "mid.VAR" => \$mid,
+         "mid.SUB" => \&this_month,
+
+         "right.HANDLE" => "RIGHT",
+         "right.VAR" => \$right,
+         "right.SUB" => \&next_month);
+
+foreach $key (qw/left mid right/)
+{
+   ${$DATA{"$key.VAR"}} = &{$DATA{"$key.SUB"}}($month, $year);
+   my $cmd = sprintf("cal %s", ${$DATA{"$key.VAR"}});
+   open($DATA{"$key.HANDLE"}, "$cmd |");
+}
+
+# foreach $fhandle (qw/LEFT MID RIGHT/)
+# {
+#    open($fhandle, "cal $left|");
+# }
+# open(MID, "cal $mid|");
+# open(RIGHT, "cal $right|");
+
+for ($done = 0 ; !$done ; )
+{
+   $done = 1;
+	foreach $key (qw/left mid right/)
+	{
+      my $handle = $DATA{"$key.HANDLE"};
+      chomp(${$DATA{"$key.VAR"}} = <$handle>);
+      if (defined(${$DATA{"$key.VAR"}})) 
+      { 
+         $done = 0;
+         if ($^O eq "aix")
+         {
+            if (${$DATA{"$key.VAR"}} =~ /^    /)
+            {
+               ${$DATA{"$key.VAR"}} =~ s/    /   /g;
+               ${$DATA{"$key.VAR"}} =~ s/(\d)  /$1 /g;
+            }
+            else
+            {
+               ${$DATA{"$key.VAR"}} =~ s/  / /g;
+            }
+         }
+         ${$DATA{"$key.VAR"}} =~ s/([A-Z][a-z])[a-z] /$1 /g;
+      }
+	}
+
+   if (!$done)
+   {
+      print("  ");
+      foreach $key (qw/left mid right/)
+      {
+         printf("%-25s ", ${$DATA{"$key.VAR"}});
+      }
+   }
+   print("\n");
+}
+
+# ===========================================================================
+sub myr
+{
+   my ($umon, $uyear) = @_;
+   my $now = mktime(0, 0, 0, 1, $umon-1, $uyear-1900);
+   return $now;
+}
+
+# ===========================================================================
+sub last_month
+{
+   my $now = myr(@_);
+   my ($sec,$min,$hour,$mday,$mon,$year) = localtime($now);
+   ($sec,$min,$hour,$mday,$mon,$year) = localtime($now - ($mday*24*3600));
+   my $rval = sprintf("%d %d", 1+$mon, 1900+$year);
+   return $rval;
+}
+
+# ===========================================================================
+sub this_month
+{
+   my $now = myr(@_);
+   my ($sec,$min,$hour,$mday,$mon,$year) = localtime($now);
+   my $rval = sprintf("%d %d", 1+$mon, 1900+$year);
+   return $rval;
+}
+
+# ===========================================================================
+sub this_year
+{
+   my ($sec,$min,$hour,$mday,$mon,$year) = localtime();
+   return 1900+$year;
+}
+
+# ===========================================================================
+sub next_month
+{
+   my $now = myr(@_);
+   my ($sec,$min,$hour,$mday,$mon,$year) = localtime($now);
+   my ($sec,$min,$hour,$mday,$mon,$year) 
+      = localtime($now + ((35-$mday)*24*3600));
+   my $rval = sprintf("%d %d", 1+$mon, 1900+$year);
+   return $rval;
+}
+
+__END__
+
+=head1 NAME
+
+wcal - display three months across the window
+
+=head1 USAGE
+
+ wcal [month [year]]
+
+=head1 DESCRIPTION
+
+With no argument, displays three calendar months side by side with the
+current month in the middle.
+
+With the number of a month as an argument, displays three calendar
+months with the specified month of the current year in the middle.
+
+If a month and year is specified, the indicated month will be put in
+the middle.
+
+=head1 LICENSE
+
+Copyright (C) 1995 - <the end of time>  Tom Barron
+  tom.barron@comcast.net
+  177 Crossroads Blvd
+  Oak Ridge, TN  37830
+
+This software is licensed under the CC-GNU GPL. For the full text of
+the license, see http://creativecommons.org/licenses/GPL/2.0/
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+=cut
+

@@ -1,0 +1,79 @@
+#!/bin/bash
+
+usage()
+{
+    cat - <<EOF
+msh - multiplex logins over a single authenticated ssh connection
+      with window titles in screen(1)
+
+Installation:
+ - put msh and screen_ssh.sh in ~/bin or somewhere else in $PATH
+ - add the following lines to ~/.ssh/config:
+
+      Host *
+         LocalCommand /Users/tpb/bin/screen_ssh.sh $PPID %n
+
+   Of course, replace my home directory with your own.
+
+This only works if screen(1) is running. If it is not, there's no
+point to this. The whole purpose of the exercise is to set the title
+of the virtual terminal in screen(1)'s window list.
+
+If "ssh -O check $TARGET" exits with a non-zero status, the master
+connection has not yet been set up, so we call ssh with the -M option.
+In this case, screen_ssh.sh will be called to set the window title.
+
+If "ssh -O check $TARGET" exits with a zero status, the master
+connection is already up and available. In this case, ssh will not
+call screen_ssh.sh, so we have to set the window title just before
+calling ssh to make the connection to $TARGET.
+
+In either case, we set the window title back to the default name at
+logout.
+
+Potential enhancement: add the code from screen_ssh.sh to this script
+and arrange for ssh to call this script with a special argument
+through the LocalCommand facility. Another alternative would be to
+just set the title in this script regardless of whether we're setting
+up a master connection. This would avoid the need to change the ssh
+configuration.
+
+EOF
+    exit
+}
+
+normalize()
+{
+   local FULL=`expr "$1" : "[a-z0-9-]*.ccs.ornl.gov"`
+   if [[ "0" -eq "$FULL" ]]; then
+      TARGET="$1.ccs.ornl.gov"
+   else
+      TARGET=$1
+   fi
+}
+
+package()
+{
+   tar zcvf $HOME/tmp/msh.tar.gz $HOME/bin/msh $HOME/bin/screen_ssh.sh
+   exit
+}
+
+if [ "$1" == "" ]; then
+   usage
+fi
+
+if [ "$1" == "--pkg" ]; then
+   package
+fi
+
+normalize $1
+ssh -O check $TARGET > /dev/null 2>&1
+if [[ $? = 0 ]]; then
+   echo -ne "\ek$1\e\\"
+   echo ssh $TARGET
+   ssh $TARGET
+else
+   echo ssh -M $TARGET
+   ssh -M $TARGET
+fi
+echo -ne "\eksumatra\e\\"

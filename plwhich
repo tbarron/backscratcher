@@ -1,0 +1,138 @@
+#!/usr/bin/perl
+
+use Getopt::Long;
+
+GetOptions("-d" => \$dirs,
+           "-f:s" => \$files);
+
+if ($dirs)
+{
+   foreach $dir (@INC)
+   {
+      print("$dir\n");
+   }
+}
+elsif ($files ne "")
+{
+   $files =~ s|::|/|g;
+   foreach $dir (@INC)
+   {
+      if (-d "$dir/$files")
+      {
+         print("$dir/$files:\n");
+         foreach $filename (glob("$dir/$files/*"))
+         {
+            printf("  $filename%s\n", (-d $filename) ? "/" : "");
+         }
+      }
+   }
+}
+elsif (defined($files))
+{
+   foreach $dir (@INC)
+   {
+      print("$dir:\n");
+      foreach $filename (glob("$dir/*"))
+      {
+         printf("  $filename%s\n", (-d $filename) ? "/" : "");
+      }
+   }
+}
+elsif (@ARGV)
+{
+   foreach $item (@ARGV)
+   {
+      $item =~ s|::|/|g;
+      $item .= ".pm" if ($item !~ /\.p.$/);
+      foreach $dir (@INC)
+      {
+         print ("$dir/$item\n") if (-e "$dir/$item");
+      }         
+   }
+}
+else
+{
+   print("\n");
+   print("   usage: plwhich [-d]       \# list dirs in \@INC\n");
+   print("          plwhich [-f] [dir] \# list files in dir\n");
+   print("          plwhich <module>   \# show module location\n");
+   print("\n");
+}
+
+__END__
+
+=head1 NAME
+
+plwhich - find perl modules by directory or name
+
+=head1 SYNOPSIS
+
+ plwhich -d       # get a list of directories from @INC
+ plwhich -f       # get a list of all known perl modules
+ plwhich -f <dir> # list files and dirs in <dir>
+ plwhich <module> # find <module> in the perl library tree
+
+=head1 DESCRIPTION
+
+The plwhich program provides functionality similar to which(1) for
+perl library modules.
+
+ plwhich -d
+
+The -d option tells plwhich to report the directories in @INC.
+
+ plwhich -f
+
+The -f option tells plwhich to report the files in the directories in
+@INC. With no argument, 'plwhich -f' will report all perl module files
+in the library. This listing can be long.
+
+ plwhich -f <directory>
+
+Given an argument, the -f option reports the files in <directory>
+anywhere it is found in the library tree. For example,
+
+   $ plwhich -f Bundle
+   /usr/local/apps/perl5/lib/site_perl/5.6.0/Bundle:
+     /usr/local/apps/perl5/lib/site_perl/5.6.0/Bundle/DBD/
+     /usr/local/apps/perl5/lib/site_perl/5.6.0/Bundle/LWP.pm
+     /usr/local/apps/perl5/lib/site_perl/5.6.0/Bundle/Net/
+   /usr/local/apps/perl5/lib/site_perl/5.6.0/aix/Bundle:
+     /usr/local/apps/perl5/lib/site_perl/5.6.0/aix/Bundle/DBI.pm
+
+Finally, with no options but a module name, plwhich searches the
+library for the named module and reports its location. For example,
+
+   $ plwhich CCS::ll_wlm
+   /usr/opt/perl5/lib/site_perl/5.8.0/CCS/ll_wlm.pm
+   /usr/opt/perl5/lib/site_perl/CCS/ll_wlm.pm
+
+Directories and module names may be specified to plwhich in the
+following forms:
+
+   CCS/ll_wlm.pm
+   CCS/ll_wlm
+   CCS::ll_wlm.pm
+   CCS::ll_wlm
+
+=head1 LICENSE
+
+Copyright (C) 1995 - <the end of time>  Tom Barron
+  tom.barron@comcast.net
+  177 Crossroads Blvd
+  Oak Ridge, TN  37830
+
+This software is licensed under the CC-GNU GPL. For the full text of
+the license, see http://creativecommons.org/licenses/GPL/2.0/
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+=cut

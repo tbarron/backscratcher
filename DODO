@@ -1,0 +1,158 @@
+
+- [2009-02-10] fl
+   + 2009-02-10 21:58: add license info
+   + 2009-02-10 21:58: write python version
+   + 2009-02-10 21:58: add to svn repo
+   > 2009-10-25 21:50: develop tests in fl.py
+   > 2009-10-25 21:50: complete the python version
+   > 2010-11-27 12:33: add -L code to link fl -> fl.py, get rid of fl
+
+- [2009-02-10] fx
+   > 2009-02-10 21:58: add license info
+   > 2009-02-10 21:58: write python version
+   > 2009-02-10 21:58: add to svn repo
+   > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
+      as a separate file
+
+- [2009-02-10] hd
+   + 2009-02-10 21:58: add license info
+   > 2009-02-10 21:58: write python version
+   > 2009-02-10 21:58: add to svn repo
+   > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
+      as a separate file
+
+- [2009-02-10] list
+   > 2009-02-10 21:59: add license info
+   > 2009-02-10 21:59: write python version
+   > 2009-02-10 21:59: add to svn repo
+   > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
+      as a separate file
+
+- [2009-02-10] magnitude
+   > 2009-02-10 21:59: add license info
+   > 2009-02-10 21:59: write python version
+   > 2009-02-10 21:59: add to svn repo
+   > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
+      as a separate file
+
+- [2009-02-10] odx
+   + 2009-02-10 21:59: add license info
+   > 2009-02-10 21:59: write python version
+   + 2009-02-10 21:59: add to svn repo
+   > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
+      as a separate file
+
+- [2009-02-10] replay
+   > 2009-02-10 21:59: add license info
+   > 2009-02-10 21:59: write python version
+   > 2009-02-10 21:59: add to svn repo
+   > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
+      as a separate file
+
+- [2009-02-10] rxlab
+   > 2009-02-10 21:59: add license info
+   > 2009-02-10 21:59: write python version
+   > 2009-02-10 21:59: add to svn repo
+   > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
+      as a separate file
+
+- [2009-02-10] summarize
+   > 2009-02-10 21:59: add license info
+   > 2009-02-10 21:59: write python version
+   > 2009-02-10 21:59: add to svn repo
+   > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
+      as a separate file
+
+- [2009-02-10] tidy
+   > 2009-02-10 22:00: rename
+   > 2009-02-10 21:59: add license info
+   > 2009-02-10 21:59: write python version
+   > 2009-02-10 21:59: add to svn repo
+   > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
+      as a separate file
+
+- [2009-02-10] tps
+   > 2009-02-10 21:59: add license info
+   > 2009-02-10 21:59: write python version
+   > 2009-02-10 21:59: add to svn repo
+   > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
+      as a separate file
+
+- [2009-02-10] truth_table
+   > 2009-02-10 21:59: add license info
+   > 2009-02-10 21:59: write python version
+   > 2009-02-10 21:59: add to svn repo
+   > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
+      as a separate file
+
+- [2009-02-10] scanpath
+   > 2009-02-10 21:59: add license info
+   > 2009-02-10 21:59: write python version
+   > 2009-02-10 21:59: add to svn repo
+   > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
+      as a separate file
+
+- [2009-02-10] vipath
+   + 2009-02-10 21:59: add license info
+   > 2009-02-10 21:59: write python version
+   + 2009-02-10 21:59: add to svn repo
+   > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
+      as a separate file
+
+- [2009-02-10] wcal
+   > 2009-02-10 21:59: add license info
+   > 2009-02-10 21:59: write python version
+   > 2009-02-10 21:59: add to svn repo
+   > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
+      as a separate file
+
+- [2009-02-10] filter
+   + 2009-02-10 22:02: write python version (filter.py)
+   > 2009-02-10 22:17: complete test suite in filter.py
+   > 2009-02-10 22:04: write perl version (filter.pm)
+   > 2009-02-10 22:04: add to svn repo
+   > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
+      as a separate file
+
+- [2009-02-10] fab - flexible make-like utility: this will be based on
+      my tool framework and will provide a make-like system when make
+      is not available
+   + 2009-02-10 22:11: write python version
+   - 2009-02-10 22:12: feature: process rudimentary makefiles
+   + 2009-02-10 22:12: feature: self-extend from any file named
+      fabfile.py in the current directory
+
+- [2009-02-10] use fab to handle distribution of backscratcher
+
+- [2009-02-10] dt
+   > 2009-02-10 22:15: implement in python
+   > 2009-02-10 22:15: implement in perl
+   > 2009-02-10 22:16: add to svn repo
+   > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
+      as a separate file
+
+- [2009-10-24] when emacs runs under 'bzr commit', ^F causes the whole
+   thing to crash. Could this be fixed?
+
+- [2009-10-24] consider moving function run from fabfile.py to tpbtools.py
+
+- [2009-10-24] consider renaming tpbtools.py to something more
+   general. perhaps util.py for example.
+
+- === DONE ===============================================
++ [2009-10-24] rename tidy to ptidy
+
++ [2009-02-10] chron
+   + 2009-02-10 21:58: add license info
+   + 2009-02-10 21:58: write python version
+   + 2009-02-10 21:58: add to svn repo
+
++ [2009-10-24] correct address in all files currently containing
+   licensing info
+
++ [2009-02-10] calc
+   > 2009-02-10 21:58: write python version
+
++ [2009-02-10] figure out what to tell svn so that it won't show DODO
+   in response to svn stat
+

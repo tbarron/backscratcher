@@ -1,0 +1,171 @@
+#!/usr/bin/perl
+# ===========================================================================
+# wxfr - batch ftp processor
+#
+# History
+#  2005-12-25   tpb   1.0    written
+#  2007-02-18   tpb   1.1    comment header added 
+# ===========================================================================
+
+use Net::FTP;
+use File::Basename;
+
+($from, $to) = @ARGV;
+
+($fhost, $fuser, $fpath) = parse_path($from);
+($thost, $tuser, $tpath) = parse_path($to);
+
+$dfrom = reassemble($fhost, $fuser, $fpath);
+$dto = reassemble($thost, $tuser, $tpath);
+
+print("Sending $dfrom to $dto\n");
+
+if (($fhost eq "") && ($thost eq ""))
+{
+   # local copy
+}
+elsif (($fhost ne "") && ($thost eq ""))
+{
+   # get something
+}
+elsif (($fhost eq "") && ($thost ne ""))
+{
+   # put something
+   $passwd = get_passwd();
+   print("Connecting to $thost as $tuser...\n");
+
+   $ftp = Net::FTP->new($thost, Debug => 0)
+      or die "Cannot connect to '$thost': $@";
+
+   $ftp->login($tuser, $passwd);
+   $ftp->binary();
+
+   $dir = dirname($fpath);
+   $base = basename($fpath);
+   # print("dir = '$dir'; base = '$base'\n");
+
+   from_local_to_remote($ftp, $fpath, $tpath);
+
+   $ftp->quit;
+}
+elsif (($fhost ne "") && ($thost ne ""))
+{
+   # get something, then put it
+}
+else
+{
+   # should never get here
+}
+
+# ---------------------------------------------------------------------------
+sub from_local_to_remote
+{
+   my ($filename, $fpath, $ftp, $tpath, @list);
+
+   ($ftp, $fpath, $tpath) = @_;
+
+   if (-d $fpath)
+   {
+      # print("mkdir $tpath\n");
+      $ftp->mkdir($tpath);
+      print("cwd $tpath\n");
+      $ftp->cwd($tpath);
+      chdir($fpath);
+
+      @list = glob("*");
+
+      foreach $filename (@list)
+      {
+         print("Sending $filename...\n");
+         from_local_to_remote($ftp, $filename, basename($filename));
+      }
+
+      chdir("..");
+      $ftp->cdup();
+   }
+   else
+   {
+      # printf("cwd %s\n", dirname($tpath));
+      $ftp->cwd(dirname($tpath));
+
+      $ftp->put($fpath);
+   }
+}
+
+# ---------------------------------------------------------------------------
+sub get_passwd
+{
+   print("password: ");
+   system("stty -echo");
+   $rval = <STDIN>;
+   system("stty echo");
+   print("\n");
+   $rval =~ s/[\n\r]*$//;
+   return $rval;
+}
+
+# ---------------------------------------------------------------------------
+sub parse_path
+{
+   my ($host, $path, $user);
+
+   ($path) = @_;
+
+   $host = "";
+   $user = "";
+   $filepath = $path;
+   if ($path =~ /\@/)
+   {
+      ($user, $host, $filepath) = ($path =~ /([^\@]+)\@([^:]*):(.*)/);
+   }
+   return($host, $user, $filepath);
+}
+
+# ---------------------------------------------------------------------------
+sub reassemble
+{
+   my ($host, $path, $user);
+
+   ($host, $user, $path) = @_;
+
+   $rval = $path;
+   if ($host ne "")
+   {
+      $rval = sprintf("%s\@%s:%s", $user, $host, $path);
+   }
+
+   return $rval;
+}
+
+__END__
+
+=head1 NAME
+
+wxfr - batch ftp processor
+
+=head1 SYNOPSIS
+
+   wxfr <from> <to>
+
+   where <from> and <to> each consist of
+   [[<user>@]<host>:]<directory>.
+
+=head1 DESCRIPTION
+
+First <from> and <to> are each parsed into user, host, and directory. 
+
+Then a decision is made as to how the files should be copied. There
+are four possibilities:
+
+ * both source and sink are local
+
+ * source is local, sink is remote
+
+ * source is remote, sink is local
+
+ * both source and sink are remote
+
+Only "source local, sink remote" currently has active code. The other
+conditions are stubbed.
+
+=cut

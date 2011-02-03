@@ -1,0 +1,7 @@
+#!/usr/bin/python
+
+import sys
+import pytool
+
+if __name__ == '__main__':
+    pytool.main(sys.argv)

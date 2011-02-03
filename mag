@@ -1,0 +1,4 @@
+#!/usr/bin/python
+import sys
+import mag
+print mag.main(sys.argv)

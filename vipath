@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+
+if ($0 =~ /vipath$/)
+{
+   print "alias editpath=\"vipath;"
+      . " . /tmp/tpb.setpath;"
+      . " rm /tmp/tpb.setpath\"\n";
+}
+elsif ($0 =~ /editpath$/)
+{
+   $filename = "/tmp/tpb.path.edit";
+   open(EDITABLE, "> $filename");
+   foreach $piece (split(/:/, $ENV{PATH}))
+   {
+      print EDITABLE "$piece\n";
+   }
+   close(EDITABLE);
+
+   system("vi $filename");
+
+   open(EDITABLE, "< $filename");
+   @path = <EDITABLE>;
+   close(EDITABLE);
+   grep(chomp, @path);
+   unlink("$filename");
+
+   $filename = "/tmp/tpb.setpath";
+   open(SETPATH, "> $filename") 
+      || die "can't open $filename: $!";
+   print SETPATH "export PATH=", join(":", @path), "\n";
+   close(SETPATH);
+
+}
+
+__END__
+
+=head1 NAME
+
+vipath/editpath - edit $PATH in an editor file
+
+=head1 DESCRIPTION
+
+vipath allows for updating your $PATH environment variable with an editor.
+
+When run as 'vipath', the program will print the alias command needed to
+create the 'editpath' alias.
+
+When run as 'editpath', the program will write the current $PATH value
+to a file, one directory per line, and put you into an editor on the
+file (currently just vi).
+
+After save the file and exit the editor, the alias will source the
+edited file and delete it.
+
+=head1 LICENSE
+
+Copyright (C) 1995 - <the end of time>  Tom Barron
+  tom.barron@comcast.net
+  177 Crossroads Blvd
+  Oak Ridge, TN  37830
+
+This software is licensed under the CC-GNU GPL. For the full text of
+the license, see http://creativecommons.org/licenses/GPL/2.0/
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+=cut
+
