@@ -1,0 +1,27 @@
+                            Backscratcher
+
+"Every good work of software starts by scratching a developer's
+ personal itch."
+  - Eric Raymond
+
+This is a collection of small programs I have developed over the years
+to take care of various tasks on the computer. Perhaps the one I use
+most is 'tps' (turbo-ps), which lets me grep the output of ps with
+strings rather than pids.
+
+Another one I use a lot is fx (effects). It can do a number of tricks
+to issue a command on each of a collection of files, even commands
+that ordinarily only operate on a single file.
+
+        <complete list of programs and what they do goes here>
+
+You may notice that some of these are written in only perl while
+others have a python version and some are only in python. I learned
+perl first and used it alongside the tcl-based expect tool until I
+discovered python and realized that it provides pretty much everything
+perl and expect do in a single tool. I'm not a performance wonk, I
+just want to get the job done, so I didn't worry too much about
+whether python is as fast or efficient as perl. I just jumped in.
+
+So now I'm in the middle of converting all these programs to python.
+
