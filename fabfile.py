@@ -1,11 +1,12 @@
-'''
+"""
 local fab control file
 
 During dry runs, the functions list what they would do.
 
 During actual execution, functions are quiet unless -v/--verbose is used.
-'''
+"""
 import difflib
+import fnmatch
 import glob
 import os
 import pdb
@@ -15,7 +16,7 @@ from tpbtools import *
 
 # ---------------------------------------------------------------------------
 def fab_clean(args):
-    '''clean - remove generated files
+    """clean - remove generated files
 
     usage: fab clean [-e] [-v]
 
@@ -23,7 +24,7 @@ def fab_clean(args):
     -e/--exec on the command line, just do a dry run, reporting what
     would happen. During execution, function is silent unless
     -v/--verbose is specified.
-    '''
+    """
     p = OptionParser()
     p.add_option('-e', '--exec',
                  default=False, action='store_true', dest='xable',
@@ -53,13 +54,13 @@ def fab_clean(args):
 
 # ---------------------------------------------------------------------------
 def fab_dist(args):
-    '''dist - tar up this package for distribution
+    """dist - tar up this package for distribution
 
     usage: fab dist [-e] [=t filename]
 
     The files in the current package are packaged into a tar file. Without
     -e or --exec on the command line, does a dry run.
-    '''
+    """
     p = OptionParser()
     p.add_option('-e', '--exec',
                  default=False, action='store_true', dest='xable',
@@ -76,7 +77,7 @@ def fab_dist(args):
         
 # ---------------------------------------------------------------------------
 def fab_install(args):
-    '''install - put stuff from this package where they belong
+    """install - put stuff from this package where they belong
 
     usage: fab install [-e/--exec] [-v/--verbose]
 
@@ -89,7 +90,7 @@ def fab_install(args):
     file exists in its installed location, but is different from the
     package version. If 'N' is appended to the copy command, the file
     does not exist in the installed location.
-    '''
+    """
     p = OptionParser()
     p.add_option('-e', '--exec',
                  default=False, action='store_true', dest='xable',
@@ -126,7 +127,7 @@ def fab_install(args):
             
 # ---------------------------------------------------------------------------
 def fab_status(args):
-    '''status - report the status of the files in the current directory
+    """status - report the status of the files in the current directory
 
     usage: fab status
 
@@ -135,9 +136,11 @@ def fab_status(args):
       - installed (I),
       - installed but needs update (U),
       - not installed (F)
-
-    '''
+    """
     p = OptionParser()
+    p.add_option('-a', '--attention',
+                 default=False, action='store_true', dest='attention',
+                 help='report only files needing attention (-f -u)')
     p.add_option('-d', '--debug',
                  default=False, action='store_true', dest='debug',
                  help='start the debugger')
@@ -158,14 +161,20 @@ def fab_status(args):
     if o.debug:   pdb.set_trace()
     
     fl = files()
-    ll = glob.glob('*')
-    ll.sort()
-    
-    print('?: not in file list')
-    print('F: in the file list')
-    print('I: installed')
-    print('U: needs update')
+    if len(a) <= 0:
+        ll = glob.glob('*')
+        ll.sort()
+    else:
+        ll = a
+
+    if o.verbose:
+        print('?: not in file list')
+        print('F: in the file list, not installed')
+        print('I: installed')
+        print('U: installed, needs update')
     for filename in ll:
+        if ignorable(filename):
+            continue
         flag = '?'
         if filename in fl.keys():
             flag = 'F'
@@ -177,25 +186,26 @@ def fab_status(args):
                 if diff != []:
                     flag += 'U'
 
-        if o.updates and 'U' in flag:
+        if (o.updates or o.attention) and 'U' in flag:
             print(" %s %s" % (flag, filename))
         elif o.installed and 'I' in flag:
             print(" %s %s" % (flag, filename))
-        elif o.needed and 'F' in flag:
+        elif (o.needed or o.attention) and 'F' in flag:
             print(" %s %s" % (flag, filename))
-        elif not o.updates and not o.needed and not o.installed:
+        elif not o.updates and not o.needed \
+                 and not o.installed and not o.attention:
             print(" %s %s" % (flag, filename))
         
 # ---------------------------------------------------------------------------
 def fab_uninstall(args):
-    '''uninstall - remove files installed from this package
+    """uninstall - remove files installed from this package
 
     usage: fab uninstall [-e/--exec] [-v/--verbose]
 
     Remove files installed by this package. Function does a dry run
     and reports what it would do unless -e/--exec is specified. During
     execution, function is silent unless -v/--verbose is specified.
-    '''
+    """
     p = OptionParser()
     p.add_option('-e', '--exec',
                  default=False, action='store_true', dest='xable',
@@ -215,29 +225,22 @@ def fab_uninstall(args):
 
 # ---------------------------------------------------------------------------
 def files():
-    '''
+    """
     List of files to be maintained/distributed and where they should live.
 
     The entry for fabfile.py is needed so it will be distributed by the
     tarball routine, even though it should not be copied out during
     installation.
-    '''
-    flist = {'Dispatcher.pm' : '$HOME/lib/perl',
-             'Executor.pm'   : '$HOME/lib/perl',
-             'align'         : '$HOME/bin',
-             'align.pl'      : '$HOME/bin',
+    """
+    flist = {'align'         : '$HOME/bin',
              'align.py'      : '$HOME/bin',
              'ascii'         : '$HOME/bin',
-             'ascii.pl'      : '$HOME/bin',
              'ascii.py'      : '$HOME/bin',
              'calc'          : '$HOME/bin',
-             'calc.pl'       : '$HOME/bin',
              'calc.py'       : '$HOME/bin',
              'chron'         : '$HOME/bin',
-             'chron.pl'      : '$HOME/bin',
              'chron.py'      : '$HOME/bin',
              'dt'            : '$HOME/bin',
-             'dt.pl'         : '$HOME/bin',
              'dt.py'         : '$HOME/bin',
              'errno'         : '$HOME/bin',
              'fab'           : '$HOME/bin',
@@ -245,15 +248,12 @@ def files():
              'fabfile.py'    : '/dev/null',
              'filter.py'     : '$HOME/lib/python',
              'fl'            : '$HOME/bin',
-             'fl.pl'         : '$HOME/bin',
              'fl.py'         : '$HOME/bin',
              'fx'            : '$HOME/bin',
-             'fx.pl'         : '$HOME/bin',
              'fx.py'         : '$HOME/bin',
              'hd'            : '$HOME/bin',
-             'hd.pl'         : '$HOME/bin',
              'hd.py'         : '$HOME/bin',
-             'list'          : '$HOME/bin',
+             'list.py'       : '$HOME/bin',
              'magnitude'     : '$HOME/bin',
              'mag.py'        : '$HOME/bin',
              'mag'           : '$HOME/bin',
@@ -277,3 +277,22 @@ def files():
              'wxfr'          : '$HOME/bin'}
     return flist
 
+# ---------------------------------------------------------------------------
+def ignorable(filename):
+    """
+    Return True or False indicating whether to ignore filename.
+    """
+    for pat in ignore():
+        if fnmatch.fnmatchcase(filename, pat):
+            return True
+    return False
+
+# ---------------------------------------------------------------------------
+def ignore():
+    """
+    List of files to be ignored.
+    """
+    rval = ["DODO",
+            "README",
+            "*.pyc"]
+    return rval
