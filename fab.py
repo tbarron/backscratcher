@@ -1,5 +1,5 @@
 #!/usr/bin/python
-'''
+"""
 fabricate stuff
 
 For a list of things that can be fabricated,
@@ -44,7 +44,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-'''
+"""
 import os
 import re
 import sys
@@ -85,5 +85,16 @@ def fab_help(args):
 def prefix():
     return 'fab'
 
+# ---------------------------------------------------------------------------
 global d
 d = dir()
+
+sname = sys.argv[0]
+if sname.endswith('.py') and '-L' in sys.argv:
+    pname = re.sub('.py$', '', sname)
+    print("creating symlink: %s -> %s" % (pname, sname))
+    os.symlink(sname, pname)
+elif sname.endswith('.py') and __name__ == '__main__':
+    unittest.main()
+elif not sname.endswith('.py') and __name__ == '__main__':
+    main(sys.argv)
