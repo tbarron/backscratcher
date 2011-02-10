@@ -46,55 +46,12 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
 import os
+import pdb
 import re
 import sys
+import toolframe
 
 if os.path.exists('fabfile.py'):
     from fabfile import *
-    
-# ---------------------------------------------------------------------------
-def main(args):
-    eval("%s_%s(args[2:])" % (prefix(), args[1]))
-        
-# ---------------------------------------------------------------------------
-def fab_help(args):
-    '''help - show this list
-    
-    usage: fab help [function-name]
-    
-    If a function name is given, show the functions __doc__ member.
-    Otherwise, show a list of functions based on the first line of
-    each __doc__ member.
-    '''
-    global d
 
-    pfx = prefix()
-    try:
-        if '%s_%s' % (pfx, args[0]) in d:
-            print eval('%s_%s.__doc__' % (pfx, args[0]))
-            return
-        
-    except IndexError:
-        for o in d:
-            if '%s_' % pfx in o:
-                x = eval('%s.__doc__' % o)
-                f = x.split('\n')[0]
-                print '   ' + f
-
-# ---------------------------------------------------------------------------
-def prefix():
-    return 'fab'
-
-# ---------------------------------------------------------------------------
-global d
-d = dir()
-
-sname = sys.argv[0]
-if sname.endswith('.py') and '-L' in sys.argv:
-    pname = re.sub('.py$', '', sname)
-    print("creating symlink: %s -> %s" % (pname, sname))
-    os.symlink(sname, pname)
-elif sname.endswith('.py') and __name__ == '__main__':
-    unittest.main()
-elif not sname.endswith('.py') and __name__ == '__main__':
-    main(sys.argv)
+toolframe.tf_launch('fab')

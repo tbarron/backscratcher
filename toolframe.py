@@ -14,6 +14,24 @@ To use this, a script must
 
 History
    2011.0209   inception
+
+Copyright (C) 2011 - <the end of time>  Tom Barron
+  tom.barron@comcast.net
+  177 Crossroads Blvd
+  Oak Ridge, TN  37830
+
+This software is licensed under the CC-GNU GPL. For the full text of
+the license, see http://creativecommons.org/licenses/GPL/2.0/
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 """
 import os
 import pdb
@@ -83,8 +101,21 @@ def tf_launch(prefix):
     if sname.endswith('.py') and not os.path.exists(pname):
         print("creating symlink: %s -> %s" % (pname, sname))
         os.symlink(sname, pname)
-    elif sys._getframe(1).f_code.co_name == '?':
+    elif sys._getframe(1).f_code.co_name in ['?', '<module>']:
         if sname.endswith('.py'):
             unittest.main()
         else:
             tf_main(sys.argv, prefix=prefix)
+
+# ---------------------------------------------------------------------------
+def ez_launch(prefix):
+    sname = sys.argv[0]
+    pname = re.sub('.py$', '', sname)
+    if sname.endswith('.py') and not os.path.exists(pname):
+        print("creating symlink: %s -> %s" % (pname, sname))
+        os.symlink(sname, pname)
+    elif sys._getframe(1).f_code.co_name == '?':
+        if sname.endswith('.py'):
+            unittest.main()
+        else:
+            sys.modules['__main__'].main(sys.argv)

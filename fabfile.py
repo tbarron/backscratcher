@@ -129,13 +129,20 @@ def fab_install(args):
 def fab_status(args):
     """status - report the status of the files in the current directory
 
-    usage: fab status
+    usage: fab status [-a] [-i|-f|-u] [-v] [-d]
 
     For each file in the current directory, report whether it is
       - not in the list of files defined herein (?),
       - installed (I),
       - installed but needs update (U),
       - not installed (F)
+
+    Options
+     -a   report only files that need attention (-f + -u)
+     -i   report only installed files
+     -f   report only uninstalled files in the list
+     -u   report only files that need updates
+     -v   show the legend
     """
     p = OptionParser()
     p.add_option('-a', '--attention',
