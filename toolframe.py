@@ -108,13 +108,13 @@ def tf_launch(prefix):
             tf_main(sys.argv, prefix=prefix)
 
 # ---------------------------------------------------------------------------
-def ez_launch(prefix):
+def ez_launch():
     sname = sys.argv[0]
     pname = re.sub('.py$', '', sname)
     if sname.endswith('.py') and not os.path.exists(pname):
         print("creating symlink: %s -> %s" % (pname, sname))
         os.symlink(sname, pname)
-    elif sys._getframe(1).f_code.co_name == '?':
+    elif sys._getframe(1).f_code.co_name in ['?', '<module>']:
         if sname.endswith('.py'):
             unittest.main()
         else:

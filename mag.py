@@ -1,5 +1,5 @@
 #!/usr/bin/python
-'''
+"""
 Report the magnitude of large numbers.
 
 SYNOPSIS
@@ -18,14 +18,34 @@ EXAMPLES
 
    $ mag 2348291384 -b
    2348291384 = 2.19 Gib
-'''
+
+Copyright (C) 2010 - <the end of time>  Tom Barron
+  tom.barron@comcast.net
+  177 Crossroads Blvd
+  Oak Ridge, TN  37830
+
+This software is licensed under the CC-GNU GPL. For the full text of
+the license, see http://creativecommons.org/licenses/GPL/2.0/
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+"""
 
 import sys
+import toolframe
 import unittest
 
 from optparse import *
 
-def main(argv = None):
+# ---------------------------------------------------------------------------
+def main(argv = None, testing=False):
     if argv == None:
         argv = sys.argv
 
@@ -46,7 +66,7 @@ def main(argv = None):
     units.reverse()
 
     if len(a) < 2:
-        return usage()
+        rval = usage()
     else:
         val = float(a[1])
         u = units.pop()
@@ -54,52 +74,61 @@ def main(argv = None):
             val /= divisor
             u = units.pop()
 
-        return("%s = %3.2f %s" % (a[1], val, u))
+        rval = "%s = %3.2f %s" % (a[1], val, u)
 
+    if testing:
+        return(rval)
+    else:
+        print rval
+
+# ---------------------------------------------------------------------------
 def usage():
-    return '''
+    return """
     mag [-b] <number>
-    '''
 
+    With -b, use a divisor of 1024. Otherwise, use 1000.
+    """
+
+# ---------------------------------------------------------------------------
 class MagTest(unittest.TestCase):
     def test_usage(self):
-        a = main(['./mag'])
+        a = main(['./mag'], True)
         assert(a == usage())
 
     def test_bit(self):
-        a = main(['./mag', '999'])
+        a = main(['./mag', '999'], True)
         self.magtest('999 = 999.00 b')
 
     def test_bbit(self):
-        a = main(['./mag', '999', '-b'])
+        a = main(['./mag', '999', '-b'], True)
         self.magtest('999 = 999.00 b')
 
     def test_kilo(self):
-        a = main(['./mag', '98765'])
+        a = main(['./mag', '98765'], True)
         self.magtest('98765 = 98.77 Kb')
 
     def test_bkilo(self):
-        a = main(['./mag', '-b', '98765'])
+        a = main(['./mag', '-b', '98765'], True)
         self.magtest('98765 = 96.45 Kib')
 
     def test_mega(self):
-        a = main(['./mag', '98765432'])
+        a = main(['./mag', '98765432'], True)
         self.magtest('98765432 = 98.77 Mb')
 
     def test_bmega(self):
-        a = main(['./mag', '-b', '98765432'])
+        a = main(['./mag', '-b', '98765432'], True)
         self.magtest('98765432 = 94.19 Mib')
 
     def test_giga(self):
-        a = main(['./mag', '12398765432'])
+        a = main(['./mag', '12398765432'], True)
         self.magtest('12398765432 = 12.40 Gb')
 
     def test_bgiga(self):
-        a = main(['./mag', '-b', '12398765432'])
+        a = main(['./mag', '-b', '12398765432'], True)
         self.magtest('12398765432 = 11.55 Gib')
 
     def test_tera(self):
-        a = main(['./mag', '12390008765432'])
+        a = main(['./mag', '12390008765432'], True)
         self.magtest('12390008765432 = 12.39 Tb')
 
     def test_btera(self):
@@ -137,12 +166,12 @@ class MagTest(unittest.TestCase):
         else:
             args = ['./mag', v]
             
-        a = main(args)
+        a = main(args, True)
         try:
             assert(a == string)
         except AssertionError:
             print "\nexpected: '%s'" % a
             print "result:   '%s'" % string
         
-if __name__ == '__main__':
-    unittest.main()
+# ---------------------------------------------------------------------------
+toolframe.ez_launch()
