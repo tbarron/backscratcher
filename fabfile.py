@@ -267,6 +267,7 @@ def files():
              'scanpath'      : '$HOME/bin',
              'summarize'     : '$HOME/bin',
              'testhelp.py'   : '$HOME/lib/python',
+             'toolframe.py'  : '$HOME/lib/python',
              'tpbtools.py'   : '$HOME/bin',
              'tps'           : '$HOME/bin',
              'truth_table'   : '$HOME/bin',
