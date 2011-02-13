@@ -34,10 +34,18 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-'''
+"""
 import toolframe
 
 def main(args):
-    print args
+    for str in args[1:]:
+        if str.startswith("0x"):
+            val = int(str, 16)
+        elif str.startswith("0"):
+            val = int(str, 8)
+        else:
+            val = int(str)
 
+        print("%s -> 0%o / %d / 0x%x" % (str, val, val, val))
+        
 toolframe.ez_launch()

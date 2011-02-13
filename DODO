@@ -1,10 +1,3 @@
-- [2009-02-10] odx
-   + 2009-02-10 21:59: add license info
-   > 2009-02-10 21:59: write python version
-   + 2009-02-10 21:59: add to git repo
-   > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
-      as a separate file
-
 - [2009-02-10] replay
    > 2009-02-10 21:59: add license info
    > 2009-02-10 21:59: write python version
@@ -111,6 +104,13 @@
 - [2011.0202] add tests to hd
 
 - === DONE ===============================================
++ [2009-02-10] odx
+   + 2009-02-10 21:59: add license info
+   + 2009-02-10 21:59: write python version
+   + 2009-02-10 21:59: add to git repo
+   + 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
+      as a separate file
+
 + [2009-02-10] hd
    + 2009-02-10 21:58: add license info
    + 2009-02-10 21:58: write python version

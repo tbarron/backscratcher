@@ -96,6 +96,8 @@ def tf_help(A, prefix=None):
 
 # ---------------------------------------------------------------------------
 def tf_launch(prefix):
+    if len(sys.argv) == 1 and sys.argv[0] == '':
+        return
     sname = sys.argv[0]
     pname = re.sub('.py$', '', sname)
     if sname.endswith('.py') and not os.path.exists(pname):
@@ -109,6 +111,8 @@ def tf_launch(prefix):
 
 # ---------------------------------------------------------------------------
 def ez_launch():
+    if len(sys.argv) == 1 and sys.argv[0] == '':
+        return
     sname = sys.argv[0]
     pname = re.sub('.py$', '', sname)
     if sname.endswith('.py') and not os.path.exists(pname):
