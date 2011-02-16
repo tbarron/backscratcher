@@ -439,12 +439,11 @@ def timeclose(C, last, when, all=False):
     'start' and 'end' members of the interval. If 'all' is True, scan
     the whole structure for time intervals needing closeout.
     """
-    # if last == '%#% ALL %#%':
     if all:
         klist = C.keys()
         for key in klist:
             cat = category(key)
-            if cat != key:
+            if cat != key or ':' not in key:
                 reset_category_total(C, cat)
 
         if last != 'COB' and last != None:
@@ -457,7 +456,7 @@ def timeclose(C, last, when, all=False):
 
         for key in klist:
             cat = category(key)
-            if cat != key:
+            if (cat != key or ':' not in key) and key != 'COB':
                 try:
                     increment_category_total(C, cat, C[key]['length'])
                 except KeyError, e:
@@ -509,7 +508,7 @@ def category(task):
     try:
         [cat] = re.findall(r'([^:]+):?.*', task)
     except ValueError:
-        cat = ''
+        cat = task
 
     if verbose():
         # print 'category: catgory(%s) -> %s' % (task, cat)
@@ -864,7 +863,10 @@ class workrptTest(unittest.TestCase):
 
         r = write_report('XYZ', '2009.0721', '2009.0724', False, True)
         os.unlink('XYZ')
-        assert('32:30:06' in r)
+        try:
+            assert('32:30:06' in r)
+        except AssertionError:
+            print r
 
     def test_week_ending(self):
         tlist = {'yesterday': time.time() - 24*3600,
