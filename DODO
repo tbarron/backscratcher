@@ -77,7 +77,7 @@
    > 2010-11-27 12:33: add -L code to link $@ -> $@.py, get rid of $@
       as a separate file
 
-- [2009-10-24] when emacs runs under 'bzr commit', ^F causes the whole
+- [2009-10-24] when emacs runs under 'git commit', ^G causes the whole
    thing to crash. Could this be fixed?
 
 - [2009-10-24] consider moving function run from fabfile.py to tpbtools.py
