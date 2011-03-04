@@ -889,7 +889,6 @@ class workrptTest(unittest.TestCase):
         f.close()
 
         r = write_report('XYZ', '2009.0721', '2009.0724', False, True)
-        print r
         os.unlink('XYZ')
         try:
             assert('23.10' not in r)
