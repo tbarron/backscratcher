@@ -48,4 +48,4 @@ def main(args):
 
         print("%s -> 0%o / %d / 0x%x" % (str, val, val, val))
         
-toolframe.ez_launch()
+toolframe.ez_launch(main)

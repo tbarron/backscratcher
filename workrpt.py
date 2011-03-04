@@ -40,6 +40,7 @@ import pdb
 import re
 import sys
 import time
+import toolframe
 import unittest
 
 from optparse import *
@@ -201,15 +202,9 @@ def hms(seconds):
 
 # ---------------------------------------------------------------------------
 def fph(seconds):
-    minutes = int(seconds/60)
-    seconds = seconds - 60 * minutes
-
-    hours = int(minutes/60)
-    minutes = minutes - 60 * hours
-
-    fh = (minutes + 1) / 6;
+    hours = float(seconds)/3600.0;
     
-    return '%d.%d' % (hours, fh)
+    return '%3.1f' % (hours)
 
 # ---------------------------------------------------------------------------
 def intify(list):
@@ -839,6 +834,7 @@ class workrptTest(unittest.TestCase):
         assert(parse_ymd(target) == s[0:3])
 
     def test_standalone_category(self):
+        # pdb.set_trace()
         lines = '''-- Tuesday
 2009-07-21 08:30:28 admin: setup
 2009-07-21 08:35:34 admin: liason
@@ -867,6 +863,45 @@ class workrptTest(unittest.TestCase):
             assert('32:30:06' in r)
         except AssertionError:
             print r
+
+    def test_rounding(self):
+        # pdb.set_trace()
+        lines = '''-- Tuesday
+2009-07-21 08:30:28 admin: setup
+2009-07-21 08:35:34 admin: liason
+2009-07-21 17:00:34 COB
+
+-- Wednesday
+2009-07-22 08:35:59 vacation
+2009-07-22 16:34:59 COB
+
+-- Thursday
+2009-07-23 08:35:59 vacation
+2009-07-23 16:35:59 COB
+
+-- Friday
+2009-07-24 08:35:59 vacation
+2009-07-24 16:35:59 COB
+'''
+        verbose(False, True)
+        f = open('XYZ', 'w')
+        f.write(lines)
+        f.close()
+
+        r = write_report('XYZ', '2009.0721', '2009.0724', False, True)
+        print r
+        os.unlink('XYZ')
+        try:
+            assert('23.10' not in r)
+        except AssertionError:
+            print r
+            raise
+
+        try:
+            assert('24.0' in r)
+        except AssertionError:
+            print r
+            raise
 
     def test_week_ending(self):
         tlist = {'yesterday': time.time() - 24*3600,
@@ -994,5 +1029,4 @@ class workrptTest(unittest.TestCase):
             raise
         
 # ---------------------------------------------------------------------------
-if __name__ == '__main__':
-    unittest.main()
+toolframe.ez_launch(main)

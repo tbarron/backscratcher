@@ -4,17 +4,48 @@ toolframe - creating a script with commandline-callable subfunctions
 
 To use this, a script must
 
+To build a tool-style program (i.e., one with multiple entry points
+that can be called individually from the command line with a list of
+options and arguments):
+
     * provide a prefix() routine that returns the prefix that will
-      indicate and callable subfunction
+      indicate command line callable subfunctions
 
     * provide a collection of callable subfunctions with names like
       '%s_callme' % prefix()
 
-    * call toolframe.tf_launch() (no args) outside any function
+    * Call toolframe.tf_launch() (no args) outside any function
+
+    * Additional features:
+    
+       * When run as 'program.py -L', symlink program -> program.py is
+         created so the program can be easily called from the command
+         line without typing the .py suffix.
+
+       * When run as 'program.py', any unittest cases that are defined
+         will be run.
+
+       * When run as 'program subfunc <options> <arguments>',
+         subfunction prefix_subfunc will be called.
+
+Non-tool-style programs can call toolfram.ez_launch(main) to get the
+following:
+
+    * When run as 'program.py -L', a symlink program -> program.py
+      will be created so the program can be easily called from the
+      command line.
+
+    * When run as 'program.py', any unittest test cases defined will
+      be run.
+
+    * When run as 'program <options> <args>', routine main (the one
+      passed to ez_launch) will be called with sys.argv as an
+      argument.
 
 History
    2011.0209   inception
-
+   2011.0304   figured out to pass routine main to ez_launch
+   
 Copyright (C) 2011 - <the end of time>  Tom Barron
   tom.barron@comcast.net
   177 Crossroads Blvd
@@ -110,7 +141,8 @@ def tf_launch(prefix):
             tf_main(sys.argv, prefix=prefix)
 
 # ---------------------------------------------------------------------------
-def ez_launch():
+def ez_launch(main = None):
+    # pdb.set_trace()
     if len(sys.argv) == 1 and sys.argv[0] == '':
         return
     sname = sys.argv[0]
@@ -121,5 +153,7 @@ def ez_launch():
     elif sys._getframe(1).f_code.co_name in ['?', '<module>']:
         if sname.endswith('.py'):
             unittest.main()
+        elif main == None:
+            raise StandardError("Pass your main routine to ez_launch")
         else:
-            sys.modules['__main__'].main(sys.argv)
+            main(sys.argv)

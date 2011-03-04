@@ -275,7 +275,6 @@ def files():
              'truth_table'   : '$HOME/bin',
              'vipath'        : '$HOME/bin',
              'wcal'          : '$HOME/bin',
-             'workrpt'       : '$HOME/bin',
              'workrpt.py'    : '$HOME/bin',
              'wxfr'          : '$HOME/bin'}
     return flist
