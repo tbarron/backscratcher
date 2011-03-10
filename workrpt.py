@@ -220,6 +220,8 @@ def interpret_options(o):
         raise Exception('--last and --start or --end are not compatible')
     elif (o.weektype != '') and ((o.start_ymd != '') or (o.end_ymd != '')):
         raise Exception('--week and --start or --end are not compatible')
+    elif (o.since != '') and (o.start_ymd != ''):
+        raise Exception('--since and --start are not compatible')
     elif (re.search('^[fcMTWtFsS]$', o.weektype)) \
              and (o.start_ymd == '') \
              and (o.end_ymd == ''):
@@ -238,6 +240,9 @@ def interpret_options(o):
         end = o.end_ymd
         # start = ymd(parse_ymd(o.start_ymd))
         # end = ymd(parse_ymd(o.end_ymd))
+    elif (o.since != ''):
+        start = o.since
+        end = time.strftime("%Y.%m%d", time.localtime())
     else:
         (start, x) = week_starting_last(day_offset('M'), 0)
         end = time.strftime("%Y.%m%d", time.localtime())
@@ -290,6 +295,9 @@ def makeOptionParser(argv):
     p.add_option('-s', '--start',
                  action='store', dest='start_ymd', type='string', default='',
                  help='start date for report YYYY.MMDD')
+    p.add_option('-S', '--since',
+                 action='store', dest='since', type='string', default='',
+                 help='report date YYYY.MMDD through end of file')
     p.add_option('-w', '--week',
                  action='store', dest='weektype', type='string', default='',
                  help='one of [fcMTWtFsS]')
@@ -735,6 +743,27 @@ class workrptTest(unittest.TestCase):
             (start, end) = interpret_options(o)
         except Exception, e:
             assert(str(e) == '--last and --start or --end are not compatible')
+            success = True
+        assert(success)
+        
+    def test_interpret_options_since(self):
+        (o, a) = makeOptionParser(['--since', '2009.0501'])
+        success = False
+        try:
+            (start, end) = interpret_options(o)
+            assert(start == '2009.0501')
+            assert(end == time.strftime('%Y.%m%d'))
+            success = True
+        except Exception, e:
+            success = False
+        assert(success)
+
+        success = False
+        (o, a) = makeOptionParser(['-s', '2010.0101', '-S', '2010.1231'])
+        try:
+            (start, end) = interpret_options(o)
+        except Exception, e:
+            assert(str(e) == '--since and --start are not compatible')
             success = True
         assert(success)
         
