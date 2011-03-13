@@ -32,6 +32,8 @@ GNU General Public License for more details.
 import os
 import re
 import sys
+import testhelp
+import toolframe
 import unittest
 
 from optparse import *
@@ -87,16 +89,8 @@ def hexdump(input):
 # ---------------------------------------------------------------------------
 class HdTest(unittest.TestCase):
     def test_example(self):
-        pass
+        print("hd needs more tests")
+        assert(False)
 
 # ---------------------------------------------------------------------------
-sname = sys.argv[0]
-if sname.endswith('.py') and '-L' in sys.argv:
-    pname = re.sub('.py$', '', sname)
-    print("creating symlink: %s -> %s" % (pname, sname))
-    os.symlink(sname, pname)
-elif sname.endswith('.py') and __name__ == '__main__':
-    if not testhelp.main(sys.argv):
-        cleanup_tests()
-elif not sname.endswith('.py'):
-    main(sys.argv)
+toolframe.ez_launch(main)

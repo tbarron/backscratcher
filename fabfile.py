@@ -268,7 +268,7 @@ def files():
              'replay.py'     : '$HOME/bin',
              'rxlab'         : '$HOME/bin',
              'scanpath'      : '$HOME/bin',
-             'summarize'     : '$HOME/bin',
+             'summarize.pl'  : '$HOME/bin',
              'testhelp.py'   : '$HOME/lib/python',
              'toolframe.py'  : '$HOME/lib/python',
              'tpbtools.py'   : '$HOME/bin',
