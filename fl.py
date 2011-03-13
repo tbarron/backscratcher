@@ -111,15 +111,10 @@ import sys
 import tpbtools
 import testhelp
 import time
+import toolframe
 import unittest
 
 from optparse import *
-
-# ---------------------------------------------------------------------------
-def main(args):
-    op = args[1]
-    cmd = "fl_%s(args[2:])" % op
-    eval(cmd)
 
 # ---------------------------------------------------------------------------
 def fl_help(args):
@@ -426,17 +421,4 @@ class FLTests(unittest.TestCase):
         assert(s[stat.ST_ATIME] == s[stat.ST_MTIME])
 
 # ---------------------------------------------------------------------------
-global d
-d = dir()
-        
-sname = sys.argv[0]
-if sname.endswith('.py') and '-L' in sys.argv:
-    pname = re.sub('.py$', '', sname)
-    print("creating symlink: %s -> %s" % (pname, sname))
-    os.symlink(sname, pname)
-elif sname.endswith('.py') and __name__ == '__main__':
-    if not testhelp.main(sys.argv):
-        cleanup_tests()
-elif not sname.endswith('.py'):
-    main(sys.argv)
-                                
+toolframe.tf_launch('fl')

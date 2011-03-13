@@ -136,7 +136,7 @@ def tf_launch(prefix):
         os.symlink(sname, pname)
     elif sys._getframe(1).f_code.co_name in ['?', '<module>']:
         if sname.endswith('.py'):
-            unittest.main()
+            testhelp.main(sys.argv)
         else:
             tf_main(sys.argv, prefix=prefix)
 
