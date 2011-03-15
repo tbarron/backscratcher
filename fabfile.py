@@ -239,6 +239,11 @@ def files():
     tarball routine, even though it should not be copied out during
     installation.
     """
+    
+#    flist = {'align'         : {'loc': '$HOME/bin', 'testable': False},
+#             'align.py'      : {'loc': '$HOME/bin', 'testable': False},
+#             'ascii'         : {'loc': '$HOME/bin', 'testable': False},
+#             'ascii.py'      : {'loc': '$HOME/bin', 'testable': False},
     flist = {'align'         : '$HOME/bin',
              'align.py'      : '$HOME/bin',
              'ascii'         : '$HOME/bin',
