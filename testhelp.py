@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import os
 import pexpect
 import sys
 import unittest
@@ -93,6 +94,15 @@ def expectVSgot(expected, got):
             print "GOT:      '%s'" % got
             raise e
         
+# ---------------------------------------------------------------------------
+def into_test_dir():
+    tdname = '_test.%d' % os.getpid()
+    bname = os.path.basename(os.getcwd())
+    if bname != tdname:
+        os.mkdir(tdname)
+        os.chdir(tdname)
+    return tdname
+
 # ---------------------------------------------------------------------------
 def list_tests(a, final, testlist):
     if len(a) <= 1:

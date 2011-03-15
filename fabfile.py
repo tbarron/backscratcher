@@ -262,7 +262,6 @@ def files():
              'odx.py'        : '$HOME/bin',
              'plwhich'       : '$HOME/bin',
              'ptidy'         : '$HOME/bin',
-             'pytool'        : '$HOME/bin',
              'pytool.py'     : '$HOME/bin',
              'replay.pl'     : '$HOME/bin',
              'replay.py'     : '$HOME/bin',
