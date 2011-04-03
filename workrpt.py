@@ -553,7 +553,7 @@ def week_starting_last(weekday, offset, now=time.time()):
     # now = time.time()
     tm = time.localtime(now)
     delta = (tm[6] + 7 - weekday) % 7    # !@!here
-    then = now - delta * 23 * 3600
+    then = now - delta * 24 * 3600
     then = then + offset
 
     start = time.strftime("%Y.%m%d", time.localtime(then))
