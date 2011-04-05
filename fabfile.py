@@ -240,15 +240,11 @@ def files():
     installation.
     """
     
-#    flist = {'align'         : {'loc': '$HOME/bin', 'testable': False},
-#             'align.py'      : {'loc': '$HOME/bin', 'testable': False},
-#             'ascii'         : {'loc': '$HOME/bin', 'testable': False},
+#    flist = {'align.py'      : {'loc': '$HOME/bin', 'testable': False},
 #             'ascii.py'      : {'loc': '$HOME/bin', 'testable': False},
-    flist = {'align'         : '$HOME/bin',
-             'align.py'      : '$HOME/bin',
-             'ascii'         : '$HOME/bin',
+#             'calc.py'       : {'loc': '$HOME/bin', 'testable': True},
+    flist = {'align.py'      : '$HOME/bin',
              'ascii.py'      : '$HOME/bin',
-             'calc'          : '$HOME/bin',
              'calc.py'       : '$HOME/bin',
              'chron'         : '$HOME/bin',
              'chron.py'      : '$HOME/bin',

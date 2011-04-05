@@ -37,7 +37,9 @@ GNU General Public License for more details.
 '''
 import re
 import sys
+import toolframe
 
+# ---------------------------------------------------------------------------
 def main(A):
     lines = [l.strip() for l in sys.stdin.readlines()]
     width = []
@@ -60,3 +62,5 @@ def main(A):
             oline = oline + fmt % f[i]
         print oline
 
+# ---------------------------------------------------------------------------
+toolframe.ez_launch(main)

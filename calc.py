@@ -28,11 +28,14 @@ GNU General Public License for more details.
 '''
 
 import getopt
+import pexpect
 import sys
+import toolframe
 import unittest
 
 from optparse import *
 
+# ---------------------------------------------------------------------------
 def main(argv = None):
     if argv == None:
         argv = sys.argv
@@ -62,9 +65,31 @@ def main(argv = None):
         print ''
         sys.exit(0)
         
+# ---------------------------------------------------------------------------
 class CalcTest(unittest.TestCase):
     def test_example(self):
-        pass
+        S = pexpect.spawn("./calc")
+        # S.logfile = sys.stdout
+        S.expect("> ")
 
-if __name__ == '__main__':
-    unittest.main()
+        S.sendline("7 + 12")
+        S.expect("> ")
+
+        assert("19" in S.before)
+
+        S.sendline("7.988 + 28.576")
+        S.expect("> ")
+
+        assert("36.564000" in S.before)
+
+        S.sendline("\"zap\" * 2")
+        S.expect("> ")
+
+        assert("zapzap" in S.before)
+        
+        S.sendline("exit()")
+        S.expect(pexpect.EOF)
+        S.close()
+
+# ---------------------------------------------------------------------------
+toolframe.ez_launch(main)
