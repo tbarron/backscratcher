@@ -246,7 +246,6 @@ def files():
     flist = {'align.py'      : '$HOME/bin',
              'ascii.py'      : '$HOME/bin',
              'calc.py'       : '$HOME/bin',
-             'chron'         : '$HOME/bin',
              'chron.py'      : '$HOME/bin',
              'dt'            : '$HOME/bin',
              'dt.py'         : '$HOME/bin',

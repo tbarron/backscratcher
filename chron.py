@@ -34,10 +34,12 @@ GNU General Public License for more details.
 import os
 import sys
 import time
+import toolframe
 import unittest
 
 from optparse import *
 
+# ---------------------------------------------------------------------------
 def main(argv = None):
     if argv == None:
         argv = sys.argv
@@ -115,5 +117,5 @@ class ChronTest(unittest.TestCase):
     def test_example(self):
         pass
 
-if __name__ == '__main__':
-    unittest.main()
+# ---------------------------------------------------------------------------
+toolframe.ez_launch(main)
