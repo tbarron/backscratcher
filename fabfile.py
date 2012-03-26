@@ -60,6 +60,8 @@ def fab_dist(args):
 
     The files in the current package are packaged into a tar file. Without
     -e or --exec on the command line, does a dry run.
+
+    The default location for the output tarball is /tmp/backscratcher.tar.gz.
     """
     p = OptionParser()
     p.add_option('-e', '--exec',
@@ -72,6 +74,7 @@ def fab_dist(args):
 
     fl = files()
     f = fl.keys()
+    f.sort()
     fstring = ' '.join(f)
     run('tar zcvf %s %s' % (o.tarball, fstring), o.xable)
         
@@ -297,5 +300,6 @@ def ignore():
     """
     rval = ["DODO",
             "README",
+            "fabfile.py",
             "*.pyc"]
     return rval
