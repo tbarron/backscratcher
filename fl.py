@@ -170,34 +170,6 @@ def fl_diff(args):
         tpbtools.run(cmd, o.xable)
     
 # ---------------------------------------------------------------------------
-def fl_ls(args):
-    """ls - like ls, but make dates and file sizes more readable
-
-    usage: fl ls [options] <filespec> ...
-
-    """
-    p = OptionParser()
-    p.add_option('-l',
-                 default=False, action='store_true', dest='long',
-                 help='long listing')
-    (o,a) = p.parse_args(args)
-
-    try:
-        if o.long:
-            for fname in a:
-                long_listing(fname)
-        else:
-            for fname in a:
-                print(fname)
-    except Exception, e:
-        print("failed in fl_ls: (%s)%s" % (type(e), str(e)))
-        sys.exit(1)
-
-# ---------------------------------------------------------------------------
-def long_listing(filename):
-    pass
-
-# ---------------------------------------------------------------------------
 def fl_revert(args):
     """revert - revert <file> back to its most recent saved version
 
