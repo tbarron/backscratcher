@@ -261,6 +261,7 @@ def files():
              'mag.py'        : '$HOME/bin',
              'odx.py'        : '$HOME/bin',
              'plwhich'       : '$HOME/bin',
+             'pstrack'       : '$HOME/bin',
              'ptidy'         : '$HOME/bin',
              'pytool.py'     : '$HOME/bin',
              'replay.pl'     : '$HOME/bin',
