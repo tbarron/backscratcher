@@ -56,7 +56,7 @@ def fab_clean(args):
 def fab_dist(args):
     """dist - tar up this package for distribution
 
-    usage: fab dist [-e] [=t filename]
+    usage: fab dist [-e] [-t filename]
 
     The files in the current package are packaged into a tar file. Without
     -e or --exec on the command line, does a dry run.
