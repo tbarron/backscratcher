@@ -27,25 +27,24 @@ import glob
 import os
 import pdb
 import re
-import subprocess
 import sys
 import toolframe
 import unittest
 
 from optparse import *
 
+try:
+    subproc_available = True
+    import subprocess
+except:
+    subproc_available = False
+
 # ---------------------------------------------------------------------------
 def main(args):
     p = OptionParser()
-#     p.add_option('-b', '--background',
-#                  action='store_true', default=False, dest='background',
-#                  help='put the session in the background')
     p.add_option('-d', '--debug',
                  action='store_true', default=False, dest='debug',
                  help='start the debugger')
-#     p.add_option('-t', '--tunnel',
-#                  action='store', dest='tunnel',
-#                  help='port to use for tunnel')
 #     p.add_option('-v', '--verbose',
 #                  action='store_true', default=False, dest='verbose',
 #                  help='report more of what is going on')
@@ -80,15 +79,20 @@ def get_process_list():
             d['cmd'] = get_cmd(pdir)
             pd[d['pid']] = d
     else:
-        p = subprocess.Popen("ps -ef".split(),
-                             stdin=None,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.STDOUT)
-        (out, err) = p.communicate()
-        ptxt = out.split('\n')
+        if subproc_available:
+            p = subprocess.Popen("ps -ef".split(),
+                                 stdin=None,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.STDOUT)
+            (out, err) = p.communicate()
+            ptxt = out.split('\n')
+        else:
+            p = os.popen("ps -ef", "r")
+            ptxt = [x.strip('\n') for x in p.readlines()]
+            
         rgx = r'\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)' \
               + '\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)'
-        for pline in out.split('\n'):
+        for pline in ptxt:
             q = re.search(rgx, pline)
             d = {}
             if q:
