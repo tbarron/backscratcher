@@ -614,6 +614,7 @@ def write_report(filename, start, end, dayflag, testing=False):
         print "write_report: dayflag = %s" % dayflag
 
     rval = ''
+    last = None
     if dayflag:
         day = start
         while day <= end:
@@ -624,7 +625,7 @@ def write_report(filename, start, end, dayflag, testing=False):
                 if lastc != None:
                     last = lastc
             f.close()
-            if last in C.keys():
+            if last != None and last in C.keys():
                 timeclose(C, last, time.time(), True)
             rval = rval + format_report(day, day, C, testing)
             day = next_day(day)
@@ -927,6 +928,33 @@ class workrptTest(unittest.TestCase):
 
         try:
             assert('24.0' in r)
+        except AssertionError:
+            print r
+            raise
+
+    def test_start_date_missing(self):
+        #pdb.set_trace()
+        lines = '''-- Friday
+2012-04-13 08:30:48 3op3arst: trouble-shooting production logc
+2012-04-13 14:16:34 3op3sysp: e-mail
+2012-04-13 15:45:03 3op3arst: bug 1476
+2012-04-13 17:55:00 COB
+'''
+        verbose(False, True)
+        f = open('XYZ', 'w')
+        f.write(lines)
+        f.close()
+
+        r = write_report('XYZ', '2012.0407', '2012.0413', True, True)
+        os.unlink('XYZ')
+        try:
+            assert('23.10' not in r)
+        except AssertionError:
+            print r
+            raise
+
+        try:
+            assert('09:24:12 (9.4)' in r)
         except AssertionError:
             print r
             raise
