@@ -62,13 +62,24 @@ def main(args):
         
 # ---------------------------------------------------------------------------
 def get_process_list():
-    mypid = os.getpid()
-    pdir = "/proc/%d" % mypid
-    if os.path.exists(pdir):
+    """
+    Build a process tree of the form
+
+       pd = {pid1: {'pid': pid1, 'ppid': parent-pid, 'cmd': command},
+             pid2: {'pid': pid2, 'ppid': parent-pid, 'cmd': command},
+             ...}
+    """
+    pd = {}
+    if os.path.exists("/proc/%d" % os.getpid()):
         # We have a /proc directory -- get the tree from there
-        pass
+        procs = glob.glob("/proc/[0-9]*")
+        for pdir in procs:
+            d = {}
+            d['pid'] = pdir.replace("/proc/", "")
+            d['ppid'] = get_ppid(pdir)
+            d['cmd'] = get_cmd(pdir)
+            pd[d['pid']] = d
     else:
-        # We don't have a /proc dir -- have to call ps
         p = subprocess.Popen("ps -ef".split(),
                              stdin=None,
                              stdout=subprocess.PIPE,
@@ -77,17 +88,32 @@ def get_process_list():
         ptxt = out.split('\n')
         rgx = r'\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)' \
               + '\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)'
-        pd = {}
         for pline in out.split('\n'):
-            d = {}
             q = re.search(rgx, pline)
+            d = {}
             if q:
                 d['pid'] = q.groups()[1]
                 d['ppid'] = q.groups()[2]
                 d['cmd'] = q.groups()[7]
                 pd[d['pid']] = d
                 
-        return pd
+    return pd
+
+# ---------------------------------------------------------------------------
+def get_cmd(pdir):
+    f = open("%s/cmdline" % pdir)
+    line = f.readline()
+    f.close()
+    rval = line.replace("\000", " ").strip()
+    return rval
+
+# ---------------------------------------------------------------------------
+def get_ppid(pdir):
+    f = open("%s/stat" % pdir)
+    line = f.readline()
+    f.close()
+    rval = line.split()[3]
+    return rval
 
 # ---------------------------------------------------------------------------
 def usage():
