@@ -267,6 +267,7 @@ def files():
              'pstrack.py'    : '$HOME/bin',
              'ptidy'         : '$HOME/bin',
              'pytool.py'     : '$HOME/bin',
+             'pywhich.py'    : '$HOME/bin',
              'replay.pl'     : '$HOME/bin',
              'replay.py'     : '$HOME/bin',
              'rxlab'         : '$HOME/bin',

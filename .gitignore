@@ -12,6 +12,7 @@ mag
 odx*
 pstrack
 pytool
+pywhich
 replay
 workrpt
 *.pyc
