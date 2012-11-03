@@ -141,6 +141,13 @@ def run_tests(a, final, testlist, volume):
     unittest.TextTestRunner(verbosity=volume).run(suite)
 
 # ---------------------------------------------------------------------------
+class UnderConstructionError(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
+            
+# ---------------------------------------------------------------------------
 class TesthelpTest(unittest.TestCase):
     # -----------------------------------------------------------------------
     def test_all_tests(self):
