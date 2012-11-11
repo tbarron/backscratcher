@@ -7,10 +7,33 @@ import pdb
 import pexpect
 import re
 import sys
+import tpbtools
 from testhelp import UnderConstructionError
 import toolframe
 import traceback as tb
 
+"""
+ - "clps -f <filename>" should load <filename>
+
+ - "clps" (no args) should attempt to load a default file
+ 
+ - clps> clip -h  => exits when it should not
+
+ - clps> show -p  => exits when it should not
+
+ - If I say
+      clps add -H abc.com -U johndoe
+
+   I should get a prompt for a password and the entry should be added
+   to my default password safe file.
+
+"""
+
+# ---------------------------------------------------------------------------
+def clps_prolog(args):
+    print("This is the prolog")
+    
+# ---------------------------------------------------------------------------
 def clps_add(args):
     """add - add a new entry to the password table
 
@@ -63,6 +86,7 @@ def clps_add(args):
         tb.print_exc()
         sys.exit()
 
+# ---------------------------------------------------------------------------
 def clps_clip(args):
     """clip - copy a password into the clipboard for pasting
 
@@ -92,7 +116,9 @@ def clps_clip(args):
     if o.debug: pdb.set_trace()
 
     result = data_lookup(o.hostname, o.username, o.password)
-    if len(result) == 1:
+    if 0 == len(result):
+        print("No match found")
+    elif 1 == len(result):
         # print("copy password from result into clipboard")
         copy_to_clipboard(result[0][2])
     else:
@@ -105,26 +131,79 @@ def clps_clip(args):
         copy_to_clipboard(result[int(choice) - 1][2])
         # print("copy password from result[int(choice)] into clipboard")
 
+# ---------------------------------------------------------------------------
 def clps_load(args):
     """load - read an encrypted file of password information
 
     load <filename>
     """
-    pass
+    p = OptionParser()
+    p.add_option('-d', '--debug',
+                 action='store_true', default=False, dest='debug',
+                 help='run under debugger')
+    p.add_option('-p', '--plain',
+                 action='store_true', default=False, dest='plaintext',
+                 help='load plaintext, do not try to decrypt')
+    (o, a) = p.parse_args(args)
 
+    if o.debug: pdb.set_trace()
+    
+    if 1 == len(a):
+        filename = a.pop(0)
+    else:
+        raise StandardError('load requires a filename')
+
+    if o.plaintext:
+        f = open(filename, 'r')
+        for line in f.readlines():
+            [h, u, p] = line.rstrip().split('!@!', 2)
+            data_store(h, u, p)
+        f.close()
+    else:
+        passphrase = getpass.getpass()
+        f = os.popen("gpg -d --passphrase %s < %s"
+                     % (passphrase, filename))
+        for line in f.readlines():
+            if line.strip() == '':
+                continue
+            [h, u, p] = line.rstrip().split('!@!', 2)
+            data_store(h, u, p)
+        f.close()
+
+# ---------------------------------------------------------------------------
 def clps_save(args):
     """save - write out an encrypted file of password information
 
     save <filename>
     """
-    pass
+    p = OptionParser()
+    p.add_option('-d', '--debug',
+                 action='store_true', default=False, dest='debug',
+                 help='run under debugger')
+    (o, a) = p.parse_args(args)
 
+    if o.debug: pdb.set_trace()
+        
+    if 1 == len(a):
+        filename = a.pop(0)
+    else:
+        raise StandardError('save requires a filename')
+
+    passphrase = getpass.getpass()
+    f = os.popen('gpg -c --passphrase %s > %s' % (passphrase, filename), 'w')
+    all = data_lookup('', '', '')
+    for (h, u, p) in all:
+        f.write('%s!@!%s!@!%s\n' % (h, u, p))
+    f.close()
+
+# ---------------------------------------------------------------------------
 def clps_show(args):
     """show - display the password entries in the table
 
     show [-P] [<regex>]
 
-    Without <regex>, show all entries. Without -P, show only host and usernames.
+    Without <regex>, show all entries. Without -P, show only host and
+    usernames.
     """
     p = OptionParser()
     p.add_option('-d', '--debug',
@@ -134,21 +213,29 @@ def clps_show(args):
                  action='store_true', default=False, dest='pwd',
                  help='show passwords')
     (o, a) = p.parse_args(args)
-
+    
     if o.debug: pdb.set_trace()
+
+    rgx = ''
+    if 0 < len(a):
+        rgx = a.pop(0)
 
     all = data_lookup('', '', '')
     for (h,u,p) in all:
         if o.pwd:
-            print("%s %s %s" % (h, u, p))
+            if re.search(rgx, h) or re.search(rgx, u) or re.search(rgx, p):
+                print("%s %s %s" % (h, u, p))
         else:
-            print("%s %s" % (h, u))
+            if re.search(rgx, h) or re.search(rgx, u):
+                print("%s %s" % (h, u))
 
+# ---------------------------------------------------------------------------
 def copy_to_clipboard(value):
     p = os.popen("pbcopy", 'w')
     p.write(value)
     p.close()
 
+# ---------------------------------------------------------------------------
 def data_lookup(hostname, username, password):
     global data
     try:
@@ -164,6 +251,7 @@ def data_lookup(hostname, username, password):
         rval = data
     return rval
 
+# ---------------------------------------------------------------------------
 def data_store(hostname, username, password):
     global data
 
@@ -180,10 +268,11 @@ class ClipTest(toolframe.unittest.TestCase):
     # -----------------------------------------------------------------------
     def test_clip_by_host_one(self):
         global data
-        # raise UnderConstructionError('under construction')
-        pdb.set_trace()
         data = [['foobar.com', 'username', 'password']]
 
+        # clear the clipboard
+        os.system("pbcopy < /dev/null")
+        
         clps_clip(['clip', '-H', '.*bar.*'])
         S = pexpect.spawn('pbpaste')
         S.expect(pexpect.EOF)
@@ -191,40 +280,139 @@ class ClipTest(toolframe.unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def test_clip_by_host_multi(self):
-        # !@!
-        raise UnderConstructionError('under construction')
-    
+        global data
+        data = [['foobar.com', 'username', 'password'],
+                ['sumatra.org', 'chairil', 'Bukittinggi'],
+                ['java.org', 'khalida', 'Surabaya']]
+
+        S = pexpect.spawn("clps")
+
+        for item in data:
+            S.expect(self.prompt)
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+
+        S.expect(self.prompt)
+        S.sendline("clip -H \\.org")
+        
+        S.expect("Please make a selection> ")
+
+        self.assertEqual('sumatra.org' in S.before, True)
+        self.assertEqual('java.org' in S.before, True)
+
+        S.sendline("2")
+        # S.expect("Password for khalida@java.org copied to clipboard")
+        S.expect(self.prompt)
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+
+        S = pexpect.spawn("pbpaste")
+        S.expect(pexpect.EOF)
+        self.assertEqual('Surabaya' in S.before, True)
+        
     # -----------------------------------------------------------------------
     def test_clip_by_pwd_one(self):
         global data
-        # raise UnderConstructionError('under construction')
         data = [('foobar.com', 'username', 'password')]
 
-        clps_clip(['clip', '-H', '.*bar.*'])
-        S = pexepct.spawn('pbpaste')
+        # clear the clipboard
+        os.system("pbcopy < /dev/null")
+        
+        clps_clip(['clip', '-p', '.*sswo.*'])
+        S = pexpect.spawn('pbpaste')
         S.expect(pexpect.EOF)
         self.assertEqual('password' in S.before, True)
     
     # -----------------------------------------------------------------------
     def test_clip_by_pwd_multi(self):
-        # !@!
-        raise UnderConstructionError('under construction')
-    
+        global data
+        data = [['foobar.com', 'username', 'password'],
+                ['sumatra.org', 'chairil', 'Bukittinggi'],
+                ['java.org', 'khalida', 'Surabaya']]
+
+        S = pexpect.spawn("clps")
+
+        for item in data:
+            S.expect(self.prompt)
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+
+        S.expect(self.prompt)
+        S.sendline("clip -p .*r.*")
+        
+        S.expect("Please make a selection> ")
+
+        self.assertEqual('foobar.com' in S.before, True)
+        self.assertEqual('java.org' in S.before, True)
+
+        S.sendline("1")
+
+        S.expect(self.prompt)
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+
+        S = pexpect.spawn("pbpaste")
+        S.expect(pexpect.EOF)
+        self.assertEqual('password' in S.before, True)
+        
     # -----------------------------------------------------------------------
     def test_clip_by_user_one(self):
-        # !@!
-        raise UnderConstructionError('under construction')
+        global data
+
+        # clear the clipboard
+        os.system("pbcopy < /dev/null")
+
+        data = [('foobar.com', 'username', 'password')]
+
+        clps_clip(['clip', '-u', '.*serna.*'])
+        S = pexpect.spawn('pbpaste')
+        S.expect(pexpect.EOF)
+        self.assertEqual('password' in S.before, True)
+    
     
     # -----------------------------------------------------------------------
     def test_clip_by_user_multi(self):
-        # !@!
-        raise UnderConstructionError('under construction')
+        global data
+        data = [['foobar.com', 'username', 'password'],
+                ['sumatra.org', 'chairil', 'Bukittinggi'],
+                ['java.org', 'khalida', 'Surabaya']]
+
+        S = pexpect.spawn("clps")
+
+        for item in data:
+            S.expect(self.prompt)
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+
+        S.expect(self.prompt)
+        S.sendline("clip -u .*a[im].*")
+        
+        S.expect("Please make a selection> ")
+
+        self.assertEqual('foobar.com' in S.before, True)
+        self.assertEqual('sumatra.org' in S.before, True)
+
+        S.sendline("2")
+
+        S.expect(self.prompt)
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+
+        S = pexpect.spawn("pbpaste")
+        S.expect(pexpect.EOF)
+        self.assertEqual('Bukittinggi' in S.before, True)
     
     # -----------------------------------------------------------------------
     def test_copy_to_clipboard(self):
-        # !@!
-        raise UnderConstructionError('under construction')
-    
+        test_value = 'Brobdinagian'
+        copy_to_clipboard(test_value)
+        S = pexpect.spawn("pbpaste")
+        S.expect(pexpect.EOF)
+        self.assertEqual(test_value in S.before, True)
+
     # -----------------------------------------------------------------------
     def test_dlup_by_host(self):
         global data
@@ -429,9 +617,34 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_load(self):
-        # !@!
-        raise UnderConstructionError('under construction')
+        data = [['foobar.com', 'username', 'password'],
+                ['sumatra.org', 'chairil', 'Bukittinggi'],
+                ['java.org', 'khalida', 'Surabaya'],
+                ['jellico.net', 'severino', 'foo!@!bar']]
+
+        filename = 'test_load.clps'
+        f = open(filename, 'w')
+        for item in data:
+            f.write('%s!@!%s!@!%s\n' % (item[0], item[1], item[2]))
+        f.close()
         
+        S = pexpect.spawn('clps')
+        S.expect(self.prompt)
+        S.sendline('load %s' % filename)
+
+        S.expect(self.prompt)
+        S.sendline('show')
+
+        S.expect(self.prompt)
+
+        for item in data:
+            self.assertEqual(item[0] in S.before, True)
+            self.assertEqual(item[1] in S.before, True)
+            self.assertEqual(item[2] in S.before, False)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
+
     # -----------------------------------------------------------------------
     def test_optionA_addshow(self):
         prompt = "clps> "
@@ -597,10 +810,9 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_prompt_addshow(self):
-        prompt = "clps> "
         S = pexpect.spawn("clps")
 
-        S.expect(prompt)
+        S.expect(self.prompt)
         S.sendline("add")
 
         S.expect("Hostname: ")
@@ -612,10 +824,10 @@ class ClipTest(toolframe.unittest.TestCase):
         S.expect("Password: ")
         S.sendline("fruitful")
 
-        S.expect(prompt)
+        S.expect(self.prompt)
         S.sendline("show")
 
-        S.expect(prompt)
+        S.expect(self.prompt)
         self.assertEqual("abc.org" in S.before, True)
         self.assertEqual("jock" in S.before, True)
         self.assertEqual("fruitful" not in S.before, True)
@@ -625,27 +837,136 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_save(self):
-        # !@!
-        raise UnderConstructionError('under construction')
-        
-    # -----------------------------------------------------------------------
-    def test_show_all_nopass(self):
-        # !@!
-        raise UnderConstructionError('under construction')
+        filename = "test_save.clps"
+        data = [['foobar.com', 'username', 'password'],
+                ['sumatra.org', 'chairil', 'Bukittinggi'],
+                ['java.org', 'khalida', 'Surabaya']]
+        S = pexpect.spawn("clps")
+        for item in data:
+            S.expect(self.prompt)
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+
+        S.expect(self.prompt)
+        S.sendline('save %s' % filename)
+
+        S.expect(self.prompt)
+        S.sendline('quit')
+
+        S.expect(pexpect.EOF)
+
+        self.assertEqual(os.path.exists(filename), True)
+
+        C = tpbtools.contents(filename)
+        for item in data:
+            for element in item:
+                self.assertEqual(element in ''.join(C), False)
 
     # -----------------------------------------------------------------------
+    def test_show_all_nopass(self):
+        data = [['foobar.com', 'username', 'password'],
+                ['sumatra.org', 'chairil', 'Bukittinggi'],
+                ['java.org', 'khalida', 'Surabaya']]
+
+        S = pexpect.spawn("clps")
+        for item in data:
+            S.expect(self.prompt)
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+
+        S.expect(self.prompt)
+        S.sendline('show')
+
+        S.expect(self.prompt)
+        for item in data:
+            self.assertEqual(item[0] in S.before, True)
+            self.assertEqual(item[1] in S.before, True)
+            self.assertEqual(item[2] in S.before, False)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
+        
+    # -----------------------------------------------------------------------
     def test_show_all_wpass(self):
-        # !@!
-        raise UnderConstructionError('under construction')
+        data = [['foobar.com', 'username', 'password'],
+                ['sumatra.org', 'chairil', 'Bukittinggi'],
+                ['java.org', 'khalida', 'Surabaya']]
+
+        S = pexpect.spawn("clps")
+        for item in data:
+            S.expect(self.prompt)
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+
+        S.expect(self.prompt)
+        S.sendline('show -P')
+
+        S.expect(self.prompt)
+        for item in data:
+            self.assertEqual(item[0] in S.before, True)
+            self.assertEqual(item[1] in S.before, True)
+            self.assertEqual(item[2] in S.before, True)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
 
     # -----------------------------------------------------------------------
     def test_show_rgx_nopass(self):
-        # !@!
-        raise UnderConstructionError('under construction')
+        data = [['foobar.com', 'username', 'password'],
+                ['sumatra.org', 'chairil', 'Bukittinggi'],
+                ['java.org', 'khalida', 'Surabaya']]
+
+        S = pexpect.spawn("clps")
+        for item in data:
+            S.expect(self.prompt)
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+
+        S.expect(self.prompt)
+        S.sendline('show \\.org')
+
+        S.expect(self.prompt)
+        xp = [[False, False, False],
+              [True, True, False],
+              [True, True, False]]
+        for idx in range(0,3):
+            for jdx in range(0,3):
+                self.assertEqual(data[idx][jdx] in S.before,
+                                 xp[idx][jdx])
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
 
     # -----------------------------------------------------------------------
     def test_show_rgx_wpass(self):
-        # !@!
-        raise UnderConstructionError('under construction')
+        data = [['foobar.com', 'username', 'password'],
+                ['sumatra.org', 'chairil', 'Bukittinggi'],
+                ['java.org', 'khalida', 'Surabaya']]
+
+        S = pexpect.spawn("clps")
+        for item in data:
+            S.expect(self.prompt)
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+
+        S.expect(self.prompt)
+        S.sendline('show -P \\.org')
+
+        S.expect(self.prompt)
+        xp = [[False, False, False],
+              [True, True, True],
+              [True, True, True]]
+        for idx in range(0,3):
+            for jdx in range(0,3):
+                self.assertEqual(data[idx][jdx] in S.before,
+                                 xp[idx][jdx])
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
 
 toolframe.tf_launch('clps', noarg='shell')

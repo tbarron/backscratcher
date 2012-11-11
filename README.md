@@ -28,6 +28,13 @@ that ordinarily only operate on a single file.
         Timer. Can count up (like a stopwatch) or down (like a kitchen
         timer).
 
+    clps.py
+        Command Line Password Safe. Stores (host, user, password)
+        tuples in an encrypted file, can copy a password to the
+        clipboard for pasting into a password prompt without
+        displaying it on the screen. Mac-specific, since it uses
+        pbcopy and pbpaste.
+
     dt.py
         Easy date arithmetic.
 

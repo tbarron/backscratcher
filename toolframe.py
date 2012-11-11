@@ -92,8 +92,10 @@ def tf_main(args, prefix=None, noarg='help'):
     elif args[1] == "help":
         tf_help(args[2:], prefix=prefix)
     else:
+        tf_dispatch_prolog(prefix)
         tf_dispatch(prefix, args[1:])
-
+        tf_dispatch_epilog(prefix)
+        
 # ---------------------------------------------------------------------------
 def tf_dispatch(prefix, args):
     if args[0] == 'help':
@@ -112,6 +114,22 @@ def tf_dispatch(prefix, args):
         except:
             raise
 
+# ---------------------------------------------------------------------------
+def tf_dispatch_epilog(prefix):
+    try:
+        eval("sys.modules['__main__'].%s_epilog()" % prefix)
+    except:
+        # no epilog defined -- carry on
+        pass
+    
+# ---------------------------------------------------------------------------
+def tf_dispatch_prolog(prefix):
+    try:
+        eval("sys.modules['__main__'].%s_prolog()" % prefix)
+    except:
+        # no prolog defined -- carry on
+        pass
+    
 # ---------------------------------------------------------------------------
 def tf_help(A, prefix=None):
     """help - show this list
