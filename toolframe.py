@@ -81,20 +81,23 @@ import unittest
 def tf_main(args, prefix=None, noarg='help'):
     if prefix == None:
         prefix = sys.modules['__main__'].prefix()
-    if len(args) < 2:
+
+    args = tf_dispatch_prolog(prefix, args)
+    # print("tf_main: args = %s" % args)
+    if len(args) < 1:
         if noarg == 'help':
             tf_help([], prefix=prefix)
         elif noarg == 'shell':
-            tf_shell(prefix=prefix)
+            tf_shell(prefix, args)
         else:
             raise StandardError('noarg must be "help" or "shell", not "%s"'
                                 % noarg)
-    elif args[1] == "help":
-        tf_help(args[2:], prefix=prefix)
+    elif args[0] == "help":
+        tf_help(args[1:], prefix=prefix)
     else:
-        tf_dispatch_prolog(prefix)
-        tf_dispatch(prefix, args[1:])
-        tf_dispatch_epilog(prefix)
+        tf_dispatch(prefix, args)
+
+    tf_dispatch_epilog(prefix, args)
         
 # ---------------------------------------------------------------------------
 def tf_dispatch(prefix, args):
@@ -115,21 +118,23 @@ def tf_dispatch(prefix, args):
             raise
 
 # ---------------------------------------------------------------------------
-def tf_dispatch_epilog(prefix):
+def tf_dispatch_epilog(prefix, args):
     try:
-        eval("sys.modules['__main__'].%s_epilog()" % prefix)
+        eval("sys.modules['__main__'].%s_epilog(args)" % prefix)
     except:
         # no epilog defined -- carry on
         pass
     
 # ---------------------------------------------------------------------------
-def tf_dispatch_prolog(prefix):
+def tf_dispatch_prolog(prefix, args):
+    rval = args
     try:
-        eval("sys.modules['__main__'].%s_prolog()" % prefix)
+        rval = eval("sys.modules['__main__'].%s_prolog(args)" % prefix)
     except:
         # no prolog defined -- carry on
         pass
-    
+    return rval
+
 # ---------------------------------------------------------------------------
 def tf_help(A, prefix=None):
     """help - show this list
@@ -181,10 +186,10 @@ def tf_launch(prefix, noarg='help', cleanup_tests = None):
             if None != cleanup_tests:
                 cleanup_tests()
         else:
-            tf_main(sys.argv, prefix=prefix, noarg=noarg)
+            tf_main(sys.argv[1:], prefix=prefix, noarg=noarg)
 
 # ---------------------------------------------------------------------------
-def tf_shell(prefix):
+def tf_shell(prefix, args):
     prompt = "%s> " % prefix
     req = raw_input(prompt)
     while req != 'quit':
@@ -192,7 +197,7 @@ def tf_shell(prefix):
         tf_dispatch(prefix, r)
             
         req = raw_input(prompt)
-        
+
 # ---------------------------------------------------------------------------
 def ez_launch(main = None):
     # pdb.set_trace()

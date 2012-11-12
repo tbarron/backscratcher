@@ -13,9 +13,9 @@ import toolframe
 import traceback as tb
 
 """
- - "clps -f <filename>" should load <filename>
+ + "clps -f <filename>" should load <filename>
 
- - "clps" (no args) should attempt to load a default file
+ + "clps" (no args) should attempt to load a default file
  
  - clps> clip -h  => exits when it should not
 
@@ -27,11 +27,47 @@ import traceback as tb
    I should get a prompt for a password and the entry should be added
    to my default password safe file.
 
+ - in shell mode, "help" gets a traceback
 """
 
 # ---------------------------------------------------------------------------
 def clps_prolog(args):
-    print("This is the prolog")
+    default_filename = os.getenv('CLPS_FILENAME')
+    p = OptionParser()
+    p.add_option('-d', '--debug',
+                 action='store_true', default=False, dest='debug',
+                 help='run under debugger')
+    p.add_option('-f', '--filename',
+                 action='store', default=default_filename, dest='filename',
+                 help='name of password safe to open on startup')
+
+    # print("prolog: incoming args = %s" % args)
+    pre_opts = []
+    post_opts = []
+    idx = 0
+    while idx < len(args):
+        if args[idx] == '-d':
+            pre_opts.append(args[idx])
+        elif args[idx] == '-f':
+            pre_opts.append(args[idx])
+            try:
+                idx += 1
+                pre_opts.append(args[idx])
+            except IndexError:
+                print("-f requires an argument")
+        else:
+            post_opts.append(args[idx])
+        idx += 1
+        
+    (o, a) = p.parse_args(pre_opts)
+
+    if o.debug: pdb.set_trace()
+    if o.filename != None:
+        clps_load([o.filename])
+        
+    # print("prolog: return args = %s" % post_opts)
+    
+    return post_opts
     
 # ---------------------------------------------------------------------------
 def clps_add(args):
@@ -161,7 +197,7 @@ def clps_load(args):
         f.close()
     else:
         passphrase = getpass.getpass()
-        f = os.popen("gpg -d --passphrase %s < %s"
+        f = os.popen("gpg -d --passphrase %s < %s 2>/dev/null"
                      % (passphrase, filename))
         for line in f.readlines():
             if line.strip() == '':
@@ -280,6 +316,8 @@ class ClipTest(toolframe.unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def test_clip_by_host_multi(self):
+        if None != os.getenv('CLPS_FILENAME'):
+            del os.environ['CLPS_FILENAME']
         global data
         data = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
@@ -326,6 +364,8 @@ class ClipTest(toolframe.unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def test_clip_by_pwd_multi(self):
+        if None != os.getenv('CLPS_FILENAME'):
+            del os.environ['CLPS_FILENAME']
         global data
         data = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
@@ -374,6 +414,8 @@ class ClipTest(toolframe.unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def test_clip_by_user_multi(self):
+        if None != os.getenv('CLPS_FILENAME'):
+            del os.environ['CLPS_FILENAME']
         global data
         data = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
@@ -617,21 +659,31 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_load(self):
+        if None != os.getenv('CLPS_FILENAME'):
+            del os.environ['CLPS_FILENAME']
         data = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
                 ['java.org', 'khalida', 'Surabaya'],
                 ['jellico.net', 'severino', 'foo!@!bar']]
 
         filename = 'test_load.clps'
+        passphrase = 'iChAb0d'
         f = open(filename, 'w')
+        f = os.popen('gpg -c --passphrase %s > %s'
+                     % (passphrase, filename),
+                     'w')
         for item in data:
-            f.write('%s!@!%s!@!%s\n' % (item[0], item[1], item[2]))
+            # f.write('%s!@!%s!@!%s\n' % (item[0], item[1], item[2]))
+            f.write('%s\n' % '!@!'.join(item))
         f.close()
         
         S = pexpect.spawn('clps')
         S.expect(self.prompt)
         S.sendline('load %s' % filename)
 
+        S.expect("Password: ")
+        S.sendline(passphrase)
+        
         S.expect(self.prompt)
         S.sendline('show')
 
@@ -837,9 +889,11 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_save(self):
+        if None != os.getenv('CLPS_FILENAME'):
+            del os.environ['CLPS_FILENAME']
         filename = "test_save.clps"
         data = [['foobar.com', 'username', 'password'],
-                ['sumatra.org', 'chairil', 'Bukittinggi'],
+                ['sumatra.org', 'chairil', 'Methuselah'],
                 ['java.org', 'khalida', 'Surabaya']]
         S = pexpect.spawn("clps")
         for item in data:
@@ -851,6 +905,9 @@ class ClipTest(toolframe.unittest.TestCase):
         S.expect(self.prompt)
         S.sendline('save %s' % filename)
 
+        S.expect('Password: ')
+        S.sendline('test_passphrase')
+        
         S.expect(self.prompt)
         S.sendline('quit')
 
