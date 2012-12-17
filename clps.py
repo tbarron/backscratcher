@@ -15,19 +15,34 @@ import traceback as tb
 """
  + "clps -f <filename>" should load <filename>
 
- + "clps" (no args) should attempt to load a default file
+ + "clps" (no args) should attempt to load a default file ($CLPS_FILENAME)
  
- - clps> clip -h  => exits when it should not
+ + clps> clip -h  => exits when it should not
 
- - clps> show -p  => exits when it should not
+ + clps> show -p  => exits when it should not
 
- - If I say
+ x If I say
       clps add -H abc.com -U johndoe
 
    I should get a prompt for a password and the entry should be added
    to my default password safe file.
 
- - in shell mode, "help" gets a traceback
+ + in shell mode, "help" gets a traceback
+
+ - Need a way to remove old entries
+
+ - it would be helpful to have each entry timestamped so we can tell
+   ages and most recent
+
+ - When save overwrites an existing file, the old version should be
+   renamed with a timestamp
+
+ - I think help inside clps is blowing up on 'clps_prolog' or
+   'clps_epilog'. Need to protect these from being dispatchable
+   somehow.
+
+ - An unrecognized subfunction exits when it should not
+ 
 """
 
 # ---------------------------------------------------------------------------
@@ -38,7 +53,7 @@ def clps_prolog(args):
                  action='store_true', default=False, dest='debug',
                  help='run under debugger')
     p.add_option('-f', '--filename',
-                 action='store', default=default_filename, dest='filename',
+                 action='store', default=None, dest='filename',
                  help='name of password safe to open on startup')
 
     # print("prolog: incoming args = %s" % args)
@@ -55,14 +70,21 @@ def clps_prolog(args):
                 pre_opts.append(args[idx])
             except IndexError:
                 print("-f requires an argument")
+        elif args[idx] == '-h':
+            pre_opts.append(args[idx])
         else:
             post_opts.append(args[idx])
         idx += 1
-        
-    (o, a) = p.parse_args(pre_opts)
+
+    try:
+        (o, a) = p.parse_args(pre_opts)
+    except SystemExit:
+        sys.exit(0)
 
     if o.debug: pdb.set_trace()
-    if o.filename != None:
+    if o.filename == None and default_filename != None:
+        clps_load([default_filename])
+    elif o.filename != None and o.filename != '':
         clps_load([o.filename])
         
     # print("prolog: return args = %s" % post_opts)
@@ -96,7 +118,10 @@ def clps_add(args):
     p.add_option('-u', '--username',
                  action='store', default='', dest='username',
                  help='record a username')
-    (o, a) = p.parse_args(args)
+    try:
+        (o, a) = p.parse_args(args)
+    except SystemExit:
+        return
 
     if o.debug: pdb.set_trace()
     
@@ -147,7 +172,10 @@ def clps_clip(args):
     p.add_option('-p', '--password',
                  action='store', default='', dest='password',
                  help='search on passwords')
-    (o, a) = p.parse_args(args)
+    try:
+        (o, a) = p.parse_args(args)
+    except SystemExit:
+        return
 
     if o.debug: pdb.set_trace()
 
@@ -180,7 +208,10 @@ def clps_load(args):
     p.add_option('-p', '--plain',
                  action='store_true', default=False, dest='plaintext',
                  help='load plaintext, do not try to decrypt')
-    (o, a) = p.parse_args(args)
+    try:
+        (o, a) = p.parse_args(args)
+    except SystemExit:
+        return
 
     if o.debug: pdb.set_trace()
     
@@ -216,7 +247,10 @@ def clps_save(args):
     p.add_option('-d', '--debug',
                  action='store_true', default=False, dest='debug',
                  help='run under debugger')
-    (o, a) = p.parse_args(args)
+    try:
+        (o, a) = p.parse_args(args)
+    except SystemExit:
+        return
 
     if o.debug: pdb.set_trace()
         
@@ -248,7 +282,10 @@ def clps_show(args):
     p.add_option('-P', '--pwd',
                  action='store_true', default=False, dest='pwd',
                  help='show passwords')
-    (o, a) = p.parse_args(args)
+    try:
+        (o, a) = p.parse_args(args)
+    except SystemExit:
+        return
     
     if o.debug: pdb.set_trace()
 
@@ -300,20 +337,8 @@ def data_store(hostname, username, password):
 # ---------------------------------------------------------------------------
 class ClipTest(toolframe.unittest.TestCase):
     prompt = "clps> "
+    cmdlist = ['add', 'clip', 'load', 'save', 'show', 'help']
 
-    # -----------------------------------------------------------------------
-    def test_clip_by_host_one(self):
-        global data
-        data = [['foobar.com', 'username', 'password']]
-
-        # clear the clipboard
-        os.system("pbcopy < /dev/null")
-        
-        clps_clip(['clip', '-H', '.*bar.*'])
-        S = pexpect.spawn('pbpaste')
-        S.expect(pexpect.EOF)
-        self.assertEqual('password' in S.before, True)
-    
     # -----------------------------------------------------------------------
     def test_clip_by_host_multi(self):
         if None != os.getenv('CLPS_FILENAME'):
@@ -350,14 +375,14 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual('Surabaya' in S.before, True)
         
     # -----------------------------------------------------------------------
-    def test_clip_by_pwd_one(self):
+    def test_clip_by_host_one(self):
         global data
-        data = [('foobar.com', 'username', 'password')]
+        data = [['foobar.com', 'username', 'password']]
 
         # clear the clipboard
         os.system("pbcopy < /dev/null")
         
-        clps_clip(['clip', '-p', '.*sswo.*'])
+        clps_clip(['clip', '-H', '.*bar.*'])
         S = pexpect.spawn('pbpaste')
         S.expect(pexpect.EOF)
         self.assertEqual('password' in S.before, True)
@@ -398,19 +423,17 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual('password' in S.before, True)
         
     # -----------------------------------------------------------------------
-    def test_clip_by_user_one(self):
+    def test_clip_by_pwd_one(self):
         global data
+        data = [('foobar.com', 'username', 'password')]
 
         # clear the clipboard
         os.system("pbcopy < /dev/null")
-
-        data = [('foobar.com', 'username', 'password')]
-
-        clps_clip(['clip', '-u', '.*serna.*'])
+        
+        clps_clip(['clip', '-p', '.*sswo.*'])
         S = pexpect.spawn('pbpaste')
         S.expect(pexpect.EOF)
         self.assertEqual('password' in S.before, True)
-    
     
     # -----------------------------------------------------------------------
     def test_clip_by_user_multi(self):
@@ -447,6 +470,66 @@ class ClipTest(toolframe.unittest.TestCase):
         S.expect(pexpect.EOF)
         self.assertEqual('Bukittinggi' in S.before, True)
     
+    # -----------------------------------------------------------------------
+    def test_clip_by_user_one(self):
+        global data
+
+        # clear the clipboard
+        os.system("pbcopy < /dev/null")
+
+        data = [('foobar.com', 'username', 'password')]
+
+        clps_clip(['clip', '-u', '.*serna.*'])
+        S = pexpect.spawn('pbpaste')
+        S.expect(pexpect.EOF)
+        self.assertEqual('password' in S.before, True)
+    
+    # -----------------------------------------------------------------------
+    def test_cmd_opt_h(self):
+        if None != os.getenv('CLPS_FILENAME'):
+            del os.environ['CLPS_FILENAME']
+        S = pexpect.spawn("clps")
+        S.expect(self.prompt)
+
+        cmdl = [x for x in self.cmdlist if x != 'help']
+        for cmd in cmdl:
+            # print cmd
+            S.sendline('%s -h' % cmd)
+            S.expect(self.prompt)
+
+            self.assertEqual('Usage:' in S.before, True)
+            self.assertEqual('--debug' in S.before, True)
+            self.assertEqual('0' in S.before, False)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
+    
+    # -----------------------------------------------------------------------
+    def test_cmd_bad_opt(self):
+        if None != os.getenv('CLPS_FILENAME'):
+            del os.environ['CLPS_FILENAME']
+        S = pexpect.spawn("clps")
+        S.expect(self.prompt)
+
+        cmdl = [x for x in self.cmdlist if x != 'help']
+        for cmd in cmdl:
+            # print cmd
+            S.sendline('%s -x' % cmd)
+            S.expect(self.prompt)
+
+            self.assertEqual('Usage:' in S.before, True)
+            self.assertEqual('no such option' in S.before, True)
+            self.assertEqual('-x' in S.before, True)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
+    
+    # -----------------------------------------------------------------------
+    def test_clps_opt_h(self):
+        S = pexpect.spawn("clps -h")
+        S.expect(pexpect.EOF)
+        self.assertEqual('debug' in S.before, True)
+        
     # -----------------------------------------------------------------------
     def test_copy_to_clipboard(self):
         test_value = 'Brobdinagian'
@@ -568,26 +651,6 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual(e, [])
         
     # -----------------------------------------------------------------------
-    def test_dlup_by_pwd(self):
-        global data
-
-        data = [['hostname.com', 'username', 'password'],
-                ['google.com', 'nameroon', 'broadsword']]
-
-        # match more than one
-        a = data_lookup('', '', 'sword')
-        
-        # match just one
-        b = data_lookup('', '', 'broad')
-
-        # match none
-        c = data_lookup('', '', 'nomatch')
-
-        self.assertEqual(a, data)
-        self.assertEqual(b, [data[1]])
-        self.assertEqual(c, [])
-        
-    # -----------------------------------------------------------------------
     def test_dlup_by_pu(self):
         global data
 
@@ -614,6 +677,26 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual(c, [data[0]])
         self.assertEqual(d, [])
         self.assertEqual(e, [])
+        
+    # -----------------------------------------------------------------------
+    def test_dlup_by_pwd(self):
+        global data
+
+        data = [['hostname.com', 'username', 'password'],
+                ['google.com', 'nameroon', 'broadsword']]
+
+        # match more than one
+        a = data_lookup('', '', 'sword')
+        
+        # match just one
+        b = data_lookup('', '', 'broad')
+
+        # match none
+        c = data_lookup('', '', 'nomatch')
+
+        self.assertEqual(a, data)
+        self.assertEqual(b, [data[1]])
+        self.assertEqual(c, [])
         
     # -----------------------------------------------------------------------
     def test_dlup_by_user(self):
@@ -657,6 +740,45 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual(data[1] in a, True)
         self.assertEqual(['flack.org', 'sinbad', 'mermaid'] in a, True)
         
+    # -----------------------------------------------------------------------
+    def test_help_noarg(self):
+        if None != os.getenv('CLPS_FILENAME'):
+            del os.environ['CLPS_FILENAME']
+        
+        S = pexpect.spawn('clps')
+        S.expect(self.prompt)
+        S.sendline('help')
+
+        which = S.expect([self.prompt, pexpect.EOF])
+        if 0 == which:
+            for cmd in self.cmdlist:
+                self.assertEqual(cmd in S.before, True)
+        else:
+            self.fail('help failed')
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
+
+    # -----------------------------------------------------------------------
+    def test_help_cmd(self):
+        if None != os.getenv('CLPS_FILENAME'):
+            del os.environ['CLPS_FILENAME']
+        
+        S = pexpect.spawn('clps')
+        S.expect(self.prompt)
+        S.sendline('help')
+
+        S.expect(self.prompt)
+
+        for cmd in self.cmdlist:
+            S.sendline('help %s' % cmd)
+            S.expect(self.prompt)
+            x = '%s - ' % cmd
+            self.assertEqual(x in S.before, True)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
+
     # -----------------------------------------------------------------------
     def test_load(self):
         if None != os.getenv('CLPS_FILENAME'):
@@ -1026,4 +1148,5 @@ class ClipTest(toolframe.unittest.TestCase):
         S.sendline('quit')
         S.expect(pexpect.EOF)
 
+# pdb.set_trace()
 toolframe.tf_launch('clps', noarg='shell')

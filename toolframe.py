@@ -114,8 +114,8 @@ def tf_dispatch(prefix, args):
         except AttributeError:
             print("unrecognized subfunction: %s" % args[0])
             tf_help([], prefix=prefix)
-        except:
-            raise
+        except SystemExit as e:
+            print(e)
 
 # ---------------------------------------------------------------------------
 def tf_dispatch_epilog(prefix, args):
@@ -130,6 +130,8 @@ def tf_dispatch_prolog(prefix, args):
     rval = args
     try:
         rval = eval("sys.modules['__main__'].%s_prolog(args)" % prefix)
+    except SystemExit:
+        sys.exit(0)
     except:
         # no prolog defined -- carry on
         pass
@@ -145,9 +147,11 @@ def tf_help(A, prefix=None):
     Otherwise, show a list of functions based on the first line of
     each __doc__ member.
     """
-    d = dir(sys.modules['__main__'])
     if prefix == None:
         prefix = sys.modules['__main__'].prefix()
+    d = [x for x in dir(sys.modules['__main__'])
+         if x.startswith(prefix) and
+         not (x.endswith('_prolog') or x.endswith('_epilog'))]
     if 0 < len(A):
         if '%s_%s' % (prefix, A[0]) in d:
             dname = "sys.modules['__main__'].%s_%s.__doc__" % (prefix, A[0])
