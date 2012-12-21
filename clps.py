@@ -29,6 +29,12 @@ import traceback as tb
 
  + in shell mode, "help" gets a traceback
 
+ + I think help inside clps is blowing up on 'clps_prolog' or
+   'clps_epilog'. Need to protect these from being dispatchable
+   somehow.
+
+ + An unrecognized subfunction exits when it should not
+
  - Need a way to remove old entries
 
  - it would be helpful to have each entry timestamped so we can tell
@@ -37,12 +43,9 @@ import traceback as tb
  - When save overwrites an existing file, the old version should be
    renamed with a timestamp
 
- - I think help inside clps is blowing up on 'clps_prolog' or
-   'clps_epilog'. Need to protect these from being dispatchable
-   somehow.
+ - On a clip command, if more than one match is found and the user
+   just hits Enter rather than typing a number, we get a traceback.
 
- - An unrecognized subfunction exits when it should not
- 
 """
 
 # ---------------------------------------------------------------------------
@@ -290,6 +293,7 @@ def clps_show(args):
     if o.debug: pdb.set_trace()
 
     rgx = ''
+    fmt = "%-25s %-25s %-25s"
     if 0 < len(a):
         rgx = a.pop(0)
 
@@ -297,10 +301,10 @@ def clps_show(args):
     for (h,u,p) in all:
         if o.pwd:
             if re.search(rgx, h) or re.search(rgx, u) or re.search(rgx, p):
-                print("%s %s %s" % (h, u, p))
+                print(fmt % (h, u, p))
         else:
             if re.search(rgx, h) or re.search(rgx, u):
-                print("%s %s" % (h, u))
+                print(fmt % (h, u, ""))
 
 # ---------------------------------------------------------------------------
 def copy_to_clipboard(value):
