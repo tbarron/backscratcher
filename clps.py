@@ -340,9 +340,12 @@ class ClipTest(toolframe.unittest.TestCase):
     cmdlist = ['add', 'clip', 'load', 'save', 'show', 'help']
 
     # -----------------------------------------------------------------------
-    def test_clip_by_host_multi(self):
+    def setUp(self):
         if None != os.getenv('CLPS_FILENAME'):
             del os.environ['CLPS_FILENAME']
+
+    # -----------------------------------------------------------------------
+    def test_clip_by_host_multi(self):
         global data
         data = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
@@ -389,8 +392,6 @@ class ClipTest(toolframe.unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def test_clip_by_pwd_multi(self):
-        if None != os.getenv('CLPS_FILENAME'):
-            del os.environ['CLPS_FILENAME']
         global data
         data = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
@@ -437,8 +438,6 @@ class ClipTest(toolframe.unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def test_clip_by_user_multi(self):
-        if None != os.getenv('CLPS_FILENAME'):
-            del os.environ['CLPS_FILENAME']
         global data
         data = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
@@ -486,8 +485,6 @@ class ClipTest(toolframe.unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def test_cmd_opt_h(self):
-        if None != os.getenv('CLPS_FILENAME'):
-            del os.environ['CLPS_FILENAME']
         S = pexpect.spawn("clps")
         S.expect(self.prompt)
 
@@ -506,8 +503,6 @@ class ClipTest(toolframe.unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def test_cmd_bad_opt(self):
-        if None != os.getenv('CLPS_FILENAME'):
-            del os.environ['CLPS_FILENAME']
         S = pexpect.spawn("clps")
         S.expect(self.prompt)
 
@@ -742,9 +737,6 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_help_noarg(self):
-        if None != os.getenv('CLPS_FILENAME'):
-            del os.environ['CLPS_FILENAME']
-        
         S = pexpect.spawn('clps')
         S.expect(self.prompt)
         S.sendline('help')
@@ -761,9 +753,6 @@ class ClipTest(toolframe.unittest.TestCase):
 
     # -----------------------------------------------------------------------
     def test_help_cmd(self):
-        if None != os.getenv('CLPS_FILENAME'):
-            del os.environ['CLPS_FILENAME']
-        
         S = pexpect.spawn('clps')
         S.expect(self.prompt)
         S.sendline('help')
@@ -781,8 +770,6 @@ class ClipTest(toolframe.unittest.TestCase):
 
     # -----------------------------------------------------------------------
     def test_load(self):
-        if None != os.getenv('CLPS_FILENAME'):
-            del os.environ['CLPS_FILENAME']
         data = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
                 ['java.org', 'khalida', 'Surabaya'],
@@ -964,7 +951,8 @@ class ClipTest(toolframe.unittest.TestCase):
     def test_optionUa_addshow(self):
         prompt = "clps> "
         S = pexpect.spawn("clps")
-
+        S.timeout = 5
+        
         S.expect(prompt)
         S.sendline("add -u phineas abracadabra.com")
 
@@ -1011,8 +999,6 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_save(self):
-        if None != os.getenv('CLPS_FILENAME'):
-            del os.environ['CLPS_FILENAME']
         filename = "test_save.clps"
         data = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Methuselah'],
