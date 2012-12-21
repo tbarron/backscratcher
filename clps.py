@@ -8,7 +8,7 @@ import pexpect
 import re
 import sys
 import tpbtools
-from testhelp import UnderConstructionError
+from testhelp import UnderConstructionError, debug_flag
 import toolframe
 import traceback as tb
 
@@ -345,6 +345,9 @@ class ClipTest(toolframe.unittest.TestCase):
 
     # -----------------------------------------------------------------------
     def setUp(self):
+        if debug_flag():
+            pdb.set_trace()
+            
         if None != os.getenv('CLPS_FILENAME'):
             del os.environ['CLPS_FILENAME']
 

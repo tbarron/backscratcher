@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import pdb
 import pexpect
 import sys
 import unittest
@@ -12,6 +13,9 @@ def main(args=None, filter=None):
     if args == None:
         args = sys.argv
     p = OptionParser()
+    p.add_option('-d', '--debug',
+                 action='store_true', default=False, dest='debug',
+                 help='debug')
     p.add_option('-k', '--keep',
                  action='store_true', default=False, dest='keep',
                  help='keep test files')
@@ -29,6 +33,8 @@ def main(args=None, filter=None):
                  help='louder')
     (o, a) = p.parse_args(args)
 
+    debug_flag(o.debug)
+    
     if o.verbose:
         volume = 2
     elif o.quiet:
@@ -69,6 +75,21 @@ def all_tests(name, filter=None):
         for case in unittest.TestLoader().getTestCaseNames(cobj):
             cases.append('%s.%s' % (c, case))
     return cases
+
+# ---------------------------------------------------------------------------
+def debug_flag(value=None):
+    global dval
+
+    if value != None:
+        dval = value
+        
+    try:
+        rval = dval
+    except NameError:
+        dval = False
+        rval = dval
+
+    return rval
 
 # ---------------------------------------------------------------------------
 def expectVSgot(expected, got):
