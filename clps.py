@@ -35,14 +35,14 @@ import traceback as tb
 
  + An unrecognized subfunction exits when it should not
 
- - 'clip' and 'show' handle searching differently. 'clip' has to be
+ + 'clip' and 'show' handle searching differently. 'clip' has to be
    told which field to search on. 'show' searches across the ones it's
    going to display. The documentation for clip says that it searches
    across all three if no option is given, but what it actually does
    is to select all entries and ask the user to select one. What to do:
 
     + fix clip so it really does search across all fields with no option
-    - add support for -H -u -p options to show
+    + add support for -H -u -p options to show
 
  - Need a way to remove old entries
 
@@ -376,6 +376,9 @@ def data_store(hostname, username, password):
 class ClipTest(toolframe.unittest.TestCase):
     prompt = "clps> "
     cmdlist = ['add', 'clip', 'load', 'save', 'show', 'help']
+    testdata = [['foobar.com', 'username', 'password'],
+                ['sumatra.org', 'chairil', 'Bukittinggi'],
+                ['java.org', 'khalida', 'Surabaya']]
 
     # -----------------------------------------------------------------------
     def setUp(self):
@@ -387,10 +390,12 @@ class ClipTest(toolframe.unittest.TestCase):
 
     # -----------------------------------------------------------------------
     def test_clip_by_host_multi(self):
+        """
+        Test clip doing a lookup by host and getting multiple hits.
+        User has to select one.
+        """
         global data
-        data = [['foobar.com', 'username', 'password'],
-                ['sumatra.org', 'chairil', 'Bukittinggi'],
-                ['java.org', 'khalida', 'Surabaya']]
+        data = self.testdata
 
         S = pexpect.spawn("clps", timeout=5)
 
@@ -524,6 +529,46 @@ class ClipTest(toolframe.unittest.TestCase):
         S.expect(pexpect.EOF)
         self.assertEqual('password' in S.before, True)
     
+    # -----------------------------------------------------------------------
+    def test_clip_multi_enter(self):
+        """
+        Clip gets multiple hits and asks user to select one. Instead,
+        user hits Enter. Clip should repeat the prompt.
+        """
+        
+    # -----------------------------------------------------------------------
+    def test_clip_rgx_multi(self):
+        """
+        Test clip with a regex across all fields, catching multiple
+        entries so the user has to pick one. The regex should match
+        host in one record, user in another, and password in a third.
+        """
+        raise UnderConstructionError()
+    
+    # -----------------------------------------------------------------------
+    def test_clip_rgx_host(self):
+        """
+        Test clip with a regex across all fields, catching a single
+        entry by matching on the host field.
+        """
+        raise UnderConstructionError('this one next')
+
+    # -----------------------------------------------------------------------
+    def test_clip_rgx_user(self):
+        """
+        Test clip with a regex across all fields, catching a single
+        entry by matching on the user field.
+        """
+        raise UnderConstructionError('ready or not')
+
+    # -----------------------------------------------------------------------
+    def test_clip_rgx_pwd(self):
+        """
+        Test clip with a regex across all fields, catching a single
+        entry by matching on the password field.
+        """
+        raise UnderConstructionError('')
+
     # -----------------------------------------------------------------------
     def test_cmd_opt_h(self):
         S = pexpect.spawn("clps", timeout=5)
@@ -818,12 +863,10 @@ class ClipTest(toolframe.unittest.TestCase):
 
         filename = 'test_load.clps'
         passphrase = 'iChAb0d'
-        f = open(filename, 'w')
         f = os.popen('gpg -c --passphrase %s > %s'
                      % (passphrase, filename),
                      'w')
         for item in data:
-            # f.write('%s!@!%s!@!%s\n' % (item[0], item[1], item[2]))
             f.write('%s\n' % '!@!'.join(item))
         f.close()
         
@@ -1120,7 +1163,31 @@ class ClipTest(toolframe.unittest.TestCase):
         S.expect(pexpect.EOF)
 
     # -----------------------------------------------------------------------
+    def test_show_by_host(self):
+        """
+        Test show selecting entries by host (-H).
+        """
+        raise UnderConstructionError()
+    
+    # -----------------------------------------------------------------------
+    def test_show_by_pwd(self):
+        """
+        Test show selecting entries by password (-p).
+        """
+        raise UnderConstructionError()
+        
+    # -----------------------------------------------------------------------
+    def test_show_by_user(self):
+        """
+        Test show selecting entries by user (-u).
+        """
+        raise UnderConstructionError()
+        
+    # -----------------------------------------------------------------------
     def test_show_rgx_nopass(self):
+        """
+        Test show with a regex across all displayed fields.
+        """
         data = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
                 ['java.org', 'khalida', 'Surabaya']]
@@ -1133,7 +1200,7 @@ class ClipTest(toolframe.unittest.TestCase):
             S.sendline(item[2])
 
         S.expect(self.prompt)
-        S.sendline('show \\.org')
+        S.sendline('show (jav|ril)')
 
         S.expect(self.prompt)
         xp = [[False, False, False],
@@ -1161,7 +1228,7 @@ class ClipTest(toolframe.unittest.TestCase):
             S.sendline(item[2])
 
         S.expect(self.prompt)
-        S.sendline('show -P \\.org')
+        S.sendline('show -P [sS]u[rm]')
 
         S.expect(self.prompt)
         xp = [[False, False, False],

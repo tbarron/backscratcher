@@ -163,7 +163,7 @@ def run_tests(a, final, testlist, volume):
 
 # ---------------------------------------------------------------------------
 class UnderConstructionError(Exception):
-    def __init__(self, value):
+    def __init__(self, value='under construction'):
         self.value = value
     def __str__(self):
         return repr(self.value)
