@@ -300,6 +300,15 @@ def clps_show(args):
     p.add_option('-d', '--debug',
                  action='store_true', default=False, dest='debug',
                  help='run under debugger')
+    p.add_option('-H', '--host',
+                 action='store', default='', dest='hostname',
+                 help='search on hostnames')
+    p.add_option('-u', '--username',
+                 action='store', default='', dest='username',
+                 help='search on usernames')
+    p.add_option('-p', '--password',
+                 action='store', default='', dest='password',
+                 help='search on passwords')
     p.add_option('-P', '--pwd',
                  action='store_true', default=False, dest='pwd',
                  help='show passwords')
@@ -310,19 +319,26 @@ def clps_show(args):
     
     if o.debug: pdb.set_trace()
 
+    result = []
     rgx = ''
     fmt = "%-25s %-25s %-25s"
-    if 0 < len(a):
+    if 0 == len(a):
+        result = data_lookup(o.hostname, o.username, o.password)
+    else:
         rgx = a.pop(0)
-
-    all = data_lookup('', '', '')
-    for (h,u,p) in all:
+        for (h,u,p) in data_lookup('','',''):
+            if o.pwd:
+                if re.search(rgx,h) or re.search(rgx,u) or re.search(rgx,p):
+                    result.append((h,u,p))
+            else:
+                if re.search(rgx,h) or re.search(rgx,u):
+                    result.append((h,u,p))
+        
+    for (h,u,p) in result:
         if o.pwd:
-            if re.search(rgx, h) or re.search(rgx, u) or re.search(rgx, p):
-                print(fmt % (h, u, p))
+            print(fmt % (h, u, p))
         else:
-            if re.search(rgx, h) or re.search(rgx, u):
-                print(fmt % (h, u, ""))
+            print(fmt % (h, u, ""))
 
 # ---------------------------------------------------------------------------
 def copy_to_clipboard(value):
