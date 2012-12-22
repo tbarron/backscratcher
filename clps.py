@@ -204,17 +204,10 @@ def clps_clip(args):
     if 0 == len(result):
         print("No match found")
     elif 1 == len(result):
-        # print("copy password from result into clipboard")
         copy_to_clipboard(result[0][2])
     else:
-        cdx = 1
-        for entry in result:
-            print(" %3d. %s / %s" % (cdx, entry[0], entry[1]))
-            cdx += 1
-            
-        choice = raw_input("Please make a selection> ")
+        choice = user_make_selection(result)
         copy_to_clipboard(result[int(choice) - 1][2])
-        # print("copy password from result[int(choice)] into clipboard")
 
 # ---------------------------------------------------------------------------
 def clps_load(args):
@@ -373,6 +366,17 @@ def data_store(hostname, username, password):
         data.append([hostname, username, password])
 
 # ---------------------------------------------------------------------------
+def user_make_selection(choices):
+    rval = ""
+    while not rval.isdigit() or int(rval) not in range(1, len(choices)+1):
+        cdx = 1
+        for entry in choices:
+            print(" %3d. %s / %s" % (cdx, entry[0], entry[1]))
+            cdx += 1
+        rval = raw_input("Please make a selection> ")
+    return rval
+
+# ---------------------------------------------------------------------------
 class ClipTest(toolframe.unittest.TestCase):
     prompt = "clps> "
     cmdlist = ['add', 'clip', 'load', 'save', 'show', 'help']
@@ -425,9 +429,13 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_clip_by_host_one(self):
+        """
+        Test clip where it selects on the host field and gets a single
+        hit.
+        """
         global data
-        data = [['foobar.com', 'username', 'password']]
-
+        data = self.testdata
+        
         # clear the clipboard
         os.system("pbcopy < /dev/null")
         
@@ -438,10 +446,11 @@ class ClipTest(toolframe.unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def test_clip_by_pwd_multi(self):
+        """
+        Test clip selecting on password and getting multiple hits.
+        """
         global data
-        data = [['foobar.com', 'username', 'password'],
-                ['sumatra.org', 'chairil', 'Bukittinggi'],
-                ['java.org', 'khalida', 'Surabaya']]
+        data = self.testdata
 
         S = pexpect.spawn("clps", timeout=5)
 
@@ -471,9 +480,12 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_clip_by_pwd_one(self):
+        """
+        Test clip selecting on password and getting a single hit.
+        """
         global data
-        data = [('foobar.com', 'username', 'password')]
-
+        data = self.testdata
+        
         # clear the clipboard
         os.system("pbcopy < /dev/null")
         
@@ -484,10 +496,12 @@ class ClipTest(toolframe.unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def test_clip_by_user_multi(self):
+        """
+        Test clip doing a lookup by user and getting multiple hits.
+        User has to select one.
+        """
         global data
-        data = [['foobar.com', 'username', 'password'],
-                ['sumatra.org', 'chairil', 'Bukittinggi'],
-                ['java.org', 'khalida', 'Surabaya']]
+        data = self.testdata
 
         S = pexpect.spawn("clps", timeout=5)
 
@@ -517,12 +531,14 @@ class ClipTest(toolframe.unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def test_clip_by_user_one(self):
+        """
+        Test clip doing a lookup by user and getting a single hit.
+        """
         global data
-
+        data = self.testdata
+        
         # clear the clipboard
         os.system("pbcopy < /dev/null")
-
-        data = [('foobar.com', 'username', 'password')]
 
         clps_clip(['-u', '.*serna.*'])
         S = pexpect.spawn('pbpaste')
@@ -535,7 +551,44 @@ class ClipTest(toolframe.unittest.TestCase):
         Clip gets multiple hits and asks user to select one. Instead,
         user hits Enter. Clip should repeat the prompt.
         """
+        global data
+        data = self.testdata
+
+        S = pexpect.spawn("clps", timeout=5)
+
+        for item in data:
+            S.expect(self.prompt)
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+
+        S.expect(self.prompt)
+        S.sendline("clip [sS][su]")
         
+        S.expect("Please make a selection> ")
+
+        self.assertEqual('foobar.com' in S.before, True)
+        self.assertEqual('sumatra.org' in S.before, True)
+        self.assertEqual('java.org' in S.before, True)
+
+        S.sendline("")
+
+        S.expect("Please make a selection> ")
+
+        self.assertEqual('foobar.com' in S.before, True)
+        self.assertEqual('sumatra.org' in S.before, True)
+        self.assertEqual('java.org' in S.before, True)
+
+        S.sendline("2")
+        
+        S.expect(self.prompt)
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+
+        S = pexpect.spawn("pbpaste")
+        S.expect(pexpect.EOF)
+        self.assertEqual('Bukittinggi' in S.before, True)
+    
     # -----------------------------------------------------------------------
     def test_clip_rgx_multi(self):
         """
@@ -571,6 +624,9 @@ class ClipTest(toolframe.unittest.TestCase):
 
     # -----------------------------------------------------------------------
     def test_cmd_opt_h(self):
+        """
+        Test all the commands with option -h.
+        """
         S = pexpect.spawn("clps", timeout=5)
         S.expect(self.prompt)
 
@@ -589,6 +645,9 @@ class ClipTest(toolframe.unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def test_cmd_bad_opt(self):
+        """
+        Test all commands with an invalid option.
+        """
         S = pexpect.spawn("clps", timeout=5)
         S.expect(self.prompt)
 
@@ -607,12 +666,18 @@ class ClipTest(toolframe.unittest.TestCase):
     
     # -----------------------------------------------------------------------
     def test_clps_opt_h(self):
+        """
+        Test running clps with the -h option.
+        """
         S = pexpect.spawn("clps -h", timeout=5)
         S.expect(pexpect.EOF)
         self.assertEqual('debug' in S.before, True)
         
     # -----------------------------------------------------------------------
     def test_copy_to_clipboard(self):
+        """
+        Test the function copy_to_clipboard().
+        """
         test_value = 'Brobdinagian'
         copy_to_clipboard(test_value)
         S = pexpect.spawn("pbpaste")
@@ -621,6 +686,9 @@ class ClipTest(toolframe.unittest.TestCase):
 
     # -----------------------------------------------------------------------
     def test_dlup_by_host(self):
+        """
+        Test the data_lookup() routine, selecting on hostname.
+        """
         global data
 
         data = [['hostname.com', 'username', 'password'],
@@ -641,6 +709,10 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_dlup_by_hp(self):
+        """
+        Test the data_lookup() routine, selecting on hostname and
+        password.
+        """
         global data
 
         data = [['hostname.com', 'username', 'password'],
@@ -669,6 +741,10 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_dlup_by_hpu(self):
+        """
+        Test the data_lookup() routine, selecting on hostname,
+        password, and user.
+        """
         global data
 
         data = [['hostname.com', 'username', 'password'],
@@ -705,6 +781,10 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_dlup_by_hu(self):
+        """
+        Test the data_lookup() routine, selecting on hostname and
+        user.
+        """
         global data
 
         data = [['hostname.com', 'username', 'password'],
@@ -733,6 +813,10 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_dlup_by_pu(self):
+        """
+        Test the data_lookup() routine, selecting on password and
+        user.
+        """
         global data
 
         data = [['hostname.com', 'username', 'password'],
@@ -761,6 +845,9 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_dlup_by_pwd(self):
+        """
+        Test the data_lookup() routine, selecting on password.
+        """
         global data
 
         data = [['hostname.com', 'username', 'password'],
@@ -781,6 +868,9 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_dlup_by_user(self):
+        """
+        Test the data_lookup() routine, selecting on user.
+        """
         global data
 
         data = [['hostname.com', 'username', 'password'],
@@ -801,6 +891,9 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_dstore_empty(self):
+        """
+        Test the data_store() routine, beginning with an empty store.
+        """
         global data
 
         data = []
@@ -810,6 +903,10 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_dstore_full(self):
+        """
+        Test the data_store() routine, beginning with some data
+        already present.
+        """
         global data
         
         data = [['hostname.com', 'username', 'password'],
@@ -823,6 +920,9 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_help_noarg(self):
+        """
+        Test interactive help inside clps.
+        """
         S = pexpect.spawn('clps', timeout=5)
         S.expect(self.prompt)
         S.sendline('help')
@@ -839,6 +939,9 @@ class ClipTest(toolframe.unittest.TestCase):
 
     # -----------------------------------------------------------------------
     def test_help_cmd(self):
+        """
+        Test interactive help inside clps, passing it a command name.
+        """
         S = pexpect.spawn('clps', timeout=5)
         S.expect(self.prompt)
         S.sendline('help')
@@ -856,6 +959,9 @@ class ClipTest(toolframe.unittest.TestCase):
 
     # -----------------------------------------------------------------------
     def test_load(self):
+        """
+        Test loading a file of clps data.
+        """
         data = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
                 ['java.org', 'khalida', 'Surabaya'],
@@ -892,6 +998,10 @@ class ClipTest(toolframe.unittest.TestCase):
 
     # -----------------------------------------------------------------------
     def test_optionA_addshow(self):
+        """
+        Test add routine, including hostname on the command, getting
+        prompted for username and password.
+        """
         prompt = "clps> "
         S = pexpect.spawn("clps", timeout=5)
 
@@ -917,6 +1027,10 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_optionAA_addshow(self):
+        """
+        Test add routine, including hostname and username on the
+        command, getting prompted for password.
+        """
         prompt = "clps> "
         S = pexpect.spawn("clps", timeout=5)
 
@@ -939,6 +1053,10 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_optionH_addshow(self):
+        """
+        Test add routine, including hostname on the command with the
+        -H option, getting prompted for username and password.
+        """
         prompt = "clps> "
         S = pexpect.spawn("clps", timeout=5)
 
@@ -964,6 +1082,11 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_optionHa_addshow(self):
+        """
+        Test add routine, including hostname on the command with the
+        -H option and the username positionally, getting prompted for
+        password.
+        """
         prompt = "clps> "
         S = pexpect.spawn("clps", timeout=5)
 
@@ -986,6 +1109,11 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_optionUH_addshow(self):
+        """
+        Test add routine, including hostname on the command with the
+        -H option, username on the command with the -u option, getting
+        prompted for password.
+        """
         prompt = "clps> "
         S = pexpect.spawn("clps", timeout=5)
 
@@ -1008,6 +1136,10 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_optionU_addshow(self):
+        """
+        Test add routine, including username on the command with the
+        -u option, getting prompted for hostname and password.
+        """
         prompt = "clps> "
         S = pexpect.spawn("clps", timeout=5)
 
@@ -1033,6 +1165,11 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_optionUa_addshow(self):
+        """
+        Test add routine, including hostname on the command
+        positionally, username on the command with the -u option,
+        getting prompted for password.
+        """
         prompt = "clps> "
         S = pexpect.spawn("clps", timeout=5)
         S.timeout = 5
@@ -1056,6 +1193,9 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_prompt_addshow(self):
+        """
+        Test add routine, getting prompted for everything.
+        """
         S = pexpect.spawn("clps", timeout=5)
 
         S.expect(self.prompt)
@@ -1083,6 +1223,9 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_save(self):
+        """
+        Test the save routine.
+        """
         filename = "test_save.clps"
         data = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Methuselah'],
@@ -1114,6 +1257,9 @@ class ClipTest(toolframe.unittest.TestCase):
 
     # -----------------------------------------------------------------------
     def test_show_all_nopass(self):
+        """
+        Test show routine, showing all entries without passwords.
+        """
         data = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
                 ['java.org', 'khalida', 'Surabaya']]
@@ -1139,6 +1285,9 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def test_show_all_wpass(self):
+        """
+        Test show routine, showing all entries with passwords.
+        """
         data = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
                 ['java.org', 'khalida', 'Surabaya']]
@@ -1216,6 +1365,10 @@ class ClipTest(toolframe.unittest.TestCase):
 
     # -----------------------------------------------------------------------
     def test_show_rgx_wpass(self):
+        """
+        Test show routine, selecting across all fields with a regex,
+        showing passwords.
+        """
         data = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
                 ['java.org', 'khalida', 'Surabaya']]
