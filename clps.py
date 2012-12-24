@@ -55,6 +55,9 @@ import traceback as tb
  - On a clip command, if more than one match is found and the user
    just hits Enter rather than typing a number, we get a traceback.
 
+ - the load and save commands should cache the most recently used
+   filename so after loading a file, saying 'save' with no argument
+   should save the same filename.
 """
 
 # ---------------------------------------------------------------------------
