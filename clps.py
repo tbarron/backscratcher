@@ -631,7 +631,26 @@ class ClipTest(toolframe.unittest.TestCase):
         Test clip with a regex across all fields, catching a single
         entry by matching on the host field.
         """
-        raise UnderConstructionError('this one next')
+        data = self.testdata
+
+        S = pexpect.spawn("clps", timeout=5)
+
+        for item in data:
+            S.expect(self.prompt)
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+
+        S.expect(self.prompt)
+        S.sendline("clip (com)")
+        
+        S.expect(self.prompt)
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+
+        S = pexpect.spawn("pbpaste")
+        S.expect(pexpect.EOF)
+        self.assertEqual('password' in S.before, True)
 
     # -----------------------------------------------------------------------
     def test_clip_rgx_user(self):
@@ -639,7 +658,26 @@ class ClipTest(toolframe.unittest.TestCase):
         Test clip with a regex across all fields, catching a single
         entry by matching on the user field.
         """
-        raise UnderConstructionError('ready or not')
+        data = self.testdata
+
+        S = pexpect.spawn("clps", timeout=5)
+
+        for item in data:
+            S.expect(self.prompt)
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+
+        S.expect(self.prompt)
+        S.sendline("clip (lida)")
+        
+        S.expect(self.prompt)
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+
+        S = pexpect.spawn("pbpaste")
+        S.expect(pexpect.EOF)
+        self.assertEqual('Surabaya' in S.before, True)
 
     # -----------------------------------------------------------------------
     def test_clip_rgx_pwd(self):
@@ -647,7 +685,26 @@ class ClipTest(toolframe.unittest.TestCase):
         Test clip with a regex across all fields, catching a single
         entry by matching on the password field.
         """
-        raise UnderConstructionError('')
+        data = self.testdata
+
+        S = pexpect.spawn("clps", timeout=5)
+
+        for item in data:
+            S.expect(self.prompt)
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+
+        S.expect(self.prompt)
+        S.sendline("clip (kittin)")
+        
+        S.expect(self.prompt)
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+
+        S = pexpect.spawn("pbpaste")
+        S.expect(pexpect.EOF)
+        self.assertEqual('Bukittinggi' in S.before, True)
 
     # -----------------------------------------------------------------------
     def test_cmd_opt_h(self):
