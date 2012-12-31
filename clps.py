@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import getpass
+import glob
 from optparse import OptionParser
 import os
 import pdb
@@ -9,6 +10,7 @@ import re
 import sys
 import tpbtools
 from testhelp import UnderConstructionError, debug_flag
+import time
 import toolframe
 import traceback as tb
 
@@ -52,7 +54,7 @@ import traceback as tb
  - When save overwrites an existing file, the old version should be
    renamed with a timestamp
 
- - On a clip command, if more than one match is found and the user
+ + On a clip command, if more than one match is found and the user
    just hits Enter rather than typing a number, we get a traceback.
 
  - the load and save commands should cache the most recently used
@@ -401,7 +403,6 @@ class ClipTest(toolframe.unittest.TestCase):
         Test clip doing a lookup by host and getting multiple hits.
         User has to select one.
         """
-        global data
         data = self.testdata
 
         S = pexpect.spawn("clps", timeout=5)
@@ -452,7 +453,6 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         Test clip selecting on password and getting multiple hits.
         """
-        global data
         data = self.testdata
 
         S = pexpect.spawn("clps", timeout=5)
@@ -503,7 +503,6 @@ class ClipTest(toolframe.unittest.TestCase):
         Test clip doing a lookup by user and getting multiple hits.
         User has to select one.
         """
-        global data
         data = self.testdata
 
         S = pexpect.spawn("clps", timeout=5)
@@ -554,7 +553,6 @@ class ClipTest(toolframe.unittest.TestCase):
         Clip gets multiple hits and asks user to select one. Instead,
         user hits Enter. Clip should repeat the prompt.
         """
-        global data
         data = self.testdata
 
         S = pexpect.spawn("clps", timeout=5)
@@ -599,8 +597,34 @@ class ClipTest(toolframe.unittest.TestCase):
         entries so the user has to pick one. The regex should match
         host in one record, user in another, and password in a third.
         """
-        raise UnderConstructionError()
-    
+        data = self.testdata
+
+        S = pexpect.spawn("clps", timeout=5)
+
+        for item in data:
+            S.expect(self.prompt)
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+
+        S.expect(self.prompt)
+        S.sendline("clip (com|chair|Sura)")
+        
+        S.expect("Please make a selection> ")
+
+        self.assertEqual('foobar.com' in S.before, True)
+        self.assertEqual('chairil' in S.before, True)
+        self.assertEqual('java.org' in S.before, True)
+
+        S.sendline("2")
+        S.expect(self.prompt)
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+
+        S = pexpect.spawn("pbpaste")
+        S.expect(pexpect.EOF)
+        self.assertEqual('Bukittinggi' in S.before, True)
+        
     # -----------------------------------------------------------------------
     def test_clip_rgx_host(self):
         """
@@ -1258,6 +1282,55 @@ class ClipTest(toolframe.unittest.TestCase):
             for element in item:
                 self.assertEqual(element in ''.join(C), False)
 
+    # -----------------------------------------------------------------------
+    def test_save_overwrite(self):
+        """
+        Test that when the save routine overwrites an existing file,
+        it first renames that file so it's not lost.
+        """
+        filename = "test_save.clps"
+        oldglob = time.strftime("test_save.%Y.%m%d*")
+        for oldfname in glob.glob(oldglob):
+            os.unlink(oldfname)
+            
+        data = [['foobar.com', 'username', 'password'],
+                ['sumatra.org', 'chairil', 'Methuselah'],
+                ['java.org', 'khalida', 'Surabaya']]
+                                
+        f = open(filename, 'w')
+        f.write("Avoid data loss\n")
+        f.close()
+
+                                
+        S = pexpect.spawn("clps", timeout=5)
+        for item in data:
+            S.expect(self.prompt)
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+
+        S.expect(self.prompt)
+        S.sendline('save %s' % filename)
+
+        S.expect('Password: ')
+        S.sendline('test_passphrase')
+        
+        S.expect(self.prompt)
+        S.sendline('quit')
+
+                                
+        S.expect(pexpect.EOF)
+
+        self.assertEqual(os.path.exists(filename), True)
+        
+        C = tpbtools.contents(filename)
+        for item in data:
+            for element in item:
+                self.assertEqual(element in ''.join(C), False)
+
+        fl = glob.glob(oldglob)
+        self.assertEqual(0 < len(fl), True)
+                                
     # -----------------------------------------------------------------------
     def test_show_all_nopass(self):
         """
