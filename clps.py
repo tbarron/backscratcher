@@ -278,6 +278,10 @@ def clps_save(args):
     else:
         raise StandardError('save requires a filename')
 
+    if os.path.exists(filename):
+        newname = filename + time.strftime(".%Y.%m%d.%H%M%S")
+        os.rename(filename, newname)
+
     passphrase = getpass.getpass()
     f = os.popen('gpg -c --passphrase %s > %s' % (passphrase, filename), 'w')
     all = data_lookup('', '', '')
@@ -1346,7 +1350,7 @@ class ClipTest(toolframe.unittest.TestCase):
         it first renames that file so it's not lost.
         """
         filename = "test_save.clps"
-        oldglob = time.strftime("test_save.%Y.%m%d*")
+        oldglob = time.strftime(filename + ".%Y.%m%d*")
         for oldfname in glob.glob(oldglob):
             os.unlink(oldfname)
             
@@ -1421,10 +1425,8 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         Test show routine, showing all entries with passwords.
         """
-        data = [['foobar.com', 'username', 'password'],
-                ['sumatra.org', 'chairil', 'Bukittinggi'],
-                ['java.org', 'khalida', 'Surabaya']]
-
+        data = self.testdata
+        
         S = pexpect.spawn("clps", timeout=5)
         for item in data:
             S.expect(self.prompt)
@@ -1449,21 +1451,69 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         Test show selecting entries by host (-H).
         """
-        raise UnderConstructionError()
+        data = self.testdata
+        
+        S = pexpect.spawn("clps", timeout=5)
+        for item in data:
+            S.expect(self.prompt)
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+
+        S.expect(self.prompt)
+        S.sendline('show -P -H com')
+
+        S.expect(self.prompt)
+        self.assertEqual('password' in S.before, True)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
     
     # -----------------------------------------------------------------------
     def test_show_by_pwd(self):
         """
         Test show selecting entries by password (-p).
         """
-        raise UnderConstructionError()
+        data = self.testdata
+        
+        S = pexpect.spawn("clps", timeout=5)
+        for item in data:
+            S.expect(self.prompt)
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+
+        S.expect(self.prompt)
+        S.sendline('show -P -p ggi')
+
+        S.expect(self.prompt)
+        self.assertEqual('Bukittinggi' in S.before, True)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
         
     # -----------------------------------------------------------------------
     def test_show_by_user(self):
         """
         Test show selecting entries by user (-u).
         """
-        raise UnderConstructionError()
+        data = self.testdata
+        
+        S = pexpect.spawn("clps", timeout=5)
+        for item in data:
+            S.expect(self.prompt)
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+
+        S.expect(self.prompt)
+        S.sendline('show -P -u khal')
+
+        S.expect(self.prompt)
+        self.assertEqual('Surabaya' in S.before, True)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
         
     # -----------------------------------------------------------------------
     def test_show_rgx_nopass(self):
