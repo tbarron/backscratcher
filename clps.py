@@ -15,6 +15,9 @@ import toolframe
 import traceback as tb
 
 """
+New issues should be managed in the github issue tracker associated
+with the backscratcher project rather than this list.
+
  + "clps -f <filename>" should load <filename>
 
  + "clps" (no args) should attempt to load a default file ($CLPS_FILENAME)
@@ -46,20 +49,13 @@ import traceback as tb
     + fix clip so it really does search across all fields with no option
     + add support for -H -u -p options to show
 
- - Need a way to remove old entries
-
- - it would be helpful to have each entry timestamped so we can tell
-   ages and most recent
+ + Need a way to remove old entries
 
  + When save overwrites an existing file, the old version should be
    renamed with a timestamp
 
  + On a clip command, if more than one match is found and the user
    just hits Enter rather than typing a number, we get a traceback.
-
- - the load and save commands should cache the most recently used
-   filename so after loading (or saving) a file, saying 'save' with no
-   argument should save the same filename.
 """
 
 # ---------------------------------------------------------------------------
@@ -1563,6 +1559,177 @@ class ClipTest(toolframe.unittest.TestCase):
         S.sendline('quit')
         S.expect(pexpect.EOF)
 
+    # -----------------------------------------------------------------------
+    # load tests
+    #    $SEC = $HOME/.clps/secrets.clps
+    #    $CF  = $CLPS_FILENAME
+    #    $FARG = -f argument
+    #      x = exists; s = set + exists; S = set + !exists; u = unset
+    #    $SEC    $CF    $FARG     result
+    #      x      -       s        open $FARG          cmdline_exist
+    #      x      -       S        fail to prompt      cmdline_nosuch
+    #      x      s       u        open $CF            env_exist
+    #      x      S       u        fail to prompt      env_nosuch
+    #      x      u       u        open $SEC           default_exist
+    #     !x      S       u        fail to prompt      defenv_nosuch
+    #     !x      u       u        drop to prompt (no error)  default_nosuch
+    #
+    # other possible failure modes
+    #   $FARG cannot be opened due to permissions      cmdline_perm
+    #   $FARG cannot be decrypted (bad passphrase)     cmdline_pass
+    #   $FARG cannot be decrypted (corrupt file)       cmdline_gpg
+    #   $CF cannot be opened due to permissions        env_perm
+    #   $CF cannot be decrypted (bad passphrase)       env_pass
+    #   $CF cannot be decrypted (corrupt file)         env_gpg
+    #   $SEC cannot be opened due to permissions       default_perm
+    #   $SEC cannot be decrypted (bad passphrase)      default_pass
+    #   $SEC cannot be decrypted (corrupt file)        defalut_gpg
+
+    # -----------------------------------------------------------------------
+    def test_load_cmdline_exist(self):
+        """
+        Option -f supplied on command line with a file that exists. We
+        don't care about $CLPS_FILENAME or the default file
+        ($HOME/.clps/secrets.clps). We load the file named by the
+        option.
+        """
+        raise UnderConstructionError
+    
+    # -----------------------------------------------------------------------
+    def test_load_cmdline_nosuch(self):
+        """
+        Option -f supplied on command line but its argument does not
+        exist. We complain about the missing file and drop to the
+        prompt with nothing loaded.
+        """
+        raise UnderConstructionError
+    
+    # -----------------------------------------------------------------------
+    def test_load_cmdline_perm(self):
+        """
+        Option -f supplied on command line but its argument cannot be
+        opened because the permissions on the file don't allow it. We
+        complain about the error and drop to the prompt with nothing
+        loaded.
+        """
+        raise UnderConstructionError
+    
+    # -----------------------------------------------------------------------
+    def test_load_cmdline_pass(self):
+        """
+        Option -f supplied on command line but its argument cannot be
+        opened because the wrong passphrase is supplied. We complain
+        about the error and drop to the prompt with nothing loaded.
+        """
+        raise UnderConstructionError
+    
+    # -----------------------------------------------------------------------
+    def test_load_cmdline_gpg(self):
+        """
+        Option -f supplied on command line but its argument cannot be
+        opened because it is not a gpg-encrypted file. We complain
+        about the error and drop to the prompt with nothing loaded.
+        """
+        raise UnderConstructionError
+    
+    # -----------------------------------------------------------------------
+    def test_load_env_exist(self):
+        """
+        Option -f is not specified but $CLPS_FILENAME names an
+        existing file. We load it.
+        """
+        raise UnderConstructionError
+    
+    # -----------------------------------------------------------------------
+    def test_load_env_nosuch(self):
+        """
+        Option -f is not specified and $CLPS_FILENAME names a
+        non-existent file. We complain about the error and drop to the
+        prompt with nothing loaded.
+        """
+        raise UnderConstructionError
+    
+    # -----------------------------------------------------------------------
+    def test_load_env_perm(self):
+        """
+        $CLPS_FILENAME names an existing file but the permissions on
+        the file don't allow it to be opened. We complain about the
+        error and drop to the prompt with nothing loaded.
+        """
+        raise UnderConstructionError
+    
+    # -----------------------------------------------------------------------
+    def test_load_env_pass(self):
+        """
+        $CLPS_FILENAME names an existing file which cannot be opened
+        because the wrong passphrase is supplied. We complain about
+        the error and drop to the prompt with nothing loaded.
+        """
+        raise UnderConstructionError
+    
+    # -----------------------------------------------------------------------
+    def test_load_env_gpg(self):
+        """
+        $CLPS_FILENAME names an existing file which cannot be opened
+        because it is not a gpg-encrypted file. We complain about the
+        error and drop to the prompt with nothing loaded.
+        """
+        raise UnderConstructionError
+    
+    # -----------------------------------------------------------------------
+    def test_load_default_exist(self):
+        """
+        We successfully open the default file $HOME/.clps/secrets.clps
+        since -f and $CLPS_FILENAME are not specified and the default
+        file exists.
+        """
+        raise UnderConstructionError
+    
+    # -----------------------------------------------------------------------
+    def test_load_defenv_nosuch(self):
+        """
+        $CLPS_FILENAME names a file that does not exist and the
+        default file does not exist. We complain about $CLPS_FILENAME
+        not existing, then drop to the prompt with nothing loaded.
+        """
+        raise UnderConstructionError
+    
+    # -----------------------------------------------------------------------
+    def test_load_default_nosuch(self):
+        """
+        Neither -f or $CLPS_FILENAME are set and the default file does
+        not exist. We drop to the prompt with no error and nothing
+        loaded.
+        """
+        raise UnderConstructionError
+    
+    # -----------------------------------------------------------------------
+    def test_load_default_perm(self):
+        """
+        $HOME/.clps/secrets exists but the permissions on the file
+        don't allow it to be opened. We complain about the error and
+        drop to the prompt with nothing loaded.
+        """
+        raise UnderConstructionError
+    
+    # -----------------------------------------------------------------------
+    def test_load_default_pass(self):
+        """
+        $HOME/.clps/secrets.clps exists but cannot be opened because
+        the wrong passphrase is supplied. We complain about the error
+        and drop to the prompt with nothing loaded.
+        """
+        raise UnderConstructionError
+    
+    # -----------------------------------------------------------------------
+    def test_load_default_gpg(self):
+        """
+        $HOME/.clps/secrets.clps exists but cannot be opened because
+        it is not a gpg-encrypted file. We complain about the error
+        and drop to the prompt with nothing loaded.
+        """
+        raise UnderConstructionError
+    
     # -----------------------------------------------------------------------
     def test_optionA_addshow(self):
         """
