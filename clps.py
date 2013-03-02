@@ -51,15 +51,15 @@ import traceback as tb
  - it would be helpful to have each entry timestamped so we can tell
    ages and most recent
 
- - When save overwrites an existing file, the old version should be
+ + When save overwrites an existing file, the old version should be
    renamed with a timestamp
 
  + On a clip command, if more than one match is found and the user
    just hits Enter rather than typing a number, we get a traceback.
 
  - the load and save commands should cache the most recently used
-   filename so after loading a file, saying 'save' with no argument
-   should save the same filename.
+   filename so after loading (or saving) a file, saying 'save' with no
+   argument should save the same filename.
 """
 
 # ---------------------------------------------------------------------------
@@ -215,6 +215,60 @@ def clps_clip(args):
         copy_to_clipboard(result[int(choice) - 1][2])
 
 # ---------------------------------------------------------------------------
+def clps_del(args):
+    """del - delete an entry
+
+    del [-H|-u|-p] <regex>
+
+    Search the list of password entries, applying the regex to
+    hostnames, usernames, or passwords (or all three if no options are
+    given). List all the matched entries and ask the user for
+    confirmation to delete them.
+    """
+    p = OptionParser()
+    p.add_option('-d', '--debug',
+                 action='store_true', default=False, dest='debug',
+                 help='run under debugger')
+    p.add_option('-H', '--host',
+                 action='store', default='', dest='hostname',
+                 help='search on hostnames')
+    p.add_option('-u', '--username',
+                 action='store', default='', dest='username',
+                 help='search on usernames')
+    p.add_option('-p', '--password',
+                 action='store', default='', dest='password',
+                 help='search on passwords')
+    try:
+        (o, a) = p.parse_args(args)
+
+        if o.debug: pdb.set_trace()
+
+        result = []
+        if 0 == len(a):
+            result = data_lookup(o.hostname, o.username, o.password)
+        else:
+            result = []
+            rgx = a[0]
+            for (h,u,p) in data_lookup('', '', ''):
+                if re.search(rgx, h) or re.search(rgx,u) or re.search(rgx,p):
+                    result.append((h,u,p))
+
+        if 0 < len(result):
+            fmt = "%-25s %-25s %-25s"
+            print("Deleting:")
+            for (h,u,p) in result:
+                print(fmt % (h, u, p))
+
+            answer = raw_input("Ok? > ")
+            if re.match("ye?s?", answer):
+                for (h, u, p) in result:
+                    data_delete(h, u, p)
+        else:
+            print("Nothing found to delete")
+    except:
+        tb.print_exc()
+
+# ---------------------------------------------------------------------------
 def clps_load(args):
     """load - read an encrypted file of password information
 
@@ -349,6 +403,15 @@ def copy_to_clipboard(value):
     p.close()
 
 # ---------------------------------------------------------------------------
+def data_delete(hostname, username, password):
+    global data
+    try:
+        data.remove([hostname, username, password])
+    except ValueError:
+        print("['%s', '%s', '%s'] not found in data"
+              % (hostname, username, password))
+
+# ---------------------------------------------------------------------------
 def data_lookup(hostname, username, password):
     global data
     try:
@@ -392,6 +455,7 @@ class ClipTest(toolframe.unittest.TestCase):
     testdata = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
                 ['java.org', 'khalida', 'Surabaya']]
+    okprompt = r'Ok\? > '
 
     # -----------------------------------------------------------------------
     def setUp(self):
@@ -426,7 +490,6 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual('java.org' in S.before, True)
 
         S.sendline("2")
-        # S.expect("Password for khalida@java.org copied to clipboard")
         S.expect(self.prompt)
         S.sendline("quit")
         S.expect(pexpect.EOF)
@@ -710,6 +773,422 @@ class ClipTest(toolframe.unittest.TestCase):
         S.expect(pexpect.EOF)
         self.assertEqual('Bukittinggi' in S.before, True)
 
+    # -----------------------------------------------------------------------
+    def test_del_by_host_multi(self):
+        """
+        Test del doing a lookup by host and getting multiple hits.
+        User has to select one.
+        """
+        data = self.testdata
+
+        S = pexpect.spawn("clps", timeout=5)
+        S.expect(self.prompt)
+            
+        for item in data:
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+            S.expect(self.prompt)
+            
+        S.sendline("del -H \\.org")
+        S.expect(self.okprompt)
+
+        self.assertEqual('Deleting' in S.before, True)
+        self.assertEqual('foobar.com' in S.before, False)
+        self.assertEqual('sumatra.org' in S.before, True)
+        self.assertEqual('java.org' in S.before, True)
+        
+        S.sendline("yes")
+        S.expect(self.prompt)
+
+        S.sendline("show -P")
+        S.expect(self.prompt)
+        
+        self.assertEqual('foobar.com' in S.before, True)
+        self.assertEqual('sumatra.org' in S.before, False)
+        self.assertEqual('java.org' in S.before, False)
+                        
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+
+    # -----------------------------------------------------------------------
+    def test_del_by_host_one(self):
+        """
+        Test del where it selects on the host field and gets a single
+        hit.
+        """
+        data = self.testdata
+
+        S = pexpect.spawn("clps", timeout=5)
+        S.expect(self.prompt)
+            
+        for item in data:
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+            S.expect(self.prompt)
+            
+        S.sendline("del -H java")
+        S.expect(self.okprompt)
+
+        self.assertEqual('Deleting' in S.before, True)
+        self.assertEqual('foobar.com' in S.before, False)
+        self.assertEqual('sumatra.org' in S.before, False)
+        self.assertEqual('java.org' in S.before, True)
+        
+        S.sendline("yes")
+        S.expect(self.prompt)
+
+        S.sendline("show -P")
+        S.expect(self.prompt)
+        
+        self.assertEqual('foobar.com' in S.before, True)
+        self.assertEqual('sumatra.org' in S.before, True)
+        self.assertEqual('java.org' in S.before, False)
+                        
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+
+    # -----------------------------------------------------------------------
+    def test_del_by_pwd_multi(self):
+        """
+        Test del selecting on password and getting multiple hits.
+        """
+        data = self.testdata
+
+        S = pexpect.spawn("clps", timeout=5)
+        S.expect(self.prompt)
+            
+        for item in data:
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+            S.expect(self.prompt)
+            
+        S.sendline("del -p .*r.*")
+        S.expect(self.okprompt)
+
+        self.assertEqual('Deleting' in S.before, True)
+        self.assertEqual('foobar.com' in S.before, True)
+        self.assertEqual('sumatra.org' in S.before, False)
+        self.assertEqual('java.org' in S.before, True)
+        
+        S.sendline("yes")
+        S.expect(self.prompt)
+
+        S.sendline("show -P")
+        S.expect(self.prompt)
+        
+        self.assertEqual('foobar.com' in S.before, False)
+        self.assertEqual('sumatra.org' in S.before, True)
+        self.assertEqual('java.org' in S.before, False)
+                        
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+        
+    # -----------------------------------------------------------------------
+    def test_del_by_pwd_one(self):
+        """
+        Test del selecting on password and getting a single hit.
+        """
+        data = self.testdata
+
+        S = pexpect.spawn("clps", timeout=5)
+        S.expect(self.prompt)
+            
+        for item in data:
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+            S.expect(self.prompt)
+            
+        S.sendline("del -p baya")
+        S.expect(self.okprompt)
+
+        self.assertEqual('Deleting' in S.before, True)
+        self.assertEqual('foobar.com' in S.before, False)
+        self.assertEqual('sumatra.org' in S.before, False)
+        self.assertEqual('java.org' in S.before, True)
+        
+        S.sendline("yes")
+        S.expect(self.prompt)
+
+        S.sendline("show -P")
+        S.expect(self.prompt)
+        
+        self.assertEqual('foobar.com' in S.before, True)
+        self.assertEqual('sumatra.org' in S.before, True)
+        self.assertEqual('java.org' in S.before, False)
+                        
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+    
+    # -----------------------------------------------------------------------
+    def test_del_by_user_multi(self):
+        """
+        Test del doing a lookup by user and getting multiple hits.
+        User has to select one.
+        """
+        data = self.testdata
+
+        S = pexpect.spawn("clps", timeout=5)
+        S.expect(self.prompt)
+            
+        for item in data:
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+            S.expect(self.prompt)
+            
+        S.sendline("del -u .*a[im].*")
+        S.expect(self.okprompt)
+
+        self.assertEqual('Deleting' in S.before, True)
+        self.assertEqual('foobar.com' in S.before, True)
+        self.assertEqual('sumatra.org' in S.before, True)
+        self.assertEqual('java.org' in S.before, False)
+        
+        S.sendline("yes")
+        S.expect(self.prompt)
+
+        S.sendline("show -P")
+        S.expect(self.prompt)
+        
+        self.assertEqual('foobar.com' in S.before, False)
+        self.assertEqual('sumatra.org' in S.before, False)
+        self.assertEqual('java.org' in S.before, True)
+                        
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+    
+    # -----------------------------------------------------------------------
+    def test_del_by_user_one(self):
+        """
+        Test del doing a lookup by user and getting a single hit.
+        """
+        data = self.testdata
+
+        S = pexpect.spawn("clps", timeout=5)
+        S.expect(self.prompt)
+
+        for item in data:
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+            S.expect(self.prompt)
+
+        S.sendline("del -u chairil")
+        S.expect(self.okprompt)
+
+        self.assertEqual('Deleting' in S.before, True)
+        self.assertEqual('foobar.com' in S.before, False)
+        self.assertEqual('sumatra.org' in S.before, True)
+        self.assertEqual('java.org' in S.before, False)
+
+        S.sendline("yes")
+        S.expect(self.prompt)
+
+        S.sendline("show -P")
+        S.expect(self.prompt)
+        
+        self.assertEqual('foobar.com' in S.before, True)
+        self.assertEqual('sumatra.org' in S.before, False)
+        self.assertEqual('java.org' in S.before, True)
+
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+    
+    # -----------------------------------------------------------------------
+    def test_del_multi_enter(self):
+        """
+        Del gets multiple hits and asks user to select one. Instead,
+        user hits Enter. Del should repeat the prompt.
+        """
+        data = self.testdata
+
+        S = pexpect.spawn("clps", timeout=5)
+        S.expect(self.prompt)
+
+        for item in data:
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+            S.expect(self.prompt)
+
+        S.sendline("del [sS][su]")
+        S.expect(self.okprompt)
+
+        self.assertEqual('foobar.com' in S.before, True)
+        self.assertEqual('sumatra.org' in S.before, True)
+        self.assertEqual('java.org' in S.before, True)
+
+        S.sendline("yes")
+        S.expect(self.prompt)
+
+        S.sendline("show -P")
+        S.expect(self.prompt)
+        
+        self.assertEqual('foobar.com' in S.before, False)
+        self.assertEqual('sumatra.org' in S.before, False)
+        self.assertEqual('java.org' in S.before, False)
+
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+
+    # -----------------------------------------------------------------------
+    def test_del_rgx_multi(self):
+        """
+        Test del with a regex across all fields, catching multiple
+        entries so the user has to pick one. The regex should match
+        host in one record, user in another, and password in a third.
+        """
+        data = self.testdata
+
+        S = pexpect.spawn("clps", timeout=5)
+        S.expect(self.prompt)
+
+        for item in data:
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+            S.expect(self.prompt)
+
+        S.sendline("del (com|chair|Sura)")
+        S.expect(self.okprompt)
+
+        self.assertEqual('Deleting' in S.before, True)
+        self.assertEqual('foobar.com' in S.before, True)
+        self.assertEqual('chairil' in S.before, True)
+        self.assertEqual('java.org' in S.before, True)
+
+        S.sendline("yes")
+        S.expect(self.prompt)
+
+        S.sendline("show -P")
+        S.expect(self.prompt)
+
+        self.assertEqual('foobar.com' in S.before, False)
+        self.assertEqual('chairil' in S.before, False)
+        self.assertEqual('Surabaya' in S.before, False)
+        
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+
+    # -----------------------------------------------------------------------
+    def test_del_rgx_host(self):
+        """
+        Test del with a regex across all fields, catching a single
+        entry by matching on the host field.
+        """
+        data = self.testdata
+
+        S = pexpect.spawn("clps", timeout=5)
+        S.expect(self.prompt)
+
+        for item in data:
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+            S.expect(self.prompt)
+
+        S.sendline("del (com)")
+        S.expect(self.okprompt)
+
+        self.assertEqual('Deleting' in S.before, True)
+        self.assertEqual('foobar.com' in S.before, True)
+        self.assertEqual('sumatra.org' in S.before, False)
+        self.assertEqual('java.org' in S.before, False)
+
+        S.sendline("yes")
+        S.expect(self.prompt)
+
+        S.sendline("show -P")
+        S.expect(self.prompt)
+        
+        self.assertEqual('password' in S.before, False)
+        self.assertEqual('Surabaya' in S.before, True)
+        self.assertEqual('Bukittinggi' in S.before, True)
+        
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+
+    # -----------------------------------------------------------------------
+    def test_del_rgx_user(self):
+        """
+        Test del with a regex across all fields, catching a single
+        entry by matching on the user field.
+        """
+        data = self.testdata
+
+        S = pexpect.spawn("clps", timeout=5)
+        S.expect(self.prompt)
+
+        for item in data:
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+            S.expect(self.prompt)
+
+        S.sendline("del (lida)")
+        S.expect(self.okprompt)
+
+        self.assertEqual('Deleting' in S.before, True)
+        self.assertEqual('foobar.com' in S.before, False)
+        self.assertEqual('sumatra.org' in S.before, False)
+        self.assertEqual('java.org' in S.before, True)
+
+        S.sendline("yes")
+        S.expect(self.prompt)
+
+        S.sendline("show -P")
+        S.expect(self.prompt)
+        
+        self.assertEqual('password' in S.before, True)
+        self.assertEqual('Surabaya' in S.before, False)
+        self.assertEqual('Bukittinggi' in S.before, True)
+
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+
+    # -----------------------------------------------------------------------
+    def test_del_rgx_pwd(self):
+        """
+        Test del with a regex across all fields, catching a single
+        entry by matching on the password field.
+        """
+        data = self.testdata
+
+        S = pexpect.spawn("clps", timeout=5)
+        S.expect(self.prompt)
+
+        for item in data:
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+            S.expect(self.prompt)
+
+        S.sendline("del (kittin)")
+        S.expect(self.okprompt)
+
+        self.assertEqual('Deleting' in S.before, True)
+        self.assertEqual('foobar.com' in S.before, False)
+        self.assertEqual('sumatra.org' in S.before, True)
+        self.assertEqual('java.org' in S.before, False)
+
+        S.sendline("yes")
+        S.expect(self.prompt)
+        
+        S.sendline("show -P")
+        S.expect(self.prompt)
+        
+        self.assertEqual('password' in S.before, True)
+        self.assertEqual('Surabaya' in S.before, True)
+        self.assertEqual('Bukittinggi' in S.before, False)
+        
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+
+    
     # -----------------------------------------------------------------------
     def test_cmd_opt_h(self):
         """
