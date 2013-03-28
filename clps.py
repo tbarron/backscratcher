@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import errno
 import getpass
 import glob
 from optparse import OptionParser
@@ -95,10 +96,15 @@ def clps_prolog(args):
         sys.exit(0)
 
     if o.debug: pdb.set_trace()
-    if o.filename == None and default_filename != None:
-        clps_load([default_filename])
-    elif o.filename != None and o.filename != '':
-        clps_load([o.filename])
+    try:
+        if o.filename == None and default_filename != None:
+            clps_load([default_filename])
+        elif o.filename != None and o.filename != '':
+            clps_load([o.filename])
+    except OSError as e:
+        if e.errno == errno.ENOENT:
+            print("OSError: [Errno %d] %s: '%s'"
+                  % (e.errno, e.strerror, e.filename))
         
     # print("prolog: return args = %s" % post_opts)
     
@@ -289,12 +295,15 @@ def clps_load(args):
     else:
         raise StandardError('load requires a filename')
 
+    if not os.path.exists(filename):
+        raise OSError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
+
     if o.plaintext:
         f = open(filename, 'r')
         for line in f.readlines():
             [h, u, p] = line.rstrip().split('!@!', 2)
             data_store(h, u, p)
-        f.close()
+            f.close()
     else:
         passphrase = getpass.getpass()
         f = os.popen("gpg -d --passphrase %s < %s 2>/dev/null"
@@ -447,12 +456,34 @@ def user_make_selection(choices):
 # ---------------------------------------------------------------------------
 class ClipTest(toolframe.unittest.TestCase):
     prompt = "clps> "
+    passphrase = 'iChAb0d'
     cmdlist = ['add', 'clip', 'load', 'save', 'show', 'help']
     testdata = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
                 ['java.org', 'khalida', 'Surabaya']]
     okprompt = r'Ok\? > '
 
+    # -----------------------------------------------------------------------
+    def write_test_clps_file(self,
+                             filename,
+                             passphrase=passphrase,
+                             data=testdata):
+        f = os.popen('gpg -c --passphrase %s > %s'
+                     % (passphrase, filename), 'w')
+        for item in data:
+            f.write('%s\n' % '!@!'.join(item))
+        f.close()
+        
+    # -----------------------------------------------------------------------
+    def write_test_plain_file(self,
+                             filename,
+                             passphrase=passphrase,
+                             data=testdata):
+        f = open(filename, 'w')
+        for item in data:
+            f.write('%s\n' % '!@!'.join(item))
+        f.close()
+        
     # -----------------------------------------------------------------------
     def setUp(self):
         if debug_flag():
@@ -1593,7 +1624,24 @@ class ClipTest(toolframe.unittest.TestCase):
         ($HOME/.clps/secrets.clps). We load the file named by the
         option.
         """
-        raise UnderConstructionError
+        filename = 'test_lcx.clps'
+        self.write_test_clps_file(filename, self.passphrase)
+        
+        S = pexpect.spawn("clps -f %s" % filename, timeout=5)
+        S.expect("Password: ")
+        S.sendline(self.passphrase)
+
+        S.expect(self.prompt)
+        S.sendline('show')
+
+        S.expect(self.prompt)
+        for item in self.testdata:
+            self.assertEqual(item[0] in S.before, True)
+            self.assertEqual(item[1] in S.before, True)
+            self.assertEqual(item[2] in S.before, False)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
     
     # -----------------------------------------------------------------------
     def test_load_cmdline_nosuch(self):
@@ -1602,7 +1650,24 @@ class ClipTest(toolframe.unittest.TestCase):
         exist. We complain about the missing file and drop to the
         prompt with nothing loaded.
         """
-        raise UnderConstructionError
+        filename = 'test_lcn.clps'
+        if os.path.exists(filename):
+            os.unlink(filename)
+        
+        S = pexpect.spawn("clps -f %s" % filename, timeout=5)
+        S.expect("No such file or directory: '%s'" % filename)
+
+        S.expect(self.prompt)
+        S.sendline('show')
+
+        S.expect(self.prompt)
+        for item in self.testdata:
+            self.assertEqual(item[0] in S.before, False)
+            self.assertEqual(item[1] in S.before, False)
+            self.assertEqual(item[2] in S.before, False)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
     
     # -----------------------------------------------------------------------
     def test_load_cmdline_perm(self):
@@ -1630,7 +1695,12 @@ class ClipTest(toolframe.unittest.TestCase):
         opened because it is not a gpg-encrypted file. We complain
         about the error and drop to the prompt with nothing loaded.
         """
-        raise UnderConstructionError
+        filename = 'test_lcg.clps'
+        self.write_test_plain_file(filename, self.passphrase)
+        
+        S = pexpect.spawn("clps -f %s" % filename, timeout=5)
+        S.expect(pexpect.EOF)
+        self.assertEqual('%s is not a gpg file' in S.before, True)
     
     # -----------------------------------------------------------------------
     def test_load_env_exist(self):
@@ -2225,4 +2295,11 @@ class ClipTest(toolframe.unittest.TestCase):
         S.expect(pexpect.EOF)
 
 # pdb.set_trace()
+p = OptionParser()
+p.add_option('-d', '--debug',
+             action='store_true', default=False, dest='debug',
+             help='run under debugger')
+p.add_option('-f', '--filename',
+             action='store', default=None, dest='filename',
+             help='name of password safe to open on startup')
 toolframe.tf_launch('clps', noarg='shell')

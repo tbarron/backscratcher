@@ -75,6 +75,7 @@ import re
 import shlex
 import sys
 import testhelp
+import traceback as tb
 import unittest
 
 # ---------------------------------------------------------------------------
@@ -107,14 +108,18 @@ def tf_dispatch(prefix, args):
         try:
             eval("sys.modules['__main__'].%s_%s(args[1:])" % (prefix, args[0]))
         except IndexError:
+            tb.print_exc()
             tf_help([], prefix=prefix)
         except NameError:
+            tb.print_exc()
             print("unrecognized subfunction: %s" % args[0])
             tf_help([], prefix=prefix)
         except AttributeError:
+            tb.print_exc()
             print("unrecognized subfunction: %s" % args[0])
             tf_help([], prefix=prefix)
         except SystemExit as e:
+            tb.print_exc()
             print(e)
 
 # ---------------------------------------------------------------------------
