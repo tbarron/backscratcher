@@ -305,15 +305,20 @@ def clps_load(args):
             data_store(h, u, p)
             f.close()
     else:
-        passphrase = getpass.getpass()
-        f = os.popen("gpg -d --passphrase %s < %s 2>/dev/null"
-                     % (passphrase, filename))
-        for line in f.readlines():
-            if line.strip() == '':
-                continue
-            [h, u, p] = line.rstrip().split('!@!', 2)
-            data_store(h, u, p)
-        f.close()
+        f = open(filename, 'r')
+        d = f.read(4)
+        if d != '\x8c\x0d\x04\x03':
+            print("%s is not a gpg file" % filename)
+        else:
+            passphrase = getpass.getpass()
+            f = os.popen("gpg -d --passphrase %s < %s 2>/dev/null"
+                         % (passphrase, filename))
+            for line in f.readlines():
+                if line.strip() == '':
+                    continue
+                [h, u, p] = line.rstrip().split('!@!', 2)
+                data_store(h, u, p)
+            f.close()
 
 # ---------------------------------------------------------------------------
 def clps_save(args):
@@ -1699,9 +1704,24 @@ class ClipTest(toolframe.unittest.TestCase):
         self.write_test_plain_file(filename, self.passphrase)
         
         S = pexpect.spawn("clps -f %s" % filename, timeout=5)
-        S.expect(pexpect.EOF)
-        self.assertEqual('%s is not a gpg file' in S.before, True)
-    
+        msg = '%s is not a gpg file' % filename
+        which = S.expect([self.prompt, msg, pexpect.EOF])
+        if 0 == which:
+            self.assertEqual(msg in S.before, True)
+        elif 2 == which:
+            self.fail('expected prompt after error message, got EOF')
+        elif 1 != which:
+            self.fail('unexpected which (%d) should be in [0..2]' % which)
+            
+        which = S.expect([self.prompt, pexpect.EOF])
+        if 0 == which:
+            S.sendline('quit')
+            S.expect(pexpect.EOF)
+        elif 1 == which:
+            self.fail('expected prompt after error message, got EOF')
+        else:
+            self.fail('unexpected which (%d) should be in [0..1]' % which)
+
     # -----------------------------------------------------------------------
     def test_load_env_exist(self):
         """
