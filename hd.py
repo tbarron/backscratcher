@@ -76,7 +76,7 @@ def hexdump(input):
         for o in range(0, min(len(d)-b, 16)):
             if 0 == o % 8:
                 sys.stdout.write(" ")
-            if d[b+o] < ' ':
+            if d[b+o] < ' ' or 0x7f < ord(d[b+o]):
                 sys.stdout.write(".")
             else:
                 sys.stdout.write("%c" % d[b+o])
