@@ -298,27 +298,38 @@ def clps_load(args):
     if not os.path.exists(filename):
         raise OSError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
 
-    if o.plaintext:
-        f = open(filename, 'r')
-        for line in f.readlines():
-            [h, u, p] = line.rstrip().split('!@!', 2)
-            data_store(h, u, p)
-            f.close()
-    else:
-        f = open(filename, 'r')
-        d = f.read(4)
-        if d != '\x8c\x0d\x04\x03':
-            print("%s is not a gpg file" % filename)
-        else:
-            passphrase = getpass.getpass()
-            f = os.popen("gpg -d --passphrase %s < %s 2>/dev/null"
-                         % (passphrase, filename))
+    try:
+        if o.plaintext:
+            f = open(filename, 'r')
             for line in f.readlines():
-                if line.strip() == '':
-                    continue
                 [h, u, p] = line.rstrip().split('!@!', 2)
                 data_store(h, u, p)
+                f.close()
+        else:
+            f = open(filename, 'r')
+            d = f.read(4)
             f.close()
+            if d != '\x8c\x0d\x04\x03':
+                print("%s is not a gpg file" % filename)
+            else:
+                passphrase = getpass.getpass()
+                (q, f, x) = os.popen3("gpg -d --passphrase %s < %s"
+                             % (passphrase, filename))
+                xd = " ".join(x.readlines())
+                if 'decryption failed: bad key' in xd:
+                    print('%s cannot be decrypted with the passphrase supplied'
+                          % filename)
+                    return
+
+                for line in f.readlines():
+                    if line.strip() == '':
+                        continue
+                    [h, u, p] = line.rstrip().split('!@!', 2)
+                    data_store(h, u, p)
+                f.close()
+    except Exception, e:
+        if e.errno == 13:
+            print('%s cannot be opened for read' % filename)
 
 # ---------------------------------------------------------------------------
 def clps_save(args):
@@ -473,6 +484,8 @@ class ClipTest(toolframe.unittest.TestCase):
                              filename,
                              passphrase=passphrase,
                              data=testdata):
+        if os.path.exists(filename):
+            os.unlink(filename)
         f = os.popen('gpg -c --passphrase %s > %s'
                      % (passphrase, filename), 'w')
         for item in data:
@@ -1682,8 +1695,21 @@ class ClipTest(toolframe.unittest.TestCase):
         complain about the error and drop to the prompt with nothing
         loaded.
         """
-        raise UnderConstructionError
-    
+        filename = 'test_lcm.clps'
+        self.write_test_clps_file(filename, self.passphrase)
+        os.chmod(filename, 0000)
+
+        S = pexpect.spawn("clps -f %s" % filename, timeout=5)
+        # S.logfile = sys.stdout
+        msg = '%s cannot be opened for read' % filename
+        which = S.expect(["Password: ", msg, pexpect.EOF])
+        if 0 == which:
+            self.fail('expected permission error')
+        elif 2 == which:
+            self.fail('expected prompt after error message, got EOF')
+        elif 1 != which:
+            self.fail('unexpected which (%d) should be in [0..2]' % which)
+
     # -----------------------------------------------------------------------
     def test_load_cmdline_pass(self):
         """
@@ -1691,8 +1717,34 @@ class ClipTest(toolframe.unittest.TestCase):
         opened because the wrong passphrase is supplied. We complain
         about the error and drop to the prompt with nothing loaded.
         """
-        raise UnderConstructionError
-    
+        filename = 'test_lcp.clps'
+        self.write_test_clps_file(filename, self.passphrase)
+
+        S = pexpect.spawn("clps -f %s" % filename, timeout=5)
+        # S.logfile = sys.stdout
+        S.expect("Password: ")
+        S.sendline('X' + self.passphrase)
+
+        msg = '%s cannot be decrypted with the passphrase supplied' % filename
+        which = S.expect([self.prompt, msg, pexpect.EOF])
+        if 0 == which:
+            # print("msg: '%s'" % msg)
+            # print("S.before: '%s'" % S.before)
+            self.assertEqual(msg in S.before, True)
+        elif 2 == which:
+            self.fail('expectd prompt after error message, got EOF')
+        elif 1 != which:
+            self.fail('unexpected which (%d) should be in [0..2]' % which)
+
+        which = S.expect([self.prompt, pexpect.EOF])
+        if 0 == which:
+            S.sendline('quit')
+            S.expect(pexpect.EOF)
+        elif 1 == which:
+            self.fail('expected prompt after error message, got EOF')
+        else:
+            self.fail('unexpected which (%d) should be in [0..1]' % which)
+        
     # -----------------------------------------------------------------------
     def test_load_cmdline_gpg(self):
         """
