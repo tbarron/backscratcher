@@ -1780,7 +1780,25 @@ class ClipTest(toolframe.unittest.TestCase):
         Option -f is not specified but $CLPS_FILENAME names an
         existing file. We load it.
         """
-        raise UnderConstructionError
+        filename = 'test_lcx.clps'
+        self.write_test_clps_file(filename, self.passphrase)
+
+        os.environ['CLPS_FILENAME'] = filename
+        S = pexpect.spawn("clps", timeout=5)
+        S.expect("Password: ")
+        S.sendline(self.passphrase)
+
+        S.expect(self.prompt)
+        S.sendline('show')
+
+        S.expect(self.prompt)
+        for item in self.testdata:
+            self.assertEqual(item[0] in S.before, True)
+            self.assertEqual(item[1] in S.before, True)
+            self.assertEqual(item[2] in S.before, False)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
     
     # -----------------------------------------------------------------------
     def test_load_env_nosuch(self):
@@ -1789,7 +1807,25 @@ class ClipTest(toolframe.unittest.TestCase):
         non-existent file. We complain about the error and drop to the
         prompt with nothing loaded.
         """
-        raise UnderConstructionError
+        filename = 'test_lcn.clps'
+        if os.path.exists(filename):
+            os.unlink(filename)
+
+        os.environ['CLPS_FILENAME'] = filename
+        S = pexpect.spawn("clps", timeout=5)
+        S.expect("No such file or directory: '%s'" % filename)
+
+        S.expect(self.prompt)
+        S.sendline('show')
+
+        S.expect(self.prompt)
+        for item in self.testdata:
+            self.assertEqual(item[0] in S.before, False)
+            self.assertEqual(item[1] in S.before, False)
+            self.assertEqual(item[2] in S.before, False)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
     
     # -----------------------------------------------------------------------
     def test_load_env_perm(self):
@@ -1798,7 +1834,21 @@ class ClipTest(toolframe.unittest.TestCase):
         the file don't allow it to be opened. We complain about the
         error and drop to the prompt with nothing loaded.
         """
-        raise UnderConstructionError
+        filename = 'test_lcm.clps'
+        self.write_test_clps_file(filename, self.passphrase)
+        os.chmod(filename, 0000)
+
+        os.environ['CLPS_FILENAME'] = filename
+        S = pexpect.spawn("clps", timeout=5)
+        # S.logfile = sys.stdout
+        msg = '%s cannot be opened for read' % filename
+        which = S.expect(["Password: ", msg, pexpect.EOF])
+        if 0 == which:
+            self.fail('expected permission error')
+        elif 2 == which:
+            self.fail('expected prompt after error message, got EOF')
+        elif 1 != which:
+            self.fail('unexpected which (%d) should be in [0..2]' % which)
     
     # -----------------------------------------------------------------------
     def test_load_env_pass(self):
@@ -1807,7 +1857,34 @@ class ClipTest(toolframe.unittest.TestCase):
         because the wrong passphrase is supplied. We complain about
         the error and drop to the prompt with nothing loaded.
         """
-        raise UnderConstructionError
+        filename = 'test_lcp.clps'
+        self.write_test_clps_file(filename, self.passphrase)
+
+        os.environ['CLPS_FILENAME'] = filename
+        S = pexpect.spawn("clps", timeout=5)
+        # S.logfile = sys.stdout
+        S.expect("Password: ")
+        S.sendline('X' + self.passphrase)
+
+        msg = '%s cannot be decrypted with the passphrase supplied' % filename
+        which = S.expect([self.prompt, msg, pexpect.EOF])
+        if 0 == which:
+            # print("msg: '%s'" % msg)
+            # print("S.before: '%s'" % S.before)
+            self.assertEqual(msg in S.before, True)
+        elif 2 == which:
+            self.fail('expectd prompt after error message, got EOF')
+        elif 1 != which:
+            self.fail('unexpected which (%d) should be in [0..2]' % which)
+
+        which = S.expect([self.prompt, pexpect.EOF])
+        if 0 == which:
+            S.sendline('quit')
+            S.expect(pexpect.EOF)
+        elif 1 == which:
+            self.fail('expected prompt after error message, got EOF')
+        else:
+            self.fail('unexpected which (%d) should be in [0..1]' % which)
     
     # -----------------------------------------------------------------------
     def test_load_env_gpg(self):
@@ -1816,7 +1893,28 @@ class ClipTest(toolframe.unittest.TestCase):
         because it is not a gpg-encrypted file. We complain about the
         error and drop to the prompt with nothing loaded.
         """
-        raise UnderConstructionError
+        filename = 'test_lcg.clps'
+        self.write_test_plain_file(filename, self.passphrase)
+        
+        os.environ['CLPS_FILENAME'] = filename
+        S = pexpect.spawn("clps", timeout=5)
+        msg = '%s is not a gpg file' % filename
+        which = S.expect([self.prompt, msg, pexpect.EOF])
+        if 0 == which:
+            self.assertEqual(msg in S.before, True)
+        elif 2 == which:
+            self.fail('expected prompt after error message, got EOF')
+        elif 1 != which:
+            self.fail('unexpected which (%d) should be in [0..2]' % which)
+            
+        which = S.expect([self.prompt, pexpect.EOF])
+        if 0 == which:
+            S.sendline('quit')
+            S.expect(pexpect.EOF)
+        elif 1 == which:
+            self.fail('expected prompt after error message, got EOF')
+        else:
+            self.fail('unexpected which (%d) should be in [0..1]' % which)
     
     # -----------------------------------------------------------------------
     def test_load_default_exist(self):
