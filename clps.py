@@ -418,12 +418,18 @@ def clps_show(args):
 
 # ---------------------------------------------------------------------------
 def copy_to_clipboard(value):
+    """
+    Copy value into clipboard.
+    """
     p = os.popen("pbcopy", 'w')
     p.write(value)
     p.close()
 
 # ---------------------------------------------------------------------------
 def data_delete(hostname, username, password):
+    """
+    Remove data from the store.
+    """
     global data
     try:
         data.remove([hostname, username, password])
@@ -433,6 +439,9 @@ def data_delete(hostname, username, password):
 
 # ---------------------------------------------------------------------------
 def data_lookup(hostname, username, password):
+    """
+    Lookup a record in the data store.
+    """
     global data
     try:
         rval = []
@@ -450,7 +459,7 @@ def data_lookup(hostname, username, password):
 # ---------------------------------------------------------------------------
 def data_store(hostname, username, password):
     """
-    !@!
+    Add data to the store.
     """
     global data
 
@@ -476,6 +485,9 @@ def default_filename():
 
 # ---------------------------------------------------------------------------
 def user_make_selection(choices):
+    """
+    Ask the user to make a selection from a set of choices.
+    """
     rval = ""
     while not rval.isdigit() or int(rval) not in range(1, len(choices)+1):
         cdx = 1
@@ -487,6 +499,9 @@ def user_make_selection(choices):
 
 # ---------------------------------------------------------------------------
 class ClipTest(toolframe.unittest.TestCase):
+    """
+    Test suite for clps.
+    """
     prompt = "clps> "
     passphrase = 'iChAb0d'
     cmdlist = ['add', 'clip', 'load', 'save', 'show', 'help']
@@ -500,6 +515,9 @@ class ClipTest(toolframe.unittest.TestCase):
                              filename,
                              passphrase=passphrase,
                              data=testdata):
+        """
+        Write out an encrypted test file.
+        """
         filename = os.path.expanduser(os.path.expandvars(filename))
         if '/' in filename:
             dirname = os.path.dirname(filename)
@@ -519,6 +537,9 @@ class ClipTest(toolframe.unittest.TestCase):
                              filepath,
                              passphrase=passphrase,
                              data=testdata):
+        """
+        Write out a plaintext test file.
+        """
         filepath = os.path.expanduser(os.path.expandvars(filepath))
         if '/' in filepath:
             dirname = os.path.dirname(filepath)
@@ -532,6 +553,9 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def setUp(self):
+        """
+        Set up for testing.
+        """
         if debug_flag():
             pdb.set_trace()
             
@@ -2510,6 +2534,7 @@ class ClipTest(toolframe.unittest.TestCase):
         S.sendline('quit')
         S.expect(pexpect.EOF)
 
+# ---------------------------------------------------------------------------
 # pdb.set_trace()
 p = OptionParser()
 p.add_option('-d', '--debug',
