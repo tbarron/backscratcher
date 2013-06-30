@@ -61,13 +61,15 @@ with the backscratcher project rather than this list.
 
 # ---------------------------------------------------------------------------
 def clps_prolog(args):
-    default_filename = os.getenv('CLPS_FILENAME')
+    """
+    Set things up.
+    """
     p = OptionParser()
     p.add_option('-d', '--debug',
                  action='store_true', default=False, dest='debug',
                  help='run under debugger')
     p.add_option('-f', '--filename',
-                 action='store', default=None, dest='filename',
+                 action='store', default=default_filename(), dest='filename',
                  help='name of password safe to open on startup')
 
     # print("prolog: incoming args = %s" % args)
@@ -97,10 +99,7 @@ def clps_prolog(args):
 
     if o.debug: pdb.set_trace()
     try:
-        if o.filename == None and default_filename != None:
-            clps_load([default_filename])
-        elif o.filename != None and o.filename != '':
-            clps_load([o.filename])
+        clps_load([o.filename])
     except OSError as e:
         if e.errno == errno.ENOENT:
             print("OSError: [Errno %d] %s: '%s'"
@@ -450,6 +449,9 @@ def data_lookup(hostname, username, password):
 
 # ---------------------------------------------------------------------------
 def data_store(hostname, username, password):
+    """
+    !@!
+    """
     global data
 
     try:
@@ -457,6 +459,20 @@ def data_store(hostname, username, password):
     except NameError:
         data = []
         data.append([hostname, username, password])
+
+# ---------------------------------------------------------------------------
+def default_filename():
+    """
+    Define the default filename to be opened.
+    """
+    rval = os.getenv('CLPS_FILENAME')
+    if None == rval:
+        home = os.getenv('HOME')
+        if None == home:
+            p = pwd.getpwuid(os.getuid())
+            home = p.pw_dir
+        rval = '%s/.clps/secrets.clps' % home
+    return rval
 
 # ---------------------------------------------------------------------------
 def user_make_selection(choices):
