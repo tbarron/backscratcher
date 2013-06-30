@@ -484,6 +484,12 @@ class ClipTest(toolframe.unittest.TestCase):
                              filename,
                              passphrase=passphrase,
                              data=testdata):
+        filename = os.path.expanduser(os.path.expandvars(filename))
+        if '/' in filename:
+            dirname = os.path.dirname(filename)
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
+                
         if os.path.exists(filename):
             os.unlink(filename)
         f = os.popen('gpg -c --passphrase %s > %s'
@@ -494,10 +500,16 @@ class ClipTest(toolframe.unittest.TestCase):
         
     # -----------------------------------------------------------------------
     def write_test_plain_file(self,
-                             filename,
+                             filepath,
                              passphrase=passphrase,
                              data=testdata):
-        f = open(filename, 'w')
+        filepath = os.path.expanduser(os.path.expandvars(filepath))
+        if '/' in filepath:
+            dirname = os.path.dirname(filepath)
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
+
+        f = open(filepath, 'w')
         for item in data:
             f.write('%s\n' % '!@!'.join(item))
         f.close()
@@ -1923,7 +1935,25 @@ class ClipTest(toolframe.unittest.TestCase):
         since -f and $CLPS_FILENAME are not specified and the default
         file exists.
         """
-        raise UnderConstructionError
+        os.environ['HOME'] = "./testhome"
+        filename = '$HOME/.clps/secrets.clps'
+        self.write_test_clps_file(filename, self.passphrase)
+        
+        S = pexpect.spawn("clps", timeout=5)
+        S.expect("Password: ")
+        S.sendline(self.passphrase)
+
+        S.expect(self.prompt)
+        S.sendline('show')
+
+        S.expect(self.prompt)
+        for item in self.testdata:
+            self.assertEqual(item[0] in S.before, True)
+            self.assertEqual(item[1] in S.before, True)
+            self.assertEqual(item[2] in S.before, False)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
     
     # -----------------------------------------------------------------------
     def test_load_defenv_nosuch(self):
