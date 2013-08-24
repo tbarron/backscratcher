@@ -71,6 +71,9 @@ def clps_prolog(args):
     p.add_option('-f', '--filename',
                  action='store', default=default_filename(), dest='filename',
                  help='name of password safe to open on startup')
+    p.add_option('-n', '--nofile',
+                 action='store_true', default=False, dest='nofile',
+                 help="don't open a file on startup")
 
     # print("prolog: incoming args = %s" % args)
     pre_opts = []
@@ -88,6 +91,8 @@ def clps_prolog(args):
                 print("-f requires an argument")
         elif args[idx] == '-h':
             pre_opts.append(args[idx])
+        elif args[idx] == '-n':
+            pre_opts.append(args[idx])
         else:
             post_opts.append(args[idx])
         idx += 1
@@ -99,7 +104,8 @@ def clps_prolog(args):
 
     if o.debug: pdb.set_trace()
     try:
-        clps_load([o.filename])
+        if not o.nofile:
+            clps_load([o.filename])
     except OSError as e:
         if e.errno == errno.ENOENT:
             print("OSError: [Errno %d] %s: '%s'"
@@ -504,6 +510,7 @@ class ClipTest(toolframe.unittest.TestCase):
     """
     prompt = "clps> "
     passphrase = 'iChAb0d'
+    clps_cmd = "clps -n"
     cmdlist = ['add', 'clip', 'load', 'save', 'show', 'help']
     testdata = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
@@ -570,7 +577,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
 
         for item in data:
             S.expect(self.prompt)
@@ -619,7 +626,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
 
         for item in data:
             S.expect(self.prompt)
@@ -669,7 +676,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
 
         for item in data:
             S.expect(self.prompt)
@@ -719,7 +726,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
 
         for item in data:
             S.expect(self.prompt)
@@ -763,7 +770,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
 
         for item in data:
             S.expect(self.prompt)
@@ -797,7 +804,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
 
         for item in data:
             S.expect(self.prompt)
@@ -824,7 +831,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
 
         for item in data:
             S.expect(self.prompt)
@@ -851,7 +858,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
 
         for item in data:
             S.expect(self.prompt)
@@ -878,7 +885,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
             
         for item in data:
@@ -916,7 +923,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
             
         for item in data:
@@ -953,7 +960,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
             
         for item in data:
@@ -990,7 +997,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
             
         for item in data:
@@ -1028,7 +1035,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
             
         for item in data:
@@ -1065,7 +1072,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
 
         for item in data:
@@ -1103,7 +1110,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
 
         for item in data:
@@ -1141,7 +1148,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
 
         for item in data:
@@ -1179,7 +1186,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
 
         for item in data:
@@ -1217,7 +1224,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
 
         for item in data:
@@ -1255,7 +1262,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
 
         for item in data:
@@ -1291,7 +1298,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         Test all the commands with option -h.
         """
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
 
         cmdl = [x for x in self.cmdlist if x != 'help']
@@ -1312,7 +1319,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         Test all commands with an invalid option.
         """
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
 
         cmdl = [x for x in self.cmdlist if x != 'help']
@@ -1587,7 +1594,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         Test interactive help inside clps.
         """
-        S = pexpect.spawn('clps', timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
         S.sendline('help')
 
@@ -1606,7 +1613,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         Test interactive help inside clps, passing it a command name.
         """
-        S = pexpect.spawn('clps', timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
         S.sendline('help')
 
@@ -1640,7 +1647,7 @@ class ClipTest(toolframe.unittest.TestCase):
             f.write('%s\n' % '!@!'.join(item))
         f.close()
         
-        S = pexpect.spawn('clps', timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
         S.sendline('load %s' % filename)
 
@@ -2011,7 +2018,25 @@ class ClipTest(toolframe.unittest.TestCase):
         not exist. We drop to the prompt with no error and nothing
         loaded.
         """
-        raise UnderConstructionError
+        os.environ['HOME'] = "./testhome"
+        filename = os.path.expandvars('$HOME/.clps/secrets.clps')
+        if os.path.exists(filename):
+            os.unlink(filename)
+
+        S = pexpect.spawn("clps")
+        which = S.expect(["Password:", pexpect.EOF, self.prompt])
+        if 0 == which:
+            self.fail("Unexpected password prompt")
+        elif 1 == which:
+            self.fail("Program terminates unexpectedly")
+        else:
+            S.sendline("show")
+
+        S.expect(self.prompt)
+        self.assertEqual(S.before, "show\r\n")
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
     
     # -----------------------------------------------------------------------
     def test_load_default_perm(self):
@@ -2047,7 +2072,7 @@ class ClipTest(toolframe.unittest.TestCase):
         prompted for username and password.
         """
         prompt = "clps> "
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
 
         S.expect(prompt)
         S.sendline("add host.org")
@@ -2076,7 +2101,7 @@ class ClipTest(toolframe.unittest.TestCase):
         command, getting prompted for password.
         """
         prompt = "clps> "
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
 
         S.expect(prompt)
         S.sendline("add host.org sally")
@@ -2102,7 +2127,7 @@ class ClipTest(toolframe.unittest.TestCase):
         -H option, getting prompted for username and password.
         """
         prompt = "clps> "
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
 
         S.expect(prompt)
         S.sendline("add -H host.org")
@@ -2132,7 +2157,7 @@ class ClipTest(toolframe.unittest.TestCase):
         password.
         """
         prompt = "clps> "
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
 
         S.expect(prompt)
         S.sendline("add -H host.org freddie")
@@ -2159,7 +2184,7 @@ class ClipTest(toolframe.unittest.TestCase):
         prompted for password.
         """
         prompt = "clps> "
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
 
         S.expect(prompt)
         S.sendline("add -u phineas -H wuzzles.org")
@@ -2185,7 +2210,7 @@ class ClipTest(toolframe.unittest.TestCase):
         -u option, getting prompted for hostname and password.
         """
         prompt = "clps> "
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
 
         S.expect(prompt)
         S.sendline("add -u phineas")
@@ -2215,7 +2240,7 @@ class ClipTest(toolframe.unittest.TestCase):
         getting prompted for password.
         """
         prompt = "clps> "
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.timeout = 5
         
         S.expect(prompt)
@@ -2240,7 +2265,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         Test add routine, getting prompted for everything.
         """
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
 
         S.expect(self.prompt)
         S.sendline("add")
@@ -2274,7 +2299,7 @@ class ClipTest(toolframe.unittest.TestCase):
         data = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Methuselah'],
                 ['java.org', 'khalida', 'Surabaya']]
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         for item in data:
             S.expect(self.prompt)
             S.sendline("add -H %s -u %s" % (item[0], item[1]))
@@ -2319,7 +2344,7 @@ class ClipTest(toolframe.unittest.TestCase):
         f.close()
 
                                 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         for item in data:
             S.expect(self.prompt)
             S.sendline("add -H %s -u %s" % (item[0], item[1]))
@@ -2357,7 +2382,7 @@ class ClipTest(toolframe.unittest.TestCase):
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
                 ['java.org', 'khalida', 'Surabaya']]
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         for item in data:
             S.expect(self.prompt)
             S.sendline("add -H %s -u %s" % (item[0], item[1]))
@@ -2383,7 +2408,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
         
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         for item in data:
             S.expect(self.prompt)
             S.sendline("add -H %s -u %s" % (item[0], item[1]))
@@ -2409,7 +2434,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
         
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         for item in data:
             S.expect(self.prompt)
             S.sendline("add -H %s -u %s" % (item[0], item[1]))
@@ -2432,7 +2457,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
         
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         for item in data:
             S.expect(self.prompt)
             S.sendline("add -H %s -u %s" % (item[0], item[1]))
@@ -2455,7 +2480,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         data = self.testdata
         
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         for item in data:
             S.expect(self.prompt)
             S.sendline("add -H %s -u %s" % (item[0], item[1]))
@@ -2480,7 +2505,7 @@ class ClipTest(toolframe.unittest.TestCase):
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
                 ['java.org', 'khalida', 'Surabaya']]
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         for item in data:
             S.expect(self.prompt)
             S.sendline("add -H %s -u %s" % (item[0], item[1]))
@@ -2512,7 +2537,7 @@ class ClipTest(toolframe.unittest.TestCase):
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
                 ['java.org', 'khalida', 'Surabaya']]
 
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
         for item in data:
             S.expect(self.prompt)
             S.sendline("add -H %s -u %s" % (item[0], item[1]))
