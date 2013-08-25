@@ -2003,15 +2003,6 @@ class ClipTest(toolframe.unittest.TestCase):
         S.expect(pexpect.EOF)
     
     # -----------------------------------------------------------------------
-    def test_load_defenv_nosuch(self):
-        """
-        $CLPS_FILENAME names a file that does not exist and the
-        default file does not exist. We complain about $CLPS_FILENAME
-        not existing, then drop to the prompt with nothing loaded.
-        """
-        raise UnderConstructionError
-    
-    # -----------------------------------------------------------------------
     def test_load_default_nosuch(self):
         """
         Neither -f or $CLPS_FILENAME are set and the default file does
@@ -2039,13 +2030,28 @@ class ClipTest(toolframe.unittest.TestCase):
         S.expect(pexpect.EOF)
     
     # -----------------------------------------------------------------------
-    def test_load_default_perm(self):
+    def test_load_default_gpg(self):
         """
-        $HOME/.clps/secrets exists but the permissions on the file
-        don't allow it to be opened. We complain about the error and
-        drop to the prompt with nothing loaded.
+        $HOME/.clps/secrets.clps exists but cannot be opened because
+        it is not a gpg-encrypted file. We complain about the error
+        and drop to the prompt with nothing loaded.
         """
-        raise UnderConstructionError
+        os.environ['HOME'] = './testhome'
+        filename = os.path.expandvars('$HOME/.clps/secrets.clps')
+        self.write_test_plain_file(filename)
+
+        S = pexpect.spawn("clps")
+        which = S.expect(["Password:", pexpect.EOF, self.prompt])
+        if 0 == which:
+            self.fail("Unexpected password prompt")
+        elif 1 == which:
+            self.fail("Program terminates unexpectedly")
+        elif 2 == which:
+            self.assertEqual('%s is not a gpg file' % filename in S.before,
+                             True)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
     
     # -----------------------------------------------------------------------
     def test_load_default_pass(self):
@@ -2057,11 +2063,20 @@ class ClipTest(toolframe.unittest.TestCase):
         raise UnderConstructionError
     
     # -----------------------------------------------------------------------
-    def test_load_default_gpg(self):
+    def test_load_default_perm(self):
         """
-        $HOME/.clps/secrets.clps exists but cannot be opened because
-        it is not a gpg-encrypted file. We complain about the error
-        and drop to the prompt with nothing loaded.
+        $HOME/.clps/secrets exists but the permissions on the file
+        don't allow it to be opened. We complain about the error and
+        drop to the prompt with nothing loaded.
+        """
+        raise UnderConstructionError
+    
+    # -----------------------------------------------------------------------
+    def test_load_defenv_nosuch(self):
+        """
+        $CLPS_FILENAME names a file that does not exist and the
+        default file does not exist. We complain about $CLPS_FILENAME
+        not existing, then drop to the prompt with nothing loaded.
         """
         raise UnderConstructionError
     
