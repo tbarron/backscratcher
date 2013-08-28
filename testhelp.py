@@ -1,15 +1,19 @@
 #!/usr/bin/python
 
+import logging, logging.handlers
 import os
 import pdb
 import pexpect
+import socket
 import sys
 import unittest
 import StringIO
 
 from optparse import *
 
-def main(args=None, filter=None):
+tlogger = None
+
+def main(args=None, filter=None, logfile=None):
     if args == None:
         args = sys.argv
     p = OptionParser()
@@ -50,7 +54,7 @@ def main(args=None, filter=None):
         list_tests(a, o.final, testlist)
         o.keep = True
     else:
-        run_tests(a, o.final, testlist, volume)
+        run_tests(a, o.final, testlist, volume, logfile)
 
     return o.keep
 
@@ -68,12 +72,22 @@ def all_tests(name, filter=None):
     # print("all_tests(%s, %s)" % (name, filter))
     # print dir(sys.modules[name])
     for item in dir(sys.modules[name]):
-        if filter in item:
-            testclasses.append(item)
+        iobj = getattr(sys.modules[name], item)
+        for iobjmember in dir(iobj):
+            if iobjmember.startswith('test_') and filter in item:
+                testclasses.append(item)
+                break
+
     for c in testclasses:
         cobj = getattr(sys.modules[name], c)
         for case in unittest.TestLoader().getTestCaseNames(cobj):
-            cases.append('%s.%s' % (c, case))
+            skip = case.replace('test_', 'skip_', 1)
+            sfunc = getattr(sys.modules[name], skip, None)
+            if sfunc == None:
+                cases.append(['%s.%s' % (c, case), None])
+            else:
+                cases.append(['%s.%s' % (c, case), skip])
+
     return cases
 
 # ---------------------------------------------------------------------------
@@ -82,7 +96,7 @@ def debug_flag(value=None):
 
     if value != None:
         dval = value
-        
+
     try:
         rval = dval
     except NameError:
@@ -116,6 +130,11 @@ def expectVSgot(expected, got):
             raise e
         
 # ---------------------------------------------------------------------------
+def get_logger():
+    global tlogger
+    return tlogger
+
+# ---------------------------------------------------------------------------
 def into_test_dir():
     tdname = '_test.%d' % os.getpid()
     bname = os.path.basename(os.getcwd())
@@ -125,49 +144,158 @@ def into_test_dir():
     return tdname
 
 # ---------------------------------------------------------------------------
+def keepfiles(value=None):
+    """
+    Return value of global value kf_flag. Optionally set it if value
+    is specified. If it is not set, the default return value is False.
+    """
+    global kf_flag
+    try:
+        rval = kf_flag
+    except:
+        kf_flag = False
+        rval = kf_flag
+
+    if value != None:
+        kf_flag = value
+
+    return rval
+
+# ---------------------------------------------------------------------------
 def list_tests(a, final, testlist):
     if len(a) <= 1:
         for c in testlist:
-            print c
-            if final != '' and final in c:
+            print c[0]
+            if final != '' and final in c[0]:
                 break
     else:
         for arg in a[1:]:
             for c in testlist:
-                if arg in c:
-                    print c
-                if final != '' and final in c:
+                if arg in c[0]:
+                    print c[0]
+                if final != '' and final in c[0]:
                     break
 
 # ---------------------------------------------------------------------------
-def run_tests(a, final, testlist, volume):
+def test_name(obj=None):
+    """
+    Return the caller's function name (with an optional class prefix).
+    """
+    return str(obj).split()[0]
+
+# ---------------------------------------------------------------------------
+def run_tests(a, final, testlist, volume, logfile=None):
     mainmod = sys.modules['__main__']
     if len(a) <= 1:
-        suite = unittest.TestSuite()
-        for c in testlist:
-            s = unittest.TestLoader().loadTestsFromName(c, mainmod)
-            suite.addTest(s)
-            if final != '' and final in c:
+        suite = LoggingTestSuite(logfile=logfile)
+        for (case, skip) in testlist:
+            if skip_check(skip):
+                continue
+            s = unittest.TestLoader().loadTestsFromName(case, mainmod)
+            suite.addTests(s)
+            if final != '' and final in case:
                 break
     else:
-        suite = unittest.TestSuite()
+        suite = LoggingTestSuite(logfile=logfile)
         for arg in a[1:]:
-            for c in testlist:
-                if arg in c:
-                    s = unittest.TestLoader().loadTestsFromName(c, mainmod)
-                    suite.addTest(s)
-                if final != '' and final in c:
+            for (case, skip) in testlist:
+                if skip_check(skip):
+                    continue
+                if arg in case:
+                    s = unittest.TestLoader().loadTestsFromName(case, mainmod)
+                    suite.addTests(s)
+                if final != '' and final in case:
                     break
 
-    unittest.TextTestRunner(verbosity=volume).run(suite)
+    result = unittest.TextTestRunner(verbosity=volume).run(suite)
+    
+# ---------------------------------------------------------------------------
+class LoggingTestSuite(unittest.TestSuite):
+    def __init__(self, tests=(), logfile=None):
+        super(LoggingTestSuite, self).__init__(tests)
+        self._logger = None
+        if None != logfile:
+            self.setup_logging(logfile)
+
+    def setup_logging(self, logfile):
+        self._logger = logging.getLogger('TestSuite')
+        self._logger.setLevel(logging.INFO)
+        host = socket.gethostname().split('.')[0]
+        fh = logging.handlers.RotatingFileHandler(logfile,
+                                                  maxBytes=10*1024*1024,
+                                                  backupCount=5)
+        strfmt = "%" + "(asctime)s [%s] " % host + "%" + "(message)s"
+        fmt = logging.Formatter(strfmt, datefmt="%Y.%m%d %H:%M:%S")
+        fh.setFormatter(fmt)
+
+        self._logger.addHandler(fh)
+        self._logger.info('-' * (55 - len(host)))
+
+    def run(self, result):
+        errs = 0
+        fails = 0
+        for test in self._tests:
+            if result.shouldStop:
+                break
+            if None != self._logger:
+                test(result)
+                if fails < len(result.failures):
+                    self._logger.info('%-30s >>> FAILED' % test_name(test))
+                    fails = len(result.failures)
+                elif errs < len(result.errors):
+                    self._logger.info('%-30s >>> ERROR' % test_name(test))
+                    errs = len(result.errors)
+                else:
+                    self._logger.info('%-25s PASSED' % test_name(test))
+            else:
+                test(result)
+        return result
+        
+# ---------------------------------------------------------------------------
+def show_stdout(value=None):
+    """
+    Return value of global value show_stdout. Optionally set it if
+    value is specified. If it is not set, the default return value is False.
+    """
+    global show_output
+    try:
+        rval = show_output
+    except:
+        show_output = False
+        rval = show_output
+
+    if value != None:
+        show_output = value
+
+    return rval
 
 # ---------------------------------------------------------------------------
-class UnderConstructionError(Exception):
-    def __init__(self, value='under construction'):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
-            
+def skip_check(skipfunc):
+    if skipfunc == None:
+        return False
+    func = getattr(sys.modules['__main__'], skipfunc)
+    rval = func()
+    if rval:
+        print "skipping %s" % skipfunc.replace('skip_', 'test_')
+    return rval
+
+# ---------------------------------------------------------------------------
+def touch(pathname):
+    open(pathname, 'a').close()
+
+# ---------------------------------------------------------------------------
+def write_file(filename, mode=0644, content=None):
+    f = open(filename, 'w')
+    if type(content) == str:
+        f.write(content)
+    elif type(content) == list:
+        f.writelines([x.rstrip() + '\n' for x in content])
+    else:
+        raise StandardError("content is not of a suitable type (%s)"
+                            % type(content))
+    f.close()
+    os.chmod(filename, mode)
+                        
 # ---------------------------------------------------------------------------
 class TesthelpTest(unittest.TestCase):
     # -----------------------------------------------------------------------
@@ -232,6 +360,16 @@ class TesthelpTest(unittest.TestCase):
             print "expected: '''\n%s'''" % expected
             print "got:      '''\n%s'''" % r
         
+# ---------------------------------------------------------------------------
+class UnderConstructionError(Exception):
+    def __init__(self, value=""):
+        if value == '':
+            self.value = 'under construction'
+        else:
+            self.value = value
+    def __str__(self):
+        return repr(self.value)
+    
 # ---------------------------------------------------------------------------
 global d
 d = dir()

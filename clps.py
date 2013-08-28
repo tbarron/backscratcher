@@ -69,7 +69,7 @@ def clps_prolog(args):
                  action='store_true', default=False, dest='debug',
                  help='run under debugger')
     p.add_option('-f', '--filename',
-                 action='store', default=default_filename(), dest='filename',
+                 action='store', default='', dest='filename',
                  help='name of password safe to open on startup')
     p.add_option('-n', '--nofile',
                  action='store_true', default=False, dest='nofile',
@@ -103,9 +103,14 @@ def clps_prolog(args):
         sys.exit(0)
 
     if o.debug: pdb.set_trace()
+
+    implicit = False
+    if o.filename == '':
+        (o.filename, implicit) = default_filename()
+        
     try:
         if not o.nofile:
-            clps_load([o.filename])
+            clps_load([o.filename], implicit=implicit)
     except OSError as e:
         if e.errno == errno.ENOENT:
             print("OSError: [Errno %d] %s: '%s'"
@@ -276,7 +281,7 @@ def clps_del(args):
         tb.print_exc()
 
 # ---------------------------------------------------------------------------
-def clps_load(args):
+def clps_load(args, implicit=False):
     """load - read an encrypted file of password information
 
     load <filename>
@@ -301,7 +306,10 @@ def clps_load(args):
         raise StandardError('load requires a filename')
 
     if not os.path.exists(filename):
-        raise OSError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
+        if implicit:
+            return
+        else:
+            raise OSError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
 
     try:
         if o.plaintext:
@@ -480,14 +488,16 @@ def default_filename():
     """
     Define the default filename to be opened.
     """
+    implicit = False
     rval = os.getenv('CLPS_FILENAME')
     if None == rval:
+        implicit = True
         home = os.getenv('HOME')
         if None == home:
             p = pwd.getpwuid(os.getuid())
             home = p.pw_dir
         rval = '%s/.clps/secrets.clps' % home
-    return rval
+    return(rval, implicit)
 
 # ---------------------------------------------------------------------------
 def user_make_selection(choices):
@@ -2023,6 +2033,8 @@ class ClipTest(toolframe.unittest.TestCase):
         else:
             S.sendline("show")
 
+        self.assertEqual("No such file or directory" in S.before, False)
+        
         S.expect(self.prompt)
         self.assertEqual(S.before, "show\r\n")
 
@@ -2050,6 +2062,10 @@ class ClipTest(toolframe.unittest.TestCase):
             self.assertEqual('%s is not a gpg file' % filename in S.before,
                              True)
 
+        S.sendline("show")
+        S.expect(self.prompt)
+        self.assertEqual(S.before, "show\r\n")
+        
         S.sendline('quit')
         S.expect(pexpect.EOF)
     
@@ -2060,7 +2076,29 @@ class ClipTest(toolframe.unittest.TestCase):
         the wrong passphrase is supplied. We complain about the error
         and drop to the prompt with nothing loaded.
         """
-        raise UnderConstructionError
+        os.environ['HOME'] = './testhome'
+        filename = os.path.expandvars('$HOME/.clps/secrets.clps')
+        self.write_test_clps_file(filename)
+
+        S = pexpect.spawn("clps")
+        which = S.expect(["Password:", pexpect.EOF, self.prompt])
+        if 0 == which:
+            S.sendline('x' + self.passphrase)
+        elif 1 == which:
+            self.fail("Program terminates unexpectedly")
+        elif 2 == which:
+            self.fail("Expected password prompt but didn't get one")
+
+        S.expect(self.prompt)
+        self.assertEqual("cannot be decrypted with the passphrase supplied"
+                         in S.before, True)
+
+        S.sendline('show')
+        S.expect(self.prompt)
+        self.assertEqual(S.before, "show\r\n")
+        
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
     
     # -----------------------------------------------------------------------
     def test_load_default_perm(self):
@@ -2069,7 +2107,29 @@ class ClipTest(toolframe.unittest.TestCase):
         don't allow it to be opened. We complain about the error and
         drop to the prompt with nothing loaded.
         """
-        raise UnderConstructionError
+        os.environ['HOME'] = './testhome'
+        filename = os.path.expandvars('$HOME/.clps/secrets.clps')
+        self.write_test_clps_file(filename)
+        os.chmod(filename, 0000)
+        
+        S = pexpect.spawn("clps")
+        msg = '%s cannot be opened for read' % filename
+        which = S.expect(["Password:", pexpect.EOF, self.prompt, msg])
+        if 0 == which:
+            self.fail('expected permission error, got Password prompt')
+        elif 1 == which:
+            self.fail("expected prompt after error message, got EOF")
+        elif 2 == which:
+            self.fail("expected error message, just got shell prompt")
+        elif 3 == which:
+            S.expect(self.prompt)
+
+        S.sendline('show')
+        S.expect(self.prompt)
+        self.assertEqual(S.before, "show\r\n")
+        
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
     
     # -----------------------------------------------------------------------
     def test_load_defenv_nosuch(self):
@@ -2078,7 +2138,33 @@ class ClipTest(toolframe.unittest.TestCase):
         default file does not exist. We complain about $CLPS_FILENAME
         not existing, then drop to the prompt with nothing loaded.
         """
-        raise UnderConstructionError
+        os.environ['HOME'] = "./testhome"
+        filename = os.path.expandvars('$HOME/.clps/secrets.clps')
+        if os.path.exists(filename):
+            os.unlink(filename)
+
+        clps_fname = "./nosuchdir/nosuchfile"
+        os.environ['CLPS_FILENAME'] = clps_fname
+        if os.path.exists(clps_fname):
+            self.fail("%s should not exist" % clps_fname)
+
+        S = pexpect.spawn("clps")
+        which = S.expect(["Password:", pexpect.EOF, self.prompt])
+        if 0 == which:
+            self.fail("Unexpected password prompt")
+        elif 1 == which:
+            self.fail("Program terminates unexpectedly")
+        else:
+            msg = "No such file or directory: '%s'" % clps_fname
+            self.assertEqual(msg in S.before, True)
+            S.sendline("show")
+
+        S.expect(self.prompt)
+        self.assertEqual(S.before, "show\r\n")
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
+
     
     # -----------------------------------------------------------------------
     def test_optionA_addshow(self):
@@ -2583,4 +2669,4 @@ p.add_option('-d', '--debug',
 p.add_option('-f', '--filename',
              action='store', default=None, dest='filename',
              help='name of password safe to open on startup')
-toolframe.tf_launch('clps', noarg='shell')
+toolframe.tf_launch('clps', noarg='shell', logfile="clps_test.log")

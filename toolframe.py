@@ -1,6 +1,8 @@
 #!/usr/bin/python
 """
-commandline-callable subfunctions and optional shell mode
+toolframe - creating a script with commandline-callable subfunctions
+
+To use this, a script must
 
 To build a tool-style program (i.e., one with multiple entry points
 that can be called individually from the command line with a list of
@@ -25,13 +27,6 @@ options and arguments):
 
        * When run as 'program subfunc <options> <arguments>',
          subfunction prefix_subfunc will be called.
-
-To get the optional shell mode, call tf_launch() with noargs='shell'.
-Options for this argument are 'shell' or 'help'. If noargs='help' (the
-default), when the top level command is called with no arguments, it
-will run its help function. If noargs='shell', it will run its shell
-function in which each of the subcommands defined in the importing
-program can be called interactively.
 
 Non-tool-style programs can call toolfram.ez_launch(main) to get the
 following:
@@ -84,22 +79,22 @@ def tf_main(args, prefix=None, noarg='help'):
         prefix = sys.modules['__main__'].prefix()
 
     args = tf_dispatch_prolog(prefix, args)
-    # print("tf_main: args = %s" % args)
-    if len(args) < 1:
+    
+    if len(args) < 2:
         if noarg == 'help':
             tf_help([], prefix=prefix)
         elif noarg == 'shell':
             tf_shell(prefix, args)
         else:
-            raise StandardError('noarg must be "help" or "shell", not "%s"'
-                                % noarg)
-    elif args[0] == "help":
-        tf_help(args[1:], prefix=prefix)
+            raise StandardError('noarg must be "help" or "shell", not "%s"' %
+                                noarg)
+    elif args[1] == "help":
+        tf_help(args[2:], prefix=prefix)
     else:
         tf_dispatch(prefix, args)
 
     tf_dispatch_epilog(prefix, args)
-        
+
 # ---------------------------------------------------------------------------
 def tf_dispatch(prefix, args):
     if args[0] == 'help':
@@ -152,11 +147,9 @@ def tf_help(A, prefix=None):
     Otherwise, show a list of functions based on the first line of
     each __doc__ member.
     """
+    d = dir(sys.modules['__main__'])
     if prefix == None:
         prefix = sys.modules['__main__'].prefix()
-    d = [x for x in dir(sys.modules['__main__'])
-         if x.startswith(prefix) and
-         not (x.endswith('_prolog') or x.endswith('_epilog'))]
     if 0 < len(A):
         if '%s_%s' % (prefix, A[0]) in d:
             dname = "sys.modules['__main__'].%s_%s.__doc__" % (prefix, A[0])
@@ -180,8 +173,9 @@ def tf_help(A, prefix=None):
             print "   %s" % (docsum)
             
 
-# ---------------------------------------------------------------------------
-def tf_launch(prefix, noarg='help', cleanup_tests = None):
+# ------------------------------------------------------------------------------
+def tf_launch(prefix, noarg='help', cleanup_tests=None, testclass='',
+              logfile=''):
     if len(sys.argv) == 1 and sys.argv[0] == '':
         return
     sname = sys.argv[0]
@@ -191,11 +185,11 @@ def tf_launch(prefix, noarg='help', cleanup_tests = None):
         os.symlink(sname, pname)
     elif sys._getframe(1).f_code.co_name in ['?', '<module>']:
         if sname.endswith('.py'):
-            testhelp.main(sys.argv)
+            testhelp.main(sys.argv, testclass, logfile=logfile)
             if None != cleanup_tests:
                 cleanup_tests()
         else:
-            tf_main(sys.argv[1:], prefix=prefix, noarg=noarg)
+            tf_main(sys.argv, prefix=prefix, noarg=noarg)
 
 # ---------------------------------------------------------------------------
 def tf_shell(prefix, args):
@@ -208,7 +202,7 @@ def tf_shell(prefix, args):
         req = raw_input(prompt)
 
 # ---------------------------------------------------------------------------
-def ez_launch(main = None):
+def ez_launch(main = None, cleanup=None, test=None):
     # pdb.set_trace()
     if len(sys.argv) == 1 and sys.argv[0] == '':
         return
@@ -219,13 +213,15 @@ def ez_launch(main = None):
         os.symlink(sname, pname)
     elif sys._getframe(1).f_code.co_name in ['?', '<module>']:
         if sname.endswith('.py'):
-            unittest.main()
+            if '-d' in sys.argv:
+                sys.argv.remove('-d')
+                # pdb.set_trace()
+            if test == None:
+                unittest.main()
+            else:
+                if not testhelp.main(sys.argv,test) and cleanup != None:
+                    cleanup()
         elif main == None:
             raise StandardError("Pass your main routine to ez_launch")
         else:
             main(sys.argv)
-
-# ---------------------------------------------------------------------------
-class TfTest(unittest.TestCase):
-    def test_eventual(self):
-        pass

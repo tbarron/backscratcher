@@ -19,5 +19,6 @@ pytool
 pywhich
 replay
 workrpt
+*.log
 *.pyc
 *~
