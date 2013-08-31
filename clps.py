@@ -772,6 +772,33 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual('Bukittinggi' in S.before, True)
     
     # -----------------------------------------------------------------------
+    def test_clip_rgx_host(self):
+        """
+        Test clip with a regex across all fields, catching a single
+        entry by matching on the host field.
+        """
+        data = self.testdata
+
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
+
+        for item in data:
+            S.expect(self.prompt)
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
+
+        S.expect(self.prompt)
+        S.sendline("clip (com)")
+        
+        S.expect(self.prompt)
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+
+        S = pexpect.spawn("pbpaste")
+        S.expect(pexpect.EOF)
+        self.assertEqual('password' in S.before, True)
+
+    # -----------------------------------------------------------------------
     def test_clip_rgx_multi(self):
         """
         Test clip with a regex across all fields, catching multiple
@@ -807,10 +834,10 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual('Bukittinggi' in S.before, True)
         
     # -----------------------------------------------------------------------
-    def test_clip_rgx_host(self):
+    def test_clip_rgx_pwd(self):
         """
         Test clip with a regex across all fields, catching a single
-        entry by matching on the host field.
+        entry by matching on the password field.
         """
         data = self.testdata
 
@@ -823,7 +850,7 @@ class ClipTest(toolframe.unittest.TestCase):
             S.sendline(item[2])
 
         S.expect(self.prompt)
-        S.sendline("clip (com)")
+        S.sendline("clip (kittin)")
         
         S.expect(self.prompt)
         S.sendline("quit")
@@ -831,7 +858,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S = pexpect.spawn("pbpaste")
         S.expect(pexpect.EOF)
-        self.assertEqual('password' in S.before, True)
+        self.assertEqual('Bukittinggi' in S.before, True)
 
     # -----------------------------------------------------------------------
     def test_clip_rgx_user(self):
@@ -861,31 +888,66 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual('Surabaya' in S.before, True)
 
     # -----------------------------------------------------------------------
-    def test_clip_rgx_pwd(self):
+    def test_clps_opt_h(self):
         """
-        Test clip with a regex across all fields, catching a single
-        entry by matching on the password field.
+        Test running clps with the -h option.
         """
-        data = self.testdata
-
-        S = pexpect.spawn(self.clps_cmd, timeout=5)
-
-        for item in data:
-            S.expect(self.prompt)
-            S.sendline("add -H %s -u %s" % (item[0], item[1]))
-            S.expect("Password:")
-            S.sendline(item[2])
-
-        S.expect(self.prompt)
-        S.sendline("clip (kittin)")
-        
-        S.expect(self.prompt)
-        S.sendline("quit")
+        S = pexpect.spawn("clps -h", timeout=5)
         S.expect(pexpect.EOF)
+        self.assertEqual('debug' in S.before, True)
+        
+    # -----------------------------------------------------------------------
+    def test_cmd_bad_opt(self):
+        """
+        Test all commands with an invalid option.
+        """
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
+        S.expect(self.prompt)
 
+        cmdl = [x for x in self.cmdlist if x != 'help']
+        for cmd in cmdl:
+            # print cmd
+            S.sendline('%s -x' % cmd)
+            S.expect(self.prompt)
+
+            self.assertEqual('Usage:' in S.before, True)
+            self.assertEqual('no such option' in S.before, True)
+            self.assertEqual('-x' in S.before, True)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
+    
+    # -----------------------------------------------------------------------
+    def test_cmd_opt_h(self):
+        """
+        Test all the commands with option -h.
+        """
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
+        S.expect(self.prompt)
+
+        cmdl = [x for x in self.cmdlist if x != 'help']
+        for cmd in cmdl:
+            # print cmd
+            S.sendline('%s -h' % cmd)
+            S.expect(self.prompt)
+
+            self.assertEqual('Usage:' in S.before, True)
+            self.assertEqual('--debug' in S.before, True)
+            self.assertEqual('0' in S.before, False)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
+    
+    # -----------------------------------------------------------------------
+    def test_copy_to_clipboard(self):
+        """
+        Test the function copy_to_clipboard().
+        """
+        test_value = 'Brobdinagian'
+        copy_to_clipboard(test_value)
         S = pexpect.spawn("pbpaste")
         S.expect(pexpect.EOF)
-        self.assertEqual('Bukittinggi' in S.before, True)
+        self.assertEqual(test_value in S.before, True)
 
     # -----------------------------------------------------------------------
     def test_del_by_host_multi(self):
@@ -1150,45 +1212,6 @@ class ClipTest(toolframe.unittest.TestCase):
         S.expect(pexpect.EOF)
 
     # -----------------------------------------------------------------------
-    def test_del_rgx_multi(self):
-        """
-        Test del with a regex across all fields, catching multiple
-        entries so the user has to pick one. The regex should match
-        host in one record, user in another, and password in a third.
-        """
-        data = self.testdata
-
-        S = pexpect.spawn(self.clps_cmd, timeout=5)
-        S.expect(self.prompt)
-
-        for item in data:
-            S.sendline("add -H %s -u %s" % (item[0], item[1]))
-            S.expect("Password:")
-            S.sendline(item[2])
-            S.expect(self.prompt)
-
-        S.sendline("del (com|chair|Sura)")
-        S.expect(self.okprompt)
-
-        self.assertEqual('Deleting' in S.before, True)
-        self.assertEqual('foobar.com' in S.before, True)
-        self.assertEqual('chairil' in S.before, True)
-        self.assertEqual('java.org' in S.before, True)
-
-        S.sendline("yes")
-        S.expect(self.prompt)
-
-        S.sendline("show -P")
-        S.expect(self.prompt)
-
-        self.assertEqual('foobar.com' in S.before, False)
-        self.assertEqual('chairil' in S.before, False)
-        self.assertEqual('Surabaya' in S.before, False)
-        
-        S.sendline("quit")
-        S.expect(pexpect.EOF)
-
-    # -----------------------------------------------------------------------
     def test_del_rgx_host(self):
         """
         Test del with a regex across all fields, catching a single
@@ -1227,10 +1250,11 @@ class ClipTest(toolframe.unittest.TestCase):
         S.expect(pexpect.EOF)
 
     # -----------------------------------------------------------------------
-    def test_del_rgx_user(self):
+    def test_del_rgx_multi(self):
         """
-        Test del with a regex across all fields, catching a single
-        entry by matching on the user field.
+        Test del with a regex across all fields, catching multiple
+        entries so the user has to pick one. The regex should match
+        host in one record, user in another, and password in a third.
         """
         data = self.testdata
 
@@ -1243,12 +1267,12 @@ class ClipTest(toolframe.unittest.TestCase):
             S.sendline(item[2])
             S.expect(self.prompt)
 
-        S.sendline("del (lida)")
+        S.sendline("del (com|chair|Sura)")
         S.expect(self.okprompt)
 
         self.assertEqual('Deleting' in S.before, True)
-        self.assertEqual('foobar.com' in S.before, False)
-        self.assertEqual('sumatra.org' in S.before, False)
+        self.assertEqual('foobar.com' in S.before, True)
+        self.assertEqual('chairil' in S.before, True)
         self.assertEqual('java.org' in S.before, True)
 
         S.sendline("yes")
@@ -1256,11 +1280,11 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline("show -P")
         S.expect(self.prompt)
-        
-        self.assertEqual('password' in S.before, True)
-        self.assertEqual('Surabaya' in S.before, False)
-        self.assertEqual('Bukittinggi' in S.before, True)
 
+        self.assertEqual('foobar.com' in S.before, False)
+        self.assertEqual('chairil' in S.before, False)
+        self.assertEqual('Surabaya' in S.before, False)
+        
         S.sendline("quit")
         S.expect(pexpect.EOF)
 
@@ -1304,66 +1328,42 @@ class ClipTest(toolframe.unittest.TestCase):
 
     
     # -----------------------------------------------------------------------
-    def test_cmd_opt_h(self):
+    def test_del_rgx_user(self):
         """
-        Test all the commands with option -h.
+        Test del with a regex across all fields, catching a single
+        entry by matching on the user field.
         """
+        data = self.testdata
+
         S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
 
-        cmdl = [x for x in self.cmdlist if x != 'help']
-        for cmd in cmdl:
-            # print cmd
-            S.sendline('%s -h' % cmd)
+        for item in data:
+            S.sendline("add -H %s -u %s" % (item[0], item[1]))
+            S.expect("Password:")
+            S.sendline(item[2])
             S.expect(self.prompt)
 
-            self.assertEqual('Usage:' in S.before, True)
-            self.assertEqual('--debug' in S.before, True)
-            self.assertEqual('0' in S.before, False)
+        S.sendline("del (lida)")
+        S.expect(self.okprompt)
 
-        S.sendline('quit')
-        S.expect(pexpect.EOF)
-    
-    # -----------------------------------------------------------------------
-    def test_cmd_bad_opt(self):
-        """
-        Test all commands with an invalid option.
-        """
-        S = pexpect.spawn(self.clps_cmd, timeout=5)
+        self.assertEqual('Deleting' in S.before, True)
+        self.assertEqual('foobar.com' in S.before, False)
+        self.assertEqual('sumatra.org' in S.before, False)
+        self.assertEqual('java.org' in S.before, True)
+
+        S.sendline("yes")
         S.expect(self.prompt)
 
-        cmdl = [x for x in self.cmdlist if x != 'help']
-        for cmd in cmdl:
-            # print cmd
-            S.sendline('%s -x' % cmd)
-            S.expect(self.prompt)
-
-            self.assertEqual('Usage:' in S.before, True)
-            self.assertEqual('no such option' in S.before, True)
-            self.assertEqual('-x' in S.before, True)
-
-        S.sendline('quit')
-        S.expect(pexpect.EOF)
-    
-    # -----------------------------------------------------------------------
-    def test_clps_opt_h(self):
-        """
-        Test running clps with the -h option.
-        """
-        S = pexpect.spawn("clps -h", timeout=5)
-        S.expect(pexpect.EOF)
-        self.assertEqual('debug' in S.before, True)
+        S.sendline("show -P")
+        S.expect(self.prompt)
         
-    # -----------------------------------------------------------------------
-    def test_copy_to_clipboard(self):
-        """
-        Test the function copy_to_clipboard().
-        """
-        test_value = 'Brobdinagian'
-        copy_to_clipboard(test_value)
-        S = pexpect.spawn("pbpaste")
+        self.assertEqual('password' in S.before, True)
+        self.assertEqual('Surabaya' in S.before, False)
+        self.assertEqual('Bukittinggi' in S.before, True)
+
+        S.sendline("quit")
         S.expect(pexpect.EOF)
-        self.assertEqual(test_value in S.before, True)
 
     # -----------------------------------------------------------------------
     def test_dlup_by_host(self):
@@ -1600,25 +1600,6 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual(['flack.org', 'sinbad', 'mermaid'] in a, True)
         
     # -----------------------------------------------------------------------
-    def test_help_noarg(self):
-        """
-        Test interactive help inside clps.
-        """
-        S = pexpect.spawn(self.clps_cmd, timeout=5)
-        S.expect(self.prompt)
-        S.sendline('help')
-
-        which = S.expect([self.prompt, pexpect.EOF])
-        if 0 == which:
-            for cmd in self.cmdlist:
-                self.assertEqual(cmd in S.before, True)
-        else:
-            self.fail('help failed')
-
-        S.sendline('quit')
-        S.expect(pexpect.EOF)
-
-    # -----------------------------------------------------------------------
     def test_help_cmd(self):
         """
         Test interactive help inside clps, passing it a command name.
@@ -1634,6 +1615,25 @@ class ClipTest(toolframe.unittest.TestCase):
             S.expect(self.prompt)
             x = '%s - ' % cmd
             self.assertEqual(x in S.before, True)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
+
+    # -----------------------------------------------------------------------
+    def test_help_noarg(self):
+        """
+        Test interactive help inside clps.
+        """
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
+        S.expect(self.prompt)
+        S.sendline('help')
+
+        which = S.expect([self.prompt, pexpect.EOF])
+        if 0 == which:
+            for cmd in self.cmdlist:
+                self.assertEqual(cmd in S.before, True)
+        else:
+            self.fail('help failed')
 
         S.sendline('quit')
         S.expect(pexpect.EOF)
@@ -1731,6 +1731,35 @@ class ClipTest(toolframe.unittest.TestCase):
         S.expect(pexpect.EOF)
     
     # -----------------------------------------------------------------------
+    def test_load_cmdline_gpg(self):
+        """
+        Option -f supplied on command line but its argument cannot be
+        opened because it is not a gpg-encrypted file. We complain
+        about the error and drop to the prompt with nothing loaded.
+        """
+        filename = 'test_lcg.clps'
+        self.write_test_plain_file(filename, self.passphrase)
+        
+        S = pexpect.spawn("clps -f %s" % filename, timeout=5)
+        msg = '%s is not a gpg file' % filename
+        which = S.expect([self.prompt, msg, pexpect.EOF])
+        if 0 == which:
+            self.assertEqual(msg in S.before, True)
+        elif 2 == which:
+            self.fail('expected prompt after error message, got EOF')
+        elif 1 != which:
+            self.fail('unexpected which (%d) should be in [0..2]' % which)
+            
+        which = S.expect([self.prompt, pexpect.EOF])
+        if 0 == which:
+            S.sendline('quit')
+            S.expect(pexpect.EOF)
+        elif 1 == which:
+            self.fail('expected prompt after error message, got EOF')
+        else:
+            self.fail('unexpected which (%d) should be in [0..1]' % which)
+
+    # -----------------------------------------------------------------------
     def test_load_cmdline_nosuch(self):
         """
         Option -f supplied on command line but its argument does not
@@ -1756,29 +1785,6 @@ class ClipTest(toolframe.unittest.TestCase):
         S.sendline('quit')
         S.expect(pexpect.EOF)
     
-    # -----------------------------------------------------------------------
-    def test_load_cmdline_perm(self):
-        """
-        Option -f supplied on command line but its argument cannot be
-        opened because the permissions on the file don't allow it. We
-        complain about the error and drop to the prompt with nothing
-        loaded.
-        """
-        filename = 'test_lcm.clps'
-        self.write_test_clps_file(filename, self.passphrase)
-        os.chmod(filename, 0000)
-
-        S = pexpect.spawn("clps -f %s" % filename, timeout=5)
-        # S.logfile = sys.stdout
-        msg = '%s cannot be opened for read' % filename
-        which = S.expect(["Password: ", msg, pexpect.EOF])
-        if 0 == which:
-            self.fail('expected permission error')
-        elif 2 == which:
-            self.fail('expected prompt after error message, got EOF')
-        elif 1 != which:
-            self.fail('unexpected which (%d) should be in [0..2]' % which)
-
     # -----------------------------------------------------------------------
     def test_load_cmdline_pass(self):
         """
@@ -1815,100 +1821,18 @@ class ClipTest(toolframe.unittest.TestCase):
             self.fail('unexpected which (%d) should be in [0..1]' % which)
         
     # -----------------------------------------------------------------------
-    def test_load_cmdline_gpg(self):
+    def test_load_cmdline_perm(self):
         """
         Option -f supplied on command line but its argument cannot be
-        opened because it is not a gpg-encrypted file. We complain
-        about the error and drop to the prompt with nothing loaded.
-        """
-        filename = 'test_lcg.clps'
-        self.write_test_plain_file(filename, self.passphrase)
-        
-        S = pexpect.spawn("clps -f %s" % filename, timeout=5)
-        msg = '%s is not a gpg file' % filename
-        which = S.expect([self.prompt, msg, pexpect.EOF])
-        if 0 == which:
-            self.assertEqual(msg in S.before, True)
-        elif 2 == which:
-            self.fail('expected prompt after error message, got EOF')
-        elif 1 != which:
-            self.fail('unexpected which (%d) should be in [0..2]' % which)
-            
-        which = S.expect([self.prompt, pexpect.EOF])
-        if 0 == which:
-            S.sendline('quit')
-            S.expect(pexpect.EOF)
-        elif 1 == which:
-            self.fail('expected prompt after error message, got EOF')
-        else:
-            self.fail('unexpected which (%d) should be in [0..1]' % which)
-
-    # -----------------------------------------------------------------------
-    def test_load_env_exist(self):
-        """
-        Option -f is not specified but $CLPS_FILENAME names an
-        existing file. We load it.
-        """
-        filename = 'test_lcx.clps'
-        self.write_test_clps_file(filename, self.passphrase)
-
-        os.environ['CLPS_FILENAME'] = filename
-        S = pexpect.spawn("clps", timeout=5)
-        S.expect("Password: ")
-        S.sendline(self.passphrase)
-
-        S.expect(self.prompt)
-        S.sendline('show')
-
-        S.expect(self.prompt)
-        for item in self.testdata:
-            self.assertEqual(item[0] in S.before, True)
-            self.assertEqual(item[1] in S.before, True)
-            self.assertEqual(item[2] in S.before, False)
-
-        S.sendline('quit')
-        S.expect(pexpect.EOF)
-    
-    # -----------------------------------------------------------------------
-    def test_load_env_nosuch(self):
-        """
-        Option -f is not specified and $CLPS_FILENAME names a
-        non-existent file. We complain about the error and drop to the
-        prompt with nothing loaded.
-        """
-        filename = 'test_lcn.clps'
-        if os.path.exists(filename):
-            os.unlink(filename)
-
-        os.environ['CLPS_FILENAME'] = filename
-        S = pexpect.spawn("clps", timeout=5)
-        S.expect("No such file or directory: '%s'" % filename)
-
-        S.expect(self.prompt)
-        S.sendline('show')
-
-        S.expect(self.prompt)
-        for item in self.testdata:
-            self.assertEqual(item[0] in S.before, False)
-            self.assertEqual(item[1] in S.before, False)
-            self.assertEqual(item[2] in S.before, False)
-
-        S.sendline('quit')
-        S.expect(pexpect.EOF)
-    
-    # -----------------------------------------------------------------------
-    def test_load_env_perm(self):
-        """
-        $CLPS_FILENAME names an existing file but the permissions on
-        the file don't allow it to be opened. We complain about the
-        error and drop to the prompt with nothing loaded.
+        opened because the permissions on the file don't allow it. We
+        complain about the error and drop to the prompt with nothing
+        loaded.
         """
         filename = 'test_lcm.clps'
         self.write_test_clps_file(filename, self.passphrase)
         os.chmod(filename, 0000)
 
-        os.environ['CLPS_FILENAME'] = filename
-        S = pexpect.spawn("clps", timeout=5)
+        S = pexpect.spawn("clps -f %s" % filename, timeout=5)
         # S.logfile = sys.stdout
         msg = '%s cannot be opened for read' % filename
         which = S.expect(["Password: ", msg, pexpect.EOF])
@@ -1918,73 +1842,7 @@ class ClipTest(toolframe.unittest.TestCase):
             self.fail('expected prompt after error message, got EOF')
         elif 1 != which:
             self.fail('unexpected which (%d) should be in [0..2]' % which)
-    
-    # -----------------------------------------------------------------------
-    def test_load_env_pass(self):
-        """
-        $CLPS_FILENAME names an existing file which cannot be opened
-        because the wrong passphrase is supplied. We complain about
-        the error and drop to the prompt with nothing loaded.
-        """
-        filename = 'test_lcp.clps'
-        self.write_test_clps_file(filename, self.passphrase)
 
-        os.environ['CLPS_FILENAME'] = filename
-        S = pexpect.spawn("clps", timeout=5)
-        # S.logfile = sys.stdout
-        S.expect("Password: ")
-        S.sendline('X' + self.passphrase)
-
-        msg = '%s cannot be decrypted with the passphrase supplied' % filename
-        which = S.expect([self.prompt, msg, pexpect.EOF])
-        if 0 == which:
-            # print("msg: '%s'" % msg)
-            # print("S.before: '%s'" % S.before)
-            self.assertEqual(msg in S.before, True)
-        elif 2 == which:
-            self.fail('expectd prompt after error message, got EOF')
-        elif 1 != which:
-            self.fail('unexpected which (%d) should be in [0..2]' % which)
-
-        which = S.expect([self.prompt, pexpect.EOF])
-        if 0 == which:
-            S.sendline('quit')
-            S.expect(pexpect.EOF)
-        elif 1 == which:
-            self.fail('expected prompt after error message, got EOF')
-        else:
-            self.fail('unexpected which (%d) should be in [0..1]' % which)
-    
-    # -----------------------------------------------------------------------
-    def test_load_env_gpg(self):
-        """
-        $CLPS_FILENAME names an existing file which cannot be opened
-        because it is not a gpg-encrypted file. We complain about the
-        error and drop to the prompt with nothing loaded.
-        """
-        filename = 'test_lcg.clps'
-        self.write_test_plain_file(filename, self.passphrase)
-        
-        os.environ['CLPS_FILENAME'] = filename
-        S = pexpect.spawn("clps", timeout=5)
-        msg = '%s is not a gpg file' % filename
-        which = S.expect([self.prompt, msg, pexpect.EOF])
-        if 0 == which:
-            self.assertEqual(msg in S.before, True)
-        elif 2 == which:
-            self.fail('expected prompt after error message, got EOF')
-        elif 1 != which:
-            self.fail('unexpected which (%d) should be in [0..2]' % which)
-            
-        which = S.expect([self.prompt, pexpect.EOF])
-        if 0 == which:
-            S.sendline('quit')
-            S.expect(pexpect.EOF)
-        elif 1 == which:
-            self.fail('expected prompt after error message, got EOF')
-        else:
-            self.fail('unexpected which (%d) should be in [0..1]' % which)
-    
     # -----------------------------------------------------------------------
     def test_load_default_exist(self):
         """
@@ -2165,6 +2023,148 @@ class ClipTest(toolframe.unittest.TestCase):
         S.sendline('quit')
         S.expect(pexpect.EOF)
 
+    
+    # -----------------------------------------------------------------------
+    def test_load_env_exist(self):
+        """
+        Option -f is not specified but $CLPS_FILENAME names an
+        existing file. We load it.
+        """
+        filename = 'test_lcx.clps'
+        self.write_test_clps_file(filename, self.passphrase)
+
+        os.environ['CLPS_FILENAME'] = filename
+        S = pexpect.spawn("clps", timeout=5)
+        S.expect("Password: ")
+        S.sendline(self.passphrase)
+
+        S.expect(self.prompt)
+        S.sendline('show')
+
+        S.expect(self.prompt)
+        for item in self.testdata:
+            self.assertEqual(item[0] in S.before, True)
+            self.assertEqual(item[1] in S.before, True)
+            self.assertEqual(item[2] in S.before, False)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
+    
+    # -----------------------------------------------------------------------
+    def test_load_env_gpg(self):
+        """
+        $CLPS_FILENAME names an existing file which cannot be opened
+        because it is not a gpg-encrypted file. We complain about the
+        error and drop to the prompt with nothing loaded.
+        """
+        filename = 'test_lcg.clps'
+        self.write_test_plain_file(filename, self.passphrase)
+        
+        os.environ['CLPS_FILENAME'] = filename
+        S = pexpect.spawn("clps", timeout=5)
+        msg = '%s is not a gpg file' % filename
+        which = S.expect([self.prompt, msg, pexpect.EOF])
+        if 0 == which:
+            self.assertEqual(msg in S.before, True)
+        elif 2 == which:
+            self.fail('expected prompt after error message, got EOF')
+        elif 1 != which:
+            self.fail('unexpected which (%d) should be in [0..2]' % which)
+            
+        which = S.expect([self.prompt, pexpect.EOF])
+        if 0 == which:
+            S.sendline('quit')
+            S.expect(pexpect.EOF)
+        elif 1 == which:
+            self.fail('expected prompt after error message, got EOF')
+        else:
+            self.fail('unexpected which (%d) should be in [0..1]' % which)
+    
+    # -----------------------------------------------------------------------
+    def test_load_env_nosuch(self):
+        """
+        Option -f is not specified and $CLPS_FILENAME names a
+        non-existent file. We complain about the error and drop to the
+        prompt with nothing loaded.
+        """
+        filename = 'test_lcn.clps'
+        if os.path.exists(filename):
+            os.unlink(filename)
+
+        os.environ['CLPS_FILENAME'] = filename
+        S = pexpect.spawn("clps", timeout=5)
+        S.expect("No such file or directory: '%s'" % filename)
+
+        S.expect(self.prompt)
+        S.sendline('show')
+
+        S.expect(self.prompt)
+        for item in self.testdata:
+            self.assertEqual(item[0] in S.before, False)
+            self.assertEqual(item[1] in S.before, False)
+            self.assertEqual(item[2] in S.before, False)
+
+        S.sendline('quit')
+        S.expect(pexpect.EOF)
+    
+    # -----------------------------------------------------------------------
+    def test_load_env_pass(self):
+        """
+        $CLPS_FILENAME names an existing file which cannot be opened
+        because the wrong passphrase is supplied. We complain about
+        the error and drop to the prompt with nothing loaded.
+        """
+        filename = 'test_lcp.clps'
+        self.write_test_clps_file(filename, self.passphrase)
+
+        os.environ['CLPS_FILENAME'] = filename
+        S = pexpect.spawn("clps", timeout=5)
+        # S.logfile = sys.stdout
+        S.expect("Password: ")
+        S.sendline('X' + self.passphrase)
+
+        msg = '%s cannot be decrypted with the passphrase supplied' % filename
+        which = S.expect([self.prompt, msg, pexpect.EOF])
+        if 0 == which:
+            # print("msg: '%s'" % msg)
+            # print("S.before: '%s'" % S.before)
+            self.assertEqual(msg in S.before, True)
+        elif 2 == which:
+            self.fail('expectd prompt after error message, got EOF')
+        elif 1 != which:
+            self.fail('unexpected which (%d) should be in [0..2]' % which)
+
+        which = S.expect([self.prompt, pexpect.EOF])
+        if 0 == which:
+            S.sendline('quit')
+            S.expect(pexpect.EOF)
+        elif 1 == which:
+            self.fail('expected prompt after error message, got EOF')
+        else:
+            self.fail('unexpected which (%d) should be in [0..1]' % which)
+    
+    # -----------------------------------------------------------------------
+    def test_load_env_perm(self):
+        """
+        $CLPS_FILENAME names an existing file but the permissions on
+        the file don't allow it to be opened. We complain about the
+        error and drop to the prompt with nothing loaded.
+        """
+        filename = 'test_lcm.clps'
+        self.write_test_clps_file(filename, self.passphrase)
+        os.chmod(filename, 0000)
+
+        os.environ['CLPS_FILENAME'] = filename
+        S = pexpect.spawn("clps", timeout=5)
+        # S.logfile = sys.stdout
+        msg = '%s cannot be opened for read' % filename
+        which = S.expect(["Password: ", msg, pexpect.EOF])
+        if 0 == which:
+            self.fail('expected permission error')
+        elif 2 == which:
+            self.fail('expected prompt after error message, got EOF')
+        elif 1 != which:
+            self.fail('unexpected which (%d) should be in [0..2]' % which)
     
     # -----------------------------------------------------------------------
     def test_optionA_addshow(self):
