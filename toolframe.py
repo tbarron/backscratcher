@@ -91,7 +91,7 @@ def tf_main(args, prefix=None, noarg='help'):
     elif args[1] == "help":
         tf_help(args[2:], prefix=prefix)
     else:
-        tf_dispatch(prefix, args)
+        tf_dispatch(prefix, args[1:])
 
     tf_dispatch_epilog(prefix, args)
 
@@ -185,8 +185,8 @@ def tf_launch(prefix, noarg='help', cleanup_tests=None, testclass='',
         os.symlink(sname, pname)
     elif sys._getframe(1).f_code.co_name in ['?', '<module>']:
         if sname.endswith('.py'):
-            testhelp.main(sys.argv, testclass, logfile=logfile)
-            if None != cleanup_tests:
+            keep = testhelp.main(sys.argv, testclass, logfile=logfile)
+            if not keep and None != cleanup_tests:
                 cleanup_tests()
         else:
             tf_main(sys.argv, prefix=prefix, noarg=noarg)

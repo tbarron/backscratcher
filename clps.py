@@ -8,6 +8,7 @@ import os
 import pdb
 import pexpect
 import re
+import shutil
 import sys
 import tpbtools
 from testhelp import UnderConstructionError, debug_flag
@@ -326,8 +327,9 @@ def clps_load(args, implicit=False):
                 print("%s is not a gpg file" % filename)
             else:
                 passphrase = getpass.getpass()
-                (q, f, x) = os.popen3("gpg -d --passphrase %s < %s"
-                             % (passphrase, filename))
+                cmd = ("gpg -d --no-tty --passphrase %s < %s" %
+                       (passphrase, filename))
+                (q, f, x) = os.popen3(cmd)
                 xd = " ".join(x.readlines())
                 if 'decryption failed: bad key' in xd:
                     print('%s cannot be decrypted with the passphrase supplied'
@@ -514,6 +516,26 @@ def user_make_selection(choices):
     return rval
 
 # ---------------------------------------------------------------------------
+def post_test_cleanup():
+    """
+    Cleanup after tests
+    """
+    path_l = ['test_lcg.clps',
+              'test_save.clps',
+              'testhome',
+              'test_save.clps.*',
+              'test_lcp.clps',
+              'test_lcx.clps',
+              'test_load.clps',
+              'test_lcm.clps']
+    for gexp in path_l:
+        for path in glob.glob(gexp):
+            if os.path.isdir(path):
+                shutil.rmtree(path)
+            elif os.path.exists(path):
+                os.unlink(path)
+
+# ---------------------------------------------------------------------------
 class ClipTest(toolframe.unittest.TestCase):
     """
     Test suite for clps.
@@ -526,58 +548,6 @@ class ClipTest(toolframe.unittest.TestCase):
                 ['sumatra.org', 'chairil', 'Bukittinggi'],
                 ['java.org', 'khalida', 'Surabaya']]
     okprompt = r'Ok\? > '
-
-    # -----------------------------------------------------------------------
-    def write_test_clps_file(self,
-                             filename,
-                             passphrase=passphrase,
-                             data=testdata):
-        """
-        Write out an encrypted test file.
-        """
-        filename = os.path.expanduser(os.path.expandvars(filename))
-        if '/' in filename:
-            dirname = os.path.dirname(filename)
-            if not os.path.exists(dirname):
-                os.makedirs(dirname)
-                
-        if os.path.exists(filename):
-            os.unlink(filename)
-        f = os.popen('gpg -c --passphrase %s > %s'
-                     % (passphrase, filename), 'w')
-        for item in data:
-            f.write('%s\n' % '!@!'.join(item))
-        f.close()
-        
-    # -----------------------------------------------------------------------
-    def write_test_plain_file(self,
-                             filepath,
-                             passphrase=passphrase,
-                             data=testdata):
-        """
-        Write out a plaintext test file.
-        """
-        filepath = os.path.expanduser(os.path.expandvars(filepath))
-        if '/' in filepath:
-            dirname = os.path.dirname(filepath)
-            if not os.path.exists(dirname):
-                os.makedirs(dirname)
-
-        f = open(filepath, 'w')
-        for item in data:
-            f.write('%s\n' % '!@!'.join(item))
-        f.close()
-        
-    # -----------------------------------------------------------------------
-    def setUp(self):
-        """
-        Set up for testing.
-        """
-        if debug_flag():
-            pdb.set_trace()
-            
-        if None != os.getenv('CLPS_FILENAME'):
-            del os.environ['CLPS_FILENAME']
 
     # -----------------------------------------------------------------------
     def test_clip_by_host_multi(self):
@@ -1639,7 +1609,7 @@ class ClipTest(toolframe.unittest.TestCase):
         S.expect(pexpect.EOF)
 
     # -----------------------------------------------------------------------
-    def test_load(self):
+    def test_load_x(self):
         """
         Test loading a file of clps data.
         """
@@ -2660,6 +2630,58 @@ class ClipTest(toolframe.unittest.TestCase):
         S.sendline('quit')
         S.expect(pexpect.EOF)
 
+    # -----------------------------------------------------------------------
+    def setUp(self):
+        """
+        Set up for testing.
+        """
+        if debug_flag():
+            pdb.set_trace()
+            
+        if None != os.getenv('CLPS_FILENAME'):
+            del os.environ['CLPS_FILENAME']
+
+    # -----------------------------------------------------------------------
+    def write_test_clps_file(self,
+                             filename,
+                             passphrase=passphrase,
+                             data=testdata):
+        """
+        Write out an encrypted test file.
+        """
+        filename = os.path.expanduser(os.path.expandvars(filename))
+        if '/' in filename:
+            dirname = os.path.dirname(filename)
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
+                
+        if os.path.exists(filename):
+            os.unlink(filename)
+        f = os.popen('gpg -c --passphrase %s > %s'
+                     % (passphrase, filename), 'w')
+        for item in data:
+            f.write('%s\n' % '!@!'.join(item))
+        f.close()
+        
+    # -----------------------------------------------------------------------
+    def write_test_plain_file(self,
+                             filepath,
+                             passphrase=passphrase,
+                             data=testdata):
+        """
+        Write out a plaintext test file.
+        """
+        filepath = os.path.expanduser(os.path.expandvars(filepath))
+        if '/' in filepath:
+            dirname = os.path.dirname(filepath)
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
+
+        f = open(filepath, 'w')
+        for item in data:
+            f.write('%s\n' % '!@!'.join(item))
+        f.close()
+        
 # ---------------------------------------------------------------------------
 # pdb.set_trace()
 p = OptionParser()
@@ -2669,4 +2691,7 @@ p.add_option('-d', '--debug',
 p.add_option('-f', '--filename',
              action='store', default=None, dest='filename',
              help='name of password safe to open on startup')
-toolframe.tf_launch('clps', noarg='shell', logfile="clps_test.log")
+toolframe.tf_launch('clps',
+                    cleanup_tests=post_test_cleanup,
+                    noarg='shell',
+                    logfile="clps_test.log")
