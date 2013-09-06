@@ -2657,7 +2657,7 @@ class ClipTest(toolframe.unittest.TestCase):
                 
         if os.path.exists(filename):
             os.unlink(filename)
-        f = os.popen('gpg -c --passphrase %s > %s'
+        f = os.popen('gpg -c --passphrase %s > %s 2>/dev/null'
                      % (passphrase, filename), 'w')
         for item in data:
             f.write('%s\n' % '!@!'.join(item))
