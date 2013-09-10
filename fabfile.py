@@ -250,7 +250,6 @@ def files():
              'ascii.py'      : '$HOME/bin',
              'calc.py'       : '$HOME/bin',
              'chron.py'      : '$HOME/bin',
-             'dt'            : '$HOME/bin',
              'dt.py'         : '$HOME/bin',
              'errno'         : '$HOME/bin',
              'fab.py'        : '$HOME/bin',

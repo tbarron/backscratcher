@@ -58,30 +58,37 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 '''
 
-import getopt
+# import getopt
+import pdb
 import re
 import sys
 import time
+import toolframe
 import unittest
 
 from optparse import OptionParser
 
 # ---------------------------------------------------------------------------
 def main(argv = None):
-    if argv == None:
-        argv = sys.argv
+#     if argv == None:
+#         argv = sys.argv
 
     p = OptionParser()
+    p.add_option('-d', '--debug', dest='debug',
+                 action='store_true', default=False,
+                 help='run the debugger')
     p.add_option('-f', '--format', type='string', dest='format',
                  action='store', default='%Y.%m%d %H:%M:%S',
                  help='date format (see strftime(3))')
     (o, a) = p.parse_args(argv)
 
+    if o.debug: pdb.set_trace()
     print report_date(o.format, a[1:])
 
 # ---------------------------------------------------------------------------
 def fatal(msg):
-    raise DtError(msg)
+    # raise DtError(msg)
+    raise StandardError(msg)
 
 # ---------------------------------------------------------------------------
 def report_date(format, args):
@@ -123,49 +130,64 @@ def parse_whenspec(args):
 # ---------------------------------------------------------------------------
 def next(args):
     if len(args) < 1:
-        raise DtError('next: expected unit or weekday, found nothing')
+        # raise DtError('next: expected unit or weekday, found nothing')
+        raise StandardError('next: expected unit or weekday, found nothing')
     elif re.match(r'[+-]?\d+', args[0]):
-        raise DtError('next: expected unit or weekday, got number')
+        # raise DtError('next: expected unit or weekday, got number')
+        raise StandardError('next: expected unit or weekday, got number')
     elif args[0] in ['second', 'minute', 'hour', 'day',
                      'week', 'month', 'year']:
         rval = unit_size(args[0])
-    elif args[0] in weekday_list():
+    elif 0 <= weekday_number(args[0]) and weekday_number(args[0]) <= 6:
         rval = time_to(args[0], dir='next')
 
     try:
         return rval
     except UnboundLocalError:
-        raise DtError('next: no return value set')
+        # raise DtError('next: no return value set')
+        raise StandardError('next: no return value set')
 
 # ---------------------------------------------------------------------------
 def last(args):
     if len(args) < 1:
-        raise DtError('last: expected unit or weekday, found nothing')
+        # raise DtError('last: expected unit or weekday, found nothing')
+        raise StandardError('last: expected unit or weekday, found nothing')
     elif re.match(r'[+-]?\d+', args[0]):
-        raise DtError('last: expected unit or weekday, got number')
+        # raise DtError('last: expected unit or weekday, got number')
+        raise StandardError('last: expected unit or weekday, got number')
     elif args[0] in ['second', 'minute', 'hour', 'day',
                      'week', 'month', 'year']:
         rval = unit_size(args[0])
-    elif args[0] in weekday_list():
+    elif 0 <= weekday_number(args[0]) and weekday_number(args[0]) <= 6:
         rval = time_to(args[0], dir='last')
 
     try:
         return rval
     except UnboundLocalError:
-        raise DtError('last: no return value set')
+        # raise DtError('last: no return value set')
+        raise StandardError('last: no return value set')
+
+# ---------------------------------------------------------------------------
+def weekday_number(day):
+    wdl = weekday_list()
+    for num in range(len(wdl)):
+        if wdl[num].startswith(day):
+            return num
+    return -1
 
 # ---------------------------------------------------------------------------
 def time_to(day, dir):
     wdl = weekday_list()
-    daynum = wdl.index(day)
-    now = time.time()
+    # daynum = wdl.index(day)
+    daynum = weekday_number(day)
     tup = time.localtime()
     if dir == 'last':
         then = -24*60*60 * ((7 + tup[6] - daynum - 1) % 7 + 1)
     elif dir == 'next':
         then = 24*60*60 * ((7 + daynum - tup[6] - 1) % 7 + 1)
     else:
-        raise DtError('time_to: invalid direction')
+        # raise DtError('time_to: invalid direction')
+        raise StandardError('time_to: invalid direction')
     return then
 
 # ---------------------------------------------------------------------------
@@ -251,17 +273,17 @@ class dtTest(unittest.TestCase):
     def parse_test(self, testargs, expected):
         if type(expected) == int:
             a = parse_whenspec(testargs)
-            assert(a == expected)
+            self.assertEqual(a, expected)
         elif type(expected) == str:
             got_exception = False
             try:
                 a = parse_whenspec(testargs)
-            except DtError, e:
+            except StandardError, e:
                 got_exception = True
-                assert(e.message == expected)
+                self.assertEqual(str(e), expected)
             assert(got_exception)
         else:
-            raise DtError("expected int or string, got '%s'" % expected)
+            raise StandardError("expected int or string, got '%s'" % expected)
         
     # -----------------------------------------------------------------------
     def report_test(self, testargs, expected):
@@ -269,17 +291,17 @@ class dtTest(unittest.TestCase):
             a = report_date(self.default_fmt(), testargs)
             b = time.strftime(self.default_fmt(),
                               time.localtime(time.time() + expected))
-            assert(a == b)
+            self.assertEqual(a, b)
         elif type(expected) == str:
             got_exception = False
             try:
                 a = report_date(self.default_fmt(), testargs)
-            except DtError, e:
+            except StandardError, e:
                 got_exception = True
-                assert(e.message, expected)
+                self.assertEqual(str(e), expected)
             assert(got_exception)
         else:
-            raise DtError("expected int or string, got '%s'" % expected)
+            raise StandardError("expected int or string, got '%s'" % expected)
             
     # -----------------------------------------------------------------------
     def test_today(self):
@@ -370,12 +392,4 @@ class dtTest(unittest.TestCase):
         self.both_test(['next', 'sunday'], time_to('sunday', 'next'))
 
 # ---------------------------------------------------------------------------
-class DtError(Exception):
-    def __init__(self, message):
-        self.message = message
-    def __str__(self):
-        return repr(self.message)
-    
-# ---------------------------------------------------------------------------
-if __name__ == '__main__':
-    unittest.main()
+toolframe.ez_launch(main)
