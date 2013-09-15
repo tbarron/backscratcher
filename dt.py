@@ -3,9 +3,9 @@
 dt - date/time manipulation from the command line
 
 Apply a format to a time index like date(1). However, dt will also
-accept a time offset to adjust the time index to be formatted.
+accept a time specification to indicate the time index to be formatted.
 
-The offset can be one of the following:
+The time spec can be one of the following:
 
    today
    tomorrow
@@ -13,13 +13,15 @@ The offset can be one of the following:
    (last|next) (week|month|year)
    (+|-)<n> (seconds|minutes|hours|days|weeks|months|years)
    (+|-)((HH:)MM:)SS
-                  
+   [epoch-time]
+   
  dt -f '%Y.%m%d' next week
  dt -f '%Y.%m%d' {next|last} {second|minute|hour|day|week|month|year
                               |monday|tuesday|wednesday|thursday
                               |friday|saturday|sunday}
  dt -f <format> [+|-]<integer> {sec|min|hour|day|week|month|year}
-
+ dt -f <format> [epoch-time]
+ 
 EXAMPLES
 
    $ dt next week
@@ -36,6 +38,8 @@ EXAMPLES
 
    $ dt -f %s
    1270587188
+
+   $ dt -f "%Y.%m%d" 1270587188
 
 LICENSE
 
@@ -107,8 +111,18 @@ def report_date(format, args):
     return time.strftime(format, time.localtime(when))
     
 # ---------------------------------------------------------------------------
+def is_numeric(strval):
+    try:
+        float(strval)
+    except:
+        return False
+    return True
+
+# ---------------------------------------------------------------------------
 def parse_whenspec(args):
-    if args[0] == 'next':
+    if is_numeric(args[0]) and (1 == len(args)):
+        rval = int(args[0]) - time.time()
+    elif args[0] == 'next':
         rval = next(args[1:])
     elif args[0] == 'last':
         rval = last(args[1:])
