@@ -121,7 +121,7 @@ def is_numeric(strval):
 # ---------------------------------------------------------------------------
 def parse_whenspec(args):
     if is_numeric(args[0]) and (1 == len(args)):
-        rval = int(args[0]) - time.time()
+        rval = int(args[0]) - int(time.time())
     elif args[0] == 'next':
         rval = next(args[1:])
     elif args[0] == 'last':
@@ -297,7 +297,7 @@ class dtTest(unittest.TestCase):
                 self.assertEqual(str(e), expected)
             assert(got_exception)
         else:
-            raise StandardError("expected int or string, got '%s'" % expected)
+            raise StandardError("expected int or string, got '%s'" % a)
         
     # -----------------------------------------------------------------------
     def report_test(self, testargs, expected):
@@ -315,8 +315,13 @@ class dtTest(unittest.TestCase):
                 self.assertEqual(str(e), expected)
             assert(got_exception)
         else:
-            raise StandardError("expected int or string, got '%s'" % expected)
+            raise StandardError("expected int or string, got '%s'" % a)
             
+    # -----------------------------------------------------------------------
+    def test_epoch(self):
+        when = int(time.time()) - 300
+        self.both_test(['%d' % when], -300)
+        
     # -----------------------------------------------------------------------
     def test_today(self):
         self.both_test(['today'], 0)
