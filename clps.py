@@ -60,6 +60,8 @@ with the backscratcher project rather than this list.
    just hits Enter rather than typing a number, we get a traceback.
 """
 
+LAST_LOADED = "<empty>"
+
 # ---------------------------------------------------------------------------
 def clps_prolog(args):
     """
@@ -287,6 +289,7 @@ def clps_load(args, implicit=False):
 
     load <filename>
     """
+    global LAST_LOADED
     p = OptionParser()
     p.add_option('-d', '--debug',
                  action='store_true', default=False, dest='debug',
@@ -302,7 +305,7 @@ def clps_load(args, implicit=False):
     if o.debug: pdb.set_trace()
     
     if 1 == len(a):
-        filename = a.pop(0)
+        LAST_LOADED = filename = a.pop(0)
     else:
         raise StandardError('load requires a filename')
 
@@ -365,9 +368,13 @@ def clps_save(args):
         
     if 1 == len(a):
         filename = a.pop(0)
+    elif LAST_LOADED != "<empty>":
+        filename = LAST_LOADED
+        print("saving %s" % filename)
     else:
-        raise StandardError('save requires a filename')
-
+        print('save requires a filename')
+        return
+    
     if os.path.exists(filename):
         newname = filename + time.strftime(".%Y.%m%d.%H%M%S")
         os.rename(filename, newname)
@@ -524,6 +531,7 @@ def post_test_cleanup():
               'test_save.clps',
               'testhome',
               'test_save.clps.*',
+              'test_savell.clps*',
               'test_lcp.clps',
               'test_lcx.clps',
               'test_load.clps',
@@ -2394,6 +2402,57 @@ class ClipTest(toolframe.unittest.TestCase):
         for item in data:
             for element in item:
                 self.assertEqual(element in ''.join(C), False)
+
+    # -------------------------------------------------------------------------
+    def test_save_last_loaded(self):
+        """
+        Test that save with no arguments saves the most recently loaded file if
+        there is one.
+         - on save with no last_loaded, don't throw exception just warn
+        """
+        os.environ['HOME'] = homedir = "./testhome"
+        if not os.path.exists(homedir):
+            os.mkdir(homedir)
+        filename = "test_savell.clps"
+        f = os.popen('gpg -c --passphrase %s > %s 2>/dev/null' %
+                     (self.passphrase, filename),
+                     'w')
+        for item in self.testdata:
+            f.write('%s\n' % '!@!'.join(item))
+        f.close()
+        
+        S = pexpect.spawn(self.clps_cmd, timeout=5)
+        S.expect(self.prompt)
+
+        S.sendline("save")
+        S.expect("save requires a filename")
+        S.expect(self.prompt)
+        
+        S.sendline("load test_savell.clps")
+        S.expect("Password: ")
+
+        S.sendline(self.passphrase)
+        S.expect(self.prompt)
+
+        S.sendline("add -u tiddly winks.com")
+        S.expect("Password: ")
+
+        S.sendline("abc123")
+        S.expect(self.prompt)
+
+        S.sendline("save")
+        S.expect("saving test_savell.clps")
+        S.expect("Password:")
+        
+        S.sendline(self.passphrase)
+        S.expect(self.prompt)
+
+        S.sendline("quit")
+        S.expect(pexpect.EOF)
+        
+        fl = glob.glob("test_savell.clps*")
+        self.assertEqual(1 < len(fl), True,
+                         "Not enough files matching test_savell.clps*")
 
     # -----------------------------------------------------------------------
     def test_save_overwrite(self):
