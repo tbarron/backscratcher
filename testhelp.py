@@ -177,7 +177,7 @@ def list_tests(a, final, testlist):
                     break
 
 # ---------------------------------------------------------------------------
-def test_name(obj=None):
+def name_of(obj=None):
     """
     Return the caller's function name (with an optional class prefix).
     """
@@ -240,13 +240,13 @@ class LoggingTestSuite(unittest.TestSuite):
             if None != self._logger:
                 test(result)
                 if fails < len(result.failures):
-                    self._logger.info('%-30s >>> FAILED' % test_name(test))
+                    self._logger.info('%-30s >>> FAILED' % name_of(test))
                     fails = len(result.failures)
                 elif errs < len(result.errors):
-                    self._logger.info('%-30s >>> ERROR' % test_name(test))
+                    self._logger.info('%-30s >>> ERROR' % name_of(test))
                     errs = len(result.errors)
                 else:
-                    self._logger.info('%-25s PASSED' % test_name(test))
+                    self._logger.info('%-25s PASSED' % name_of(test))
             else:
                 test(result)
         return result

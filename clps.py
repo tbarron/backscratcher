@@ -3,7 +3,7 @@
 import errno
 import getpass
 import glob
-from optparse import OptionParser
+import optparse
 import os
 import pdb
 import pexpect
@@ -11,53 +11,34 @@ import re
 import shutil
 import sys
 import tpbtools
-from testhelp import UnderConstructionError, debug_flag
+import testhelp
 import time
 import toolframe
 import traceback as tb
 
 """
+Copyright (C) 1995 - <the end of time>  Tom Barron
+  tom.barron@comcast.net
+  177 Crossroads Blvd
+  Oak Ridge, TN  37830
+
+This software is licensed under the CC-GNU GPL. For the full text of
+the license, see http://creativecommons.org/licenses/GPL/2.0/
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+              ------------------------------------------
+
 New issues should be managed in the github issue tracker associated
 with the backscratcher project rather than this list.
-
- + "clps -f <filename>" should load <filename>
-
- + "clps" (no args) should attempt to load a default file ($CLPS_FILENAME)
- 
- + clps> clip -h  => exits when it should not
-
- + clps> show -p  => exits when it should not
-
- x If I say
-      clps add -H abc.com -U johndoe
-
-   I should get a prompt for a password and the entry should be added
-   to my default password safe file.
-
- + in shell mode, "help" gets a traceback
-
- + I think help inside clps is blowing up on 'clps_prolog' or
-   'clps_epilog'. Need to protect these from being dispatchable
-   somehow.
-
- + An unrecognized subfunction exits when it should not
-
- + 'clip' and 'show' handle searching differently. 'clip' has to be
-   told which field to search on. 'show' searches across the ones it's
-   going to display. The documentation for clip says that it searches
-   across all three if no option is given, but what it actually does
-   is to select all entries and ask the user to select one. What to do:
-
-    + fix clip so it really does search across all fields with no option
-    + add support for -H -u -p options to show
-
- + Need a way to remove old entries
-
- + When save overwrites an existing file, the old version should be
-   renamed with a timestamp
-
- + On a clip command, if more than one match is found and the user
-   just hits Enter rather than typing a number, we get a traceback.
 """
 
 LAST_LOADED = "<empty>"
@@ -67,7 +48,7 @@ def clps_prolog(args):
     """
     Set things up.
     """
-    p = OptionParser()
+    p = optparse.OptionParser()
     p.add_option('-d', '--debug',
                  action='store_true', default=False, dest='debug',
                  help='run under debugger')
@@ -140,7 +121,7 @@ def clps_add(args):
     and let clps prompt you for all three pieces of info. clps will
     always prompt for password (and read it without echoing).
     """
-    p = OptionParser()
+    p = optparse.OptionParser()
     p.add_option('-d', '--debug',
                  action='store_true', default=False, dest='debug',
                  help='run under debugger')
@@ -191,7 +172,7 @@ def clps_clip(args):
     clipboard. If more than one match is found, list them and ask the
     user to select one to copy to the clipboard.
     """
-    p = OptionParser()
+    p = optparse.OptionParser()
     p.add_option('-d', '--debug',
                  action='store_true', default=False, dest='debug',
                  help='run under debugger')
@@ -240,7 +221,7 @@ def clps_del(args):
     given). List all the matched entries and ask the user for
     confirmation to delete them.
     """
-    p = OptionParser()
+    p = optparse.OptionParser()
     p.add_option('-d', '--debug',
                  action='store_true', default=False, dest='debug',
                  help='run under debugger')
@@ -290,7 +271,7 @@ def clps_load(args, implicit=False):
     load <filename>
     """
     global LAST_LOADED
-    p = OptionParser()
+    p = optparse.OptionParser()
     p.add_option('-d', '--debug',
                  action='store_true', default=False, dest='debug',
                  help='run under debugger')
@@ -355,7 +336,7 @@ def clps_save(args):
 
     save <filename>
     """
-    p = OptionParser()
+    p = optparse.OptionParser()
     p.add_option('-d', '--debug',
                  action='store_true', default=False, dest='debug',
                  help='run under debugger')
@@ -395,7 +376,7 @@ def clps_show(args):
     Without <regex>, show all entries. Without -P, show only host and
     usernames.
     """
-    p = OptionParser()
+    p = optparse.OptionParser()
     p.add_option('-d', '--debug',
                  action='store_true', default=False, dest='debug',
                  help='run under debugger')
@@ -2694,7 +2675,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         Set up for testing.
         """
-        if debug_flag():
+        if testhelp.debug_flag():
             pdb.set_trace()
             
         if None != os.getenv('CLPS_FILENAME'):
@@ -2743,7 +2724,7 @@ class ClipTest(toolframe.unittest.TestCase):
         
 # ---------------------------------------------------------------------------
 # pdb.set_trace()
-p = OptionParser()
+p = optparse.OptionParser()
 p.add_option('-d', '--debug',
              action='store_true', default=False, dest='debug',
              help='run under debugger')
