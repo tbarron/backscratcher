@@ -1,5 +1,5 @@
 #!/usr/bin/python
-'''
+"""
 stopwatch or countdown timer
 
 chron -c/--count up
@@ -29,7 +29,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
       
-'''
+"""
 
 import os
 import sys

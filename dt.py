@@ -1,5 +1,5 @@
 #!/usr/bin/python
-'''
+"""
 dt - date/time manipulation from the command line
 
 Apply a format to a time index like date(1). However, dt will also
@@ -60,9 +60,9 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-'''
+"""
 
-# import getopt
+import optparse
 import pdb
 import re
 import sys
@@ -70,14 +70,12 @@ import time
 import toolframe
 import unittest
 
-from optparse import OptionParser
-
 # ---------------------------------------------------------------------------
 def main(argv = None):
 #     if argv == None:
 #         argv = sys.argv
 
-    p = OptionParser()
+    p = optparse.OptionParser()
     p.add_option('-d', '--debug', dest='debug',
                  action='store_true', default=False,
                  help='run the debugger')

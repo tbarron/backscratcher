@@ -1,20 +1,21 @@
 #!/usr/bin/python
-'''
+"""
 align
 
 Take as input a file of partially formatted columns and align them
 neatly in columns of minimal width.
 
 Example:
-   $ cal | align
-   December  2008
-   S         M     Tu  W   Th  F   S
-          1     2   3   4   5   6
-          7     8   9  10  11  12  13
-         14    15  16  17  18  19  20
-         21    22  23  24  25  26  27
-         28    29  30  31
+    $ cal | align
+    November  2013  
+    Su        Mo    Tu  We  Th  Fr  Sa  
+           1     2  
+           3     4   5   6   7   8   9  
+          10    11  12  13  14  15  16  
+          17    18  19  20  21  22  23  
+          24    25  26  27  28  29  30  
 
+                                
 Note that numbers are right-aligned while words are left-aligned.
 
 Copyright (C) 1995 - <the end of time>  Tom Barron
@@ -34,7 +35,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-'''
+"""
 import re
 import sys
 import toolframe
