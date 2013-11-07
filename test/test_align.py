@@ -9,6 +9,13 @@ import toolframe
 import unittest
 
 # ---------------------------------------------------------------------------
+def tearDownModule():
+    flist = ['testdata']
+    for fname in flist:
+        if os.path.exists(fname):
+            os.unlink(fname)
+
+# ---------------------------------------------------------------------------
 class AlignTest(unittest.TestCase):
     """
     Test suite for align
@@ -74,10 +81,9 @@ class AlignTest(unittest.TestCase):
     # -------------------------------------------------------------------------
     def test_next_steps(self):
         self.fail("""
-         - arrange to clean up after test_align.py
          - run pep8 on all my python code and clean up the complaints
         """)
 
 # ---------------------------------------------------------------------------
 if __name__ == '__main__':
-    toolframe.ez_launch(test=AlignTest)
+    toolframe.ez_launch(test=AlignTest, cleanup=tearDownModule)

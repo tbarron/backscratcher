@@ -19,6 +19,7 @@ pstrack
 pytool
 pywhich
 replay
+test/test_all
 workrpt
 *.log
 *.pyc

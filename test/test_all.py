@@ -3,6 +3,7 @@ import sys, os
 sys.path.insert(0, os.getcwd())
 
 import glob
+import pdb
 import testhelp
 import toolframe
 
@@ -15,25 +16,27 @@ def main(args):
         tlist.remove('test_all')
     testlist = []
     for mod in tlist:
-        __import__(mod)
-        for item in dir(sys.modules[mod]):
+        mhandle = __import__(mod)
+        for item in dir(mhandle):
             if item.endswith('Test'):
-                testlist.append(mod + '.' + item)
-    print testlist
-    run_tests(testlist)
-
+                tclass = getattr(mhandle, item)
+                testlist.append((mhandle, tclass))
+        for testset in testlist:
+            run_tests(testset)
+        if hasattr(mhandle, 'tearDownModule'):
+            tdf = getattr(mhandle, 'tearDownModule')
+            tdf()
+        
     
 # -----------------------------------------------------------------------------
-def run_tests(tests):
+def run_tests(mt_tup):
     suite = testhelp.LoggingTestSuite(logfile='bstest.log')
-    for t in tests:
-        (module, tclass) = t.split('.')
-        m = sys.modules[module]
-        t = getattr(m, tclass)
-        cases = testhelp.unittest.TestLoader().getTestCaseNames(t)
-        for c in cases:
-            s = testhelp.unittest.TestLoader().loadTestsFromName(c, t)
-            suite.addTests(s)
+    (m, t) = mt_tup
+    print t.__module__ + '.' + t.__name__ + ':'
+    cases = testhelp.unittest.TestLoader().getTestCaseNames(t)
+    for c in cases:
+        s = testhelp.unittest.TestLoader().loadTestsFromName(c, t)
+        suite.addTests(s)
 
     result = testhelp.unittest.TextTestRunner().run(suite)
 
