@@ -71,6 +71,13 @@ class AlignTest(unittest.TestCase):
                           (x.replace(' ','-'), len(x)))
         
         
+    # -------------------------------------------------------------------------
+    def test_next_steps(self):
+        self.fail("""
+         - arrange to clean up after test_align.py
+         - run pep8 on all my python code and clean up the complaints
+        """)
+
 # ---------------------------------------------------------------------------
 if __name__ == '__main__':
     toolframe.ez_launch(test=AlignTest)
