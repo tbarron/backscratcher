@@ -7,15 +7,15 @@ neatly in columns of minimal width.
 
 Example:
     $ cal | align
-    November  2013  
-    Su        Mo    Tu  We  Th  Fr  Sa  
-           1     2  
-           3     4   5   6   7   8   9  
-          10    11  12  13  14  15  16  
-          17    18  19  20  21  22  23  
-          24    25  26  27  28  29  30  
+    November  2013
+    Su        Mo    Tu  We  Th  Fr  Sa
+           1     2
+           3     4   5   6   7   8   9
+          10    11  12  13  14  15  16
+          17    18  19  20  21  22  23
+          24    25  26  27  28  29  30
 
-                                
+
 Note that numbers are right-aligned while words are left-aligned.
 
 Copyright (C) 1995 - <the end of time>  Tom Barron
@@ -36,13 +36,22 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
+import pdb
 import re
 import sys
 import toolframe
 
+
 # ---------------------------------------------------------------------------
 def main(A):
-    lines = [l.strip() for l in sys.stdin.readlines()]
+    if 1 < len(A):
+        input = open(A[1], 'r')
+    else:
+        input = sys.stdin
+    align(input)
+
+def align(input):
+    lines = [l.strip() for l in input.readlines()]
     width = []
     for l in lines:
         f = l.split()
@@ -64,4 +73,5 @@ def main(A):
         print oline
 
 # ---------------------------------------------------------------------------
-toolframe.ez_launch(main)
+if __name__ == '__main__':
+    toolframe.ez_launch(main)

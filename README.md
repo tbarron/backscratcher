@@ -132,3 +132,7 @@ So now I'm in the middle of converting all these programs to python.
 
 Even more recently, I have started using Perl::Expect. So now I know
 that perl can do expect-type stuff, too.
+
+----------------------------
+
+Moving tests down into directory test
