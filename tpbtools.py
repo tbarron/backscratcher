@@ -7,6 +7,7 @@ import sys
 import testhelp
 import unittest
 
+
 # ---------------------------------------------------------------------------
 def contents(filename):
     '''
@@ -18,9 +19,11 @@ def contents(filename):
     f.close()
     return rval
 
+
 # ---------------------------------------------------------------------------
 def expand(path):
     return os.path.expandvars(os.path.expanduser(path))
+
 
 # ---------------------------------------------------------------------------
 def fatal(msg):
@@ -28,10 +31,12 @@ def fatal(msg):
     print '   %s' % msg
     print ' '
     sys.exit(1)
-    
+
+
 # ---------------------------------------------------------------------------
 def function_name():
     return sys._getframe(1).f_code.co_name
+
 
 # ---------------------------------------------------------------------------
 def rmrf(path):
@@ -48,6 +53,7 @@ def rmrf(path):
         # print("os.unlink(%s)" % path)
         os.unlink(path)
 
+
 # ---------------------------------------------------------------------------
 def run(cmd, xable, verbose=False):
     # print "run: cmd='%s', %s" % (cmd, xable)
@@ -57,6 +63,7 @@ def run(cmd, xable, verbose=False):
         os.system(cmd)
     else:
         print "would do '%s'" % cmd
+
 
 # ---------------------------------------------------------------------------
 def safe_unlink(path):
@@ -69,13 +76,15 @@ def safe_unlink(path):
                 os.unlink(item)
     else:
         raise Exception('safe_unlink: argument must be str or list')
-        
+
+
 # ---------------------------------------------------------------------------
 def writefile(filepath, lines):
     f = open(filepath, 'w')
     f.writelines(lines)
     f.close()
-    
+
+
 # ---------------------------------------------------------------------------
 def tpb_cleanup_tests():
     global testdir
@@ -83,25 +92,27 @@ def tpb_cleanup_tests():
         os.chdir('..')
     if os.path.isdir(testdir):
         rmrf(testdir)
-        
+
+
 # ---------------------------------------------------------------------------
 class TpbtoolsTest(unittest.TestCase):
     # -----------------------------------------------------------------------
     def setUp(self):
         global testdir
         testdir = testhelp.into_test_dir()
-        
+
     # -----------------------------------------------------------------------
     def test_expand(self):
         home = os.environ['HOME']
         logname = os.environ['LOGNAME']
-        
+
         assert(expand('$HOME') == home)
         assert(expand('~') == home)
         assert(expand('~%s' % logname) == home)
         assert(expand('### $PYTHONPATH ###')
                == '### %s ###' % os.environ['PYTHONPATH'])
-        
+
+
 # ---------------------------------------------------------------------------
 if __name__ == '__main__':
     if not testhelp.main(sys.argv):

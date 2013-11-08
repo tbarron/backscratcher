@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
-import logging, logging.handlers
+import logging
+import logging.handlers
 import os
 import pdb
 import pexpect
@@ -13,8 +14,10 @@ from optparse import *
 
 tlogger = None
 
+
+# -----------------------------------------------------------------------------
 def main(args=None, filter=None, logfile=None):
-    if args == None:
+    if args is None:
         args = sys.argv
     p = OptionParser()
     p.add_option('-d', '--debug',
@@ -38,7 +41,7 @@ def main(args=None, filter=None, logfile=None):
     (o, a) = p.parse_args(args)
 
     debug_flag(o.debug)
-    
+
     if o.verbose:
         volume = 2
     elif o.quiet:
@@ -58,6 +61,7 @@ def main(args=None, filter=None, logfile=None):
 
     return o.keep
 
+
 # ---------------------------------------------------------------------------
 def all_tests(name, filter=None):
     '''
@@ -67,7 +71,7 @@ def all_tests(name, filter=None):
     # print("all_tests(%s, %s)" % (name, filter))
     testclasses = []
     cases = []
-    if filter == None:
+    if filter is None:
         filter = 'Test'
     # print("all_tests(%s, %s)" % (name, filter))
     # print dir(sys.modules[name])
@@ -83,18 +87,19 @@ def all_tests(name, filter=None):
         for case in unittest.TestLoader().getTestCaseNames(cobj):
             skip = case.replace('test_', 'skip_', 1)
             sfunc = getattr(sys.modules[name], skip, None)
-            if sfunc == None:
+            if sfunc is None:
                 cases.append(['%s.%s' % (c, case), None])
             else:
                 cases.append(['%s.%s' % (c, case), skip])
 
     return cases
 
+
 # ---------------------------------------------------------------------------
 def debug_flag(value=None):
     global dval
 
-    if value != None:
+    if value is not None:
         dval = value
 
     try:
@@ -104,6 +109,7 @@ def debug_flag(value=None):
         rval = dval
 
     return rval
+
 
 # ---------------------------------------------------------------------------
 def expectVSgot(expected, got):
@@ -128,11 +134,13 @@ def expectVSgot(expected, got):
             print "EXPECTED: '%s'" % expected
             print "GOT:      '%s'" % got
             raise e
-        
+
+
 # ---------------------------------------------------------------------------
 def get_logger():
     global tlogger
     return tlogger
+
 
 # ---------------------------------------------------------------------------
 def into_test_dir():
@@ -142,6 +150,7 @@ def into_test_dir():
         os.mkdir(tdname)
         os.chdir(tdname)
     return tdname
+
 
 # ---------------------------------------------------------------------------
 def keepfiles(value=None):
@@ -156,10 +165,11 @@ def keepfiles(value=None):
         kf_flag = False
         rval = kf_flag
 
-    if value != None:
+    if value is not None:
         kf_flag = value
 
     return rval
+
 
 # ---------------------------------------------------------------------------
 def list_tests(a, final, testlist):
@@ -176,12 +186,14 @@ def list_tests(a, final, testlist):
                 if final != '' and final in c[0]:
                     break
 
+
 # ---------------------------------------------------------------------------
 def name_of(obj=None):
     """
     Return the caller's function name (with an optional class prefix).
     """
     return str(obj).split()[0]
+
 
 # ---------------------------------------------------------------------------
 def run_tests(a, final, testlist, volume, logfile=None):
@@ -208,7 +220,8 @@ def run_tests(a, final, testlist, volume, logfile=None):
                     break
 
     result = unittest.TextTestRunner(verbosity=volume).run(suite)
-    
+
+
 # ---------------------------------------------------------------------------
 class LoggingTestSuite(unittest.TestSuite):
     def __init__(self, tests=(), logfile=None):
@@ -250,7 +263,8 @@ class LoggingTestSuite(unittest.TestSuite):
             else:
                 test(result)
         return result
-        
+
+
 # ---------------------------------------------------------------------------
 def show_stdout(value=None):
     """
@@ -264,14 +278,15 @@ def show_stdout(value=None):
         show_output = False
         rval = show_output
 
-    if value != None:
+    if value is not None:
         show_output = value
 
     return rval
 
+
 # ---------------------------------------------------------------------------
 def skip_check(skipfunc):
-    if skipfunc == None:
+    if skipfunc is None:
         return False
     func = getattr(sys.modules['__main__'], skipfunc)
     rval = func()
@@ -279,9 +294,11 @@ def skip_check(skipfunc):
         print "skipping %s" % skipfunc.replace('skip_', 'test_')
     return rval
 
+
 # ---------------------------------------------------------------------------
 def touch(pathname):
     open(pathname, 'a').close()
+
 
 # ---------------------------------------------------------------------------
 def write_file(filename, mode=0644, content=None):
@@ -295,7 +312,8 @@ def write_file(filename, mode=0644, content=None):
                             % type(content))
     f.close()
     os.chmod(filename, mode)
-                        
+
+
 # ---------------------------------------------------------------------------
 class TesthelpTest(unittest.TestCase):
     # -----------------------------------------------------------------------
@@ -359,18 +377,22 @@ class TesthelpTest(unittest.TestCase):
         except AssertionError:
             print "expected: '''\n%s'''" % expected
             print "got:      '''\n%s'''" % r
-        
-# ---------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
 class UnderConstructionError(Exception):
+    # -------------------------------------------------------------------------
     def __init__(self, value=""):
         if value == '':
             self.value = 'under construction'
         else:
             self.value = value
+
+    # -------------------------------------------------------------------------
     def __str__(self):
         return repr(self.value)
-    
-# ---------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
 global d
 d = dir()
 if __name__ == '__main__':

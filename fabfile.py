@@ -14,6 +14,7 @@ import pdb
 from optparse import OptionParser
 from tpbtools import *
 
+
 # ---------------------------------------------------------------------------
 def fab_clean(args):
     """clean - remove generated files
@@ -52,6 +53,7 @@ def fab_clean(args):
                 else:
                     print('would unlink %s' % f)
 
+
 # ---------------------------------------------------------------------------
 def fab_dist(args):
     """dist - tar up this package for distribution
@@ -77,7 +79,8 @@ def fab_dist(args):
     f.sort()
     fstring = ' '.join(f)
     run('tar zcvf %s %s' % (o.tarball, fstring), o.xable)
-        
+
+
 # ---------------------------------------------------------------------------
 def fab_install(args):
     """install - put stuff from this package where they belong
@@ -127,7 +130,8 @@ def fab_install(args):
         if copy_it != ' ' and fl[f] != '/dev/null':
             cmd = 'cp %s %s # %s' % (f, fpath, copy_it)
             run(cmd, o.xable, o.verbose)
-            
+
+
 # ---------------------------------------------------------------------------
 def fab_status(args):
     """status - report the status of the files in the current directory
@@ -168,8 +172,9 @@ def fab_status(args):
                  help='more output')
     (o, a) = p.parse_args(args)
 
-    if o.debug:   pdb.set_trace()
-    
+    if o.debug:
+        pdb.set_trace()
+
     fl = files()
     if len(a) <= 0:
         ll = glob.glob('*')
@@ -202,10 +207,11 @@ def fab_status(args):
             print(" %s %s" % (flag, filename))
         elif (o.needed or o.attention) and 'F' in flag:
             print(" %s %s" % (flag, filename))
-        elif not o.updates and not o.needed \
-                 and not o.installed and not o.attention:
+        elif (not o.updates and not o.needed
+              and not o.installed and not o.attention):
             print(" %s %s" % (flag, filename))
-        
+
+
 # ---------------------------------------------------------------------------
 def fab_uninstall(args):
     """uninstall - remove files installed from this package
@@ -233,6 +239,7 @@ def fab_uninstall(args):
         if os.path.exists(fpath):
             run('rm %s' % fpath, o.xable, o.verbose)
 
+
 # ---------------------------------------------------------------------------
 def files():
     """
@@ -242,46 +249,47 @@ def files():
     tarball routine, even though it should not be copied out during
     installation.
     """
-    
+
 #    flist = {'align.py'      : {'loc': '$HOME/bin', 'testable': False},
 #             'ascii.py'      : {'loc': '$HOME/bin', 'testable': False},
 #             'calc.py'       : {'loc': '$HOME/bin', 'testable': True},
-    flist = {'align.py'      : '$HOME/bin',
-             'ascii.py'      : '$HOME/bin',
-             'calc.py'       : '$HOME/bin',
-             'chron.py'      : '$HOME/bin',
-             'dt.py'         : '$HOME/bin',
-             'errno'         : '$HOME/bin',
-             'fab.py'        : '$HOME/bin',
-             'fabfile.py'    : '/dev/null',
-             'filter.py'     : '$HOME/lib/python',
-             'fl.py'         : '$HOME/bin',
-             'fx.py'         : '$HOME/bin',
-             'hd.py'         : '$HOME/bin',
-             'list.py'       : '$HOME/bin',
-             'magnitude'     : '$HOME/bin',
-             'mag.py'        : '$HOME/bin',
-             'odx.py'        : '$HOME/bin',
-             'plwhich'       : '$HOME/bin',
-             'pstrack.py'    : '$HOME/bin',
-             'ptidy'         : '$HOME/bin',
-             'pytool.py'     : '$HOME/bin',
-             'pywhich.py'    : '$HOME/bin',
-             'replay.pl'     : '$HOME/bin',
-             'replay.py'     : '$HOME/bin',
-             'rxlab'         : '$HOME/bin',
-             'scanpath'      : '$HOME/bin',
-             'summarize.pl'  : '$HOME/bin',
-             'testhelp.py'   : '$HOME/lib/python',
-             'toolframe.py'  : '$HOME/lib/python',
-             'tpbtools.py'   : '$HOME/bin',
-             'tps'           : '$HOME/bin',
-             'truth_table'   : '$HOME/bin',
-             'vipath'        : '$HOME/bin',
-             'wcal'          : '$HOME/bin',
-             'workrpt.py'    : '$HOME/bin',
-             'wxfr'          : '$HOME/bin'}
+    flist = {'align.py': '$HOME/bin',
+             'ascii.py': '$HOME/bin',
+             'calc.py': '$HOME/bin',
+             'chron.py': '$HOME/bin',
+             'dt.py': '$HOME/bin',
+             'errno': '$HOME/bin',
+             'fab.py': '$HOME/bin',
+             'fabfile.py': '/dev/null',
+             'filter.py': '$HOME/lib/python',
+             'fl.py': '$HOME/bin',
+             'fx.py': '$HOME/bin',
+             'hd.py': '$HOME/bin',
+             'list.py': '$HOME/bin',
+             'magnitude': '$HOME/bin',
+             'mag.py': '$HOME/bin',
+             'odx.py': '$HOME/bin',
+             'plwhich': '$HOME/bin',
+             'pstrack.py': '$HOME/bin',
+             'ptidy': '$HOME/bin',
+             'pytool.py': '$HOME/bin',
+             'pywhich.py': '$HOME/bin',
+             'replay.pl': '$HOME/bin',
+             'replay.py': '$HOME/bin',
+             'rxlab': '$HOME/bin',
+             'scanpath': '$HOME/bin',
+             'summarize.pl': '$HOME/bin',
+             'testhelp.py': '$HOME/lib/python',
+             'toolframe.py': '$HOME/lib/python',
+             'tpbtools.py': '$HOME/bin',
+             'tps': '$HOME/bin',
+             'truth_table': '$HOME/bin',
+             'vipath': '$HOME/bin',
+             'wcal': '$HOME/bin',
+             'workrpt.py': '$HOME/bin',
+             'wxfr': '$HOME/bin'}
     return flist
+
 
 # ---------------------------------------------------------------------------
 def ignorable(filename):
@@ -292,6 +300,7 @@ def ignorable(filename):
         if fnmatch.fnmatchcase(filename, pat):
             return True
     return False
+
 
 # ---------------------------------------------------------------------------
 def ignore():

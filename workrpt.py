@@ -12,7 +12,7 @@ workrpt - report work times
                   [-e/--end YYYY-MM-DD]
                   [-p/--pkg filename]
                   [-c/--copy dir]
-                  
+
     -D/--doc       displays this message
     -v/--verbose   output debugging info
     -f/--file      <input-file-name> is the name of the file to read
@@ -45,14 +45,16 @@ import unittest
 
 from optparse import *
 
+
 # ---------------------------------------------------------------------------
-def main(argv = None):
-    if argv == None:
+def main(argv=None):
+    if argv is None:
         argv = sys.argv
 
     (o, a) = makeOptionParser(argv)
-    if o.debug: pdb.set_trace()
-    
+    if o.debug:
+        pdb.set_trace()
+
     if o.help:
         help()
 
@@ -74,7 +76,8 @@ def main(argv = None):
         sys.exit(1)
 
     write_report(o.filename, start, end, o.dayflag)
-                                          
+
+
 # ---------------------------------------------------------------------------
 def copy_me(source, dest):
     dir = os.path.dirname(source)
@@ -84,7 +87,8 @@ def copy_me(source, dest):
         print cmd
         os.system(cmd)
     sys.exit(0)
-    
+
+
 # ---------------------------------------------------------------------------
 def day_offset(weektype):
     '''
@@ -94,6 +98,7 @@ def day_offset(weektype):
               't': 3, 'F': 4, 's': 5, 'S': 6, '': 3}
     return offset[weektype]
 
+
 # ---------------------------------------------------------------------------
 def default_input_filename():
     # rval = "%s/diary/journal/work/%s/WORKLOG" \
@@ -101,12 +106,14 @@ def default_input_filename():
     rval = time.strftime('/Volumes/ZAPHOD/journal/%Y/WORKLOG',
                          time.localtime())
     return rval
-    
+
+
 # ---------------------------------------------------------------------------
 def dst():
     now = time.localtime(time.time())
     return now[8]
-    
+
+
 # ---------------------------------------------------------------------------
 def dst_adjusted_time():
     now = time.localtime()
@@ -114,6 +121,7 @@ def dst_adjusted_time():
     if now[8] == 0:
         rval = rval - 3600
     return rval
+
 
 # ---------------------------------------------------------------------------
 def dump_struct(C):
@@ -124,25 +132,27 @@ def dump_struct(C):
         jlist.sort()
         for j in jlist:
             print('%s/%s     %f' % (k, j, C[k][j]))
-                  
+
+
 # ---------------------------------------------------------------------------
 def dump_options(o):
     ignore_list = ['ensure_value', 'read_file', 'read_module']
     for item in dir(o):
         if item not in ignore_list and not item.startswith('_'):
             print('dump_options: %s = %s' % (item, getattr(o, item)))
-    
+
 # # ---------------------------------------------------------------------------
 # def fatal(msg):
 #     raise Exception(msg)
 #     # print msg
 #     # sys.exit(1)
-    
+
+
 # ---------------------------------------------------------------------------
 def format_report(start, end, C, testing=False):
     if verbose():
         dump_struct(C)
-    rval = '%s - %s --------------------------------------------\n' % (start, end)
+    rval = '%s - %s ' % (start, end) + '-' * 44 + '\n'
     gtotal = 0
     try:
         del C['COB']
@@ -159,8 +169,8 @@ def format_report(start, end, C, testing=False):
                 else:
                     dkey = key.strip()
                 rval = rval + '%s%-47s %8s\n' % ('   ',
-                                                      dkey,
-                                                      hms(C[key]['length']))
+                                                 dkey,
+                                                 hms(C[key]['length']))
             else:
                 if verbose():
                     print "key = '%s'" % key
@@ -175,21 +185,23 @@ def format_report(start, end, C, testing=False):
                 except KeyError, e:
                     timeclose(C, key, time.time())
                     gtotal = gtotal + C[key]['total']
-                        
+
     except KeyError, e:
         rval = rval + "%s on top level key '%s'\n" % (str(e), key)
 
     rval = rval + '\n%-30s %35s (%s)\n' % ('Total:', hms(gtotal), fph(gtotal))
-    if testing == False:
+    if not testing:
         print rval
 
     return rval
-          
+
+
 # ---------------------------------------------------------------------------
 def help():
     print __doc__
     sys.exit()
-    
+
+
 # ---------------------------------------------------------------------------
 def hms(seconds):
     minutes = int(seconds/60)
@@ -200,16 +212,19 @@ def hms(seconds):
 
     return '%02d:%02d:%02d' % (hours, minutes, seconds)
 
+
 # ---------------------------------------------------------------------------
 def fph(seconds):
-    hours = float(seconds)/3600.0;
-    
+    hours = float(seconds)/3600.0
+
     return '%3.1f' % (hours)
+
 
 # ---------------------------------------------------------------------------
 def intify(list):
     rval = [int(item) for item in list]
     return rval
+
 
 # ---------------------------------------------------------------------------
 def interpret_options(o):
@@ -222,15 +237,15 @@ def interpret_options(o):
         raise Exception('--week and --start or --end are not compatible')
     elif (o.since != '') and (o.start_ymd != ''):
         raise Exception('--since and --start are not compatible')
-    elif (re.search('^[fcMTWtFsS]$', o.weektype)) \
-             and (o.start_ymd == '') \
-             and (o.end_ymd == ''):
+    elif (re.search('^[fcMTWtFsS]$', o.weektype)
+          and (o.start_ymd == '')
+          and (o.end_ymd == '')):
         if o.lastweek:
             (start, end) = week_starting_last(day_offset(o.weektype),
                                               -7 * 24 * 3600)
         else:
             (start, end) = week_starting_last(day_offset(o.weektype), 0)
-                
+
     elif (o.start_ymd == '') and (o.end_ymd != ''):
         (start, end) = week_ending(o.end_ymd)
     elif (o.start_ymd != '') and (o.end_ymd == ''):
@@ -249,6 +264,7 @@ def interpret_options(o):
 
     return (start, end)
 
+
 # ---------------------------------------------------------------------------
 # def last_monday():
 #     # print 'last_monday:'
@@ -258,7 +274,7 @@ def interpret_options(o):
 #     # delta = week_diff(tm[6], day_offset('M'))
 #     then = now - delta * 24 * 3600
 #     return then
-    
+
 # # ---------------------------------------------------------------------------
 # def last_wednesday():
 #     now = time.time()
@@ -266,7 +282,8 @@ def interpret_options(o):
 #     delta = (tm[6] + 7 - 2) % 7   # !@!here
 #     then = now - delta * 24 * 3600
 #     return then
-    
+
+
 # ---------------------------------------------------------------------------
 def makeOptionParser(argv):
     '''
@@ -314,6 +331,7 @@ def makeOptionParser(argv):
     (o, a) = p.parse_args(argv)
     return(o, a)
 
+
 # ---------------------------------------------------------------------------
 def next_tuesday():
     now = time.time()
@@ -321,20 +339,23 @@ def next_tuesday():
     delta = (1 + 7 - tm[6]) % 7    # !@!here
     then = now + delta * 24 * 3600
     return time.strftime("%Y.%m%d", time.localtime(then))
-    
+
+
 # ---------------------------------------------------------------------------
 def next_day(ymd, format=None):
-    if format == None:
+    if format is None:
         format = '%Y.%m%d'
     now = time.mktime(time.strptime(ymd, format))
     then = now + 24*3600
     return time.strftime(format, time.localtime(then))
+
 
 # ---------------------------------------------------------------------------
 def day_plus(offset):
     now = time.time()
     then = now + offset*24*3600
     return then
+
 
 # ---------------------------------------------------------------------------
 def package(source, filename):
@@ -348,11 +369,13 @@ def package(source, filename):
     print cmd
     os.system(cmd)
     sys.exit(0)
-    
+
+
 # ---------------------------------------------------------------------------
 def parse_timeline(line):
     rval = None
-    lfmt = r'(\d{4})(-(\d{2})-(\d{2})|.(\d{2})(\d{2})) (\d{2}):(\d{2}):(\d{2}) (.*)'
+    lfmt = (r'(\d{4})(-(\d{2})-(\d{2})|.(\d{2})(\d{2})) ' +
+            r'(\d{2}):(\d{2}):(\d{2}) (.*)')
     line = re.sub('#.*', '', line)
     m = re.search(lfmt, line)
     if m:
@@ -363,6 +386,7 @@ def parse_timeline(line):
             rval = [x[0], x[4], x[5], x[6], x[7], x[8], x[9]]
 
     return rval
+
 
 # ---------------------------------------------------------------------------
 def parse_ymd(dayname):
@@ -376,13 +400,13 @@ def parse_ymd(dayname):
         dt = time.localtime(time.time())
         wd = dt[6]
         t = weekday_num(dayname)
-        delta = ((-6 - wd + t) % -7) -1   # !@!here
+        delta = ((-6 - wd + t) % - 7) - 1   # !@!here
         # t = time.time() + (24 * 3600 * delta)
         t = day_plus(delta)
         ymd = time.strftime("%Y.%m%d", time.localtime(t))
     else:
         ymd = dayname
-        
+
     [rval] = re.findall(r'(\d{2,4})[-.](\d{2})[-.]?(\d{2})', ymd)
     xrval = []
     for q in rval:
@@ -390,12 +414,14 @@ def parse_ymd(dayname):
     # print 'parse_ymd: returning', xrval
     return xrval
 
+
 # ---------------------------------------------------------------------------
 def stringify(list):
     rval = []
     for item in list:
         rval.append('%02d' % item)
     return rval
+
 
 # ---------------------------------------------------------------------------
 def tally(C, start, end, Q):
@@ -406,8 +432,8 @@ def tally(C, start, end, Q):
 
     # print "tally: ----------------------------------------"
     # print "tally: ", Q
-    
-    if Q == None or 7 != len(Q):
+
+    if Q is None or 7 != len(Q):
         last = ''
         return
 
@@ -431,9 +457,10 @@ def tally(C, start, end, Q):
             timeclose(C, last, when)
     except NameError:
         pass
-        
+
     last = T
     return last
+
 
 # ---------------------------------------------------------------------------
 def timeclose(C, last, when, all=False):
@@ -449,7 +476,7 @@ def timeclose(C, last, when, all=False):
             if cat != key or ':' not in key:
                 reset_category_total(C, cat)
 
-        if last != 'COB' and last != None:
+        if last != 'COB' and last is not None:
             C[last]['end'] = when
             lapse = when - C[last]['start']
             try:
@@ -475,12 +502,13 @@ def timeclose(C, last, when, all=False):
             C[last]['length'] = lapse
         del C[last]['start']
         del C[last]['end']
-        
+
         # cat = category(last)
         # increment_category_total(C, cat, lapse)
-    
+
     # return lapse
-    
+
+
 # ---------------------------------------------------------------------------
 def reset_category_total(C, cat):
     if cat != '':
@@ -488,7 +516,8 @@ def reset_category_total(C, cat):
             C[cat]['total'] = 0
         except KeyError:
             pass
-        
+
+
 # ---------------------------------------------------------------------------
 def increment_category_total(C, cat, lapse):
     if cat != '':
@@ -497,12 +526,13 @@ def increment_category_total(C, cat, lapse):
         except KeyError:
             C[cat] = {}
             C[cat]['total'] = lapse
-        
+
+
 # ---------------------------------------------------------------------------
 def category(task):
     '''
     Parse the task category from the task description.
-    
+
     A task description looks like 'admin: liason'. The category for this
     task would be 'admin'. If the task description does not contain a colon,
     the category is the whole description. Eg., 'vacation' -> 'vacation'.
@@ -516,8 +546,9 @@ def category(task):
     if verbose():
         # print 'category: catgory(%s) -> %s' % (task, cat)
         pass
-    
+
     return cat
+
 
 # ---------------------------------------------------------------------------
 def verbose(value=None, set=False):
@@ -533,11 +564,13 @@ def verbose(value=None, set=False):
         verbosity = value
     return verbosity
 
+
 # ---------------------------------------------------------------------------
 def week_diff(a, b):
     # rval = (a + 7 - b) % 7
     rval = -1 * (((a + 6 - b) % 7) + 1)
     return rval
+
 
 # ---------------------------------------------------------------------------
 def week_starting_last(weekday, offset, now=time.time()):
@@ -545,7 +578,7 @@ def week_starting_last(weekday, offset, now=time.time()):
     Return start and end dates for week beginning on most recent <weekday>.
 
     Return values are in %Y.%m%d format.
-    
+
     <weekday> is in range(0:6), indicating Monday through Sunday.
     <offset> is a number of seconds to shift the result. Typically
     <offset> will be a number of days given as N * 24 * 3600.
@@ -561,6 +594,7 @@ def week_starting_last(weekday, offset, now=time.time()):
     end = time.strftime("%Y.%m%d", time.localtime(end_time))
     return(start, end)
 
+
 # ---------------------------------------------------------------------------
 def week_starting(ymd):
     '''
@@ -569,12 +603,13 @@ def week_starting(ymd):
     <ymd> is one of 'yesterday', 'today', 'tomorrow', 'monday', 'tuesday', etc.
     '''
     (y, m, d) = parse_ymd(ymd)
-    start_time = time.mktime([int(y),int(m),int(d),0,0,0,0,0,dst()])
+    start_time = time.mktime([int(y), int(m), int(d), 0, 0, 0, 0, 0, dst()])
     end_time = start_time + 6 * 24 * 3600
     start = time.strftime('%Y.%m%d', time.localtime(start_time))
     end = time.strftime('%Y.%m%d', time.localtime(end_time))
     return(start, end)
-   
+
+
 # ---------------------------------------------------------------------------
 def week_ending(ymd):
     '''
@@ -583,11 +618,12 @@ def week_ending(ymd):
     <ymd> is one of 'yesterday', 'today', 'tomorrow', 'monday', 'tuesday', etc.
     '''
     (y, m, d) = parse_ymd(ymd)
-    end_time = time.mktime([int(y),int(m),int(d),0,0,0,0,0,dst()])
+    end_time = time.mktime([int(y), int(m), int(d), 0, 0, 0, 0, 0, dst()])
     start_time = end_time - 6 * 24 * 3600
     start = time.strftime('%Y.%m%d', time.localtime(start_time))
     end = time.strftime('%Y.%m%d', time.localtime(end_time))
     return(start, end)
+
 
 # ---------------------------------------------------------------------------
 def weekday_num(name):
@@ -597,6 +633,7 @@ def weekday_num(name):
     x = {'monday': 0, 'tuesday': 1, 'wednesday': 2, 'thursday': 3,
          'friday': 4, 'saturday': 5, 'sunday': 6}
     return x[name]
+
 
 # ---------------------------------------------------------------------------
 def write_report(filename, start, end, dayflag, testing=False):
@@ -622,10 +659,10 @@ def write_report(filename, start, end, dayflag, testing=False):
             f = open(filename, 'r')
             for line in f:
                 lastc = tally(C, day, day, parse_timeline(line))
-                if lastc != None:
+                if lastc is not None:
                     last = lastc
             f.close()
-            if last != None and last in C.keys():
+            if last is not None and last in C.keys():
                 timeclose(C, last, time.time(), True)
             rval = rval + format_report(day, day, C, testing)
             day = next_day(day)
@@ -634,7 +671,7 @@ def write_report(filename, start, end, dayflag, testing=False):
         f = open(filename, 'r')
         for line in f:
             lastc = tally(C, start, end, parse_timeline(line))
-            if lastc != None:
+            if lastc is not None:
                 last = lastc
         f.close()
         if verbose():
@@ -642,6 +679,7 @@ def write_report(filename, start, end, dayflag, testing=False):
         timeclose(C, last, time.time(), True)
         rval = format_report(start, end, C, testing)
     return rval
+
 
 # ---------------------------------------------------------------------------
 class workrptTest(unittest.TestCase):
@@ -655,7 +693,7 @@ class workrptTest(unittest.TestCase):
     #  - increment_category_total()
     #  - week_diff()
     #  - write_report()
-    
+
     def test_day_offset(self):
         assert(day_offset('f') == 3)
         assert(day_offset('c') == 4)
@@ -686,7 +724,7 @@ class workrptTest(unittest.TestCase):
         assert(hms(72) == '00:01:12')
         assert(hms(120) == '00:02:00')
         assert(hms(4000) == '01:06:40')
-    
+
     def test_interpret_options_defaults(self):
         (o, a) = makeOptionParser([])
         try:
@@ -699,7 +737,7 @@ class workrptTest(unittest.TestCase):
         end_should_be = time.strftime('%Y.%m%d', time.localtime())
         assert(start == start_should_be)
         assert(end == end_should_be)
-        
+
     def test_interpret_options_dayflag(self):
         (o, a) = makeOptionParser(['-d'])
         try:
@@ -712,7 +750,7 @@ class workrptTest(unittest.TestCase):
         end_should_be = time.strftime('%Y.%m%d', time.localtime())
         assert(start == start_should_be)
         assert(end == end_should_be)
-        
+
     def test_interpret_options_end(self):
         (o, a) = makeOptionParser(['-e', '2009.0401'])
         try:
@@ -736,7 +774,7 @@ class workrptTest(unittest.TestCase):
             assert(str(e) == '--last and --start or --end are not compatible')
             success = True
         assert(success)
-        
+
     def test_interpret_options_last_end(self):
         (o, a) = makeOptionParser(['-l', '-e', '2009.0501'])
         success = False
@@ -746,7 +784,7 @@ class workrptTest(unittest.TestCase):
             assert(str(e) == '--last and --start or --end are not compatible')
             success = True
         assert(success)
-        
+
     def test_interpret_options_since(self):
         (o, a) = makeOptionParser(['--since', '2009.0501'])
         success = False
@@ -767,7 +805,7 @@ class workrptTest(unittest.TestCase):
             assert(str(e) == '--since and --start are not compatible')
             success = True
         assert(success)
-        
+
     def test_interpret_options_week_start(self):
         (o, a) = makeOptionParser(['-w', 'M', '-s', '2009.0501'])
         success = False
@@ -778,7 +816,7 @@ class workrptTest(unittest.TestCase):
             assert(str(e) == '--week and --start or --end are not compatible')
             success = True
         assert(success)
-        
+
     def test_interpret_options_week_end(self):
         (o, a) = makeOptionParser(['-w', 'T', '-e', '2009.0501'])
         success = False
@@ -788,7 +826,7 @@ class workrptTest(unittest.TestCase):
             assert(str(e) == '--week and --start or --end are not compatible')
             success = True
         assert(success)
-        
+
 #     def test_last_monday(self):  # last_monday() is never called
 #         now = self.last_wkday(day_offset('M'))
 #         lm = last_monday()
@@ -812,7 +850,7 @@ class workrptTest(unittest.TestCase):
             now = now - 24 * 3600
             tm = time.localtime(now)
         return now
-        
+
     def next_wkday(self, weekday):
         now = time.time()
         tm = time.localtime(now)
@@ -820,7 +858,7 @@ class workrptTest(unittest.TestCase):
             now = now + 24 * 3600
             tm = time.localtime(now)
         return now
-        
+
     def test_next_day(self):
         assert(next_day('2009.1231') == '2010.0101')
         assert(next_day('2009.0228') == '2009.0301')
@@ -834,13 +872,13 @@ class workrptTest(unittest.TestCase):
         assert(result == 'next_day threw ValueError')
 
     def test_parse_timeline(self):
-        assert(['2009','05','13','09','20','26','admin: setup'] ==
+        assert(['2009', '05', '13', '09', '20', '26', 'admin: setup'] ==
                parse_timeline('2009-05-13 09:20:26 admin: setup'))
         assert(['2009', '05', '14', '10', '20', '19', 'foobar: plugh'] ==
                parse_timeline('2009.0514 10:20:19 foobar: plugh'))
-        assert(['2010','02','07','15','30','40','3opsarst: fro-oble 8.1']
+        assert(['2010', '02', '07', '15', '30', '40', '3opsarst: fro-oble 8.1']
                == parse_timeline('2010.0207 15:30:40 3opsarst: fro-oble 8.1'))
-        
+
     def test_parse_ymd(self):
         s = stringify(time.localtime(day_plus(-1)))
         assert(parse_ymd('yesterday') == s[0:3])
@@ -975,7 +1013,7 @@ class workrptTest(unittest.TestCase):
                           'start is incorrect for %s' % t)
             self.validate(end, end_should_be,
                           'end is incorrect for %s' % t)
-            
+
     def test_week_starting(self):
         tlist = {'yesterday': time.time() - 24*3600,
                  'today': time.time(),
@@ -985,9 +1023,9 @@ class workrptTest(unittest.TestCase):
         for t in tlist.keys():
             (start, end) = week_starting(t)
             start_should_be = time.strftime('%Y.%m%d',
-                                          time.localtime(tlist[t]))
+                                            time.localtime(tlist[t]))
             end_should_be = time.strftime('%Y.%m%d',
-                                            time.localtime(tlist[t]+6*24*3600))
+                                          time.localtime(tlist[t]+6*24*3600))
             self.validate(start, start_should_be,
                           'start is incorrect for %s' % t)
             self.validate(end, end_should_be,
@@ -1059,7 +1097,7 @@ class workrptTest(unittest.TestCase):
         # print e, should_end
         assert(s == should_start)
         assert(e == should_end)
-        
+
     def test_weekday_num(self):
         count = 0
         for d in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday',
@@ -1075,7 +1113,7 @@ class workrptTest(unittest.TestCase):
             success = True
         self.validate(success, True,
                       'should have gotten a KeyError for notaday')
-        
+
     def validate(self, v1, v2, msg):
         try:
             assert(v1 == v2)
@@ -1083,6 +1121,6 @@ class workrptTest(unittest.TestCase):
             print msg
             print '%s =?= %s' % (v1, v2)
             raise
-        
+
 # ---------------------------------------------------------------------------
 toolframe.ez_launch(main)

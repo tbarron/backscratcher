@@ -43,6 +43,7 @@ with the backscratcher project rather than this list.
 
 LAST_LOADED = "<empty>"
 
+
 # ---------------------------------------------------------------------------
 def clps_prolog(args):
     """
@@ -86,12 +87,13 @@ def clps_prolog(args):
     except SystemExit:
         sys.exit(0)
 
-    if o.debug: pdb.set_trace()
+    if o.debug:
+        pdb.set_trace()
 
     implicit = False
     if o.filename == '':
         (o.filename, implicit) = default_filename()
-        
+
     try:
         if not o.nofile:
             clps_load([o.filename], implicit=implicit)
@@ -99,11 +101,12 @@ def clps_prolog(args):
         if e.errno == errno.ENOENT:
             print("OSError: [Errno %d] %s: '%s'"
                   % (e.errno, e.strerror, e.filename))
-        
+
     # print("prolog: return args = %s" % post_opts)
-    
+
     return post_opts
-    
+
+
 # ---------------------------------------------------------------------------
 def clps_add(args):
     """add - add a new entry to the password table
@@ -116,7 +119,7 @@ def clps_add(args):
     + add <host>
     + add -u <user>
     + add
-    
+
     Missing information will be requested, so you can just type 'add'
     and let clps prompt you for all three pieces of info. clps will
     always prompt for password (and read it without echoing).
@@ -136,8 +139,9 @@ def clps_add(args):
     except SystemExit:
         return
 
-    if o.debug: pdb.set_trace()
-    
+    if o.debug:
+        pdb.set_trace()
+
     try:
         hostname = username = ''
         if o.hostname != '':
@@ -159,6 +163,7 @@ def clps_add(args):
     except:
         tb.print_exc()
         sys.exit()
+
 
 # ---------------------------------------------------------------------------
 def clps_clip(args):
@@ -190,7 +195,8 @@ def clps_clip(args):
     except SystemExit:
         return
 
-    if o.debug: pdb.set_trace()
+    if o.debug:
+        pdb.set_trace()
 
     result = []
     if 0 == len(a):
@@ -198,9 +204,9 @@ def clps_clip(args):
     else:
         result = []
         rgx = a[0]
-        for (h,u,p) in data_lookup('', '', ''):
-            if re.search(rgx, h) or re.search(rgx,u) or re.search(rgx,p):
-                result.append((h,u,p))
+        for (h, u, p) in data_lookup('', '', ''):
+            if re.search(rgx, h) or re.search(rgx, u) or re.search(rgx, p):
+                result.append((h, u, p))
 
     if 0 == len(result):
         print("No match found")
@@ -209,6 +215,7 @@ def clps_clip(args):
     else:
         choice = user_make_selection(result)
         copy_to_clipboard(result[int(choice) - 1][2])
+
 
 # ---------------------------------------------------------------------------
 def clps_del(args):
@@ -237,7 +244,8 @@ def clps_del(args):
     try:
         (o, a) = p.parse_args(args)
 
-        if o.debug: pdb.set_trace()
+        if o.debug:
+            pdb.set_trace()
 
         result = []
         if 0 == len(a):
@@ -245,14 +253,14 @@ def clps_del(args):
         else:
             result = []
             rgx = a[0]
-            for (h,u,p) in data_lookup('', '', ''):
-                if re.search(rgx, h) or re.search(rgx,u) or re.search(rgx,p):
-                    result.append((h,u,p))
+            for (h, u, p) in data_lookup('', '', ''):
+                if re.search(rgx, h) or re.search(rgx, u) or re.search(rgx, p):
+                    result.append((h, u, p))
 
         if 0 < len(result):
             fmt = "%-25s %-25s %-25s"
             print("Deleting:")
-            for (h,u,p) in result:
+            for (h, u, p) in result:
                 print(fmt % (h, u, p))
 
             answer = raw_input("Ok? > ")
@@ -263,6 +271,7 @@ def clps_del(args):
             print("Nothing found to delete")
     except:
         tb.print_exc()
+
 
 # ---------------------------------------------------------------------------
 def clps_load(args, implicit=False):
@@ -283,8 +292,9 @@ def clps_load(args, implicit=False):
     except SystemExit:
         return
 
-    if o.debug: pdb.set_trace()
-    
+    if o.debug:
+        pdb.set_trace()
+
     if 1 == len(a):
         LAST_LOADED = filename = a.pop(0)
     else:
@@ -330,6 +340,7 @@ def clps_load(args, implicit=False):
         if e.errno == 13:
             print('%s cannot be opened for read' % filename)
 
+
 # ---------------------------------------------------------------------------
 def clps_save(args):
     """save - write out an encrypted file of password information
@@ -345,8 +356,9 @@ def clps_save(args):
     except SystemExit:
         return
 
-    if o.debug: pdb.set_trace()
-        
+    if o.debug:
+        pdb.set_trace()
+
     if 1 == len(a):
         filename = a.pop(0)
     elif LAST_LOADED != "<empty>":
@@ -355,7 +367,7 @@ def clps_save(args):
     else:
         print('save requires a filename')
         return
-    
+
     if os.path.exists(filename):
         newname = filename + time.strftime(".%Y.%m%d.%H%M%S")
         os.rename(filename, newname)
@@ -366,6 +378,7 @@ def clps_save(args):
     for (h, u, p) in all:
         f.write('%s!@!%s!@!%s\n' % (h, u, p))
     f.close()
+
 
 # ---------------------------------------------------------------------------
 def clps_show(args):
@@ -396,8 +409,9 @@ def clps_show(args):
         (o, a) = p.parse_args(args)
     except SystemExit:
         return
-    
-    if o.debug: pdb.set_trace()
+
+    if o.debug:
+        pdb.set_trace()
 
     result = []
     rgx = ''
@@ -406,19 +420,20 @@ def clps_show(args):
         result = data_lookup(o.hostname, o.username, o.password)
     else:
         rgx = a.pop(0)
-        for (h,u,p) in data_lookup('','',''):
+        for (h, u, p) in data_lookup('', '', ''):
             if o.pwd:
-                if re.search(rgx,h) or re.search(rgx,u) or re.search(rgx,p):
-                    result.append((h,u,p))
+                if re.search(rgx, h) or re.search(rgx, u) or re.search(rgx, p):
+                    result.append((h, u, p))
             else:
-                if re.search(rgx,h) or re.search(rgx,u):
-                    result.append((h,u,p))
-        
-    for (h,u,p) in result:
+                if re.search(rgx, h) or re.search(rgx, u):
+                    result.append((h, u, p))
+
+    for (h, u, p) in result:
         if o.pwd:
             print(fmt % (h, u, p))
         else:
             print(fmt % (h, u, ""))
+
 
 # ---------------------------------------------------------------------------
 def copy_to_clipboard(value):
@@ -428,6 +443,7 @@ def copy_to_clipboard(value):
     p = os.popen("pbcopy", 'w')
     p.write(value)
     p.close()
+
 
 # ---------------------------------------------------------------------------
 def data_delete(hostname, username, password):
@@ -440,6 +456,7 @@ def data_delete(hostname, username, password):
     except ValueError:
         print("['%s', '%s', '%s'] not found in data"
               % (hostname, username, password))
+
 
 # ---------------------------------------------------------------------------
 def data_lookup(hostname, username, password):
@@ -460,6 +477,7 @@ def data_lookup(hostname, username, password):
         rval = data
     return rval
 
+
 # ---------------------------------------------------------------------------
 def data_store(hostname, username, password):
     """
@@ -472,6 +490,7 @@ def data_store(hostname, username, password):
     except NameError:
         data = []
         data.append([hostname, username, password])
+
 
 # ---------------------------------------------------------------------------
 def default_filename():
@@ -489,6 +508,7 @@ def default_filename():
         rval = '%s/.clps/secrets.clps' % home
     return(rval, implicit)
 
+
 # ---------------------------------------------------------------------------
 def user_make_selection(choices):
     """
@@ -502,6 +522,7 @@ def user_make_selection(choices):
             cdx += 1
         rval = raw_input("Please make a selection> ")
     return rval
+
 
 # ---------------------------------------------------------------------------
 def post_test_cleanup():
@@ -523,6 +544,7 @@ def post_test_cleanup():
                 shutil.rmtree(path)
             elif os.path.exists(path):
                 os.unlink(path)
+
 
 # ---------------------------------------------------------------------------
 class ClipTest(toolframe.unittest.TestCase):
@@ -556,7 +578,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.expect(self.prompt)
         S.sendline("clip -H \\.org")
-        
+
         S.expect("Please make a selection> ")
 
         self.assertEqual('sumatra.org' in S.before, True)
@@ -570,7 +592,7 @@ class ClipTest(toolframe.unittest.TestCase):
         S = pexpect.spawn("pbpaste")
         S.expect(pexpect.EOF)
         self.assertEqual('Surabaya' in S.before, True)
-        
+
     # -----------------------------------------------------------------------
     def test_clip_by_host_one(self):
         """
@@ -579,15 +601,15 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         global data
         data = self.testdata
-        
+
         # clear the clipboard
         os.system("pbcopy < /dev/null")
-        
+
         clps_clip(['-H', '.*bar.*'])
         S = pexpect.spawn('pbpaste')
         S.expect(pexpect.EOF)
         self.assertEqual('password' in S.before, True)
-    
+
     # -----------------------------------------------------------------------
     def test_clip_by_pwd_multi(self):
         """
@@ -605,7 +627,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.expect(self.prompt)
         S.sendline("clip -p .*r.*")
-        
+
         S.expect("Please make a selection> ")
 
         self.assertEqual('foobar.com' in S.before, True)
@@ -620,7 +642,7 @@ class ClipTest(toolframe.unittest.TestCase):
         S = pexpect.spawn("pbpaste")
         S.expect(pexpect.EOF)
         self.assertEqual('password' in S.before, True)
-        
+
     # -----------------------------------------------------------------------
     def test_clip_by_pwd_one(self):
         """
@@ -628,15 +650,15 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         global data
         data = self.testdata
-        
+
         # clear the clipboard
         os.system("pbcopy < /dev/null")
-        
+
         clps_clip(['-p', '.*sswo.*'])
         S = pexpect.spawn('pbpaste')
         S.expect(pexpect.EOF)
         self.assertEqual('password' in S.before, True)
-    
+
     # -----------------------------------------------------------------------
     def test_clip_by_user_multi(self):
         """
@@ -655,7 +677,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.expect(self.prompt)
         S.sendline("clip -u .*a[im].*")
-        
+
         S.expect("Please make a selection> ")
 
         self.assertEqual('foobar.com' in S.before, True)
@@ -670,7 +692,7 @@ class ClipTest(toolframe.unittest.TestCase):
         S = pexpect.spawn("pbpaste")
         S.expect(pexpect.EOF)
         self.assertEqual('Bukittinggi' in S.before, True)
-    
+
     # -----------------------------------------------------------------------
     def test_clip_by_user_one(self):
         """
@@ -678,7 +700,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         global data
         data = self.testdata
-        
+
         # clear the clipboard
         os.system("pbcopy < /dev/null")
 
@@ -686,7 +708,7 @@ class ClipTest(toolframe.unittest.TestCase):
         S = pexpect.spawn('pbpaste')
         S.expect(pexpect.EOF)
         self.assertEqual('password' in S.before, True)
-    
+
     # -----------------------------------------------------------------------
     def test_clip_multi_enter(self):
         """
@@ -705,7 +727,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.expect(self.prompt)
         S.sendline("clip [sS][su]")
-        
+
         S.expect("Please make a selection> ")
 
         self.assertEqual('foobar.com' in S.before, True)
@@ -721,7 +743,7 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual('java.org' in S.before, True)
 
         S.sendline("2")
-        
+
         S.expect(self.prompt)
         S.sendline("quit")
         S.expect(pexpect.EOF)
@@ -729,7 +751,7 @@ class ClipTest(toolframe.unittest.TestCase):
         S = pexpect.spawn("pbpaste")
         S.expect(pexpect.EOF)
         self.assertEqual('Bukittinggi' in S.before, True)
-    
+
     # -----------------------------------------------------------------------
     def test_clip_rgx_host(self):
         """
@@ -748,7 +770,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.expect(self.prompt)
         S.sendline("clip (com)")
-        
+
         S.expect(self.prompt)
         S.sendline("quit")
         S.expect(pexpect.EOF)
@@ -776,7 +798,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.expect(self.prompt)
         S.sendline("clip (com|chair|Sura)")
-        
+
         S.expect("Please make a selection> ")
 
         self.assertEqual('foobar.com' in S.before, True)
@@ -791,7 +813,7 @@ class ClipTest(toolframe.unittest.TestCase):
         S = pexpect.spawn("pbpaste")
         S.expect(pexpect.EOF)
         self.assertEqual('Bukittinggi' in S.before, True)
-        
+
     # -----------------------------------------------------------------------
     def test_clip_rgx_pwd(self):
         """
@@ -810,7 +832,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.expect(self.prompt)
         S.sendline("clip (kittin)")
-        
+
         S.expect(self.prompt)
         S.sendline("quit")
         S.expect(pexpect.EOF)
@@ -837,7 +859,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.expect(self.prompt)
         S.sendline("clip (lida)")
-        
+
         S.expect(self.prompt)
         S.sendline("quit")
         S.expect(pexpect.EOF)
@@ -854,7 +876,7 @@ class ClipTest(toolframe.unittest.TestCase):
         S = pexpect.spawn("clps -h", timeout=5)
         S.expect(pexpect.EOF)
         self.assertEqual('debug' in S.before, True)
-        
+
     # -----------------------------------------------------------------------
     def test_cmd_bad_opt(self):
         """
@@ -875,7 +897,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline('quit')
         S.expect(pexpect.EOF)
-    
+
     # -----------------------------------------------------------------------
     def test_cmd_opt_h(self):
         """
@@ -896,7 +918,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline('quit')
         S.expect(pexpect.EOF)
-    
+
     # -----------------------------------------------------------------------
     def test_copy_to_clipboard(self):
         """
@@ -918,13 +940,13 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
-            
+
         for item in data:
             S.sendline("add -H %s -u %s" % (item[0], item[1]))
             S.expect("Password:")
             S.sendline(item[2])
             S.expect(self.prompt)
-            
+
         S.sendline("del -H \\.org")
         S.expect(self.okprompt)
 
@@ -932,17 +954,17 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual('foobar.com' in S.before, False)
         self.assertEqual('sumatra.org' in S.before, True)
         self.assertEqual('java.org' in S.before, True)
-        
+
         S.sendline("yes")
         S.expect(self.prompt)
 
         S.sendline("show -P")
         S.expect(self.prompt)
-        
+
         self.assertEqual('foobar.com' in S.before, True)
         self.assertEqual('sumatra.org' in S.before, False)
         self.assertEqual('java.org' in S.before, False)
-                        
+
         S.sendline("quit")
         S.expect(pexpect.EOF)
 
@@ -956,13 +978,13 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
-            
+
         for item in data:
             S.sendline("add -H %s -u %s" % (item[0], item[1]))
             S.expect("Password:")
             S.sendline(item[2])
             S.expect(self.prompt)
-            
+
         S.sendline("del -H java")
         S.expect(self.okprompt)
 
@@ -970,17 +992,17 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual('foobar.com' in S.before, False)
         self.assertEqual('sumatra.org' in S.before, False)
         self.assertEqual('java.org' in S.before, True)
-        
+
         S.sendline("yes")
         S.expect(self.prompt)
 
         S.sendline("show -P")
         S.expect(self.prompt)
-        
+
         self.assertEqual('foobar.com' in S.before, True)
         self.assertEqual('sumatra.org' in S.before, True)
         self.assertEqual('java.org' in S.before, False)
-                        
+
         S.sendline("quit")
         S.expect(pexpect.EOF)
 
@@ -993,13 +1015,13 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
-            
+
         for item in data:
             S.sendline("add -H %s -u %s" % (item[0], item[1]))
             S.expect("Password:")
             S.sendline(item[2])
             S.expect(self.prompt)
-            
+
         S.sendline("del -p .*r.*")
         S.expect(self.okprompt)
 
@@ -1007,20 +1029,20 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual('foobar.com' in S.before, True)
         self.assertEqual('sumatra.org' in S.before, False)
         self.assertEqual('java.org' in S.before, True)
-        
+
         S.sendline("yes")
         S.expect(self.prompt)
 
         S.sendline("show -P")
         S.expect(self.prompt)
-        
+
         self.assertEqual('foobar.com' in S.before, False)
         self.assertEqual('sumatra.org' in S.before, True)
         self.assertEqual('java.org' in S.before, False)
-                        
+
         S.sendline("quit")
         S.expect(pexpect.EOF)
-        
+
     # -----------------------------------------------------------------------
     def test_del_by_pwd_one(self):
         """
@@ -1030,13 +1052,13 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
-            
+
         for item in data:
             S.sendline("add -H %s -u %s" % (item[0], item[1]))
             S.expect("Password:")
             S.sendline(item[2])
             S.expect(self.prompt)
-            
+
         S.sendline("del -p baya")
         S.expect(self.okprompt)
 
@@ -1044,20 +1066,20 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual('foobar.com' in S.before, False)
         self.assertEqual('sumatra.org' in S.before, False)
         self.assertEqual('java.org' in S.before, True)
-        
+
         S.sendline("yes")
         S.expect(self.prompt)
 
         S.sendline("show -P")
         S.expect(self.prompt)
-        
+
         self.assertEqual('foobar.com' in S.before, True)
         self.assertEqual('sumatra.org' in S.before, True)
         self.assertEqual('java.org' in S.before, False)
-                        
+
         S.sendline("quit")
         S.expect(pexpect.EOF)
-    
+
     # -----------------------------------------------------------------------
     def test_del_by_user_multi(self):
         """
@@ -1068,13 +1090,13 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
-            
+
         for item in data:
             S.sendline("add -H %s -u %s" % (item[0], item[1]))
             S.expect("Password:")
             S.sendline(item[2])
             S.expect(self.prompt)
-            
+
         S.sendline("del -u .*a[im].*")
         S.expect(self.okprompt)
 
@@ -1082,20 +1104,20 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual('foobar.com' in S.before, True)
         self.assertEqual('sumatra.org' in S.before, True)
         self.assertEqual('java.org' in S.before, False)
-        
+
         S.sendline("yes")
         S.expect(self.prompt)
 
         S.sendline("show -P")
         S.expect(self.prompt)
-        
+
         self.assertEqual('foobar.com' in S.before, False)
         self.assertEqual('sumatra.org' in S.before, False)
         self.assertEqual('java.org' in S.before, True)
-                        
+
         S.sendline("quit")
         S.expect(pexpect.EOF)
-    
+
     # -----------------------------------------------------------------------
     def test_del_by_user_one(self):
         """
@@ -1125,14 +1147,14 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline("show -P")
         S.expect(self.prompt)
-        
+
         self.assertEqual('foobar.com' in S.before, True)
         self.assertEqual('sumatra.org' in S.before, False)
         self.assertEqual('java.org' in S.before, True)
 
         S.sendline("quit")
         S.expect(pexpect.EOF)
-    
+
     # -----------------------------------------------------------------------
     def test_del_multi_enter(self):
         """
@@ -1162,7 +1184,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline("show -P")
         S.expect(self.prompt)
-        
+
         self.assertEqual('foobar.com' in S.before, False)
         self.assertEqual('sumatra.org' in S.before, False)
         self.assertEqual('java.org' in S.before, False)
@@ -1200,11 +1222,11 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline("show -P")
         S.expect(self.prompt)
-        
+
         self.assertEqual('password' in S.before, False)
         self.assertEqual('Surabaya' in S.before, True)
         self.assertEqual('Bukittinggi' in S.before, True)
-        
+
         S.sendline("quit")
         S.expect(pexpect.EOF)
 
@@ -1243,7 +1265,7 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual('foobar.com' in S.before, False)
         self.assertEqual('chairil' in S.before, False)
         self.assertEqual('Surabaya' in S.before, False)
-        
+
         S.sendline("quit")
         S.expect(pexpect.EOF)
 
@@ -1274,18 +1296,17 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline("yes")
         S.expect(self.prompt)
-        
+
         S.sendline("show -P")
         S.expect(self.prompt)
-        
+
         self.assertEqual('password' in S.before, True)
         self.assertEqual('Surabaya' in S.before, True)
         self.assertEqual('Bukittinggi' in S.before, False)
-        
+
         S.sendline("quit")
         S.expect(pexpect.EOF)
 
-    
     # -----------------------------------------------------------------------
     def test_del_rgx_user(self):
         """
@@ -1316,7 +1337,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline("show -P")
         S.expect(self.prompt)
-        
+
         self.assertEqual('password' in S.before, True)
         self.assertEqual('Surabaya' in S.before, False)
         self.assertEqual('Bukittinggi' in S.before, True)
@@ -1336,7 +1357,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         # match more than one
         a = data_lookup(r'\.com', '', '')
-        
+
         # match just one
         b = data_lookup('hostname.com', '', '')
 
@@ -1346,7 +1367,7 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual(a, data)
         self.assertEqual(b, [data[0]])
         self.assertEqual(c, [])
-        
+
     # -----------------------------------------------------------------------
     def test_dlup_by_hp(self):
         """
@@ -1360,7 +1381,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         # match more than one
         a = data_lookup(r'\.com', '', 'sword')
-        
+
         # match just one by hostname
         b = data_lookup('google.com', '', 'sword')
 
@@ -1378,7 +1399,7 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual(c, [data[1]])
         self.assertEqual(d, [])
         self.assertEqual(e, [])
-        
+
     # -----------------------------------------------------------------------
     def test_dlup_by_hpu(self):
         """
@@ -1418,7 +1439,7 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual(e, [])
         self.assertEqual(f, [])
         self.assertEqual(g, [])
-        
+
     # -----------------------------------------------------------------------
     def test_dlup_by_hu(self):
         """
@@ -1450,7 +1471,7 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual(c, [data[1]])
         self.assertEqual(d, [])
         self.assertEqual(e, [])
-        
+
     # -----------------------------------------------------------------------
     def test_dlup_by_pu(self):
         """
@@ -1482,7 +1503,7 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual(c, [data[0]])
         self.assertEqual(d, [])
         self.assertEqual(e, [])
-        
+
     # -----------------------------------------------------------------------
     def test_dlup_by_pwd(self):
         """
@@ -1495,7 +1516,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         # match more than one
         a = data_lookup('', '', 'sword')
-        
+
         # match just one
         b = data_lookup('', '', 'broad')
 
@@ -1505,7 +1526,7 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual(a, data)
         self.assertEqual(b, [data[1]])
         self.assertEqual(c, [])
-        
+
     # -----------------------------------------------------------------------
     def test_dlup_by_user(self):
         """
@@ -1518,7 +1539,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         # match more than one
         a = data_lookup('', 'name', '')
-        
+
         # match just one
         b = data_lookup('', 'use', '')
 
@@ -1528,7 +1549,7 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual(a, data)
         self.assertEqual(b, [data[0]])
         self.assertEqual(c, [])
-        
+
     # -----------------------------------------------------------------------
     def test_dstore_empty(self):
         """
@@ -1540,7 +1561,7 @@ class ClipTest(toolframe.unittest.TestCase):
         data_store('hostname.com', 'username', 'password')
         a = data_lookup('hostname.com', '', '')
         self.assertEqual(a, [['hostname.com', 'username', 'password']])
-        
+
     # -----------------------------------------------------------------------
     def test_dstore_full(self):
         """
@@ -1548,7 +1569,7 @@ class ClipTest(toolframe.unittest.TestCase):
         already present.
         """
         global data
-        
+
         data = [['hostname.com', 'username', 'password'],
                 ['google.com', 'nameroon', 'broadsword']]
         data_store('flack.org', 'sinbad', 'mermaid')
@@ -1557,7 +1578,7 @@ class ClipTest(toolframe.unittest.TestCase):
         self.assertEqual(data[0] in a, True)
         self.assertEqual(data[1] in a, True)
         self.assertEqual(['flack.org', 'sinbad', 'mermaid'] in a, True)
-        
+
     # -----------------------------------------------------------------------
     def test_help_cmd(self):
         """
@@ -1615,14 +1636,14 @@ class ClipTest(toolframe.unittest.TestCase):
         for item in data:
             f.write('%s\n' % '!@!'.join(item))
         f.close()
-        
+
         S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
         S.sendline('load %s' % filename)
 
         S.expect("Password: ")
         S.sendline(passphrase)
-        
+
         S.expect(self.prompt)
         S.sendline('show')
 
@@ -1672,7 +1693,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         filename = 'test_lcx.clps'
         self.write_test_clps_file(filename, self.passphrase)
-        
+
         S = pexpect.spawn("clps -f %s" % filename, timeout=5)
         S.expect("Password: ")
         S.sendline(self.passphrase)
@@ -1688,7 +1709,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline('quit')
         S.expect(pexpect.EOF)
-    
+
     # -----------------------------------------------------------------------
     def test_load_cmdline_gpg(self):
         """
@@ -1698,7 +1719,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         filename = 'test_lcg.clps'
         self.write_test_plain_file(filename, self.passphrase)
-        
+
         S = pexpect.spawn("clps -f %s" % filename, timeout=5)
         msg = '%s is not a gpg file' % filename
         which = S.expect([self.prompt, msg, pexpect.EOF])
@@ -1708,7 +1729,7 @@ class ClipTest(toolframe.unittest.TestCase):
             self.fail('expected prompt after error message, got EOF')
         elif 1 != which:
             self.fail('unexpected which (%d) should be in [0..2]' % which)
-            
+
         which = S.expect([self.prompt, pexpect.EOF])
         if 0 == which:
             S.sendline('quit')
@@ -1728,7 +1749,7 @@ class ClipTest(toolframe.unittest.TestCase):
         filename = 'test_lcn.clps'
         if os.path.exists(filename):
             os.unlink(filename)
-        
+
         S = pexpect.spawn("clps -f %s" % filename, timeout=5)
         S.expect("No such file or directory: '%s'" % filename)
 
@@ -1743,7 +1764,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline('quit')
         S.expect(pexpect.EOF)
-    
+
     # -----------------------------------------------------------------------
     def test_load_cmdline_pass(self):
         """
@@ -1778,7 +1799,7 @@ class ClipTest(toolframe.unittest.TestCase):
             self.fail('expected prompt after error message, got EOF')
         else:
             self.fail('unexpected which (%d) should be in [0..1]' % which)
-        
+
     # -----------------------------------------------------------------------
     def test_load_cmdline_perm(self):
         """
@@ -1812,7 +1833,7 @@ class ClipTest(toolframe.unittest.TestCase):
         os.environ['HOME'] = "./testhome"
         filename = '$HOME/.clps/secrets.clps'
         self.write_test_clps_file(filename, self.passphrase)
-        
+
         S = pexpect.spawn("clps", timeout=5)
         S.expect("Password: ")
         S.sendline(self.passphrase)
@@ -1828,7 +1849,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline('quit')
         S.expect(pexpect.EOF)
-    
+
     # -----------------------------------------------------------------------
     def test_load_default_nosuch(self):
         """
@@ -1851,13 +1872,13 @@ class ClipTest(toolframe.unittest.TestCase):
             S.sendline("show")
 
         self.assertEqual("No such file or directory" in S.before, False)
-        
+
         S.expect(self.prompt)
         self.assertEqual(S.before, "show\r\n")
 
         S.sendline('quit')
         S.expect(pexpect.EOF)
-    
+
     # -----------------------------------------------------------------------
     def test_load_default_gpg(self):
         """
@@ -1882,10 +1903,10 @@ class ClipTest(toolframe.unittest.TestCase):
         S.sendline("show")
         S.expect(self.prompt)
         self.assertEqual(S.before, "show\r\n")
-        
+
         S.sendline('quit')
         S.expect(pexpect.EOF)
-    
+
     # -----------------------------------------------------------------------
     def test_load_default_pass(self):
         """
@@ -1913,10 +1934,10 @@ class ClipTest(toolframe.unittest.TestCase):
         S.sendline('show')
         S.expect(self.prompt)
         self.assertEqual(S.before, "show\r\n")
-        
+
         S.sendline('quit')
         S.expect(pexpect.EOF)
-    
+
     # -----------------------------------------------------------------------
     def test_load_default_perm(self):
         """
@@ -1928,7 +1949,7 @@ class ClipTest(toolframe.unittest.TestCase):
         filename = os.path.expandvars('$HOME/.clps/secrets.clps')
         self.write_test_clps_file(filename)
         os.chmod(filename, 0000)
-        
+
         S = pexpect.spawn("clps")
         msg = '%s cannot be opened for read' % filename
         which = S.expect(["Password:", pexpect.EOF, self.prompt, msg])
@@ -1944,10 +1965,10 @@ class ClipTest(toolframe.unittest.TestCase):
         S.sendline('show')
         S.expect(self.prompt)
         self.assertEqual(S.before, "show\r\n")
-        
+
         S.sendline('quit')
         S.expect(pexpect.EOF)
-    
+
     # -----------------------------------------------------------------------
     def test_load_defenv_nosuch(self):
         """
@@ -1982,7 +2003,6 @@ class ClipTest(toolframe.unittest.TestCase):
         S.sendline('quit')
         S.expect(pexpect.EOF)
 
-    
     # -----------------------------------------------------------------------
     def test_load_env_exist(self):
         """
@@ -2008,7 +2028,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline('quit')
         S.expect(pexpect.EOF)
-    
+
     # -----------------------------------------------------------------------
     def test_load_env_gpg(self):
         """
@@ -2018,7 +2038,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         filename = 'test_lcg.clps'
         self.write_test_plain_file(filename, self.passphrase)
-        
+
         os.environ['CLPS_FILENAME'] = filename
         S = pexpect.spawn("clps", timeout=5)
         msg = '%s is not a gpg file' % filename
@@ -2029,7 +2049,7 @@ class ClipTest(toolframe.unittest.TestCase):
             self.fail('expected prompt after error message, got EOF')
         elif 1 != which:
             self.fail('unexpected which (%d) should be in [0..2]' % which)
-            
+
         which = S.expect([self.prompt, pexpect.EOF])
         if 0 == which:
             S.sendline('quit')
@@ -2038,7 +2058,7 @@ class ClipTest(toolframe.unittest.TestCase):
             self.fail('expected prompt after error message, got EOF')
         else:
             self.fail('unexpected which (%d) should be in [0..1]' % which)
-    
+
     # -----------------------------------------------------------------------
     def test_load_env_nosuch(self):
         """
@@ -2065,7 +2085,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline('quit')
         S.expect(pexpect.EOF)
-    
+
     # -----------------------------------------------------------------------
     def test_load_env_pass(self):
         """
@@ -2101,7 +2121,7 @@ class ClipTest(toolframe.unittest.TestCase):
             self.fail('expected prompt after error message, got EOF')
         else:
             self.fail('unexpected which (%d) should be in [0..1]' % which)
-    
+
     # -----------------------------------------------------------------------
     def test_load_env_perm(self):
         """
@@ -2124,7 +2144,7 @@ class ClipTest(toolframe.unittest.TestCase):
             self.fail('expected prompt after error message, got EOF')
         elif 1 != which:
             self.fail('unexpected which (%d) should be in [0..2]' % which)
-    
+
     # -----------------------------------------------------------------------
     def test_optionA_addshow(self):
         """
@@ -2139,7 +2159,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.expect("Username: ")
         S.sendline('anderson')
-        
+
         S.expect("Password: ")
         S.sendline("snoopy")
 
@@ -2153,7 +2173,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline("quit")
         S.expect(pexpect.EOF)
-        
+
     # -----------------------------------------------------------------------
     def test_optionAA_addshow(self):
         """
@@ -2179,7 +2199,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline("quit")
         S.expect(pexpect.EOF)
-        
+
     # -----------------------------------------------------------------------
     def test_optionH_addshow(self):
         """
@@ -2208,7 +2228,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline("quit")
         S.expect(pexpect.EOF)
-        
+
     # -----------------------------------------------------------------------
     def test_optionHa_addshow(self):
         """
@@ -2235,7 +2255,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline("quit")
         S.expect(pexpect.EOF)
-        
+
     # -----------------------------------------------------------------------
     def test_optionUH_addshow(self):
         """
@@ -2262,7 +2282,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline("quit")
         S.expect(pexpect.EOF)
-        
+
     # -----------------------------------------------------------------------
     def test_optionU_addshow(self):
         """
@@ -2291,7 +2311,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline("quit")
         S.expect(pexpect.EOF)
-        
+
     # -----------------------------------------------------------------------
     def test_optionUa_addshow(self):
         """
@@ -2302,7 +2322,7 @@ class ClipTest(toolframe.unittest.TestCase):
         prompt = "clps> "
         S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.timeout = 5
-        
+
         S.expect(prompt)
         S.sendline("add -u phineas abracadabra.com")
 
@@ -2319,7 +2339,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline("quit")
         S.expect(pexpect.EOF)
-        
+
     # -----------------------------------------------------------------------
     def test_prompt_addshow(self):
         """
@@ -2349,7 +2369,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline("quit")
         S.expect(pexpect.EOF)
-        
+
     # -----------------------------------------------------------------------
     def test_save(self):
         """
@@ -2371,7 +2391,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.expect('Password: ')
         S.sendline('test_passphrase')
-        
+
         S.expect(self.prompt)
         S.sendline('quit')
 
@@ -2401,14 +2421,14 @@ class ClipTest(toolframe.unittest.TestCase):
         for item in self.testdata:
             f.write('%s\n' % '!@!'.join(item))
         f.close()
-        
+
         S = pexpect.spawn(self.clps_cmd, timeout=5)
         S.expect(self.prompt)
 
         S.sendline("save")
         S.expect("save requires a filename")
         S.expect(self.prompt)
-        
+
         S.sendline("load test_savell.clps")
         S.expect("Password: ")
 
@@ -2424,13 +2444,13 @@ class ClipTest(toolframe.unittest.TestCase):
         S.sendline("save")
         S.expect("saving test_savell.clps")
         S.expect("Password:")
-        
+
         S.sendline(self.passphrase)
         S.expect(self.prompt)
 
         S.sendline("quit")
         S.expect(pexpect.EOF)
-        
+
         fl = glob.glob("test_savell.clps*")
         self.assertEqual(1 < len(fl), True,
                          "Not enough files matching test_savell.clps*")
@@ -2445,16 +2465,15 @@ class ClipTest(toolframe.unittest.TestCase):
         oldglob = time.strftime(filename + ".%Y.%m%d*")
         for oldfname in glob.glob(oldglob):
             os.unlink(oldfname)
-            
+
         data = [['foobar.com', 'username', 'password'],
                 ['sumatra.org', 'chairil', 'Methuselah'],
                 ['java.org', 'khalida', 'Surabaya']]
-                                
+
         f = open(filename, 'w')
         f.write("Avoid data loss\n")
         f.close()
 
-                                
         S = pexpect.spawn(self.clps_cmd, timeout=5)
         for item in data:
             S.expect(self.prompt)
@@ -2467,15 +2486,14 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.expect('Password: ')
         S.sendline('test_passphrase')
-        
+
         S.expect(self.prompt)
         S.sendline('quit')
 
-                                
         S.expect(pexpect.EOF)
 
         self.assertEqual(os.path.exists(filename), True)
-        
+
         C = tpbtools.contents(filename)
         for item in data:
             for element in item:
@@ -2483,7 +2501,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         fl = glob.glob(oldglob)
         self.assertEqual(0 < len(fl), True)
-                                
+
     # -----------------------------------------------------------------------
     def test_show_all_nopass(self):
         """
@@ -2511,14 +2529,14 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline('quit')
         S.expect(pexpect.EOF)
-        
+
     # -----------------------------------------------------------------------
     def test_show_all_wpass(self):
         """
         Test show routine, showing all entries with passwords.
         """
         data = self.testdata
-        
+
         S = pexpect.spawn(self.clps_cmd, timeout=5)
         for item in data:
             S.expect(self.prompt)
@@ -2544,7 +2562,7 @@ class ClipTest(toolframe.unittest.TestCase):
         Test show selecting entries by host (-H).
         """
         data = self.testdata
-        
+
         S = pexpect.spawn(self.clps_cmd, timeout=5)
         for item in data:
             S.expect(self.prompt)
@@ -2560,14 +2578,14 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline('quit')
         S.expect(pexpect.EOF)
-    
+
     # -----------------------------------------------------------------------
     def test_show_by_pwd(self):
         """
         Test show selecting entries by password (-p).
         """
         data = self.testdata
-        
+
         S = pexpect.spawn(self.clps_cmd, timeout=5)
         for item in data:
             S.expect(self.prompt)
@@ -2583,14 +2601,14 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline('quit')
         S.expect(pexpect.EOF)
-        
+
     # -----------------------------------------------------------------------
     def test_show_by_user(self):
         """
         Test show selecting entries by user (-u).
         """
         data = self.testdata
-        
+
         S = pexpect.spawn(self.clps_cmd, timeout=5)
         for item in data:
             S.expect(self.prompt)
@@ -2606,7 +2624,7 @@ class ClipTest(toolframe.unittest.TestCase):
 
         S.sendline('quit')
         S.expect(pexpect.EOF)
-        
+
     # -----------------------------------------------------------------------
     def test_show_rgx_nopass(self):
         """
@@ -2630,8 +2648,8 @@ class ClipTest(toolframe.unittest.TestCase):
         xp = [[False, False, False],
               [True, True, False],
               [True, True, False]]
-        for idx in range(0,3):
-            for jdx in range(0,3):
+        for idx in range(0, 3):
+            for jdx in range(0, 3):
                 self.assertEqual(data[idx][jdx] in S.before,
                                  xp[idx][jdx])
 
@@ -2662,8 +2680,8 @@ class ClipTest(toolframe.unittest.TestCase):
         xp = [[False, False, False],
               [True, True, True],
               [True, True, True]]
-        for idx in range(0,3):
-            for jdx in range(0,3):
+        for idx in range(0, 3):
+            for jdx in range(0, 3):
                 self.assertEqual(data[idx][jdx] in S.before,
                                  xp[idx][jdx])
 
@@ -2677,7 +2695,7 @@ class ClipTest(toolframe.unittest.TestCase):
         """
         if testhelp.debug_flag():
             pdb.set_trace()
-            
+
         if None != os.getenv('CLPS_FILENAME'):
             del os.environ['CLPS_FILENAME']
 
@@ -2694,7 +2712,7 @@ class ClipTest(toolframe.unittest.TestCase):
             dirname = os.path.dirname(filename)
             if not os.path.exists(dirname):
                 os.makedirs(dirname)
-                
+
         if os.path.exists(filename):
             os.unlink(filename)
         f = os.popen('gpg -c --passphrase %s > %s 2>/dev/null'
@@ -2702,12 +2720,12 @@ class ClipTest(toolframe.unittest.TestCase):
         for item in data:
             f.write('%s\n' % '!@!'.join(item))
         f.close()
-        
+
     # -----------------------------------------------------------------------
     def write_test_plain_file(self,
-                             filepath,
-                             passphrase=passphrase,
-                             data=testdata):
+                              filepath,
+                              passphrase=passphrase,
+                              data=testdata):
         """
         Write out a plaintext test file.
         """
@@ -2721,7 +2739,7 @@ class ClipTest(toolframe.unittest.TestCase):
         for item in data:
             f.write('%s\n' % '!@!'.join(item))
         f.close()
-        
+
 # ---------------------------------------------------------------------------
 # pdb.set_trace()
 p = optparse.OptionParser()

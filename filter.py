@@ -1,5 +1,5 @@
 #!/usr/bin/python
-'''
+"""
 filter.py - Distinguish interesting from ignorable strings in a list.
 
 Use:
@@ -37,19 +37,24 @@ License:
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-'''
+"""
 
 import re
 import unittest
 
+
+# -----------------------------------------------------------------------------
 class filter(object):
+    # -------------------------------------------------------------------------
     def __init__(self):
         self.IGN = []
         self.KEEP = []
 
+    # -------------------------------------------------------------------------
     def ignore(self, rgx):
         self.IGN.append(rgx)
-        
+
+    # -------------------------------------------------------------------------
     def is_interesting(self, item):
         rval = True
         for r in self.IGN:
@@ -58,6 +63,7 @@ class filter(object):
                 break
         return rval
 
+    # -------------------------------------------------------------------------
     def is_keepable(self, item):
         rval = False
         for r in self.KEEP:
@@ -65,17 +71,22 @@ class filter(object):
                 rval = True
                 break
         return rval
-    
+
+    # -------------------------------------------------------------------------
     def keep(self, rgx):
         self.KEEP.append(rgx)
-        
+
+
+# -----------------------------------------------------------------------------
 class FilterTests(unittest.TestCase):
+    # -------------------------------------------------------------------------
     def test_constructor(self):
         xyz = filter()
         for attr in ['ignore', 'is_interesting', 'is_keepable',
                      'keep', 'IGN', 'KEEP', '__new__']:
             assert(attr in dir(xyz))
 
+    # -------------------------------------------------------------------------
     def test_ignore(self):
         x = filter()
         x.ignore('12345')
@@ -83,12 +94,14 @@ class FilterTests(unittest.TestCase):
         assert(len(x.IGN) == 1)
         assert('foobar' not in x.IGN)
 
+    # -------------------------------------------------------------------------
     def test_is_interesting(self):
         x = filter()
         x.ignore('abccd')
         assert(not x.is_interesting('one two abccd three four'))
         assert(x.is_interesting('foo bar wokka wokka'))
 
+    # -------------------------------------------------------------------------
     def test_keep(self):
         x = filter()
         x.keep('precious')
@@ -96,6 +109,7 @@ class FilterTests(unittest.TestCase):
         assert(len(x.KEEP) == 1)
         assert('frippery' not in x.KEEP)
 
+    # -------------------------------------------------------------------------
     def test_is_keepable(self):
         x = filter()
         x.keep('precious')
@@ -104,4 +118,3 @@ class FilterTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-                                                                                                                                                                                                                

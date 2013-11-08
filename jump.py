@@ -12,7 +12,7 @@ http://code.activestate.com/recipes/577027-find-file-in-subdirectory/:
             if filename in names:
                 return os.path.join(root, filename)
         raise 'File not found'
-                                            
+
 """
 import os
 import pdb
@@ -20,6 +20,7 @@ import sys
 import toolframe
 
 from optparse import *
+
 
 # ---------------------------------------------------------------------------
 def main(argv):
@@ -46,14 +47,14 @@ def main(argv):
 
     if o.debug:
         pdb.set_trace()
-        
-    if o.tfile != None:
+
+    if o.tfile is not None:
         target = o.tfile
-    elif o.tdir != None:
+    elif o.tdir is not None:
         target = o.tdir
     else:
         raise StandardError("One of -t/--to or -i/--into is required.")
-        
+
     f = os.popen('find %s -name %s 2>/dev/null' % (o.root, target))
     l = f.readlines()
     f.close()
@@ -67,9 +68,9 @@ def main(argv):
         for item in l:
             print "%d: %s" % (count, item)
             count += 1
-    elif o.tfile != None:
+    elif o.tfile is not None:
         print(os.path.dirname(l[o.which]))
-    elif o.tdir != None:
+    elif o.tdir is not None:
         print(l[o.which])
 
 # ---------------------------------------------------------------------------

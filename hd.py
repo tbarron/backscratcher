@@ -38,8 +38,10 @@ import unittest
 
 from optparse import *
 
-def main(argv = None):
-    if argv == None:
+
+# -----------------------------------------------------------------------------
+def main(argv=None):
+    if argv is None:
         argv = sys.argv
 
     p = OptionParser()
@@ -61,6 +63,8 @@ def main(argv = None):
     else:
         hexdump(sys.stdin)
 
+
+# -----------------------------------------------------------------------------
 def hexdump(input):
     d = input.read()
     for b in range(0, len(d), 16):
@@ -85,7 +89,8 @@ def hexdump(input):
                 sys.stdout.write(" ")
             sys.stdout.write(" ")
         sys.stdout.write("\n")
-        
+
+
 # ---------------------------------------------------------------------------
 class HdTest(unittest.TestCase):
     def test_example(self):

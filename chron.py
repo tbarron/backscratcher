@@ -28,7 +28,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-      
+
 """
 
 import os
@@ -39,9 +39,10 @@ import unittest
 
 from optparse import *
 
+
 # ---------------------------------------------------------------------------
-def main(argv = None):
-    if argv == None:
+def main(argv=None):
+    if argv is None:
         argv = sys.argv
 
     p = OptionParser()
@@ -61,6 +62,7 @@ def main(argv = None):
         count_down(a[1], o.action)
     else:
         count_up()
+
 
 # ---------------------------------------------------------------------------
 def count_down(hms, action):
@@ -82,6 +84,7 @@ def count_down(hms, action):
     if action != '':
         print action
         os.system(action)
+
 
 # ---------------------------------------------------------------------------
 def count_up():
@@ -105,12 +108,14 @@ def count_up():
             x = x + 1
         sys.stdout.flush()
         time.sleep(1.0)
-    
+
+
 # ---------------------------------------------------------------------------
 def hms_seconds(hms):
     h, m, s = hms.split(':')
-    print 
+    print
     return int(s) + 60 * (int(m) + 60 * int(h))
+
 
 # ---------------------------------------------------------------------------
 class ChronTest(unittest.TestCase):

@@ -55,7 +55,9 @@ import toolframe
 
 from optparse import OptionParser
 
-def main(argv = None):
+
+# -----------------------------------------------------------------------------
+def main(argv=None):
     p = OptionParser()
     p.add_option('-c', '--change',
                  action='store_true', default=False, dest='change',
@@ -66,10 +68,14 @@ def main(argv = None):
     p.add_option('-i', '--interval',
                  action='store', default=10, dest='interval', type='int',
                  help='seconds between updates')
+    p.add_option('-p', '--prompt',
+                 action='store_true', default=False, dest='prompt',
+                 help='update on user input')
     (o, a) = p.parse_args(argv)
 
-    if o.debug: pdb.set_trace()
-    
+    if o.debug:
+        pdb.set_trace()
+
     start = time.time()
     cmd = " ".join(a[1:])
     old_stuff_s = ""
@@ -79,7 +85,10 @@ def main(argv = None):
         f.close()
         stuff_s = " ".join(stuff)
 
-        if o.change:
+        if o.prompt:
+            report(start, cmd, stuff_s)
+            x = raw_input('Press ENTER to continue...')
+        elif o.change:
             if stuff_s != old_stuff_s:
                 report(start, cmd, stuff_s)
                 old_stuff_s = stuff_s
@@ -88,6 +97,8 @@ def main(argv = None):
             report(start, cmd, stuff_s)
             time.sleep(o.interval)
 
+
+# -----------------------------------------------------------------------------
 def report(start, cmd, stuff_s):
     os.system("clear")
     print("Running %s since %s" % (ymdhms(time.time() - start),
@@ -96,11 +107,13 @@ def report(start, cmd, stuff_s):
     print(cmd)
     print(" " + stuff_s)
 
+
+# -----------------------------------------------------------------------------
 def ymdhms(seconds):
     S = seconds % 60
     minutes = (seconds - S)/60
     rval = "%02d" % S
-    
+
     M = minutes % 60
     hours = (minutes - M)/60
     if 0 < minutes:

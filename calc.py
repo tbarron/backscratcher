@@ -35,9 +35,10 @@ import unittest
 
 from optparse import *
 
+
 # ---------------------------------------------------------------------------
-def main(argv = None):
-    if argv == None:
+def main(argv=None):
+    if argv is None:
         argv = sys.argv
 
     p = OptionParser()
@@ -64,7 +65,8 @@ def main(argv = None):
     except EOFError:
         print ''
         sys.exit(0)
-        
+
+
 # ---------------------------------------------------------------------------
 class CalcTest(unittest.TestCase):
     def test_example(self):
@@ -86,7 +88,7 @@ class CalcTest(unittest.TestCase):
         S.expect("> ")
 
         assert("zapzap" in S.before)
-        
+
         S.sendline("exit()")
         S.expect(pexpect.EOF)
         S.close()

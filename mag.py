@@ -44,9 +44,10 @@ import unittest
 
 from optparse import *
 
+
 # ---------------------------------------------------------------------------
-def main(argv = None, testing=False):
-    if argv == None:
+def main(argv=None, testing=False):
+    if argv is None:
         argv = sys.argv
 
     p = OptionParser()
@@ -81,6 +82,7 @@ def main(argv = None, testing=False):
     else:
         print rval
 
+
 # ---------------------------------------------------------------------------
 def usage():
     return """
@@ -88,6 +90,7 @@ def usage():
 
     With -b, use a divisor of 1024. Otherwise, use 1000.
     """
+
 
 # ---------------------------------------------------------------------------
 class MagTest(unittest.TestCase):
@@ -165,13 +168,13 @@ class MagTest(unittest.TestCase):
             args = ['./mag', '-b', v]
         else:
             args = ['./mag', v]
-            
+
         a = main(args, True)
         try:
             assert(a == string)
         except AssertionError:
             print "\nexpected: '%s'" % a
             print "result:   '%s'" % string
-        
+
 # ---------------------------------------------------------------------------
 toolframe.ez_launch()

@@ -4,7 +4,7 @@ fabricate stuff
 
 For a list of things that can be fabricated,
 
-   fab help 
+   fab help
 
 Fab is a python-based make substitute for when a make program is not
 available or make won't quite do what you want. The equivalent of

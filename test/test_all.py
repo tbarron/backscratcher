@@ -1,11 +1,13 @@
 #!/usr/bin/env python
-import sys, os
+import os
+import sys
 sys.path.insert(0, os.getcwd())
 
 import glob
 import pdb
 import testhelp
 import toolframe
+
 
 # -----------------------------------------------------------------------------
 def main(args):
@@ -26,8 +28,8 @@ def main(args):
         if hasattr(mhandle, 'tearDownModule'):
             tdf = getattr(mhandle, 'tearDownModule')
             tdf()
-        
-    
+
+
 # -----------------------------------------------------------------------------
 def run_tests(mt_tup):
     suite = testhelp.LoggingTestSuite(logfile='bstest.log')
@@ -43,4 +45,3 @@ def run_tests(mt_tup):
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
     toolframe.ez_launch(main=main)
-    

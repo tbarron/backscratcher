@@ -14,14 +14,14 @@ The time spec can be one of the following:
    (+|-)<n> (seconds|minutes|hours|days|weeks|months|years)
    (+|-)((HH:)MM:)SS
    [epoch-time]
-   
+
  dt -f '%Y.%m%d' next week
  dt -f '%Y.%m%d' {next|last} {second|minute|hour|day|week|month|year
                               |monday|tuesday|wednesday|thursday
                               |friday|saturday|sunday}
  dt -f <format> [+|-]<integer> {sec|min|hour|day|week|month|year}
  dt -f <format> [epoch-time]
- 
+
 EXAMPLES
 
    $ dt next week
@@ -70,8 +70,9 @@ import time
 import toolframe
 import unittest
 
+
 # ---------------------------------------------------------------------------
-def main(argv = None):
+def main(argv=None):
 #     if argv == None:
 #         argv = sys.argv
 
@@ -84,13 +85,16 @@ def main(argv = None):
                  help='date format (see strftime(3))')
     (o, a) = p.parse_args(argv)
 
-    if o.debug: pdb.set_trace()
+    if o.debug:
+        pdb.set_trace()
     print report_date(o.format, a[1:])
+
 
 # ---------------------------------------------------------------------------
 def fatal(msg):
     # raise DtError(msg)
     raise StandardError(msg)
+
 
 # ---------------------------------------------------------------------------
 def report_date(format, args):
@@ -107,7 +111,8 @@ def report_date(format, args):
     offset = parse_whenspec(edited_args)
     when = time.time() + offset
     return time.strftime(format, time.localtime(when))
-    
+
+
 # ---------------------------------------------------------------------------
 def is_numeric(strval):
     try:
@@ -115,6 +120,7 @@ def is_numeric(strval):
     except:
         return False
     return True
+
 
 # ---------------------------------------------------------------------------
 def parse_whenspec(args):
@@ -139,6 +145,7 @@ def parse_whenspec(args):
 
     return rval
 
+
 # ---------------------------------------------------------------------------
 def next(args):
     if len(args) < 1:
@@ -158,6 +165,7 @@ def next(args):
     except UnboundLocalError:
         # raise DtError('next: no return value set')
         raise StandardError('next: no return value set')
+
 
 # ---------------------------------------------------------------------------
 def last(args):
@@ -179,6 +187,7 @@ def last(args):
         # raise DtError('last: no return value set')
         raise StandardError('last: no return value set')
 
+
 # ---------------------------------------------------------------------------
 def weekday_number(day):
     wdl = weekday_list()
@@ -186,6 +195,7 @@ def weekday_number(day):
         if wdl[num].startswith(day):
             return num
     return -1
+
 
 # ---------------------------------------------------------------------------
 def time_to(day, dir):
@@ -202,13 +212,14 @@ def time_to(day, dir):
         raise StandardError('time_to: invalid direction')
     return then
 
+
 # ---------------------------------------------------------------------------
 def today(args):
     if len(args) == 0:
         return 0
     elif args[0] == '':
         return 0
-    
+
     count = int(args[0])
     if count == 0:
         fatal("expected a number, got '%s'" % args[0])
@@ -219,11 +230,12 @@ def today(args):
     rval = count * unit_size(args[1])
     return rval
 
+
 # ---------------------------------------------------------------------------
 def tomorrow(args):
     if len(args) == 0:
         return 24 * 3600
-    
+
     count = int(args[0])
     if count == 0:
         fatal("expected a number, got '%s'" % args[0])
@@ -234,10 +246,12 @@ def tomorrow(args):
     rval = 24 * 3600 + count * unit_size(args[1])
     return rval
 
+
 # ---------------------------------------------------------------------------
 def unit_list():
     return ['second', 'minute', 'hour', 'day', 'week', 'month', 'year']
-        
+
+
 # ---------------------------------------------------------------------------
 def unit_size(unit):
     uval = {'second': 1,
@@ -250,16 +264,18 @@ def unit_size(unit):
     rval = uval[unit]
     return rval
 
+
 # ---------------------------------------------------------------------------
 def weekday_list():
     return ['monday', 'tuesday', 'wednesday', 'thursday', 'friday',
             'saturday', 'sunday']
-        
+
+
 # ---------------------------------------------------------------------------
 def yesterday(args):
     if len(args) == 0:
         return -24 * 3600
-    
+
     count = int(args[0])
     if count == 0:
         fatal("expected a number, got '%s'" % args[0])
@@ -270,17 +286,18 @@ def yesterday(args):
     rval = -24 * 3600 + count * unit_size(args[1])
     return rval
 
+
 # ---------------------------------------------------------------------------
 class dtTest(unittest.TestCase):
     # -----------------------------------------------------------------------
     def default_fmt(self):
         return '%Y.%m%d %H:%M:%S'
-    
+
     # -----------------------------------------------------------------------
     def both_test(self, testargs, expected):
         self.parse_test(testargs, expected)
         self.report_test(testargs, expected)
-        
+
     # -----------------------------------------------------------------------
     def parse_test(self, testargs, expected):
         if type(expected) == int:
@@ -296,7 +313,7 @@ class dtTest(unittest.TestCase):
             assert(got_exception)
         else:
             raise StandardError("expected int or string, got '%s'" % a)
-        
+
     # -----------------------------------------------------------------------
     def report_test(self, testargs, expected):
         if type(expected) == int:
@@ -314,84 +331,84 @@ class dtTest(unittest.TestCase):
             assert(got_exception)
         else:
             raise StandardError("expected int or string, got '%s'" % a)
-            
+
     # -----------------------------------------------------------------------
     def test_epoch(self):
         when = int(time.time()) - 300
         self.both_test(['%d' % when], -300)
-        
+
     # -----------------------------------------------------------------------
     def test_today(self):
         self.both_test(['today'], 0)
-        
+
     # -----------------------------------------------------------------------
     def test_tomorrow(self):
         self.both_test(['tomorrow'], 24 * 3600)
-        
+
     # -----------------------------------------------------------------------
     def test_yesterday(self):
         self.both_test(['yesterday'], -24 * 3600)
-        
+
     # -----------------------------------------------------------------------
     def test_next(self):
         self.both_test(['next'],
                        'next: expected unit or weekday, found nothing')
-                               
+
     # -----------------------------------------------------------------------
     def test_last(self):
         self.both_test(['last'],
                        'last: expected unit or weekday, found nothing')
-        
+
     # -----------------------------------------------------------------------
     def test_plus5day(self):
         self.both_test(['+5', 'day'], 5 * 24 * 3600)
-        
+
     # -----------------------------------------------------------------------
     def test_minus3month(self):
         self.both_test(['-3', 'month'], -3 * 30 * 24 * 3600)
-        
+
     # -----------------------------------------------------------------------
     def test_tomorrow_plus2hour(self):
         self.both_test(['tomorrow', '2', 'hour'], (24+2) * 3600)
-        
+
     # -----------------------------------------------------------------------
     def test_yesterday_plus7week(self):
         self.both_test(['yesterday', '7', 'week'], (7 * 7 - 1) * 24 * 3600)
-        
+
     # -----------------------------------------------------------------------
     def test_next_minus3(self):
         self.both_test(['next', '-3', 'hour'],
                        'next: expected unit or weekday, got number')
-        
+
     # -----------------------------------------------------------------------
     def test_last_plus2day(self):
         self.both_test(['last', '+2', 'day'],
                        'last: expected unit or weekday, got number')
-        
+
     # -----------------------------------------------------------------------
     def test_minus3hour(self):
         self.both_test(['-3', 'hour'], -3 * 3600)
-        
+
     # -----------------------------------------------------------------------
     def test_plus2day(self):
         self.both_test(['+2', 'day'], 2 * 24 * 3600)
-        
+
     # -----------------------------------------------------------------------
     def test_next_day(self):
         self.both_test(['next', 'day'], 24 * 3600)
-        
+
     # -----------------------------------------------------------------------
     def test_next_monday(self):
         self.both_test(['next', 'monday'], time_to('monday', 'next'))
-        
+
     # -----------------------------------------------------------------------
     def test_last_tuesday(self):
         self.both_test(['last', 'tuesday'], time_to('tuesday', 'last'))
-        
+
     # -----------------------------------------------------------------------
     def test_next_wednesday(self):
         self.both_test(['next', 'wednesday'], time_to('wednesday', 'next'))
-        
+
     # -----------------------------------------------------------------------
     def test_last_thursday(self):
         self.both_test(['last', 'thursday'], time_to('thursday', 'last'))

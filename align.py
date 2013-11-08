@@ -50,6 +50,8 @@ def main(A):
         input = sys.stdin
     align(input)
 
+
+# ---------------------------------------------------------------------------
 def align(input):
     lines = [l.strip() for l in input.readlines()]
     width = []
@@ -71,6 +73,7 @@ def align(input):
                 fmt = '%%-%ds  ' % width[i]
             oline = oline + fmt % f[i]
         print oline
+
 
 # ---------------------------------------------------------------------------
 if __name__ == '__main__':

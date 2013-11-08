@@ -39,6 +39,7 @@ try:
 except:
     subproc_available = False
 
+
 # ---------------------------------------------------------------------------
 def main(args):
     p = OptionParser()
@@ -50,7 +51,8 @@ def main(args):
 #                  help='report more of what is going on')
     (o, a) = p.parse_args(args)
 
-    if (o.debug): pdb.set_trace()
+    if (o.debug):
+        pdb.set_trace()
 
     pt = get_process_list()
 
@@ -58,7 +60,8 @@ def main(args):
     while pid in pt.keys():
         print("%s %s" % (pid, pt[pid]['cmd']))
         pid = pt[pid]['ppid']
-        
+
+
 # ---------------------------------------------------------------------------
 def get_process_list():
     """
@@ -89,7 +92,7 @@ def get_process_list():
         else:
             p = os.popen("ps -ef", "r")
             ptxt = [x.strip('\n') for x in p.readlines()]
-            
+
         rgx = r'\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)' \
               + '\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)'
         for pline in ptxt:
@@ -100,8 +103,9 @@ def get_process_list():
                 d['ppid'] = q.groups()[2]
                 d['cmd'] = q.groups()[7]
                 pd[d['pid']] = d
-                
+
     return pd
+
 
 # ---------------------------------------------------------------------------
 def get_cmd(pdir):
@@ -111,6 +115,7 @@ def get_cmd(pdir):
     rval = line.replace("\000", " ").strip()
     return rval
 
+
 # ---------------------------------------------------------------------------
 def get_ppid(pdir):
     f = open("%s/stat" % pdir)
@@ -119,10 +124,11 @@ def get_ppid(pdir):
     rval = line.split()[3]
     return rval
 
+
 # ---------------------------------------------------------------------------
 def usage():
     print("usage: pstrack")
     sys.exit(1)
-    
+
 # ---------------------------------------------------------------------------
 toolframe.ez_launch(main)

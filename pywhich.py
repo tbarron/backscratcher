@@ -18,7 +18,7 @@ OPTIONS
     -a/--all   Report all hits, not just the first one
 
     -d/--debug Run under the python debugger
-    
+
 LICENSE
     Copyright (C) 2012 - <the end of time>  Tom Barron
         tom.barron@comcast.net
@@ -52,6 +52,7 @@ import re
 import sys
 import toolframe
 
+
 # ---------------------------------------------------------------------------
 def main(args):
     p = OptionParser()
@@ -63,7 +64,8 @@ def main(args):
                  help='run under debugger')
     (o, a) = p.parse_args(args)
 
-    if o.debug: pdb.set_trace()
+    if o.debug:
+        pdb.set_trace()
     for looking_for in a[1:]:
         lfstem = re.sub('\.py$', '', looking_for)
         indent = '\n'
@@ -75,6 +77,6 @@ def main(args):
                 if not o.all:
                     break
     print('')
-    
+
 # ---------------------------------------------------------------------------
 toolframe.ez_launch(main)

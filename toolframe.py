@@ -17,7 +17,7 @@ options and arguments):
     * Call toolframe.tf_launch() (no args) outside any function
 
     * Additional features:
-    
+
        * When run as 'program.py -L', symlink program -> program.py is
          created so the program can be easily called from the command
          line without typing the .py suffix.
@@ -45,7 +45,7 @@ following:
 History
    2011.0209   inception
    2011.0304   figured out to pass routine main to ez_launch
-   
+
 Copyright (C) 2011 - <the end of time>  Tom Barron
   tom.barron@comcast.net
   177 Crossroads Blvd
@@ -73,13 +73,14 @@ import testhelp
 import traceback as tb
 import unittest
 
+
 # ---------------------------------------------------------------------------
 def tf_main(args, prefix=None, noarg='help'):
-    if prefix == None:
+    if prefix is None:
         prefix = sys.modules['__main__'].prefix()
 
     args = tf_dispatch_prolog(prefix, args)
-    
+
     if len(args) < 2:
         if noarg == 'help':
             tf_help([], prefix=prefix)
@@ -94,6 +95,7 @@ def tf_main(args, prefix=None, noarg='help'):
         tf_dispatch(prefix, args[1:])
 
     tf_dispatch_epilog(prefix, args)
+
 
 # ---------------------------------------------------------------------------
 def tf_dispatch(prefix, args):
@@ -117,6 +119,7 @@ def tf_dispatch(prefix, args):
             tb.print_exc()
             print(e)
 
+
 # ---------------------------------------------------------------------------
 def tf_dispatch_epilog(prefix, args):
     try:
@@ -124,7 +127,8 @@ def tf_dispatch_epilog(prefix, args):
     except:
         # no epilog defined -- carry on
         pass
-    
+
+
 # ---------------------------------------------------------------------------
 def tf_dispatch_prolog(prefix, args):
     rval = args
@@ -137,6 +141,7 @@ def tf_dispatch_prolog(prefix, args):
         pass
     return rval
 
+
 # ---------------------------------------------------------------------------
 def tf_help(A, prefix=None):
     """help - show this list
@@ -148,7 +153,7 @@ def tf_help(A, prefix=None):
     each __doc__ member.
     """
     d = dir(sys.modules['__main__'])
-    if prefix == None:
+    if prefix is None:
         prefix = sys.modules['__main__'].prefix()
     if 0 < len(A):
         if '%s_%s' % (prefix, A[0]) in d:
@@ -171,9 +176,9 @@ def tf_help(A, prefix=None):
             f = 'help'
             docsum = tf_help.__doc__.split('\n')[0]
             print "   %s" % (docsum)
-            
 
-# ------------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
 def tf_launch(prefix, noarg='help', cleanup_tests=None, testclass='',
               logfile=''):
     if len(sys.argv) == 1 and sys.argv[0] == '':
@@ -191,6 +196,7 @@ def tf_launch(prefix, noarg='help', cleanup_tests=None, testclass='',
         else:
             tf_main(sys.argv, prefix=prefix, noarg=noarg)
 
+
 # ---------------------------------------------------------------------------
 def tf_shell(prefix, args):
     prompt = "%s> " % prefix
@@ -198,17 +204,19 @@ def tf_shell(prefix, args):
     while req != 'quit':
         r = shlex.split(req)
         tf_dispatch(prefix, r)
-            
+
         req = raw_input(prompt)
 
+
 # ---------------------------------------------------------------------------
-def ez_launch(main = None, cleanup=None, test=None):
+def ez_launch(main=None, cleanup=None, test=None):
     # pdb.set_trace()
     if len(sys.argv) == 1 and sys.argv[0] == '':
         return
     sname = sys.argv[0]
     pname = re.sub('.py$', '', sname)
-    if sname.endswith('.py') and not os.path.exists(pname) and '-L' in sys.argv:
+    if (sname.endswith('.py') and
+            not os.path.exists(pname) and '-L' in sys.argv):
         print("creating symlink: %s -> %s" % (pname, sname))
         os.symlink(sname, pname)
     elif sys._getframe(1).f_code.co_name in ['?', '<module>']:
@@ -216,12 +224,12 @@ def ez_launch(main = None, cleanup=None, test=None):
             if '-d' in sys.argv:
                 sys.argv.remove('-d')
                 # pdb.set_trace()
-            if test == None:
+            if test is None:
                 unittest.main()
             else:
-                if not testhelp.main(sys.argv) and cleanup != None:
+                if not testhelp.main(sys.argv) and cleanup is not None:
                     cleanup()
-        elif main == None:
+        elif main is None:
             raise StandardError("Pass your main routine to ez_launch")
         else:
             main(sys.argv)

@@ -32,7 +32,7 @@ If -q is used, the commands are run without being displayed first.
 
 OPTIONS
 
- -c <command>  
+ -c <command>
 
 Specify the command to be run.
 
@@ -91,12 +91,13 @@ import unittest
 
 from optparse import *
 
+
 # ---------------------------------------------------------------------------
-def main(argv = None):
+def main(argv=None):
     """
     Select the function to apply based on the command line options.
     """
-    if argv == None:
+    if argv is None:
         argv = sys.argv
 
     p = OptionParser()
@@ -104,7 +105,7 @@ def main(argv = None):
                  action='store', default='', dest='cmd', type='string',
                  help='command to apply to all arguments')
     p.add_option('-d', '--debug',
-                 action='store_true', default = False, dest='debug',
+                 action='store_true', default=False, dest='debug',
                  help='run under the debugger')
     p.add_option('-e', '--edit',
                  action='store', default='', dest='edit', type='string',
@@ -139,12 +140,14 @@ def main(argv = None):
     else:
         Usage()
 
+
 # ---------------------------------------------------------------------------
 def expand(cmd):
     """
     Expand environment variables and user notation in a command string.
     """
     return os.path.expandvars(os.path.expanduser(cmd))
+
 
 # ---------------------------------------------------------------------------
 def BatchCommand(options, arglist):
@@ -156,6 +159,7 @@ def BatchCommand(options, arglist):
     """
     for cmd in xargs_wrap(options.cmd, sys.stdin):
         psys(cmd, options)
+
 
 # ---------------------------------------------------------------------------
 def IterateCommand(options, arglist):
@@ -169,6 +173,7 @@ def IterateCommand(options, arglist):
     for idx in range(int(low), int(high)):
         cmd = expand(re.sub('%', str(idx), options.cmd))
         psys(cmd, options)
+
 
 # ---------------------------------------------------------------------------
 def psys(cmd, options):
@@ -195,7 +200,8 @@ def psys(cmd, options):
         f = os.popen(cmd, 'r')
         sys.stdout.write(f.read())
         f.close()
-        
+
+
 # ---------------------------------------------------------------------------
 def SubstCommand(options, arglist):
     """
@@ -204,7 +210,8 @@ def SubstCommand(options, arglist):
     for filename in arglist:
         cmd = expand(re.sub('%', filename, options.cmd))
         psys(cmd, options)
-        
+
+
 # ---------------------------------------------------------------------------
 def SubstRename(options, arglist):
     """
@@ -217,7 +224,8 @@ def SubstRename(options, arglist):
         print("rename %s %s" % (filename, newname))
         if not options.dryrun:
             os.rename(filename, newname)
-        
+
+
 # ---------------------------------------------------------------------------
 def Usage():
     """
@@ -228,7 +236,8 @@ def Usage():
     print('          -e s/old/new/ <files> (rename file old to new name)')
     print('          -i low:high <command> (% ranges from low to high-1)')
     print
-    
+
+
 # ---------------------------------------------------------------------------
 def xargs_wrap(cmd, input):
     """
@@ -253,6 +262,7 @@ def xargs_wrap(cmd, input):
         rval.append(tcmd)
     return(rval)
 
+
 # ---------------------------------------------------------------------------
 class FxTest(unittest.TestCase):
     """
@@ -275,7 +285,7 @@ class FxTest(unittest.TestCase):
         exp += '\n'
         actual = self.undirect()
         assert(actual == exp)
-  
+
     # -----------------------------------------------------------------------
     def test_expand(self):
         """
@@ -310,7 +320,7 @@ class FxTest(unittest.TestCase):
         actual = self.undirect()
         expected = "would do 'ls -d nosuchfile'\n"
         assert(expected == actual)
-    
+
     # -----------------------------------------------------------------------
     def test_psys_quiet(self):
         """
@@ -346,7 +356,7 @@ class FxTest(unittest.TestCase):
         for x in inlist:
             f.write(str(x) + '\n')
         f.close()
-        
+
         v = Values({'dryrun': False, 'quiet': False, 'xargs': True,
                     'cmd': 'echo %'})
 
@@ -363,7 +373,7 @@ class FxTest(unittest.TestCase):
         actual = self.undirect()
 
         self.check_result(exp == actual, exp, actual)
-        
+
     # -----------------------------------------------------------------------
     def test_BatchCommand_quiet(self):
         """
@@ -375,7 +385,7 @@ class FxTest(unittest.TestCase):
         for x in inlist:
             f.write(str(x) + '\n')
         f.close()
-        
+
         v = Values({'dryrun': False, 'quiet': True, 'xargs': True,
                     'cmd': 'echo %'})
 
@@ -392,7 +402,7 @@ class FxTest(unittest.TestCase):
         actual = self.undirect()
 
         self.check_result(exp == actual, exp, actual)
-        
+
     # -----------------------------------------------------------------------
     def test_BatchCommand_dryrun(self):
         """
@@ -404,7 +414,7 @@ class FxTest(unittest.TestCase):
         for x in inlist:
             f.write(str(x) + '\n')
         f.close()
-        
+
         v = Values({'dryrun': True, 'quiet': False, 'xargs': True,
                     'cmd': 'echo %'})
 
@@ -420,7 +430,7 @@ class FxTest(unittest.TestCase):
         actual = self.undirect()
 
         self.check_result(exp == actual, exp, actual)
-        
+
     # -----------------------------------------------------------------------
     def test_BatchCommand_both(self):
         """
@@ -432,7 +442,7 @@ class FxTest(unittest.TestCase):
         for x in inlist:
             f.write(str(x) + '\n')
         f.close()
-        
+
         v = Values({'dryrun': True, 'quiet': False, 'xargs': True,
                     'cmd': 'echo %'})
 
@@ -448,7 +458,7 @@ class FxTest(unittest.TestCase):
         actual = self.undirect()
 
         self.check_result(exp == actual, exp, actual)
-        
+
     # -----------------------------------------------------------------------
     def test_IterateCommand_neither(self):
         """
@@ -464,7 +474,7 @@ class FxTest(unittest.TestCase):
         IterateCommand(v, [])
         actual = self.undirect()
         self.check_result(exp == actual, exp, actual)
-    
+
     # -----------------------------------------------------------------------
     def test_IterateCommand_quiet(self):
         """
@@ -481,7 +491,7 @@ class FxTest(unittest.TestCase):
         IterateCommand(v, [])
         actual = self.undirect()
         self.check_result(exp == actual, exp, actual)
-    
+
     # -----------------------------------------------------------------------
     def test_IterateCommand_dryrun(self):
         """
@@ -498,7 +508,7 @@ class FxTest(unittest.TestCase):
         actual = self.undirect()
 
         self.check_result(exp == actual, exp, actual)
-    
+
     # -----------------------------------------------------------------------
     def test_IterateCommand_both(self):
         """
@@ -515,7 +525,7 @@ class FxTest(unittest.TestCase):
         actual = self.undirect()
 
         self.check_result(exp == actual, exp, actual)
-        
+
     # -----------------------------------------------------------------------
     def test_SubstCommand_neither(self):
         """
@@ -526,13 +536,13 @@ class FxTest(unittest.TestCase):
         a = ['a.pl', 'b.pl', 'c.pl']
         exp = "".join(['ls %s\n%s\n' % (x, x) for x in a])
         self.touch(a)
-        
+
         self.redirect()
         SubstCommand(v, a)
         actual = self.undirect()
 
         self.check_result(exp == actual, exp, actual)
-        
+
     # -----------------------------------------------------------------------
     def test_SubstCommand_dryrun(self):
         """
@@ -549,7 +559,7 @@ class FxTest(unittest.TestCase):
         actual = self.undirect()
 
         self.check_result(exp == actual, exp, actual)
-    
+
     # -----------------------------------------------------------------------
     def test_SubstCommand_quiet(self):
         """
@@ -560,13 +570,13 @@ class FxTest(unittest.TestCase):
         a = ['a.pl', 'b.pl', 'c.pl']
         exp = "".join(['%s\n' % x for x in a])
         self.touch(a)
-        
+
         self.redirect()
         SubstCommand(v, a)
         actual = self.undirect()
 
         self.check_result(exp == actual, exp, actual)
-    
+
     # -----------------------------------------------------------------------
     def test_SubstCommand_both(self):
         """
@@ -577,13 +587,13 @@ class FxTest(unittest.TestCase):
         a = ['a.pl', 'b.pl', 'c.pl']
         exp = "".join(["would do 'ls %s'\n" % x for x in a])
         self.unlink(a)
-        
+
         self.redirect()
         SubstCommand(v, a)
         actual = self.undirect()
 
         self.check_result(exp == actual, exp, actual)
-        
+
     # -----------------------------------------------------------------------
     def test_SubstRename_neither(self):
         """
@@ -607,7 +617,7 @@ class FxTest(unittest.TestCase):
         q = glob.glob('*.xyzzy')
         q.sort()
         self.check_result(q == exp, exp, q)
-        
+
     # -----------------------------------------------------------------------
     def test_SubstRename_dryrun(self):
         """
@@ -627,11 +637,11 @@ class FxTest(unittest.TestCase):
         actual = self.undirect()
 
         self.check_result(expected == actual, expected, actual)
-            
+
         q = glob.glob('*.pl')
         q.sort()
         self.check_result(q == arglist, arglist, q)
-        
+
     # -----------------------------------------------------------------------
     def test_SubstRename_quiet(self):
         """
@@ -651,15 +661,15 @@ class FxTest(unittest.TestCase):
         actual = self.undirect()
 
         self.check_result(expected == actual, expected, actual)
-        
+
         q = glob.glob('*.pl')
         q.sort()
         self.check_result(q == [], [], q)
-        
+
         q = glob.glob('*.xyzzy')
         q.sort()
         self.check_result(q == exp, exp, q)
-        
+
     # -----------------------------------------------------------------------
     def test_SubstRename_both(self):
         """
@@ -679,11 +689,11 @@ class FxTest(unittest.TestCase):
         actual = self.undirect()
 
         self.check_result(expected == actual, expected, actual)
-            
+
         q = glob.glob('*.pl')
         q.sort()
         self.check_result(q == arglist, arglist, q)
-        
+
     # -----------------------------------------------------------------------
     def check_result(self, expr, expected, actual):
         """
@@ -708,7 +718,7 @@ class FxTest(unittest.TestCase):
             if not os.path.exists('fx_test'):
                 os.mkdir('fx_test')
             os.chdir('fx_test')
-            
+
     # -----------------------------------------------------------------------
     def indirect(self, filename):
         """
@@ -716,7 +726,7 @@ class FxTest(unittest.TestCase):
         """
         self.stdin = sys.stdin
         sys.stdin = open(filename, 'r')
-        
+
     # -----------------------------------------------------------------------
     def redirect(self):
         """
@@ -737,7 +747,7 @@ class FxTest(unittest.TestCase):
             open(touchables, 'a').close()
         else:
             raise StandardError('argument must be list or string')
-        
+
     # -----------------------------------------------------------------------
     def undirect(self):
         """
@@ -746,11 +756,11 @@ class FxTest(unittest.TestCase):
         rval = sys.stdout.getvalue()
         sys.stdout.close()
         sys.stdout = self.stdout
-        if not os.isatty(sys.stdin.fileno()) \
-               and os.isatty(self.stdin.fileno()):
+        if (not os.isatty(sys.stdin.fileno()) and
+                os.isatty(self.stdin.fileno())):
             sys.stdin = self.stdin
         return rval
-    
+
     # -----------------------------------------------------------------------
     def unlink(self, args):
         """
@@ -765,8 +775,9 @@ class FxTest(unittest.TestCase):
                 os.unlink(args)
         else:
             raise StandardError('argument must be list or string')
-        
+
 # ---------------------------------------------------------------------------
+# this should use toolframe.ez_launch()
 sname = sys.argv[0]
 if sname.endswith('.py') and '-L' in sys.argv:
     pname = re.sub('.py$', '', sname)

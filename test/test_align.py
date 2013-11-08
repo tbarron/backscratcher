@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-import sys, os
+import os
+import sys
 sys.path.insert(0, os.getcwd())
 import align
 import pdb
@@ -8,12 +9,14 @@ import testhelp
 import toolframe
 import unittest
 
+
 # ---------------------------------------------------------------------------
 def tearDownModule():
     flist = ['testdata']
     for fname in flist:
         if os.path.exists(fname):
             os.unlink(fname)
+
 
 # ---------------------------------------------------------------------------
 class AlignTest(unittest.TestCase):
@@ -26,7 +29,7 @@ class AlignTest(unittest.TestCase):
     expected = ("   1234          -12342     2342.9324    -1234.9238  " +
                 "7.82734E+25  -2.2343E-17  \r\n" +
                 "abc      def             ghi           jkl           " +
-                "mno          qprs         \r\n" + 
+                "mno          qprs         \r\n" +
                 "foobard  simplification  denomination  vituperation" +
                 "  spalshy      \r\n")
 
@@ -47,12 +50,12 @@ class AlignTest(unittest.TestCase):
 
         self.assertEqual(self.expected, x,
                          '"""\n%s\n"""(%d)\n\n' %
-                         (self.expected.replace(' ','-'),
+                         (self.expected.replace(' ', '-'),
                           len(self.expected)) +
                          ' does not match' +
                          '\n\n"""\n%s\n"""(%d)' %
-                          (x.replace(' ','-'), len(x)))
-        
+                         (x.replace(' ', '-'), len(x)))
+
     # -------------------------------------------------------------------------
     def test_named_input(self):
         """
@@ -71,17 +74,15 @@ class AlignTest(unittest.TestCase):
 
         self.assertEqual(self.expected, x,
                          '"""\n%s\n"""(%d)\n\n' %
-                         (self.expected.replace(' ','-'),
+                         (self.expected.replace(' ', '-'),
                           len(self.expected)) +
                          ' does not match' +
                          '\n\n"""\n%s\n"""(%d)' %
-                          (x.replace(' ','-'), len(x)))
-        
-        
+                         (x.replace(' ', '-'), len(x)))
+
     # -------------------------------------------------------------------------
     def test_next_steps(self):
         self.fail("""
-         - run pep8 on all my python code and clean up the complaints
         """)
 
 # ---------------------------------------------------------------------------

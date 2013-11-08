@@ -7,7 +7,7 @@ History
   2009.1025     tpb   0.10   convert to python
   2011.0202     tpb   0.11   add -L trick
                              add stubs for future routines
-                             
+
   fl [-n/--noexec] {save|diff|revert} file1 file2 file3 ...
   fl [-n/--noexec] [--nopreserve] {apply|backout} filename
 
@@ -15,7 +15,7 @@ The script fl contains a number of subfunctions. In the order they are
 most likely to be used, they are:
 
  - help: display a list of functions and information about each
- 
+
  - save: saving the current version of file as a dated generation
    file (a generation is a previous version of a file)
 
@@ -116,6 +116,7 @@ import unittest
 
 from optparse import *
 
+
 # ---------------------------------------------------------------------------
 def fl_help(args):
     """help - show this list
@@ -144,6 +145,7 @@ def fl_help(args):
             f = x.split('\n')[0]
             print '   %s' % f
 
+
 # ---------------------------------------------------------------------------
 def fl_diff(args):
     """diff - compare file to its most recently 'saved' version
@@ -159,8 +161,9 @@ def fl_diff(args):
 
     for filename in a:
         dirname = os.path.dirname(filename)
-        if dirname == '': dirname = '.'
-            
+        if dirname == '':
+            dirname = '.'
+
         counterpath = most_recent_prefix_match(dirname,
                                                os.path.basename(filename))
 
@@ -168,7 +171,8 @@ def fl_diff(args):
         print cmd
         sys.stdout.flush()
         tpbtools.run(cmd, o.xable)
-    
+
+
 # ---------------------------------------------------------------------------
 def fl_revert(args):
     """revert - revert <file> back to its most recent saved version
@@ -186,13 +190,15 @@ def fl_revert(args):
 
     for f in a:
         dir = os.path.dirname(f)
-        if dir == '': dir = '.'
+        if dir == '':
+            dir = '.'
 
         counterpath = most_recent_prefix_match(dir, os.path.basename(f))
 
         tpbtools.run('mv %s %s.new' % (f, f), o.xable)
         tpbtools.run('mv %s %s' % (counterpath, f), o.xable)
-        
+
+
 # ---------------------------------------------------------------------------
 def fl_rm_cr(args):
     """rm_cr - remove carriage returns from file
@@ -215,7 +221,8 @@ def fl_rm_cr(args):
 
         os.rename(filename, "%s~" % filename)
         os.rename(wname, filename)
-        
+
+
 # ---------------------------------------------------------------------------
 def fl_save(args):
     """save - snapshot a file with a timestamp in the name
@@ -225,6 +232,7 @@ def fl_save(args):
     For each file, create file.YYYY.mmdd.
     """
     print("under construction")
+
 
 # ---------------------------------------------------------------------------
 def fl_set_atime_to_mtime(args):
@@ -239,6 +247,7 @@ def fl_set_atime_to_mtime(args):
         s = os.stat(filename)
         os.utime(filename, (s[stat.ST_MTIME], s[stat.ST_MTIME]))
 
+
 # ---------------------------------------------------------------------------
 def fl_set_mtime_to_atime(args):
     """set_mtime_to_atime - mtime <= atime
@@ -252,6 +261,7 @@ def fl_set_mtime_to_atime(args):
         s = os.stat(filename)
         os.utime(filename, (s[stat.ST_ATIME], s[stat.ST_ATIME]))
 
+
 # ---------------------------------------------------------------------------
 def fl_times(args):
     """times - report the times associated with a file
@@ -261,6 +271,7 @@ def fl_times(args):
     For each file, report the access, mod, and create times.
     """
     print("under construction")
+
 
 # ---------------------------------------------------------------------------
 def fl_unreadable(args):
@@ -272,6 +283,7 @@ def fl_unreadable(args):
     """
     print("under construction")
 
+
 # ---------------------------------------------------------------------------
 def most_recent_prefix_match(dir, filename):
     """
@@ -282,15 +294,14 @@ def most_recent_prefix_match(dir, filename):
     if os.path.exists('%s/old' % dir):
         list.extend(['old/%s' % x for x in os.listdir('%s/old' % dir)])
     # print list
-    
+
     recent_time = 0
     recent_file = ''
     for file in list:
         s = os.stat('%s/%s' % (dir, file))
         bfile = os.path.basename(file)
-        if (file != filename 
-               and bfile.startswith(filename) 
-               and recent_time < s[stat.ST_MTIME]):
+        if (file != filename and bfile.startswith(filename)
+                and recent_time < s[stat.ST_MTIME]):
             recent_time = s[stat.ST_MTIME]
             recent_file = file
 
@@ -298,15 +309,17 @@ def most_recent_prefix_match(dir, filename):
     if recent_file != '':
         # print 'mrpm returning %s/%s' % (dir, recent_file)
         return '%s/%s' % (dir, recent_file)
-    
+
+
 # ---------------------------------------------------------------------------
 def cleanup_tests():
     if os.path.basename(os.getcwd()) == 'fl_tests':
         os.chdir('..')
-        
+
     if os.path.exists('./fl_tests'):
         tpbtools.rmrf('./fl_tests')
-        
+
+
 # ---------------------------------------------------------------------------
 class FLTests(unittest.TestCase):
     # -----------------------------------------------------------------------
@@ -317,9 +330,9 @@ class FLTests(unittest.TestCase):
         if not os.path.exists('fl_tests'):
             os.mkdir('fl_tests')
             os.mkdir('fl_tests/old')
-            
+
         os.chdir('fl_tests')
-        
+
     # -----------------------------------------------------------------------
     def test_most_recent_prefix_match(self):
         """
@@ -335,7 +348,7 @@ class FLTests(unittest.TestCase):
 
         a = most_recent_prefix_match('.', 'mrpm2')
         testhelp.expectVSgot('./old/mrpm2.2009-08-31', a)
-        
+
     # -----------------------------------------------------------------------
     def test_diff(self):
         """
@@ -366,7 +379,7 @@ class FLTests(unittest.TestCase):
         got = f.readlines()
         f.close()
         testhelp.expectVSgot(expected, got)
-        
+
     # -----------------------------------------------------------------------
     def test_revert(self):
         """
@@ -398,7 +411,7 @@ class FLTests(unittest.TestCase):
         filename = 'atom'
         open(filename, 'w').close()
         os.utime(filename, (time.time() - random.randint(1000, 2000),
-                          time.time() + random.randint(1000, 2000)))
+                            time.time() + random.randint(1000, 2000)))
         s = os.stat(filename)
         assert(s[stat.ST_ATIME] != s[stat.ST_MTIME])
         fl_set_atime_to_mtime([filename])
@@ -413,7 +426,7 @@ class FLTests(unittest.TestCase):
         filename = 'mtoa'
         open(filename, 'w').close()
         os.utime(filename, (time.time() - random.randint(1000, 2000),
-                          time.time() + random.randint(1000, 2000)))
+                            time.time() + random.randint(1000, 2000)))
         s = os.stat(filename)
         assert(s[stat.ST_ATIME] != s[stat.ST_MTIME])
         fl_set_mtime_to_atime([filename])

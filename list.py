@@ -58,6 +58,7 @@ import re
 import sys
 import unittest
 
+
 # ---------------------------------------------------------------------------
 def main(args):
     operation = args[1]
@@ -73,13 +74,15 @@ def main(args):
     eval("result = list_%s(A, B)" % operation)
     p = PrettyPrinter()
     p.pprint(result)
-    
+
+
 # ---------------------------------------------------------------------------
 def generate_list(cmd):
     f = os.popen(cmd, 'r')
     rval = [x.strip() for x in f.readlines()]
     f.close()
     return rval
+
 
 # ---------------------------------------------------------------------------
 def list_minus(listA, listB):
@@ -88,6 +91,7 @@ def list_minus(listA, listB):
         if item in rval:
             rval.remove(item)
     return rval
+
 
 # ---------------------------------------------------------------------------
 def list_union(listA, listB):
@@ -99,6 +103,7 @@ def list_union(listA, listB):
     rval = m.keys()
     return rval
 
+
 # ---------------------------------------------------------------------------
 def list_intersect(listA, listB):
     rval = []
@@ -106,6 +111,7 @@ def list_intersect(listA, listB):
         if x in listB:
             rval.append(x)
     return rval
+
 
 # ---------------------------------------------------------------------------
 class ListTests(unittest.TestCase):
@@ -137,11 +143,12 @@ class ListTests(unittest.TestCase):
         a = list_intersect(['one', 'two', 'three', 'four', 'five'],
                            ['two', 'four', 'six', 'eight', 'ten'])
         assert(a == ['two', 'four'])
-        
+
 # ---------------------------------------------------------------------------
+# !@! should call toolframe.ez_launch
 global d
 d = dir()
-        
+
 sname = sys.argv[0]
 if sname.endswith('.py') and '-L' in sys.argv:
     pname = re.sub('.py$', '', sname)
@@ -151,4 +158,3 @@ elif sname.endswith('.py') and __name__ == '__main__':
     unittest.main()
 elif not sname.endswith('.py') and __name__ == '__main__':
     main(sys.argv)
-                                

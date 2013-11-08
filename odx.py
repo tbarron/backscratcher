@@ -10,13 +10,13 @@ EXAMPLES
 
    $ odx 017     # (octal)
    017 -> 15 / 0xf / 017
-   
+
    $ odx 95      # (decimal)
    95 -> 95 / 0x5f / 0137
-   
+
    $ odx 0x33    # (hexadecimal)
    0x33 -> 51 / 0x33 / 063
-   
+
 Copyright (C) 1995 - <the end of time>  Tom Barron
   tom.barron@comcast.net
   177 Crossroads Blvd
@@ -37,6 +37,8 @@ GNU General Public License for more details.
 """
 import toolframe
 
+
+# -----------------------------------------------------------------------------
 def main(args):
     for str in args[1:]:
         if str.startswith("0x"):
@@ -47,5 +49,6 @@ def main(args):
             val = int(str)
 
         print("%s -> 0%o / %d / 0x%x" % (str, val, val, val))
-        
+
+# -----------------------------------------------------------------------------
 toolframe.ez_launch(main)

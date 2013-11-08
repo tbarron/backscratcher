@@ -38,6 +38,7 @@ import unittest
 from optparse import *
 from tpbtools import *
 
+
 # ---------------------------------------------------------------------------
 def pt_newpy(args):
     '''newpy - Create a new python program
@@ -87,7 +88,7 @@ def pt_newpy(args):
                       '        process(a)\n',
                       '\n',
                       'class %sTest(unittest.TestCase):\n' %
-                          pname.capitalize(),
+                      pname.capitalize(),
                       '    def test_example(self):\n',
                       '        pass\n',
                       '\n',
@@ -95,6 +96,7 @@ def pt_newpy(args):
         f.close()
 
         os.chmod('%s.py' % pname, 0755)
+
 
 # ---------------------------------------------------------------------------
 def pt_newtool(args):
@@ -143,6 +145,7 @@ def pt_newtool(args):
 
         os.chmod('%s.py' % pname, 0755)
 
+
 # ---------------------------------------------------------------------------
 def are_we_overwriting(flist):
     already = []
@@ -164,12 +167,13 @@ def are_we_overwriting(flist):
             report = sep + a + report
             sep = ', '
         report = report[2:]
-        
+
     answer = raw_input('%s. Are you sure? > ' % report)
 
     if not re.search(r'^\s*[Yy]', answer):
         sys.exit(1)
-                           
+
+
 # ---------------------------------------------------------------------------
 class PytoolTest(unittest.TestCase):
     # -----------------------------------------------------------------------
@@ -187,7 +191,7 @@ class PytoolTest(unittest.TestCase):
             fail('pytool should not prompt in this case')
         assert(not os.path.exists('xyzzy'))
         assert(os.path.exists('xyzzy.py'))
-        
+
         got = contents('xyzzy.py')
         expected = expected_xyzzy_py()
         testhelp.expectVSgot(expected, got)
@@ -215,7 +219,7 @@ class PytoolTest(unittest.TestCase):
             self.fail('unexpected exception')
         else:
             self.fail('should have asked about overwriting xyzzy')
-            
+
         expected = ['original xyzzy\n']
         got = contents('xyzzy')
         assert(expected == got)
@@ -246,9 +250,9 @@ class PytoolTest(unittest.TestCase):
             self.fail('unexpected exception')
         else:
             self.fail('should have asked about overwriting xyzzy')
-            
+
         assert(not os.path.exists('xyzzy'))
-        
+
         expected = expected_xyzzy_py()
         got = contents('xyzzy.py')
         testhelp.expectVSgot(expected, got)
@@ -273,7 +277,7 @@ class PytoolTest(unittest.TestCase):
         elif which == 1:
             print S.before + S.after
             self.fail('unexpected exception')
-            
+
         assert(not os.path.exists('testtool'))
 
         expected = expected_testtool_py()
@@ -300,11 +304,11 @@ class PytoolTest(unittest.TestCase):
         elif which == 1:
             print S.before + S.after
             self.fail('unexpected exception')
-            
+
         # !@! check that none of the outputs exist
         for file in outputs:
             assert(not os.path.exists(file))
-            
+
     # -----------------------------------------------------------------------
     def test_help_newpy(self):
         '''
@@ -329,13 +333,13 @@ class PytoolTest(unittest.TestCase):
                     '    usage: pytool newpy <program-name>',
                     '',
                     '    Creates executable file <program-name>.py'
-                       + ' with skeletal',
+                    + ' with skeletal',
                     '    contents. Run "<program-name>.py -L" to create'
-                       + ' link <program-name>.',
+                    + ' link <program-name>.',
                     '    ',
                     '']
         testhelp.expectVSgot(expected, got)
-        
+
     # -----------------------------------------------------------------------
     def test_help_newtool(self):
         '''
@@ -360,14 +364,15 @@ class PytoolTest(unittest.TestCase):
                     '    usage: pytool newtool <program-name> <prefix>',
                     '',
                     '    Creates executable file <program-name>.py'
-                        + ' with skeletal',
+                    + ' with skeletal',
                     '    contents. The structure of the program is such'
-                        + ' that it is easy',
+                    + ' that it is easy',
                     '    to add and describe new subfunctions.',
                     '    ',
                     '']
         testhelp.expectVSgot(expected, got)
-        
+
+
 # ---------------------------------------------------------------------------
 def cleanup():
     global testdir
@@ -375,6 +380,7 @@ def cleanup():
         os.chdir("..")
     if os.path.isdir(testdir):
         rmrf(testdir)
+
 
 # ---------------------------------------------------------------------------
 def expected_testtool_py():
@@ -391,15 +397,16 @@ def expected_testtool_py():
                 'from optparse import *\n',
                 '\n',
                 '# ----------------------------------------------------'
-                    + '-----------------------\n',
+                + '-----------------------\n',
                 'def tt_example(argv):\n',
                 '    print("this is an example")\n',
                 "\n",
                 '# ----------------------------------------------------'
-                    + '-----------------------\n',
+                + '-----------------------\n',
                 "toolframe.tf_launch(\"tt\")"]
-    
+
     return expected
+
 
 # ---------------------------------------------------------------------------
 def expected_xyzzy_py():
@@ -435,9 +442,10 @@ def expected_xyzzy_py():
                 '    def test_example(self):\n',
                 '        pass\n',
                 '\n',
-                'toolframe.ez_launch(main)\n',]
+                'toolframe.ez_launch(main)\n', ]
 
     return expected
+
 
 # ---------------------------------------------------------------------------
 def prepare_tests():
