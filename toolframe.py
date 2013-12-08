@@ -168,9 +168,13 @@ def tf_help(A, prefix=None):
     d.append('tf_help')
     for o in d:
         if o.startswith(prefix + '_'):
+            x = getattr(sys.modules['__main__'], o)
+            ds = x.__doc__
             f = o.replace(prefix + '_', '')
-            x = eval("sys.modules['__main__'].%s.__doc__" % o)
-            docsum = x.split('\n')[0]
+            if ds is not None:
+                docsum = ds.split('\n')[0]
+            else:
+                docsum = "%s - no docstring provided" % f
             print "   %s" % (docsum)
         elif o == 'tf_help':
             f = 'help'
