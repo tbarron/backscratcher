@@ -31,13 +31,12 @@ GNU General Public License for more details.
 
 """
 
+import optparse
 import os
 import sys
 import time
 import toolframe
 import unittest
-
-from optparse import *
 
 
 # ---------------------------------------------------------------------------
@@ -45,7 +44,7 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    p = OptionParser()
+    p = optparse.OptionParser()
     p.add_option('-c', '--count',
                  action='store', default='up',
                  dest='count', type='string',
@@ -113,14 +112,17 @@ def count_up():
 # ---------------------------------------------------------------------------
 def hms_seconds(hms):
     h, m, s = hms.split(':')
-    print
     return int(s) + 60 * (int(m) + 60 * int(h))
 
 
 # ---------------------------------------------------------------------------
 class ChronTest(unittest.TestCase):
-    def test_example(self):
-        pass
+    # -------------------------------------------------------------------------
+    def test_hms_seconds(self):
+        exp = 3923
+        act = hms_seconds("1:05:23")
+        self.assertEqual(exp, act,
+                         "Expected %d, got %d" % (exp, act))
 
 # ---------------------------------------------------------------------------
 toolframe.ez_launch(main)
