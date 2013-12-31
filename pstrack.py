@@ -24,14 +24,13 @@ GNU General Public License for more details.
 """
 
 import glob
+import optparse
 import os
 import pdb
 import re
 import sys
 import toolframe
 import unittest
-
-from optparse import *
 
 try:
     subproc_available = True
@@ -42,7 +41,7 @@ except:
 
 # ---------------------------------------------------------------------------
 def main(args):
-    p = OptionParser()
+    p = optparse.OptionParser()
     p.add_option('-d', '--debug',
                  action='store_true', default=False, dest='debug',
                  help='start the debugger')
