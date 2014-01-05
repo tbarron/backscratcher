@@ -47,18 +47,17 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
+import optparse
 import os
 import pdb
 import sys
 import time
 import toolframe
 
-from optparse import OptionParser
-
 
 # -----------------------------------------------------------------------------
 def main(argv=None):
-    p = OptionParser()
+    p = optparse.OptionParser()
     p.add_option('-c', '--change',
                  action='store_true', default=False, dest='change',
                  help='update on change')

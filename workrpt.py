@@ -35,6 +35,7 @@ workrpt - report work times
 '''
 
 import getopt
+import optparse
 import os
 import pdb
 import re
@@ -42,8 +43,6 @@ import sys
 import time
 import toolframe
 import unittest
-
-from optparse import *
 
 
 # ---------------------------------------------------------------------------
@@ -289,7 +288,7 @@ def makeOptionParser(argv):
     '''
     Build a parser to understand the command line options.
     '''
-    p = OptionParser()
+    p = optparse.OptionParser()
     p.add_option('-c', '--copy',
                  action='store', type='string', dest='copy', default='',
                  help='copy this code to <dir>')
