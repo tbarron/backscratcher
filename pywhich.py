@@ -45,7 +45,7 @@ __credits__ = """Guido van Rossum, for my favorite programming language.
 The author of the Unix command which(1), for the inspiration.
 """
 
-from optparse import *
+import optparse
 import os
 import pdb
 import re
@@ -55,7 +55,7 @@ import toolframe
 
 # ---------------------------------------------------------------------------
 def main(args):
-    p = OptionParser()
+    p = optparse.OptionParser()
     p.add_option('-a', '--all',
                  action='store_true', default=False, dest='all',
                  help='show all hits, not just the first')

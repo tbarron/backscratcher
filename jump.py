@@ -14,17 +14,16 @@ http://code.activestate.com/recipes/577027-find-file-in-subdirectory/:
         raise 'File not found'
 
 """
+import optparse
 import os
 import pdb
 import sys
 import toolframe
 
-from optparse import *
-
 
 # ---------------------------------------------------------------------------
 def main(argv):
-    p = OptionParser()
+    p = optparse.OptionParser()
     p.add_option('-a', '--all',
                  action='store_true', default=False, dest='all',
                  help='show all hits')

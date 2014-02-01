@@ -24,7 +24,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
-
+import optparse
 import os
 import pdb
 import pexpect
@@ -33,10 +33,11 @@ import sys
 import testhelp
 import time
 import toolframe
+import tpbtools
 import unittest
 
-from optparse import *
-from tpbtools import *
+# from optparse import *
+# from tpbtools import *
 
 
 # ---------------------------------------------------------------------------
@@ -49,7 +50,7 @@ def pt_newpy(args):
     contents. Run "<program-name>.py -L" to create link <program-name>.
     '''
 
-    p = OptionParser()
+    p = optparse.OptionParser()
     (o, a) = p.parse_args(args)
 
     if a == []:
@@ -109,7 +110,7 @@ def pt_newtool(args):
     to add and describe new subfunctions.
     '''
 
-    p = OptionParser()
+    p = optparse.OptionParser()
     (o, a) = p.parse_args(args)
 
     if a == [] or len(a) != 2:
@@ -183,7 +184,7 @@ class PytoolTest(unittest.TestCase):
         and have the right contents.
         '''
         prepare_tests()
-        safe_unlink(['xyzzy', 'xyzzy.py'])
+        tpbtools.safe_unlink(['xyzzy', 'xyzzy.py'])
         S = pexpect.spawn('../pytool newpy xyzzy')
         try:
             S.expect(pexpect.EOF)
@@ -192,7 +193,7 @@ class PytoolTest(unittest.TestCase):
         assert(not os.path.exists('xyzzy'))
         assert(os.path.exists('xyzzy.py'))
 
-        got = contents('xyzzy.py')
+        got = tpbtools.contents('xyzzy.py')
         expected = expected_xyzzy_py()
         testhelp.expectVSgot(expected, got)
 
@@ -204,7 +205,7 @@ class PytoolTest(unittest.TestCase):
         the existing file is not overwritten.
         '''
         prepare_tests()
-        safe_unlink(['xyzzy', 'xyzzy.py'])
+        tpbtools.safe_unlink(['xyzzy', 'xyzzy.py'])
         writefile('xyzzy', ['original xyzzy\n'])
         writefile('xyzzy.py', ['original xyzzy.py\n'])
         S = pexpect.spawn('../pytool newpy xyzzy')
@@ -221,11 +222,11 @@ class PytoolTest(unittest.TestCase):
             self.fail('should have asked about overwriting xyzzy')
 
         expected = ['original xyzzy\n']
-        got = contents('xyzzy')
+        got = tpbtools.contents('xyzzy')
         assert(expected == got)
 
         expected = ['original xyzzy.py\n']
-        got = contents('xyzzy.py')
+        got = tpbtools.contents('xyzzy.py')
         assert(expected == got)
 
     # -----------------------------------------------------------------------
@@ -236,7 +237,7 @@ class PytoolTest(unittest.TestCase):
         that the existing file IS overwritten.
         '''
         prepare_tests()
-        safe_unlink(['xyzzy', 'xyzzy.py'])
+        tpbtools.safe_unlink(['xyzzy', 'xyzzy.py'])
         writefile('xyzzy.py', ['original xyzzy\n'])
         S = pexpect.spawn('../pytool newpy xyzzy')
         which = S.expect([r'Are you sure\? >',
@@ -254,7 +255,7 @@ class PytoolTest(unittest.TestCase):
         assert(not os.path.exists('xyzzy'))
 
         expected = expected_xyzzy_py()
-        got = contents('xyzzy.py')
+        got = tpbtools.contents('xyzzy.py')
         testhelp.expectVSgot(expected, got)
 
     # -----------------------------------------------------------------------
@@ -264,7 +265,7 @@ class PytoolTest(unittest.TestCase):
         is created and has the right contents.
         '''
         prepare_tests()
-        safe_unlink(['testtool', 'testtool.py'])
+        tpbtools.safe_unlink(['testtool', 'testtool.py'])
         S = pexpect.spawn('../pytool newtool testtool tt')
         S.logfile = sys.stdout
         which = S.expect([r'Are you sure\? >',
@@ -281,7 +282,7 @@ class PytoolTest(unittest.TestCase):
         assert(not os.path.exists('testtool'))
 
         expected = expected_testtool_py()
-        got = contents('testtool.py')
+        got = tpbtools.contents('testtool.py')
         testhelp.expectVSgot(expected, got)
 
     # -----------------------------------------------------------------------
@@ -291,7 +292,7 @@ class PytoolTest(unittest.TestCase):
         '''
         prepare_tests()
         outputs = ['testtool', 'testtool.py', 'xyzzy', 'xyzzy.py']
-        safe_unlink(outputs)
+        tpbtools.safe_unlink(outputs)
         S = pexpect.spawn('../pytool help')
         # S.logfile = sys.stdout
         which = S.expect([r'Are you sure\? >',
@@ -379,7 +380,7 @@ def cleanup():
     if testdir == os.path.basename(os.getcwd()):
         os.chdir("..")
     if os.path.isdir(testdir):
-        rmrf(testdir)
+        tpbtools.rmrf(testdir)
 
 
 # ---------------------------------------------------------------------------

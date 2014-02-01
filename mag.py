@@ -37,12 +37,10 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
-
+import optparse
 import sys
 import toolframe
 import unittest
-
-from optparse import *
 
 
 # ---------------------------------------------------------------------------
@@ -50,7 +48,7 @@ def main(argv=None, testing=False):
     if argv is None:
         argv = sys.argv
 
-    p = OptionParser()
+    p = optparse.OptionParser()
     # define options here
     p.add_option('-b', '--binary',
                  action='store_true', default=False, dest='binary',

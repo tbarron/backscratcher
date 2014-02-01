@@ -2,6 +2,7 @@
 
 import logging
 import logging.handlers
+import optparse
 import os
 import pdb
 import pexpect
@@ -10,8 +11,6 @@ import sys
 import unittest
 import StringIO
 
-from optparse import *
-
 tlogger = None
 
 
@@ -19,7 +18,7 @@ tlogger = None
 def main(args=None, filter=None, logfile=None):
     if args is None:
         args = sys.argv
-    p = OptionParser()
+    p = optparse.OptionParser()
     p.add_option('-d', '--debug',
                  action='store_true', default=False, dest='debug',
                  help='debug')

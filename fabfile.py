@@ -8,11 +8,10 @@ During actual execution, functions are quiet unless -v/--verbose is used.
 import difflib
 import fnmatch
 import glob
+import optparse
 import os
 import pdb
-
-from optparse import OptionParser
-from tpbtools import *
+import tpbtools
 
 
 # ---------------------------------------------------------------------------
@@ -26,7 +25,7 @@ def fab_clean(args):
     would happen. During execution, function is silent unless
     -v/--verbose is specified.
     """
-    p = OptionParser()
+    p = optparse.OptionParser()
     p.add_option('-e', '--exec',
                  default=False, action='store_true', dest='xable',
                  help='without this option, just do a dryrun')
@@ -41,8 +40,8 @@ def fab_clean(args):
             if o.xable:
                 if os.path.isdir(f):
                     if o.verbose:
-                        print('rmrf(%s)' % f)
-                    rmrf(f)
+                        print('tpbtools.rmrf(%s)' % f)
+                    tpbtools.rmrf(f)
                 else:
                     if o.verbose:
                         print('os.unlink(%s)' % f)
@@ -78,7 +77,7 @@ def fab_dist(args):
     f = fl.keys()
     f.sort()
     fstring = ' '.join(f)
-    run('tar zcvf %s %s' % (o.tarball, fstring), o.xable)
+    tpbtools.run('tar zcvf %s %s' % (o.tarball, fstring), o.xable)
 
 
 # ---------------------------------------------------------------------------
@@ -116,7 +115,8 @@ def fab_install(args):
             raise Exception('File %s not found in the package' % f)
 
         if os.path.exists(fpath):
-            diff = list(difflib.unified_diff(contents(fpath), contents(f)))
+            diff = list(difflib.unified_diff(tpbtools.contents(fpath),
+                                             tpbtools.contents(f)))
             if diff != []:
                 copy_it = 'D'
             elif o.verbose:
@@ -129,7 +129,7 @@ def fab_install(args):
 
         if copy_it != ' ' and fl[f] != '/dev/null':
             cmd = 'cp %s %s # %s' % (f, fpath, copy_it)
-            run(cmd, o.xable, o.verbose)
+            tpbtools.run(cmd, o.xable, o.verbose)
 
 
 # ---------------------------------------------------------------------------
@@ -196,8 +196,8 @@ def fab_status(args):
             ipath = '%s/%s' % (os.path.expandvars(fl[filename]), filename)
             if os.path.exists(ipath):
                 flag = 'I'
-                diff = list(difflib.unified_diff(contents(ipath),
-                                                 contents(filename)))
+                diff = list(difflib.unified_diff(tpbtools.contents(ipath),
+                                                 tpbtools.contents(filename)))
                 if diff != []:
                     flag += 'U'
 
@@ -237,7 +237,7 @@ def fab_uninstall(args):
     for f in fk:
         fpath = '%s/%s' % (os.path.expandvars(fl[f]), f)
         if os.path.exists(fpath):
-            run('rm %s' % fpath, o.xable, o.verbose)
+            tpbtools.run('rm %s' % fpath, o.xable, o.verbose)
 
 
 # ---------------------------------------------------------------------------

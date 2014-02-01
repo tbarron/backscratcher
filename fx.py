@@ -81,6 +81,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
 import glob
+import optparse
 import os
 import pdb
 import re
@@ -88,8 +89,6 @@ import sys
 import StringIO
 import textwrap
 import unittest
-
-from optparse import *
 
 
 # ---------------------------------------------------------------------------
@@ -100,7 +99,7 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    p = OptionParser()
+    p = optparse.OptionParser()
     p.add_option('-c', '--command',
                  action='store', default='', dest='cmd', type='string',
                  help='command to apply to all arguments')

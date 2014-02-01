@@ -29,6 +29,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
+import optparse
 import os
 import re
 import sys
@@ -36,15 +37,13 @@ import testhelp
 import toolframe
 import unittest
 
-from optparse import *
-
 
 # -----------------------------------------------------------------------------
 def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    p = OptionParser()
+    p = optparse.OptionParser()
     # define options here
     # p.add_option('-s', '--long',
     #              action='', default='',

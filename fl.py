@@ -102,6 +102,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
 
+import optparse
 import os
 import pdb
 import random
@@ -114,7 +115,7 @@ import time
 import toolframe
 import unittest
 
-from optparse import *
+# from optparse import *
 
 
 # ---------------------------------------------------------------------------
@@ -129,7 +130,7 @@ def fl_help(args):
     """
     global d
 
-    p = OptionParser()
+    p = optparse.OptionParser()
     # p = add_option('-e', '--exec',
     #                action='store_true', default=False, dest='xable',
     #                help='otherwise dryrun')
@@ -153,7 +154,7 @@ def fl_diff(args):
     usage: fl diff file1 file2 file3 ...
 
     """
-    p = OptionParser()
+    p = optparse.OptionParser()
     p.add_option('-n', '--noexec',
                  default=True, action='store_false', dest='xable',
                  help='just do a dry run')
@@ -182,7 +183,7 @@ def fl_revert(args):
     For each file listed in the command line, look for 'save'd version
     and bring it back. The current file is renamed <file>.new.
     """
-    p = OptionParser()
+    p = optparse.OptionParser()
     p.add_option('-n', '--noexec',
                  default=True, action='store_false', dest='xable',
                  help='just do a dry run')
