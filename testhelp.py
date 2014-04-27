@@ -295,6 +295,11 @@ def skip_check(skipfunc):
 
 
 # ---------------------------------------------------------------------------
+def testlog(mname):
+    return "%s/test.log" % os.path.dirname(sys.modules[mname].__file__)
+
+
+# ---------------------------------------------------------------------------
 def touch(pathname):
     open(pathname, 'a').close()
 
