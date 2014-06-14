@@ -13,6 +13,8 @@ import unittest
 # ---------------------------------------------------------------------------
 def tearDownModule():
     flist = ['testdata']
+    if os.getenv('KEEPFILES') is not None:
+        return
     for fname in flist:
         if os.path.exists(fname):
             os.unlink(fname)
@@ -83,6 +85,12 @@ class AlignTest(unittest.TestCase):
     # -------------------------------------------------------------------------
     def test_next_steps(self):
         self.fail("""
+
+        - some programs call the launch routines unconditionally. Either use
+          'if __name__ == '__main__' or embed that in the launch routine.
+
+        - add the rest of the issues from github to this list
+
         """)
 
 # ---------------------------------------------------------------------------

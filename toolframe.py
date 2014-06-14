@@ -219,7 +219,7 @@ def ez_launch(main=None, setup=None, cleanup=None, test=None, logfile=''):
     call the invoker's 'main' callback.
     """
     # pdb.set_trace()
-    print "toolframe.ez_launch: %s" % sys._getframe(1).f_code.co_name
+    # print "toolframe.ez_launch: %s" % sys._getframe(1).f_code.co_name
     if len(sys.argv) == 1 and sys.argv[0] == '':
         return
     sname = sys.argv[0]
