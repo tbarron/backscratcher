@@ -172,6 +172,7 @@ def keepfiles(value=None):
 
 # ---------------------------------------------------------------------------
 def list_tests(a, final, testlist):
+    # pdb.set_trace()
     if len(a) <= 1:
         for c in testlist:
             print c[0]
@@ -333,7 +334,11 @@ class TesthelpTest(unittest.TestCase):
         expectVSgot(all, l)
 
     def test_list_tests(self):
-        tlist = ['one', 'two', 'three', 'four', 'five']
+        tlist = [['one', None],
+                 ['two', None],
+                 ['three', None],
+                 ['four', None],
+                 ['five', None]]
         self.redirected_list_test([],
                                   '',
                                   tlist,
@@ -356,7 +361,8 @@ class TesthelpTest(unittest.TestCase):
 
         r = s.getvalue()
         s.close()
-        assert(r == expected)
+        self.assertEqual(expected, r,
+                         "Expected '%s', got '%s'" % (expected, r))
 
     def test_expected_vs_got(self):
         self.redirected_evg('', '', '')
