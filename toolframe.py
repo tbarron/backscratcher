@@ -213,14 +213,19 @@ def tf_shell(prefix, args):
 
 
 # ---------------------------------------------------------------------------
-def ez_launch(main=None, setup=None, cleanup=None, test=None, logfile=''):
+def ez_launch(modname,
+              main=None,
+              setup=None,
+              cleanup=None,
+              test=None,
+              logfile=''):
     """
     For a simple (non-tool-style) program, figure out what needs to happen and
     call the invoker's 'main' callback.
     """
-    # pdb.set_trace()
-    # print "toolframe.ez_launch: %s" % sys._getframe(1).f_code.co_name
     if len(sys.argv) == 1 and sys.argv[0] == '':
+        return
+    if modname != '__main__':
         return
     sname = sys.argv[0]
     pname = re.sub('.py$', '', sname)

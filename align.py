@@ -76,5 +76,4 @@ def align(input):
 
 
 # ---------------------------------------------------------------------------
-if __name__ == '__main__':
-    toolframe.ez_launch(main)
+toolframe.ez_launch(__name__, main)

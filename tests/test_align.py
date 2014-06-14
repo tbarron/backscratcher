@@ -21,7 +21,7 @@ def tearDownModule():
 
 
 # ---------------------------------------------------------------------------
-class AlignTest(unittest.TestCase):
+class TestAlign(unittest.TestCase):
     """
     Test suite for align
     """
@@ -83,7 +83,7 @@ class AlignTest(unittest.TestCase):
                          (x.replace(' ', '-'), len(x)))
 
     # -------------------------------------------------------------------------
-    def test_next_steps(self):
+    def text_next_steps(self):
         self.fail("""
 
         - some programs call the launch routines unconditionally. Either use

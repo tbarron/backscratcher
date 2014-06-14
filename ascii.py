@@ -22,6 +22,7 @@ GNU General Public License for more details.
 """
 
 import getopt
+import pdb
 import sys
 import toolframe
 
@@ -38,11 +39,11 @@ def main(argv=None):
         if (i+1) % 8 == 0:
             sys.stdout.write('\n')
 
-    for i in range(33, 128):
+    for i in range(33, 127):
         sys.stdout.write('0x%02x %-3c ' % (i, i))
         if (i+1) % 8 == 0:
             sys.stdout.write('\n')
 
 
 # ---------------------------------------------------------------------------
-toolframe.ez_launch(main)
+toolframe.ez_launch(__name__, main)
