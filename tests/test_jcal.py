@@ -7,6 +7,6 @@ import unittest
 
 # -----------------------------------------------------------------------------
 class JcalTest(unittest.TestCase):
-    def test_example(self):
+    def test_EMPTY(self):
         pass
 
