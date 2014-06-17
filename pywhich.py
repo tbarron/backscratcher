@@ -79,4 +79,4 @@ def main(args):
     print('')
 
 # ---------------------------------------------------------------------------
-toolframe.ez_launch(main)
+toolframe.ez_launch(__name__, main)

@@ -1122,4 +1122,4 @@ class workrptTest(unittest.TestCase):
             raise
 
 # ---------------------------------------------------------------------------
-toolframe.ez_launch(main)
+toolframe.ez_launch(__name__, main)

@@ -130,4 +130,4 @@ def usage():
     sys.exit(1)
 
 # ---------------------------------------------------------------------------
-toolframe.ez_launch(main)
+toolframe.ez_launch(__name__, main)

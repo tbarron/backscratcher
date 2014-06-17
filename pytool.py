@@ -93,7 +93,7 @@ def pt_newpy(args):
                       '    def test_example(self):\n',
                       '        pass\n',
                       '\n',
-                      'toolframe.ez_launch(main)\n'])
+                      'toolframe.ez_launch(__name__, main)\n'])
         f.close()
 
         os.chmod('%s.py' % pname, 0755)
@@ -443,7 +443,7 @@ def expected_xyzzy_py():
                 '    def test_example(self):\n',
                 '        pass\n',
                 '\n',
-                'toolframe.ez_launch(main)\n', ]
+                'toolframe.ez_launch(__name__, main)\n', ]
 
     return expected
 

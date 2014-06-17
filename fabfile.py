@@ -133,6 +133,16 @@ def fab_install(args):
 
 
 # ---------------------------------------------------------------------------
+def fab_notest(args):
+    """
+    List python modules with no tests in the tests directory.
+    """
+    ml = glob.glob("*.py")
+    for mod in ml:
+        if not os.path.exists("tests/test_%s" % mod):
+            print mod
+
+# ---------------------------------------------------------------------------
 def fab_status(args):
     """status - report the status of the files in the current directory
 
