@@ -223,6 +223,16 @@ def run_tests(a, final, testlist, volume, logfile=None):
 
 
 # ---------------------------------------------------------------------------
+class HelpedTestCase(unittest.TestCase):
+    def expgot(self, exp, actual):
+        self.assertEqual(exp, actual,
+                         "Expected '%s', got '%s'" % (exp, actual))
+
+    def exp_in_got(self, exp, actual):
+        self.assertIn(exp, actual,
+                      "Expected '%s' in '%s'" % (exp, actual))
+
+# ---------------------------------------------------------------------------
 class LoggingTestSuite(unittest.TestSuite):
     def __init__(self, tests=(), logfile=None):
         super(LoggingTestSuite, self).__init__(tests)

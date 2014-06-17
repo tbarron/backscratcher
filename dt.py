@@ -426,4 +426,4 @@ class dtTest(unittest.TestCase):
         self.both_test(['next', 'sunday'], time_to('sunday', 'next'))
 
 # ---------------------------------------------------------------------------
-toolframe.ez_launch(main)
+toolframe.ez_launch(__name__, main)

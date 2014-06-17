@@ -56,14 +56,18 @@ import os
 import pprint
 import re
 import sys
+import toolframe
 import unittest
 
 
 # ---------------------------------------------------------------------------
 def main(args):
-    operation = args[1]
-    Acmd = args[2]
-    Bcmd = args[3]
+    try:
+        operation = args[1]
+        Acmd = args[2]
+        Bcmd = args[3]
+    except IndexError:
+        usage()
 
     if (operation == "") or (Acmd == "") or (Bcmd == ""):
         usage()
@@ -71,10 +75,20 @@ def main(args):
     A = generate_list(Acmd)
     B = generate_list(Bcmd)
 
-    eval("result = list_%s(A, B)" % operation)
-    p = PrettyPrinter()
+    # eval("result = list_%s(A, B)" % operation)
+    lfunc = getattr(sys.modules[__name__], "list_" + operation)
+    result = lfunc(A, B)
+    p = pprint.PrettyPrinter()
     p.pprint(result)
 
+
+# ---------------------------------------------------------------------------
+def usage():
+    print(" ")
+    print("   usage: list <op> <liast-1> <list-2>")
+    print("     <op> may be one of 'minus', 'union' or 'intersect'")
+    print(" ")
+    sys.exit(1)
 
 # ---------------------------------------------------------------------------
 def generate_list(cmd):
@@ -145,16 +159,4 @@ class ListTests(unittest.TestCase):
         assert(a == ['two', 'four'])
 
 # ---------------------------------------------------------------------------
-# !@! should call toolframe.ez_launch
-global d
-d = dir()
-
-sname = sys.argv[0]
-if sname.endswith('.py') and '-L' in sys.argv:
-    pname = re.sub('.py$', '', sname)
-    print("creating symlink: %s -> %s" % (pname, sname))
-    os.symlink(sname, pname)
-elif sname.endswith('.py') and __name__ == '__main__':
-    unittest.main()
-elif not sname.endswith('.py') and __name__ == '__main__':
-    main(sys.argv)
+toolframe.ez_launch(__name__, main)

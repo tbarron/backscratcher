@@ -41,14 +41,18 @@ import toolframe
 # -----------------------------------------------------------------------------
 def main(args):
     for str in args[1:]:
-        if str.startswith("0x"):
-            val = int(str, 16)
-        elif str.startswith("0"):
-            val = int(str, 8)
-        else:
-            val = int(str)
-
-        print("%s -> 0%o / %d / 0x%x" % (str, val, val, val))
+        result = odx(str)
+        print(result)
 
 # -----------------------------------------------------------------------------
-toolframe.ez_launch(main)
+def odx(str):
+    if str.startswith("0x"):
+        val = int(str, 16)
+    elif str.startswith("0"):
+        val = int(str, 8)
+    else:
+        val = int(str)
+    return "%s -> 0%o / %d / 0x%x" % (str, val, val, val)
+
+# -----------------------------------------------------------------------------
+toolframe.ez_launch(__name__, main)

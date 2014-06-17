@@ -73,4 +73,4 @@ def main(argv):
         print(l[o.which])
 
 # ---------------------------------------------------------------------------
-toolframe.ez_launch(main)
+toolframe.ez_launch(__name__, main)

@@ -175,4 +175,4 @@ class MagTest(unittest.TestCase):
             print "result:   '%s'" % string
 
 # ---------------------------------------------------------------------------
-toolframe.ez_launch()
+toolframe.ez_launch(__name__, main)
