@@ -134,8 +134,10 @@ def fab_install(args):
 
 # ---------------------------------------------------------------------------
 def fab_notest(args):
-    """
-    List python modules with no tests in the tests directory.
+    """notest - list python modules with no tests
+
+    usage: fab notest
+
     """
     ml = glob.glob("*.py")
     for mod in ml:
