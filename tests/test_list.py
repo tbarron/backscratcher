@@ -15,9 +15,9 @@ class TestList(unittest.TestCase):
         Generate a list from the output of a command
         """
         a = list.generate_list("ls")
-        self.assertInList('DODO', a)
-        self.assertInList("ascii.py", a)
-        self.assertInList("list.py", a)
+        self.assertInList('LICENSE', a)
+        self.assertInList("bin", a)
+        self.assertInList("tests", a)
 
     # -----------------------------------------------------------------------
     def test_list_minus(self):

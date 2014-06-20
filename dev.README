@@ -1,0 +1,30 @@
+Converting to using distutils (i.e., setup.py). Code goes in bscr into
+importable modules. Things I want to call from the command line go in
+bin. Everything in bscr gets handled automatically because setup.py
+sees bscr as a package, so we don't have to list individual modules.
+
+Each "script" (i.e., command line callable) has to be listed by path
+in the scripts argument. I bet we can put something in setup.py to
+generate that list for us.
+
+Tests go in directory tests in a file called test_COMPONENT.py. 
+
+To run the tests 
+
+  green tests
+
+To generate a distribution tarball
+
+  python setup sdist
+
+To install the package
+
+  pip install dist/backscratcher-VERSION.tar.gz
+
+To install a new one over the top of an old one
+
+  pip install --upgrade dist/backscratcher-VERSION.tar.gz
+
+To uninstall
+
+  pip uninstall backscratcher
