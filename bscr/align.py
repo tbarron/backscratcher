@@ -73,7 +73,3 @@ def align(input):
                 fmt = '%%-%ds  ' % width[i]
             oline = oline + fmt % f[i]
         print oline
-
-
-# ---------------------------------------------------------------------------
-toolframe.ez_launch(__name__, main)

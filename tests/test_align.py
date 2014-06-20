@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+ #!/usr/bin/env python
 import os
 import sys
 sys.path.insert(0, os.getcwd())
-import align
+import bscr.align
 import pdb
 import pexpect
 import testhelp
@@ -34,14 +34,13 @@ class TestAlign(unittest.TestCase):
                 "mno          qprs         \r\n" +
                 "foobard  simplification  denomination  vituperation" +
                 "  spalshy      \r\n")
-
     # -------------------------------------------------------------------------
     def test_digit_alignment(self):
         """
         Words that contain valid numeric specifications should be right
         aligned. Words containing non-numeric values should be left aligned.
         """
-        S = pexpect.spawn("./align")
+        S = pexpect.spawn("bin/align")
         S.setecho(False)
         for line in self.tdata:
             S.sendline(line)
@@ -69,7 +68,7 @@ class TestAlign(unittest.TestCase):
             f.write(line + "\n")
         f.close()
 
-        S = pexpect.spawn("./align %s" % tfilename)
+        S = pexpect.spawn("bin/align %s" % tfilename)
         S.expect(pexpect.EOF)
         x = S.before
         S.close()
@@ -81,17 +80,6 @@ class TestAlign(unittest.TestCase):
                          ' does not match' +
                          '\n\n"""\n%s\n"""(%d)' %
                          (x.replace(' ', '-'), len(x)))
-
-    # -------------------------------------------------------------------------
-    def text_next_steps(self):
-        self.fail("""
-
-        - some programs call the launch routines unconditionally. Either use
-          'if __name__ == '__main__' or embed that in the launch routine.
-
-        - add the rest of the issues from github to this list
-
-        """)
 
 # ---------------------------------------------------------------------------
 if __name__ == '__main__':
