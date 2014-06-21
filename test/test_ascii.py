@@ -50,7 +50,7 @@ class TestAscii(unittest.TestCase):
         Run ascii and see if its output matches what is expected.
         """
         # pdb.set_trace()
-        result = pexpect.run("./ascii")
+        result = pexpect.run("bin/ascii")
         eidx = 0
         for rline in result.split("\r\n"):
             rline = rline.rstrip(" ")

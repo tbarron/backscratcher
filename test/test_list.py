@@ -17,7 +17,7 @@ class TestList(unittest.TestCase):
         a = list.generate_list("ls")
         self.assertInList('LICENSE', a)
         self.assertInList("bin", a)
-        self.assertInList("tests", a)
+        self.assertInList("test", a)
 
     # -----------------------------------------------------------------------
     def test_list_minus(self):

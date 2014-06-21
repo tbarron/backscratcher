@@ -46,4 +46,4 @@ def main(argv=None):
 
 
 # ---------------------------------------------------------------------------
-toolframe.ez_launch(__name__, main)
+#toolframe.ez_launch(__name__, main)
