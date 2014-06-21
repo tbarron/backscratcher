@@ -1,37 +1,23 @@
 #!/usr/bin/env python
 import bscr.xclean
+from bscr import util
 import os
 import shutil
 import StringIO as sio
 import sys
-import testhelp
+import testhelp as th
 import unittest
-
-# -----------------------------------------------------------------------------
-def pj(*args):
-    """
-    pathjoin -- convenience wrapper for os.path.join()
-    """
-    return os.path.join(*args)
-
-# -----------------------------------------------------------------------------
-def touch(filepath, times=None):
-    """
-    touch -- ensure file exists and update its *times* (atime, mtime)
-    """
-    open(filepath, 'a').close()
-    os.utime(filepath, times)
 
 # -----------------------------------------------------------------------------
 class TestXclean(unittest.TestCase):
     drmsg = 'Without --dryrun, would remove'
     testdir = "/tmp/test_xclean"
-    tilde = [pj(testdir, 'xxx~'),
-             pj(testdir, '.yyy~')]
-    stilde = [pj(testdir, 'sub', 'basement~'),
-              pj(testdir, 'sub', '.floor~')]
-    ntilde = [pj(testdir, 'nomatch.txt')]
-    nstilde = [pj(testdir, 'sub', 'nosuchfile')]
+    tilde = [util.pj(testdir, 'xxx~'),
+             util.pj(testdir, '.yyy~')]
+    stilde = [util.pj(testdir, 'sub', 'basement~'),
+              util.pj(testdir, 'sub', '.floor~')]
+    ntilde = [util.pj(testdir, 'nomatch.txt')]
+    nstilde = [util.pj(testdir, 'sub', 'nosuchfile')]
     testfiles = tilde + stilde + ntilde + nstilde
 
     # -------------------------------------------------------------------------
@@ -41,9 +27,9 @@ class TestXclean(unittest.TestCase):
         """
         if os.path.isdir(self.testdir):
             self.tearDown()
-        os.makedirs(pj(self.testdir, 'sub'))
+        os.makedirs(util.pj(self.testdir, 'sub'))
         for fp in self.testfiles:
-            touch(fp)
+            util.touch(fp)
 
     # -------------------------------------------------------------------------
     def tearDown(self):
@@ -51,7 +37,7 @@ class TestXclean(unittest.TestCase):
         
     # -------------------------------------------------------------------------
     def test_cleanup_dr_np_nr(self):
-        with testhelp.StdoutExcursion() as getval:
+        with th.StdoutExcursion() as getval:
             bscr.xclean.cleanup(self.testdir, dryrun=True)
             result = getval()
         self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
@@ -65,7 +51,7 @@ class TestXclean(unittest.TestCase):
 
     # -------------------------------------------------------------------------
     def test_cleanup_dr_np_r(self):
-        with testhelp.StdoutExcursion() as getval:
+        with th.StdoutExcursion() as getval:
             bscr.xclean.cleanup(self.testdir, dryrun=True, recursive=True)
             result = getval()
         self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
@@ -79,7 +65,7 @@ class TestXclean(unittest.TestCase):
         
     # -------------------------------------------------------------------------
     def test_cleanup_dr_p_nr(self):
-        with testhelp.StdoutExcursion() as getval:
+        with th.StdoutExcursion() as getval:
             bscr.xclean.cleanup(self.testdir, dryrun=True, pattern="no.*")
             result = getval()
         
@@ -94,7 +80,7 @@ class TestXclean(unittest.TestCase):
 
     # -------------------------------------------------------------------------
     def test_cleanup_dr_p_r(self):
-        with testhelp.StdoutExcursion() as getval:
+        with th.StdoutExcursion() as getval:
             bscr.xclean.cleanup(self.testdir, dryrun=True, pattern="no.*",
                                 recursive=True)
             result = getval()
@@ -110,7 +96,7 @@ class TestXclean(unittest.TestCase):
 
     # -------------------------------------------------------------------------
     def test_cleanup_ndr_np_nr(self):
-        with testhelp.StdoutExcursion() as getval:
+        with th.StdoutExcursion() as getval:
             bscr.xclean.cleanup(self.testdir)
             result = getval()
 
@@ -125,7 +111,7 @@ class TestXclean(unittest.TestCase):
 
     # -------------------------------------------------------------------------
     def test_cleanup_ndr_np_r(self):
-        with testhelp.StdoutExcursion() as getval:
+        with th.StdoutExcursion() as getval:
             bscr.xclean.cleanup(self.testdir, recursive=True)
             result = getval()
 
@@ -140,7 +126,7 @@ class TestXclean(unittest.TestCase):
             
     # -------------------------------------------------------------------------
     def test_cleanup_ndr_p_nr(self):
-        with testhelp.StdoutExcursion() as getval:
+        with th.StdoutExcursion() as getval:
             bscr.xclean.cleanup(self.testdir, pattern="no.*")
             result = getval()
 
@@ -155,7 +141,7 @@ class TestXclean(unittest.TestCase):
 
     # -------------------------------------------------------------------------
     def test_cleanup_ndr_p_r(self):
-        with testhelp.StdoutExcursion() as getval:
+        with th.StdoutExcursion() as getval:
             bscr.xclean.cleanup(self.testdir, pattern="no.*", recursive=True)
             result = getval()
 
@@ -242,7 +228,7 @@ class TestXclean(unittest.TestCase):
 
     # -------------------------------------------------------------------------
     def test_main_dr_np_nr(self):
-        with testhelp.StdoutExcursion() as getval:
+        with th.StdoutExcursion() as getval:
             bscr.xclean.main(['bin/xclean', '-n', self.testdir])
             result = getval()
         self.assertIn(self.drmsg, result)
@@ -254,7 +240,7 @@ class TestXclean(unittest.TestCase):
 
     # -------------------------------------------------------------------------
     def test_main_dr_p_nr(self):
-        with testhelp.StdoutExcursion() as getval:
+        with th.StdoutExcursion() as getval:
             bscr.xclean.main(['bin/xclean', '-n', '-p', 'no.*', self.testdir])
             result = getval()
         self.assertIn(self.drmsg, result)
@@ -266,7 +252,7 @@ class TestXclean(unittest.TestCase):
     
     # -------------------------------------------------------------------------
     def test_main_dr_np_r(self):
-        with testhelp.StdoutExcursion() as getval:
+        with th.StdoutExcursion() as getval:
             bscr.xclean.main(['bin/xclean', '-n', '-r', self.testdir])
             result = getval()
         self.assertIn(self.drmsg, result)
@@ -278,7 +264,7 @@ class TestXclean(unittest.TestCase):
 
     # -------------------------------------------------------------------------
     def test_main_dr_p_r(self):
-        with testhelp.StdoutExcursion() as getval:
+        with th.StdoutExcursion() as getval:
             bscr.xclean.main(['bin/xclean', '-n', '-p', 'no.*',
                               '-r', self.testdir])
             result = getval()
@@ -291,7 +277,7 @@ class TestXclean(unittest.TestCase):
         
     # -------------------------------------------------------------------------
     def test_main_ndr_np_nr(self):
-        with testhelp.StdoutExcursion() as getval:
+        with th.StdoutExcursion() as getval:
             bscr.xclean.main(['bin/xclean', self.testdir])
             result = getval()
         self.assertNotIn(self.drmsg, result)
@@ -303,7 +289,7 @@ class TestXclean(unittest.TestCase):
 
     # -------------------------------------------------------------------------
     def test_main_ndr_np_r(self):
-        with testhelp.StdoutExcursion() as getval:
+        with th.StdoutExcursion() as getval:
             bscr.xclean.main(['bin/xclean', '-r', self.testdir])
             result = getval()
         self.assertNotIn(self.drmsg, result)
@@ -315,7 +301,7 @@ class TestXclean(unittest.TestCase):
         
     # -------------------------------------------------------------------------
     def test_main_ndr_p_nr(self):
-        with testhelp.StdoutExcursion() as getval:
+        with th.StdoutExcursion() as getval:
             bscr.xclean.main(['bin/xclean', '-p', 'no.*', self.testdir])
             result = getval()
         self.assertNotIn(self.drmsg, result)
@@ -327,7 +313,7 @@ class TestXclean(unittest.TestCase):
 
     # -------------------------------------------------------------------------
     def test_main_ndr_p_r(self):
-        with testhelp.StdoutExcursion() as getval:
+        with th.StdoutExcursion() as getval:
             bscr.xclean.main(['bin/xclean', '-p', 'no.*', '-r', self.testdir])
             result = getval()
         self.assertNotIn(self.drmsg, result)

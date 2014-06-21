@@ -38,6 +38,13 @@ def function_name():
     return sys._getframe(1).f_code.co_name
 
 
+# -----------------------------------------------------------------------------
+def pj(*args):
+    """
+    pathjoin -- convenience wrapper for os.path.join()
+    """
+    return os.path.join(*args)
+
 # ---------------------------------------------------------------------------
 def rmrf(path):
     '''
@@ -77,6 +84,14 @@ def safe_unlink(path):
     else:
         raise Exception('safe_unlink: argument must be str or list')
 
+
+# -----------------------------------------------------------------------------
+def touch(filepath, times=None):
+    """
+    touch -- ensure file exists and update its *times* (atime, mtime)
+    """
+    open(filepath, 'a').close()
+    os.utime(filepath, times)
 
 # ---------------------------------------------------------------------------
 def writefile(filepath, lines):
