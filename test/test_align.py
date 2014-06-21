@@ -1,4 +1,4 @@
- #!/usr/bin/env python
+#!/usr/bin/env python
 import os
 import sys
 sys.path.insert(0, os.getcwd())
@@ -83,4 +83,4 @@ class TestAlign(unittest.TestCase):
 
 # ---------------------------------------------------------------------------
 if __name__ == '__main__':
-    toolframe.ez_launch(test=AlignTest, cleanup=tearDownModule)
+    unittest.main()

@@ -1,13 +1,17 @@
-import mag
+#!/usr/bin/env python
+from bscr import mag
 import os
+import pdb
 import sys
 import unittest
 
 # ---------------------------------------------------------------------------
 class TestMag(unittest.TestCase):
     def test_which_file(self):
+        pdb.set_trace()
         idir = os.path.dirname(sys.modules['mag'].__file__)
-        exp = os.path.dirname(os.path.dirname(sys.modules[__name__].__file__))
+        exp = os.path.dirname(os.path.dirname(
+            os.path.abspath(sys.modules[__name__].__file__)))
         self.assertEqual(exp, idir,
                          "Expected '%s', got '%s'" % (exp, idir))
 
@@ -92,4 +96,8 @@ class TestMag(unittest.TestCase):
         except AssertionError:
             print "\nexpected: '%s'" % a
             print "result:   '%s'" % string
+
+# -----------------------------------------------------------------------------
+if __name__ == '__main__':
+    unittest.main()
 

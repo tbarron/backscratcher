@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import dt
 import time
 import unittest
@@ -139,4 +140,8 @@ class TestDt(unittest.TestCase):
     # -----------------------------------------------------------------------
     def test_next_sunday(self):
         self.both_test(['next', 'sunday'], dt.time_to('sunday', 'next'))
+
+# -----------------------------------------------------------------------------
+if __name__ == '__main__':
+    unittest.main()
 

@@ -1,7 +1,8 @@
+#!/usr/bin/env python
 import pexpect
 import unittest
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class TestCalc(unittest.TestCase):
     def test_example(self):
         S = pexpect.spawn("bin/calc")
@@ -26,4 +27,8 @@ class TestCalc(unittest.TestCase):
         S.sendline("exit()")
         S.expect(pexpect.EOF)
         S.close()
+
+# -----------------------------------------------------------------------------
+if __name__ == '__main__':
+    unittest.main()
 

@@ -1,7 +1,8 @@
+#!/usr/bin/env python
 import chron
 import unittest
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class TestChron(unittest.TestCase):
     # -------------------------------------------------------------------------
     def test_hms_seconds(self):
@@ -10,3 +11,6 @@ class TestChron(unittest.TestCase):
         self.assertEqual(exp, act,
                          "Expected %d, got %d" % (exp, act))
 
+# -----------------------------------------------------------------------------
+if __name__ == '__main__':
+    unittest.main()

@@ -66,6 +66,5 @@ class TestAscii(unittest.TestCase):
             eidx += 1
 
 # ---------------------------------------------------------------------------
-toolframe.ez_launch(__name__, test='AsciiTest',
-                    cleanup=tearDownModule,
-                    logfile='tests/test.log')
+if __name__ == '__main__':
+    unittest.main()

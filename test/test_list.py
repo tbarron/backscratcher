@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import list
 import pprint
 import unittest
@@ -47,3 +48,6 @@ class TestList(unittest.TestCase):
                                 ['two', 'four', 'six', 'eight', 'ten'])
         assert(a == ['two', 'four'])
 
+# -----------------------------------------------------------------------------
+if __name__ == '__main__':
+    unittest.main()

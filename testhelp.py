@@ -275,6 +275,34 @@ class LoggingTestSuite(unittest.TestSuite):
         return result
 
 
+# -----------------------------------------------------------------------------
+class StdoutExcursion(object):
+    """
+    This class allows us to run something that writes to stdout and capture the
+    output in a StringIO.
+
+        with StdoutExcursion() as sio:
+            do something that writes to stdout
+            result = sio()
+        self.assertEqual(result, ...)
+
+    This is useful in a different way than
+        result = pexpect.run(something that writes stdout)
+    since pexpect.run() expects a command line but in a StdoutExcursion, we can
+    call a python function.
+    """
+    def __init__(self):
+        self.stdout = sys.stdout
+
+    def __enter__(self):
+        sys.stdout = StringIO.StringIO()
+        return sys.stdout.getvalue
+
+    def __exit__(self, type, value, traceback):
+        sys.stdout.close()
+        sys.stdout = self.stdout
+
+
 # ---------------------------------------------------------------------------
 def show_stdout(value=None):
     """
