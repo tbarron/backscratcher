@@ -1,3 +1,8 @@
+MANIFEST
+README
+attic
+bscr/test
+dist
 test_*.clps*
 testhome
 TAGS
@@ -21,6 +26,7 @@ pywhich
 replay
 test/test_all
 workrpt
+*.org
 *.log
 *.pyc
 *~

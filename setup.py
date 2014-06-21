@@ -5,7 +5,7 @@ import time
 scrlist = glob.glob("bin/*")
 setup(name='backscratcher',
       version='learn',
-      packages=['bscr'],
+      packages=['bscr', 'bscr/test'],
       scripts=scrlist,
       author="Tom Barron",
       author_email='tom.barron@comcast.net',
