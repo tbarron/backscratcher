@@ -20,7 +20,22 @@ def touch(filepath, times=None):
     open(filepath, 'a').close()
     os.utime(filepath, times)
 
+# -----------------------------------------------------------------------------
 class StdoutExcursion(object):
+    """
+    This class allows us to run something that writes to stdout and capture the
+    output in a StringIO.
+
+        with StdoutExcursion() as sio:
+            do something that writes to stdout
+            result = sio()
+        self.assertEqual(result, ...)
+
+    This is useful in a different way than
+        result = pexpect.run(something that writes stdout)
+    since pexpect.run() expects a command line but in a StdoutExcursion, we can
+    call a python function.
+    """
     def __init__(self):
         self.stdout = sys.stdout
 
@@ -33,7 +48,8 @@ class StdoutExcursion(object):
         sys.stdout = self.stdout
 
 # -----------------------------------------------------------------------------
-class TestClean(unittest.TestCase):
+class TestXclean(unittest.TestCase):
+    drmsg = 'Without --dryrun, would remove'
     testdir = "/tmp/test_xclean"
     tilde = [pj(testdir, 'xxx~'),
              pj(testdir, '.yyy~')]
@@ -45,6 +61,11 @@ class TestClean(unittest.TestCase):
 
     # -------------------------------------------------------------------------
     def setUp(self):
+        """
+        Set up for each test in the suite.
+        """
+        if os.path.isdir(self.testdir):
+            self.tearDown()
         os.makedirs(pj(self.testdir, 'sub'))
         for fp in self.testfiles:
             touch(fp)
@@ -54,75 +75,125 @@ class TestClean(unittest.TestCase):
         shutil.rmtree(self.testdir)
         
     # -------------------------------------------------------------------------
-    def test_main_dr_np_nr(self):
-        with StdoutExcursion() as sio:
-            bscr.xclean.main(['bin/xclean', '-n', self.testdir])
-            result = sio()
-        self.assertIn('Without --dryrun, would remove', result)
-        for fn in self.tilde:
-            self.assertIn(fn, result,
-                          "Expected '%s' in '%s'" % (fn, result))
-        for fn in self.ntilde:
-            self.assertNotIn(fn, result,
-                             "Expected '%s' to not be in '%s'" % (fn, result))
-        for fn in self.stilde:
-            self.assertNotIn(fn, result,
-                             "Expected '%s' to not be in '%s'" % (fn, result))
-        for fn in self.nstilde:
-            self.assertNotIn(fn, result,
-                             "Expected '%s' to not be in '%s'" % (fn, result))
+    def test_cleanup_dr_np_nr(self):
+        with StdoutExcursion() as getval:
+            bscr.xclean.cleanup(self.testdir, dryrun=True)
+            result = getval()
+        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                           [True, True, True, True])
+
+        self.assertIn(self.drmsg, result)
+
+        self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                       result,
+                       [True, False, False, False])
 
     # -------------------------------------------------------------------------
-    @unittest.skip('construction')
-    def test_main_dr_p_nr(self):
-        self.fail('construction')
-    
-    # -------------------------------------------------------------------------
-    @unittest.skip('construction')
-    def test_main_dryrun_nopat_r(self):
-        self.fail('construction')
+    def test_cleanup_dr_np_r(self):
+        with StdoutExcursion() as getval:
+            bscr.xclean.cleanup(self.testdir, dryrun=True, recursive=True)
+            result = getval()
+        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                           [True, True, True, True])
 
-    # -------------------------------------------------------------------------
-    @unittest.skip('construction')
-    def test_main_dryrun_pat_r(self):
-        self.fail('construction')
+        self.assertIn(self.drmsg, result)
+
+        self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                       result,
+                       [True, False, True, False])
         
     # -------------------------------------------------------------------------
-    @unittest.skip('construction')
-    def test_main_nodr_nopat(self):
-        self.fail('construction')
-
-    # -------------------------------------------------------------------------
-    @unittest.skip('construction')
-    def test_main_nodr_pat(self):
-        self.fail('construction')
+    def test_cleanup_dr_p_nr(self):
+        with StdoutExcursion() as getval:
+            bscr.xclean.cleanup(self.testdir, dryrun=True, pattern="no.*")
+            result = getval()
         
-    # -------------------------------------------------------------------------
-    @unittest.skip('construction')
-    def test_main_nodr_nopat_r(self):
-        self.fail('construction')
+        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                           [True, True, True, True])
+
+        self.assertIn(self.drmsg, result)
+
+        self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                       result,
+                       [False, True, False, False])
 
     # -------------------------------------------------------------------------
-    @unittest.skip('construction')
-    def test_main_nodr_pat_r(self):
-        pass
+    def test_cleanup_dr_p_r(self):
+        with StdoutExcursion() as getval:
+            bscr.xclean.cleanup(self.testdir, dryrun=True, pattern="no.*",
+                                recursive=True)
+            result = getval()
+
+        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                           [True, True, True, True])
+
+        self.assertIn(self.drmsg, result)
+
+        self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                       result,
+                       [False, True, False, True])
 
     # -------------------------------------------------------------------------
-    @unittest.skip('construction')
-    def test_cleanup_dr_np(self):
-        pass
+    def test_cleanup_ndr_np_nr(self):
+        with StdoutExcursion() as getval:
+            bscr.xclean.cleanup(self.testdir)
+            result = getval()
+
+        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                           [False, True, True, True])
+
+        self.assertNotIn(self.drmsg, result)
+
+        self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                       result,
+                       [True, False, False, False])
+
     # -------------------------------------------------------------------------
-    @unittest.skip('construction')
-    def test_cleanup_dr_p(self):
-        pass
+    def test_cleanup_ndr_np_r(self):
+        with StdoutExcursion() as getval:
+            bscr.xclean.cleanup(self.testdir, recursive=True)
+            result = getval()
+
+        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                           [False, True, False, True])
+
+        self.assertNotIn(self.drmsg, result)
+
+        self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                       result,
+                       [True, False, True, False])
+            
     # -------------------------------------------------------------------------
-    @unittest.skip('construction')
-    def test_cleanup_ndr_np(self):
-        pass
+    def test_cleanup_ndr_p_nr(self):
+        with StdoutExcursion() as getval:
+            bscr.xclean.cleanup(self.testdir, pattern="no.*")
+            result = getval()
+
+        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                           [True, False, True, True])
+
+        self.assertNotIn(self.drmsg, result)
+
+        self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                       result,
+                       [False, True, False, False])
+
     # -------------------------------------------------------------------------
-    @unittest.skip('construction')
-    def test_cleanup_ndr_p(self):
-        pass
+    def test_cleanup_ndr_p_r(self):
+        with StdoutExcursion() as getval:
+            bscr.xclean.cleanup(self.testdir, pattern="no.*", recursive=True)
+            result = getval()
+
+        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                           [True, False, True, False])
+
+        self.assertNotIn(self.drmsg, result)
+
+        self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                       result,
+                       [False, True, False, True])
+
+
     # -------------------------------------------------------------------------
     def test_find_files(self):
         fl = bscr.xclean.find_files(self.testdir)
@@ -189,4 +260,124 @@ class TestClean(unittest.TestCase):
                              "Expected %s in %s" % (fn, fl))
 
         
+        
+
+
+
+
+    # -------------------------------------------------------------------------
+    def test_main_dr_np_nr(self):
+        with StdoutExcursion() as getval:
+            bscr.xclean.main(['bin/xclean', '-n', self.testdir])
+            result = getval()
+        self.assertIn(self.drmsg, result)
+        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                           [True, True, True, True])
+        self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                       result,
+                       [True, False, False, False])
+
+    # -------------------------------------------------------------------------
+    def test_main_dr_p_nr(self):
+        with StdoutExcursion() as getval:
+            bscr.xclean.main(['bin/xclean', '-n', '-p', 'no.*', self.testdir])
+            result = getval()
+        self.assertIn(self.drmsg, result)
+        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                           [True, True, True, True])
+        self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                       result,
+                       [False, True, False, False])
+    
+    # -------------------------------------------------------------------------
+    def test_main_dr_np_r(self):
+        with StdoutExcursion() as getval:
+            bscr.xclean.main(['bin/xclean', '-n', '-r', self.testdir])
+            result = getval()
+        self.assertIn(self.drmsg, result)
+        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                           [True, True, True, True])
+        self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                       result,
+                       [True, False, True, False])
+
+    # -------------------------------------------------------------------------
+    def test_main_dr_p_r(self):
+        with StdoutExcursion() as getval:
+            bscr.xclean.main(['bin/xclean', '-n', '-p', 'no.*',
+                              '-r', self.testdir])
+            result = getval()
+        self.assertIn(self.drmsg, result)
+        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                           [True, True, True, True])
+        self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                       result,
+                       [False, True, False, True])
+        
+    # -------------------------------------------------------------------------
+    def test_main_ndr_np_nr(self):
+        with StdoutExcursion() as getval:
+            bscr.xclean.main(['bin/xclean', self.testdir])
+            result = getval()
+        self.assertNotIn(self.drmsg, result)
+        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                           [False, True, True, True])
+        self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                       result,
+                       [True, False, False, False])
+
+    # -------------------------------------------------------------------------
+    def test_main_ndr_np_r(self):
+        with StdoutExcursion() as getval:
+            bscr.xclean.main(['bin/xclean', '-r', self.testdir])
+            result = getval()
+        self.assertNotIn(self.drmsg, result)
+        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                           [False, True, False, True])
+        self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                       result,
+                       [True, False, True, False])
+        
+    # -------------------------------------------------------------------------
+    def test_main_ndr_p_nr(self):
+        with StdoutExcursion() as getval:
+            bscr.xclean.main(['bin/xclean', '-p', 'no.*', self.testdir])
+            result = getval()
+        self.assertNotIn(self.drmsg, result)
+        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                           [True, False, True, True])
+        self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                       result,
+                       [False, True, False, False])
+
+    # -------------------------------------------------------------------------
+    def test_main_ndr_p_r(self):
+        with StdoutExcursion() as getval:
+            bscr.xclean.main(['bin/xclean', '-p', 'no.*', '-r', self.testdir])
+            result = getval()
+        self.assertNotIn(self.drmsg, result)
+        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                           [True, False, True, False])
+        self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
+                       result,
+                       [False, True, False, True])
+
+    # -------------------------------------------------------------------------
+    def verify_exists(self, tv, rv):
+        for fl, exp in zip(tv, rv):
+            for fp in fl:
+                self.assertEqual(exp, os.path.exists(fp),
+                                 "expected '%s' to exist" % fp if exp else
+                                 "expected '%s' to not exist" % fp)
+        
+    # -------------------------------------------------------------------------
+    def verify_in(self, tv, text, rv):
+        for fl, exp in zip(tv, rv):
+            for fp in fl:
+                if exp:
+                    self.assertIn(fp, text,
+                                  "expected '%s' in '%s'" % (fp, text))
+                else:
+                    self.assertNotIn(fp, text,
+                                     "'%s' not expected in '%s'" % (fp, text))
         
