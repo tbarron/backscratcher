@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 from contextlib import closing
 import odx
 import os
