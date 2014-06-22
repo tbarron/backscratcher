@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import chron
+from bscr import chron
 import unittest
 
 # -----------------------------------------------------------------------------

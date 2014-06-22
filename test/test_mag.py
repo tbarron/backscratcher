@@ -10,9 +10,13 @@ import unittest
 # ---------------------------------------------------------------------------
 class TestMag(unittest.TestCase):
     def test_which_file(self):
+        # pdb.set_trace()
         idir = os.path.dirname(sys.modules['bscr.mag'].__file__)
-        here = os.path.dirname(__file__)
-        exp = os.path.abspath(os.path.dirname(here))
+        exp = os.path.dirname(os.path.abspath(__file__))
+        self.assertEqual(os.path.basename(exp), 'test')
+        exp = os.path.dirname(exp)
+        if os.path.basename(exp) != 'bscr':
+            exp = util.pj(exp, 'bscr')
         self.assertEqual(exp, idir,
                          "Expected '%s', got '%s'" % (exp, idir))
 

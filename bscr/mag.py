@@ -174,5 +174,3 @@ class MagTest(unittest.TestCase):
             print "\nexpected: '%s'" % a
             print "result:   '%s'" % string
 
-# ---------------------------------------------------------------------------
-toolframe.ez_launch(__name__, main)

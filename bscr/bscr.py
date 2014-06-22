@@ -7,14 +7,8 @@ import subprocess as subp
 import util
 
 # -----------------------------------------------------------------------------
-def dispatch(args):
-    called_as = args.pop(0)
-    try:
-        func_name = args.pop(0)
-    except IndexError:
-        func_name = 'help'
-    func = globals()['bscr_' + func_name]
-    return func(args)
+def main(args):
+    util.dispatch(args, 'bscr', __name__)
 
 # -----------------------------------------------------------------------------
 def bscr_help(args):

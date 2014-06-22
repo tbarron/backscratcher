@@ -28,6 +28,16 @@ def contents(filename):
     return rval
 
 
+# -----------------------------------------------------------------------------
+def dispatch(args, prefix, mname):
+    called_as = args.pop(0)
+    try:
+        func_name = args.pop(0)
+    except IndexError:
+        func_name = 'help'
+    func = getattr(sys.modules[mname], "_".join([prefix,func_name]))
+    return func(args)
+
 # ---------------------------------------------------------------------------
 def expand(path):
     return os.path.expandvars(os.path.expanduser(path))

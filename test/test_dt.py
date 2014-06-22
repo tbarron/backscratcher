@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import dt
+from bscr import dt
 import time
 import unittest
 

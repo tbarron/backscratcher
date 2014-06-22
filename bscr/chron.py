@@ -113,6 +113,3 @@ def count_up():
 def hms_seconds(hms):
     h, m, s = hms.split(':')
     return int(s) + 60 * (int(m) + 60 * int(h))
-
-# ---------------------------------------------------------------------------
-toolframe.ez_launch(__name__, main)
