@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+from contextlib import contextmanager
 import os
 import pdb
 import re
@@ -7,6 +7,14 @@ import sys
 import testhelp
 import unittest
 
+
+# ---------------------------------------------------------------------------
+@contextmanager
+def Chdir(where):
+    here = os.getcwd()
+    os.chdir(where)
+    yield
+    os.chdir(here)
 
 # ---------------------------------------------------------------------------
 def contents(filename):
