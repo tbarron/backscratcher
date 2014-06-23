@@ -1,7 +1,7 @@
 VERSION=learn
 
 clean:
-	rm MANIFEST README TAGS
+	rm -f MANIFEST README TAGS
 	find . -name "*~" | xargs rm
 
 help:

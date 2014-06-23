@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from contextlib import contextmanager
 import os
 import pdb
 import re
@@ -8,13 +7,41 @@ import testhelp
 import unittest
 
 
-# ---------------------------------------------------------------------------
-@contextmanager
-def Chdir(where):
-    here = os.getcwd()
-    os.chdir(where)
-    yield
-    os.chdir(here)
+# -----------------------------------------------------------------------------
+class Chdir(object):
+    """
+    This class allows for doing the following:
+
+        with Chdir('/some/other/directory'):
+            assert(in '/some/other/directory')
+            do_stuff()
+        assert(back at our starting point)
+
+    No matter what happens in do_stuff(), we're guaranteed that at the assert,
+    we'll be back in the directory we started from.
+    """
+    # ------------------------------------------------------------------------
+    def __init__(self, target):
+        """
+        This is called at instantiattion. Here we just initialize.
+        """
+        self.start = os.getcwd()
+        self.target = target
+    # ------------------------------------------------------------------------
+    def __enter__(self):
+        """
+        This is called as control enters the with block. We jump to the target
+        directory.
+        """
+        os.chdir(self.target)
+        return self.target
+    # ------------------------------------------------------------------------
+    def __exit__(self, type, value, traceback):
+        """
+        This is called as control leaves the with block. We jump back to our
+        starting directory.
+        """
+        os.chdir(self.start)
 
 # ---------------------------------------------------------------------------
 def contents(filename):
