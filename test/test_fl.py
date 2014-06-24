@@ -28,9 +28,6 @@ def tearDownModule():
 # ---------------------------------------------------------------------------
 class TestFL(unittest.TestCase):
     # -----------------------------------------------------------------------
-    def setUp(self):
-
-    # -----------------------------------------------------------------------
     def test_most_recent_prefix_match(self):
         """
         Test the routine most_recent_prefix_match()

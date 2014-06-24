@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+import bscr.perrno
+import sys
+bscr.perrno.main(sys.argv)
