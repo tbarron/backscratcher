@@ -74,7 +74,14 @@ def dispatch(mname, prefix, args):
 # ---------------------------------------------------------------------------
 def dispatch_help(mname, prefix, args):
     mod = sys.modules[mname]
-    if len(args) < 1:
+    if 3 <= len(args) and args[2] == "help":
+        print("\n".join(["help - show a list of available commands",
+                         "",
+                         "   With no arguments, show a list of commands",
+                         "   With a command as argument, show help for that command",
+                         ""
+                         ]))
+    elif len(args) < 2:
         fnlist = [x for x in dir(mod) if x.startswith(prefix)]
         clist = [getattr(mod, x) for x in fnlist]
         dlist = [x.__doc__.split("\n")[0] for x in clist]
@@ -82,15 +89,8 @@ def dispatch_help(mname, prefix, args):
         dlist.sort()
         for line in dlist:
             print("   %s" % line)
-    elif args[0] == 'help':
-        print("\n".join(["help - show a list of available commands",
-                         "",
-                         "   With no arguments, show a list of commands",
-                         "   With a command as argument, show help for that command",
-                         ""
-                         ]))
     else:
-        fname = "_".join([prefix, args[0]])
+        fname = "_".join([prefix, args[1]])
         func = getattr(mod, fname)
         print func.__doc__
 

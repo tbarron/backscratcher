@@ -41,6 +41,7 @@ class TestFL(unittest.TestCase):
         else:
             thisone = "%s/bin/fl" % here
 
+        print(thisone)
         result = pexpect.run(thisone)
         self.assertNotIn("Traceback", result)
         self.assertIn("diff", result)
