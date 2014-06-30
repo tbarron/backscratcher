@@ -31,7 +31,7 @@ class TestFL(unittest.TestCase):
     # -----------------------------------------------------------------------
     def test_command_line(self):
         here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        if here == 'bscr':
+        if os.path.basename(here) == 'bscr':
             sp = os.path.dirname(here)
             f = util.contents("%s/backscratcher-learn-py2.7.egg-info/installed-files.txt" %
                               sp)

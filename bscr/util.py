@@ -58,9 +58,9 @@ def contents(filename):
 # -----------------------------------------------------------------------------
 def dispatch(mname, prefix, args):
     # pdb.set_trace()
-    called_as = args.pop(0)
+    called_as = args[0]
     try:
-        func_name = args.pop(0)
+        func_name = args[1]
     except IndexError:
         dispatch_help(mname, prefix, args)
         return
@@ -75,9 +75,20 @@ def dispatch(mname, prefix, args):
 def dispatch_help(mname, prefix, args):
     mod = sys.modules[mname]
     if len(args) < 1:
-        for fname in [x for x in dir(mod) if x.startswith(prefix)]:
-            func = getattr(mod, fname)
-            print func.__doc__.split("\n")[0]
+        fnlist = [x for x in dir(mod) if x.startswith(prefix)]
+        clist = [getattr(mod, x) for x in fnlist]
+        dlist = [x.__doc__.split("\n")[0] for x in clist]
+        dlist.append("help - show this list")
+        dlist.sort()
+        for line in dlist:
+            print("   %s" % line)
+    elif args[0] == 'help':
+        print("\n".join(["help - show a list of available commands",
+                         "",
+                         "   With no arguments, show a list of commands",
+                         "   With a command as argument, show help for that command",
+                         ""
+                         ]))
     else:
         fname = "_".join([prefix, args[0]])
         func = getattr(mod, fname)

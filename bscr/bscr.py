@@ -1,9 +1,11 @@
 import glob
 import os
 import pdb
+import pexpect
 import re
 import shutil
 import subprocess as subp
+import sys
 import util
 
 # -----------------------------------------------------------------------------
@@ -11,23 +13,45 @@ def main(args):
     util.dispatch(__name__, 'bscr', args)
 
 # -----------------------------------------------------------------------------
-def bscr_help(args):
-    """help - things bscr can do for you
-
-    With no arguments, 'bscr help' provides a list of bscr subcommands.
-
-    'bscr help <subcommand>' will provide a description of the indicated
-    subcommand.
+def bscr_help_commands(args):
+    """help_commands - list the commands that are part of backscratcher    
     """
-    if 0 == len(args):
-        for x in globals():
-            if x.startswith('bscr_'):
-                f = globals()[x]
-                print f.__doc__.strip().split(os.linesep)[0]
-    else:
-        for fname in args:
-            f = globals()['bscr_' + fname]
-            print os.linesep + f.__doc__
+
+    cl = ["align       - use spaces to spread input lines so that columns line up",
+          "ascii       - display the ASCII collating sequence",
+          "bscr        - help and management for the backscratcher suite",
+          "calc        - simple python expression evaluator",
+          "chron       - stopwatch and timer",
+          "dt          - date and time manipulations",
+          "fl          - retrieve and report information about files",
+          "fx          - command line special effects",
+          "hd          - hexdump",
+          "jcal        - generate various kinds of calendars",
+          "list        - minus, union, or intersect two lists",
+          "mag         - report the magnitude of a large number",
+          "nvtool      - environment manipulation tool",
+          "odx         - display value in octal, decimal, and hex format",
+          "perrno      - report errno values",
+          "plwhich     - report location of a perl module",
+          "pstrack     - report whether current process stack contains root",
+          "pytool      - start python scripts",
+          "pywhich     - report location of python modules",
+          "replay      - run a command repetitively",
+          "rxlab       - play with regexps",
+          "tps         - look up processes by fragments of ps line",
+          "truth_table - generate a truth table",
+          "wcal        - show a wide calendar of three months",
+          "workrpt     - time reports",
+          "xclean      - remove files by pattern, optionally walking trees",
+          ]
+
+    ldir = os.path.dirname(sys.argv[0])
+    for line in cl:
+        cmd = line.split()[0]
+        if os.path.exists("%s/%s" % (ldir, cmd)):
+            print("   %s" % line)
+        else:
+            print(" * %s" % line)
 
 # -----------------------------------------------------------------------------
 def bscr_test(args):
@@ -36,20 +60,21 @@ def bscr_test(args):
     If green is available, we use it. Otherwise, if nosetests is available, we
     use it. Otherwise, just call unittest.main for each test file.
     """
-    target = util.pj(os.path.dirname(__file__), 'test')
-    print("Running tests in %s" % target)
-    if which('green'):
-        p = subp.Popen(['green', '-v', target])
-        p.wait()
-    elif which('nosetests') and importable('nose_ignoredoc'):
-        tl = glob.glob(util.pj(target, 'test_*.py'))
-        p = subp.Popen(['nosetests', '-v', '-c', 'nose.cfg'] + tl)
-        p.wait()
-    else:
-        tl = glob.glob(util.pj(target, 'test_*.py'))
-        for t in tl:
-            p = subp.Popen([t, '-v'])
+    with util.Chdir("/tmp"):
+        target = util.pj(os.path.dirname(__file__), 'test')
+        print("Running tests in %s" % target)
+        if which('green'):
+            p = subp.Popen(['green', '-v', target])
             p.wait()
+        elif which('nosetests') and importable('nose_ignoredoc'):
+            tl = glob.glob(util.pj(target, 'test_*.py'))
+            p = subp.Popen(['nosetests', '-v', '-c', 'nose.cfg'] + tl)
+            p.wait()
+        else:
+            tl = glob.glob(util.pj(target, 'test_*.py'))
+            for t in tl:
+                p = subp.Popen([t, '-v'])
+                p.wait()
 
 # -----------------------------------------------------------------------------
 def bscr_uninstall(args):

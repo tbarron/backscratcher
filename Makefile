@@ -15,6 +15,7 @@ help:
 	@echo "   refresh    - refresh and upgrade the distro"
 	@echo "   sdist      - build the distro"
 	@echo "   tags       - create a TAGS file for emacs"
+	@echo "   uninstall  - remove backscratcher from current system"
 	@echo "   upgrade    - pip install --upgrade dist/backscratcher-$(VERSION).tar.gz"
 	@echo "   utest      - use unittest to run the tests"
 
@@ -26,6 +27,9 @@ nose:
 
 install:
 	pip install dist/backscratcher-$(VERSION).tar.gz
+
+uninstall:
+	pip uninstall backscratcher
 
 readme:
 	cp README.md README
