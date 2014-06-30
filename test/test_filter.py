@@ -1,0 +1,41 @@
+from bscr import filter
+import unittest
+
+class TestFilter(unittest.TestCase):
+    # -------------------------------------------------------------------------
+    def test_constructor(self):
+        xyz = filter.filter()
+        for attr in ['ignore', 'is_interesting', 'is_keepable',
+                     'keep', 'IGN', 'KEEP', '__new__']:
+            assert(attr in dir(xyz))
+
+    # -------------------------------------------------------------------------
+    def test_ignore(self):
+        x = filter.filter()
+        x.ignore('12345')
+        assert('12345' in x.IGN)
+        assert(len(x.IGN) == 1)
+        assert('foobar' not in x.IGN)
+
+    # -------------------------------------------------------------------------
+    def test_is_interesting(self):
+        x = filter.filter()
+        x.ignore('abccd')
+        assert(not x.is_interesting('one two abccd three four'))
+        assert(x.is_interesting('foo bar wokka wokka'))
+
+    # -------------------------------------------------------------------------
+    def test_keep(self):
+        x = filter.filter()
+        x.keep('precious')
+        assert('precious' in x.KEEP)
+        assert(len(x.KEEP) == 1)
+        assert('frippery' not in x.KEEP)
+
+    # -------------------------------------------------------------------------
+    def test_is_keepable(self):
+        x = filter.filter()
+        x.keep('precious')
+        assert(x.is_keepable('woo hoo! precious little got done today!'))
+        assert(not x.is_keepable('not worth nuthin'))
+

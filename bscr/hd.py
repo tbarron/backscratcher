@@ -1,4 +1,3 @@
-#!/usr/bin/python
 """
 hexdump a file or data stream
 
@@ -64,37 +63,27 @@ def main(argv=None):
 
 
 # -----------------------------------------------------------------------------
-def hexdump(input):
+def hexdump(input, output=sys.stdout):
     d = input.read()
     for b in range(0, len(d), 16):
         for o in range(0, min(len(d)-b, 16)):
             if 0 == o % 4:
-                sys.stdout.write(" ")
-            sys.stdout.write("%02x " % ord(d[b+o]))
+                output.write(" ")
+            output.write("%02x " % ord(d[b+o]))
         for o in range(min(len(d)-b, 16), 16):
             if 0 == o % 4:
-                sys.stdout.write(" ")
-            sys.stdout.write("   ")
-        sys.stdout.write("  ")
+                output.write(" ")
+            output.write("   ")
+        output.write("  ")
         for o in range(0, min(len(d)-b, 16)):
             if 0 == o % 8:
-                sys.stdout.write(" ")
+                output.write(" ")
             if d[b+o] < ' ' or 0x7f < ord(d[b+o]):
-                sys.stdout.write(".")
+                output.write(".")
             else:
-                sys.stdout.write("%c" % d[b+o])
+                output.write("%c" % d[b+o])
         for o in range(min(len(d)-b, 16), 16):
             if 0 == o % 8:
-                sys.stdout.write(" ")
-            sys.stdout.write(" ")
-        sys.stdout.write("\n")
-
-
-# ---------------------------------------------------------------------------
-class HdTest(unittest.TestCase):
-    def test_example(self):
-        print("hd needs more tests")
-        assert(False)
-
-# ---------------------------------------------------------------------------
-toolframe.ez_launch(main)
+                output.write(" ")
+            output.write(" ")
+        output.write("\n")

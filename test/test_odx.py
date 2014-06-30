@@ -16,18 +16,6 @@ import unittest
 # odx(0987)       => ValueError
 # odx(0x5234g7)   => ValueError
 
-class StdoutExcursion(object):
-    def __init__(self):
-        self.stdout = sys.stdout
-
-    def __enter__(self):
-        sys.stdout = sio.StringIO()
-        return sys.stdout
-
-    def __exit__(self, type, value, traceback):
-        sys.stdout.close()
-        sys.stdout = self.stdout
-                                            
 # -----------------------------------------------------------------------------
 class TestOdx(testhelp.HelpedTestCase):
     # -------------------------------------------------------------------------

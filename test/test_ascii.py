@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from bscr import util
 import os
 import sys
 #sys.path.insert(0, os.getcwd())
@@ -41,8 +42,8 @@ class TestAscii(unittest.TestCase):
     "0x68 h   0x69 i   0x6a j   0x6b k   0x6c l   0x6d m   0x6e n   0x6f o",
     "0x70 p   0x71 q   0x72 r   0x73 s   0x74 t   0x75 u   0x76 v   0x77 w",
     "0x78 x   0x79 y   0x7a z   0x7b {   0x7c |   0x7d }   0x7e ~",
+    ""
     ]
-
         
     # -------------------------------------------------------------------------
     def test_ascii(self):
@@ -56,14 +57,24 @@ class TestAscii(unittest.TestCase):
             rline = rline.rstrip(" ")
             self.assertEqual(self.expected[eidx], rline,
                              'Expected \n' +
-                             '"""\n%s (%d)\n"""' %
-                             (repr(self.expected[eidx]),
-                              len(self.expected[eidx])) +
+                             util.lquote('%s (%d)' %
+                                         (repr(self.expected[eidx]),
+                                          len(self.expected[eidx]))) +
                              '\n but got \n' +
-                             '"""\n%s (%d)\n"""\n' %
-                             (repr(rline),
-                              len(rline)))
+                             util.lquote('%s (%d)' %
+                                         (repr(rline),
+                                          len(rline))))
             eidx += 1
+
+    # -------------------------------------------------------------------------
+    def test_final_newline(self):
+        """
+        Run ascii and verify output ends with a newline
+        """
+        # pdb.set_trace()
+        result = pexpect.run("bin/ascii")
+        self.assertTrue(result.endswith("\n"),
+                        "ascii output should end with newline")
 
 # ---------------------------------------------------------------------------
 if __name__ == '__main__':

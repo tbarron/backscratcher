@@ -44,6 +44,7 @@ def main(argv=None):
         if (i+1) % 8 == 0:
             sys.stdout.write('\n')
 
-
+    sys.stdout.write("\n")
+    
 # ---------------------------------------------------------------------------
 #toolframe.ez_launch(__name__, main)

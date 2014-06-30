@@ -3,6 +3,7 @@ import pdb
 from bscr import fl
 from bscr import util
 import os
+import pexpect
 import random
 import shutil
 import stat
@@ -27,6 +28,25 @@ def tearDownModule():
 
 # ---------------------------------------------------------------------------
 class TestFL(unittest.TestCase):
+    # -----------------------------------------------------------------------
+    def test_command_line(self):
+        here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        if here == 'bscr':
+            sp = os.path.dirname(here)
+            f = util.contents("%s/backscratcher-learn-py2.7.egg-info/installed-files.txt" %
+                              sp)
+            for each in f:
+                if each.endswith("bin/%s" % fl):
+                    thisone = each
+        else:
+            thisone = "%s/bin/fl" % here
+
+        result = pexpect.run(thisone)
+        self.assertNotIn("Traceback", result)
+        self.assertIn("diff", result)
+        self.assertIn("save", result)
+        self.assertIn("times", result)
+
     # -----------------------------------------------------------------------
     def test_most_recent_prefix_match(self):
         """

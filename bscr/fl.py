@@ -313,11 +313,11 @@ def most_recent_prefix_match(dir, filename):
 
 
 # ---------------------------------------------------------------------------
-def cleanup_tests():
-    if os.path.basename(os.getcwd()) == 'fl_tests':
-        os.chdir('..')
-
-    if os.path.exists('./fl_tests'):
-        tpbtools.rmrf('./fl_tests')
+# def cleanup_tests():
+#     if os.path.basename(os.getcwd()) == 'fl_tests':
+#         os.chdir('..')
+# 
+#     if os.path.exists('./fl_tests'):
+#         tpbtools.rmrf('./fl_tests')
 
 

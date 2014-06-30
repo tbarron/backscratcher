@@ -56,14 +56,32 @@ def contents(filename):
 
 
 # -----------------------------------------------------------------------------
-def dispatch(args, prefix, mname):
+def dispatch(mname, prefix, args):
+    # pdb.set_trace()
     called_as = args.pop(0)
     try:
         func_name = args.pop(0)
     except IndexError:
-        func_name = 'help'
-    func = getattr(sys.modules[mname], "_".join([prefix,func_name]))
-    return func(args)
+        dispatch_help(mname, prefix, args)
+        return
+
+    if func_name == 'help':
+        dispatch_help(mname, prefix, args)
+    else:
+        func = getattr(sys.modules[mname], "_".join([prefix,func_name]))
+        func(args)
+
+# ---------------------------------------------------------------------------
+def dispatch_help(mname, prefix, args):
+    mod = sys.modules[mname]
+    if len(args) < 1:
+        for fname in [x for x in dir(mod) if x.startswith(prefix)]:
+            func = getattr(mod, fname)
+            print func.__doc__.split("\n")[0]
+    else:
+        fname = "_".join([prefix, args[0]])
+        func = getattr(mod, fname)
+        print func.__doc__
 
 # ---------------------------------------------------------------------------
 def expand(path):
@@ -145,6 +163,16 @@ def writefile(filepath, lines):
     f.close()
 
 
+# ---------------------------------------------------------------------------
+def lquote(text):
+    return '\n'.join(['"""', text.rstrip(), '"""'])
+
+# ---------------------------------------------------------------------------
+def findroot():
+    afile = os.path.abspath(__file__)
+    bscr = os.path.dirname(afile)
+    return bscr
+    
 # ---------------------------------------------------------------------------
 def tpb_cleanup_tests():
     global testdir
