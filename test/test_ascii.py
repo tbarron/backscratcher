@@ -9,7 +9,6 @@ import testhelp
 import toolframe
 import unittest
 
-
 # ---------------------------------------------------------------------------
 def tearDownModule():
     flist = ['testdata']
@@ -67,6 +66,20 @@ class TestAscii(unittest.TestCase):
             eidx += 1
 
     # -------------------------------------------------------------------------
+    def test_ascii_help(self):
+        """
+        Run 'ascii --help' and validate the output
+        """
+        where = pexpect.which('ascii')
+        if where is None:
+            where = 'bin/ascii'
+        cmd = '%s --help' % where
+        result = pexpect.run(cmd)
+        exp = "Display ASCII collating sequence"
+        self.assertTrue(exp in result, "Expected '%s' in %s" %
+                        (exp, util.lquote(result)))
+
+    # -------------------------------------------------------------------------
     def test_final_newline(self):
         """
         Run ascii and verify output ends with a newline
@@ -76,6 +89,22 @@ class TestAscii(unittest.TestCase):
         self.assertTrue(result.endswith("\n"),
                         "ascii output should end with newline")
 
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_which_module(self):
+        """
+        Verify that we're importing the right align module
+        """
+        self.fail("construction")
+        
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_which_script(self):
+        """
+        Verify that we're running the right script
+        """
+        self.fail('construction')
+        
 # ---------------------------------------------------------------------------
 if __name__ == '__main__':
     unittest.main()

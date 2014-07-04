@@ -28,6 +28,13 @@ def tearDownModule():
 
 # ---------------------------------------------------------------------------
 class TestFL(unittest.TestCase):
+    # tests needed:
+    #   'fl' -- test_command_line
+    #   'fl help' -- test_fl_help
+    #   'fl help help' -- test_fl_help_help
+    #   'fl help rm_cr'
+    #   'fl times'
+    #   'fl nosuchcmd'
     # -----------------------------------------------------------------------
     def test_command_line(self):
         here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -41,13 +48,44 @@ class TestFL(unittest.TestCase):
         else:
             thisone = "%s/bin/fl" % here
 
-        print(thisone)
+        # print(thisone)
         result = pexpect.run(thisone)
         self.assertNotIn("Traceback", result)
         self.assertIn("diff", result)
         self.assertIn("save", result)
         self.assertIn("times", result)
 
+    # -------------------------------------------------------------------------
+    def test_fl_help(self):
+        where = pexpect.which('fl')
+        here = os.path.basename(os.getcwd())
+        if where is None or here == 'backscratcher':
+            cmd = "bin/fl"
+        else:
+            cmd = "fl"
+            
+        result = pexpect.run('%s help' % cmd)
+        self.assertFalse('Traceback' in result)
+        for f in [x for x in dir(fl) if x.startswith('bscr_')]:
+            subc = f.replace('bscr_', '')
+            self.assertTrue('%s - ' % subc in result)
+        
+    # -------------------------------------------------------------------------
+    def test_fl_help_help(self):
+        where = pexpect.which('fl')
+        here = os.path.basename(os.getcwd())
+        if where is None or here == 'backscratcher':
+            cmd = "bin/fl"
+        else:
+            cmd = "fl"
+            
+        result = pexpect.run('%s help help' % cmd)
+        self.assertFalse('Traceback' in result)
+        for f in ['help - show a list of available commands',
+                  'With no arguments, show a list of commands',
+                  'With a command as argument, show help for that command',]:
+            self.assertTrue(f in result)
+        
     # -----------------------------------------------------------------------
     def test_most_recent_prefix_match(self):
         """
@@ -152,6 +190,22 @@ class TestFL(unittest.TestCase):
             fl.fl_set_mtime_to_atime([filename])
             s = os.stat(filename)
             assert(s[stat.ST_ATIME] == s[stat.ST_MTIME])
+
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_which_module(self):
+        """
+        Verify that we're importing the right align module
+        """
+        self.fail("construction")
+        
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_which_script(self):
+        """
+        Verify that we're running the right script
+        """
+        self.fail('construction')
 
 if __name__ == '__main__':
     unittest.main()

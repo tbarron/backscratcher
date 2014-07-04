@@ -4,6 +4,7 @@ import unittest
 
 # -----------------------------------------------------------------------------
 class TestCalc(unittest.TestCase):
+    # -------------------------------------------------------------------------
     def test_example(self):
         S = pexpect.spawn("bin/calc")
         # S.logfile = sys.stdout
@@ -28,6 +29,30 @@ class TestCalc(unittest.TestCase):
         S.expect(pexpect.EOF)
         S.close()
 
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_calc_help(self):
+        """
+        Verify that 'calc --help' does the right thing
+        """
+        self.fail('construction')
+    
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_which_module(self):
+        """
+        Verify that we're importing the right align module
+        """
+        self.fail('construction')
+        
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_which_script(self):
+        """
+        Verify that we're running the right script
+        """
+        self.fail('construction')
+        
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
     unittest.main()

@@ -39,3 +39,11 @@ class TestFilter(unittest.TestCase):
         assert(x.is_keepable('woo hoo! precious little got done today!'))
         assert(not x.is_keepable('not worth nuthin'))
 
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_which_module(self):
+        """
+        Verify that we're importing the right align module
+        """
+        self.fail("construction")
+        

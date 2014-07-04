@@ -324,6 +324,30 @@ class TestXclean(unittest.TestCase):
                        [False, True, False, True])
 
     # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_xclean_help(self):
+        """
+        Verify that 'xclean --help' does the right thing
+        """
+        pass
+    
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_which_module(self):
+        """
+        Verify that we're importing the right align module
+        """
+        self.fail("construction")
+        
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_which_script(self):
+        """
+        Verify that we're running the right script
+        """
+        self.fail('construction')
+
+    # -------------------------------------------------------------------------
     def verify_exists(self, tv, rv):
         for fl, exp in zip(tv, rv):
             for fp in fl:

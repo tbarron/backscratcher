@@ -459,6 +459,30 @@ class TestFx(unittest.TestCase):
         actual = self.undirect()
         assert(actual == exp)
 
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_fx_help(self):
+        """
+        Verify that 'fx --help' does the right thing
+        """
+        pass
+    
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_which_module(self):
+        """
+        Verify that we're importing the right align module
+        """
+        self.fail("construction")
+        
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_which_script(self):
+        """
+        Verify that we're running the right script
+        """
+        self.fail('construction')
+
     # -----------------------------------------------------------------------
     def check_result(self, expr, expected, actual):
         """

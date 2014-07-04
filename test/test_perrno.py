@@ -23,3 +23,27 @@ class TestPerrno(unittest.TestCase):
         result = perrno.etranslate("3")
         self.assertEqual("    3  ESRCH            No such process", result)
 
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_perrno_help(self):
+        """
+        Verify that 'perrno --help' does the right thing
+        """
+        pass
+    
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_which_module(self):
+        """
+        Verify that we're importing the right align module
+        """
+        self.fail("construction")
+        
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_which_script(self):
+        """
+        Verify that we're running the right script
+        """
+        self.fail('construction')
+

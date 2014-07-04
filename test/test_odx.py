@@ -57,6 +57,30 @@ class TestOdx(testhelp.HelpedTestCase):
 
         self.exp_in_got(exp, str(v.exception))
 
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_odx_help(self):
+        """
+        Verify that 'odx --help' does the right thing
+        """
+        pass
+    
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_which_module(self):
+        """
+        Verify that we're importing the right align module
+        """
+        self.fail("construction")
+        
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_which_script(self):
+        """
+        Verify that we're running the right script
+        """
+        self.fail('construction')
+
 if __name__ == '__main__':
     unittest.main()
     

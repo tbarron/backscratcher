@@ -35,6 +35,14 @@ class TestAlign(unittest.TestCase):
                 "foobard  simplification  denomination  vituperation" +
                 "  spalshy      \r\n")
     # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_align_help(self):
+        """
+        Verify that 'align --help' does the right thing
+        """
+        pass
+    
+    # -------------------------------------------------------------------------
     def test_digit_alignment(self):
         """
         Words that contain valid numeric specifications should be right
@@ -68,10 +76,7 @@ class TestAlign(unittest.TestCase):
             f.write(line + "\n")
         f.close()
 
-        S = pexpect.spawn("bin/align %s" % tfilename)
-        S.expect(pexpect.EOF)
-        x = S.before
-        S.close()
+        x = pexpect.run("bin/align %s" % tfilename)
 
         self.assertEqual(self.expected, x,
                          '"""\n%s\n"""(%d)\n\n' %
@@ -81,6 +86,22 @@ class TestAlign(unittest.TestCase):
                          '\n\n"""\n%s\n"""(%d)' %
                          (x.replace(' ', '-'), len(x)))
 
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_which_module(self):
+        """
+        Verify that we're importing the right align module
+        """
+        self.fail('construction')
+        
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_which_script(self):
+        """
+        Verify that we're running the right script
+        """
+        self.fail('construction')
+        
 # ---------------------------------------------------------------------------
 if __name__ == '__main__':
     unittest.main()

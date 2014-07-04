@@ -22,13 +22,25 @@ GNU General Public License for more details.
 """
 
 import getopt
+import optparse
 import pdb
 import sys
 import toolframe
 
-
 # ---------------------------------------------------------------------------
 def main(argv=None):
+    p = optparse.OptionParser()
+    p.add_option('-d', '--debug',
+                 action='store_true', default=False, dest='debug',
+                 help='run under the debugger')
+    (o, a) = p.parse_args(argv)
+
+    if o.debug: pdb.set_trace()
+
+    if (1 < len(a)) and ('help' == a[1]):
+        print "ascii - Display ASCII collating sequence"
+        return
+    
     asc = ['NUL', 'SOH', 'STX', 'ETX', 'EOT', 'ENQ', 'ACK', 'BEL', 'BS',
            'TAB', 'LF', 'VT', 'FF', 'CR', 'SO', 'SI', 'DLE', 'DC1', 'DC2',
            'DC3', 'DC4', 'NAK', 'SYN', 'ETB', 'CAN', 'EM', 'SUB', 'ESC',

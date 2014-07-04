@@ -11,6 +11,30 @@ class TestChron(unittest.TestCase):
         self.assertEqual(exp, act,
                          "Expected %d, got %d" % (exp, act))
 
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_chron_help(self):
+        """
+        Verify that 'chron --help' does the right thing
+        """
+        pass
+    
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_which_module(self):
+        """
+        Verify that we're importing the right align module
+        """
+        pass
+        
+    # -------------------------------------------------------------------------
+    @unittest.skip("under construction")
+    def test_which_script(self):
+        """
+        Verify that we're running the right script
+        """
+        pass
+        
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
     unittest.main()
