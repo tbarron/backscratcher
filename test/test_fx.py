@@ -1,28 +1,43 @@
 from bscr import fx
+from bscr import util as U
 import glob
 import re
 import optparse
 import os
 import pdb
+import pexpect
+import shutil
 import StringIO
 import sys
 import testhelp as th
 import unittest
-from bscr import util
 
 # ---------------------------------------------------------------------------
 class TestFx(unittest.TestCase):
     """
     Tests for code in fx.py.
     """
-    testdir = "fx_test"
+    testdir = "/tmp/fx_test"
     
+    # -----------------------------------------------------------------------
+    @classmethod
+    def setUpClass(cls):
+        if not os.path.exists(TestFx.testdir):
+            os.mkdir(TestFx.testdir)
+
+    # -----------------------------------------------------------------------
+    @classmethod
+    def tearDownClass(cls):
+        kf = os.getenv("KEEPFILES")
+        if kf is None or not int(kf):
+            shutil.rmtree(TestFx.testdir)
+        
     # -----------------------------------------------------------------------
     def test_BatchCommand_both(self):
         """
         Test BatchCommand with dryrun True and quiet True.
         """
-        with util.Chdir(self.testdir):
+        with U.Chdir(self.testdir):
             inlist = range(1, 250)
             f = open('tmpfile', 'w')
             for x in inlist:
@@ -50,8 +65,7 @@ class TestFx(unittest.TestCase):
         """
         Test BatchCommand with dryrun True and quiet False.
         """
-        # self.into_testdir()
-        with util.Chdir(self.testdir):
+        with U.Chdir(self.testdir):
             inlist = range(1, 250)
             f = open('tmpfile', 'w')
             for x in inlist:
@@ -79,8 +93,7 @@ class TestFx(unittest.TestCase):
         """
         Test BatchCommand with dryrun and quiet both False.
         """
-        # self.into_testdir()
-        with util.Chdir(self.testdir):
+        with U.Chdir(self.testdir):
             inlist = range(1, 250)
             f = open('tmpfile', 'w')
             for x in inlist:
@@ -109,8 +122,7 @@ class TestFx(unittest.TestCase):
         """
         Test BatchCommand with dryrun False and quiet True.
         """
-        # self.into_testdir()
-        with util.Chdir(self.testdir):
+        with U.Chdir(self.testdir):
             inlist = range(1, 250)
             f = open('tmpfile', 'w')
             for x in inlist:
@@ -139,8 +151,7 @@ class TestFx(unittest.TestCase):
         """
         Test IterateCommand() with dryrun True and quiet True.
         """
-        # self.into_testdir()
-        with util.Chdir(self.testdir):
+        with U.Chdir(self.testdir):
             v = optparse.Values({'dryrun': True, 'quiet': True,
                                  'cmd': 'echo %',
                                  'irange': '5:10'})
@@ -157,8 +168,7 @@ class TestFx(unittest.TestCase):
         """
         Test IterateCommand() with dryrun True and quiet False.
         """
-        # self.into_testdir()
-        with util.Chdir(self.testdir):
+        with U.Chdir(self.testdir):
             v = optparse.Values({'dryrun': True, 'quiet': False,
                                  'cmd': 'echo %',
                                  'irange': '5:10'})
@@ -175,8 +185,7 @@ class TestFx(unittest.TestCase):
         """
         Test IterateCommand() with dryrun False and quiet False.
         """
-        # self.into_testdir()
-        with util.Chdir(self.testdir):
+        with U.Chdir(self.testdir):
             v = optparse.Values({'dryrun': False, 'quiet': False,
                                  'cmd': 'echo %',
                                  'irange': '5:10'})
@@ -193,8 +202,7 @@ class TestFx(unittest.TestCase):
         Test IterateCommand() with dryrun False and quiet True.
         """
         # pdb.set_trace()
-        # self.into_testdir()
-        with util.Chdir(self.testdir):
+        with U.Chdir(self.testdir):
             v = optparse.Values({'dryrun': False, 'quiet': True,
                                  'cmd': 'echo %',
                                  'irange': '5:10'})
@@ -210,8 +218,7 @@ class TestFx(unittest.TestCase):
         """
         Test SubstCommand() with dryrun True and quiet True.
         """
-        # self.into_testdir()
-        with util.Chdir(self.testdir):
+        with U.Chdir(self.testdir):
             v = optparse.Values({'dryrun': True, 'quiet': True, 'cmd': 'ls %'})
             a = ['a.pl', 'b.pl', 'c.pl']
             exp = "".join(["would do 'ls %s'\n" % x for x in a])
@@ -228,8 +235,7 @@ class TestFx(unittest.TestCase):
         """
         Test SubstCommand() with dryrun True and quiet False.
         """
-        # self.into_testdir()
-        with util.Chdir(self.testdir):
+        with U.Chdir(self.testdir):
             v = optparse.Values({'dryrun': True, 'quiet': False, 'cmd': 'ls %'})
             a = ['a.pl', 'b.pl', 'c.pl']
             exp = "".join(["would do 'ls %s'\n" % x for x in a])
@@ -246,8 +252,7 @@ class TestFx(unittest.TestCase):
         """
         Test SubstCommand() with dryrun False and quiet False.
         """
-        # self.into_testdir()
-        with util.Chdir(self.testdir):
+        with U.Chdir(self.testdir):
             v = optparse.Values({'dryrun': False, 'quiet': False, 'cmd': 'ls %'})
             a = ['a.pl', 'b.pl', 'c.pl']
             exp = "".join(['ls %s\n%s\n' % (x, x) for x in a])
@@ -264,8 +269,7 @@ class TestFx(unittest.TestCase):
         """
         Test SubstCommand() with dryrun False and quiet True.
         """
-        # self.into_testdir()
-        with util.Chdir(self.testdir):
+        with U.Chdir(self.testdir):
             v = optparse.Values({'dryrun': False, 'quiet': True, 'cmd': 'ls %'})
             a = ['a.pl', 'b.pl', 'c.pl']
             exp = "".join(['%s\n' % x for x in a])
@@ -282,8 +286,7 @@ class TestFx(unittest.TestCase):
         """
         Test SubstRename() with dryrun True and quiet True.
         """
-        # self.into_testdir()
-        with util.Chdir(self.testdir):
+        with U.Chdir(self.testdir):
             arglist = ['a.pl', 'b.pl', 'c.pl']
             for a in arglist:
                 self.touch(a)
@@ -307,7 +310,7 @@ class TestFx(unittest.TestCase):
         """
         Test SubstRename() with dryrun True and quiet False.
         """
-        with util.Chdir(self.testdir):
+        with U.Chdir(self.testdir):
             arglist = ['a.pl', 'b.pl', 'c.pl']
             for a in arglist:
                 self.touch(a)
@@ -331,7 +334,7 @@ class TestFx(unittest.TestCase):
         """
         Test SubstRename() with dryrun False and quiet False.
         """
-        with util.Chdir(self.testdir):
+        with U.Chdir(self.testdir):
             arglist = ['a.pl', 'b.pl', 'c.pl']
             for a in arglist:
                 self.touch(a)
@@ -355,7 +358,7 @@ class TestFx(unittest.TestCase):
         """
         Test SubstRename() with dryrun False and quiet True.
         """
-        with util.Chdir(self.testdir):
+        with U.Chdir(self.testdir):
             arglist = ['a.pl', 'b.pl', 'c.pl']
             for a in arglist:
                 self.touch(a)
@@ -395,7 +398,7 @@ class TestFx(unittest.TestCase):
         Test routine psys with dryrun False and quiet False.
         """
         # self.redirect()
-        root = util.findroot()
+        root = U.findroot()
         with th.StdoutExcursion() as getval:
             v = optparse.Values({'dryrun': False, 'quiet': False})
             fx.psys('ls -d %s/fx.py' % root, v)
@@ -446,43 +449,60 @@ class TestFx(unittest.TestCase):
         """
         Test the Usage routine.
         """
-        self.redirect()
-        fx.Usage()
         exp = '\n'
-        exp += '  fx [-n] -c <command> <files> (% in the command becomes'
+        exp += '    fx [-n] -c <command> <files> (% in the command becomes'
         exp += ' filename)\n'
-        exp += '          -e s/old/new/ <files> (rename file old to new'
+        exp += '            -e s/old/new/ <files> (rename file old to new'
         exp += ' name)\n'
-        exp += '          -i low:high <command> (% ranges from low to'
-        exp += ' high-1)\n'
-        exp += '\n'
-        actual = self.undirect()
-        assert(actual == exp)
+        exp += '            -i low:high -c <command> (% ranges from low to'
+        exp += ' high-1)\n            '
+        actual = fx.Usage()
+        self.assertEqual(actual, exp,
+                         "%s != %s" %
+                         (U.lquote(repr(actual)), U.lquote(repr(exp))))
 
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
     def test_fx_help(self):
         """
         Verify that 'fx --help' does the right thing
         """
-        pass
+        # pdb.set_trace()
+        exp_l = ["Usage:",
+                 "fx [-n] -c <command> <files> (% in the command becomes" +
+                 " filename)",
+                 "-e s/old/new/ <files> (rename file old to new name)",
+                 "-i low:high -c <command> (% ranges from low to high-1)",
+                 "Options:",
+                 "",
+                 "-c CMD, --command=CMD",
+                 "command to apply to all arguments",
+                 "-d, --debug           run under the debugger",
+                 "-e EDIT, --edit=EDIT  file rename expression applied to " +
+                 "all arguments",
+                 " -i IRANGE, --integer=IRANGE",
+                 "low:high -- generate range of numbers",
+                 "-n, --dryrun          dryrun or execute",
+                 "-q, --quiet           don't echo commands, just run them",
+                 "-x, --xargs           batch input from stdin into command" +
+                 " lines like xargs",
+                 ]
+        script = U.script_location("fx")
+        result = pexpect.run("%s --help" % script)
+        for exp_s in exp_l:
+            self.assertTrue(exp_s in result,
+                            "Expected '%s' in %s" %
+                            (exp_s, U.lquote(result)))
     
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
-        self.fail("construction")
+        idir = U.bscr_root(sys.modules['bscr.fx'].__file__)
+        exp = U.bscr_test_root(__file__)
+        self.assertEqual(exp, idir,
+                         "Expected '%s', got '%s'" % (exp, idir))
         
-    # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
-    def test_which_script(self):
-        """
-        Verify that we're running the right script
-        """
-        self.fail('construction')
-
     # -----------------------------------------------------------------------
     def check_result(self, expr, expected, actual):
         """
@@ -493,20 +513,6 @@ class TestFx(unittest.TestCase):
         if not expr:
             raise AssertionError("'''\n%s\n''' != '''\n%s\n'''"
                                  % (expected, actual))
-
-    # -----------------------------------------------------------------------
-    def into_testdir(self):
-        """
-        Make sure we're in the test directory.
-
-        Create it if necessary, then step down into it unless we're
-        already there.
-        """
-        x = os.getcwd()
-        if os.path.basename(x) != 'fx_test':
-            if not os.path.exists('fx_test'):
-                os.mkdir('fx_test')
-            os.chdir('fx_test')
 
     # -----------------------------------------------------------------------
     def indirect(self, filename):

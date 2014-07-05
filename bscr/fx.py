@@ -99,7 +99,7 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    p = optparse.OptionParser()
+    p = optparse.OptionParser(usage=Usage())
     p.add_option('-c', '--command',
                  action='store', default='', dest='cmd', type='string',
                  help='command to apply to all arguments')
@@ -137,7 +137,7 @@ def main(argv=None):
     elif o.cmd != '':
         SubstCommand(o, a[1:])
     else:
-        Usage()
+        print Usage()
 
 
 # ---------------------------------------------------------------------------
@@ -230,12 +230,11 @@ def Usage():
     """
     Report program usage.
     """
-    print
-    print('  fx [-n] -c <command> <files> (% in the command becomes filename)')
-    print('          -e s/old/new/ <files> (rename file old to new name)')
-    print('          -i low:high <command> (% ranges from low to high-1)')
-    print
-
+    return """
+    fx [-n] -c <command> <files> (% in the command becomes filename)
+            -e s/old/new/ <files> (rename file old to new name)
+            -i low:high -c <command> (% ranges from low to high-1)
+            """
 
 # ---------------------------------------------------------------------------
 def xargs_wrap(cmd, input):
