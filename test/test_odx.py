@@ -1,6 +1,7 @@
 #!/usr/bin/env python
+from bscr import odx
+from bscr import util as U
 from contextlib import closing
-import odx
 import os
 import pdb
 import pexpect
@@ -58,29 +59,34 @@ class TestOdx(testhelp.HelpedTestCase):
         self.exp_in_got(exp, str(v.exception))
 
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
     def test_odx_help(self):
         """
         Verify that 'odx --help' does the right thing
         """
-        pass
-    
+        exp = ["Usage: odx {0<octal-value>|<decimal-value>|0x<hex-value>} ...",
+               "    report each argument in octal, decimal, and hex format",
+               "",
+               "Options:",
+               "  -h, --help   show this help message and exit",
+               "  -d, --debug  run under debugger",
+               ]
+        cmd = U.script_location("odx")
+        actual = pexpect.run("%s --help" % cmd)
+        for line in exp:
+            self.assertTrue(line in actual,
+                            "Expected '%s' in %s" %
+                            (line, U.lquote(actual)))
+
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
-        self.fail("construction")
+        idir = U.bscr_root(sys.modules['bscr.odx'].__file__)
+        exp = U.bscr_test_root(__file__)
+        self.assertEqual(exp, idir,
+                         "Expected '%s', got '%s'" % (exp, idir))
         
-    # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
-    def test_which_script(self):
-        """
-        Verify that we're running the right script
-        """
-        self.fail('construction')
-
 if __name__ == '__main__':
     unittest.main()
     
