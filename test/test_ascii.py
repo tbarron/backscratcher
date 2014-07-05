@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-from bscr import util
+from bscr import ascii
+from bscr import util as U
 import os
 import sys
-#sys.path.insert(0, os.getcwd())
 import pdb
 import pexpect
 import testhelp
@@ -56,11 +56,11 @@ class TestAscii(unittest.TestCase):
             rline = rline.rstrip(" ")
             self.assertEqual(self.expected[eidx], rline,
                              'Expected \n' +
-                             util.lquote('%s (%d)' %
+                             U.lquote('%s (%d)' %
                                          (repr(self.expected[eidx]),
                                           len(self.expected[eidx]))) +
                              '\n but got \n' +
-                             util.lquote('%s (%d)' %
+                             U.lquote('%s (%d)' %
                                          (repr(rline),
                                           len(rline))))
             eidx += 1
@@ -70,14 +70,11 @@ class TestAscii(unittest.TestCase):
         """
         Run 'ascii --help' and validate the output
         """
-        where = pexpect.which('ascii')
-        if where is None:
-            where = 'bin/ascii'
-        cmd = '%s --help' % where
-        result = pexpect.run(cmd)
+        cmd = U.script_location("ascii")
+        result = pexpect.run("%s --help" % cmd)
         exp = "Display ASCII collating sequence"
         self.assertTrue(exp in result, "Expected '%s' in %s" %
-                        (exp, util.lquote(result)))
+                        (exp, U.lquote(result)))
 
     # -------------------------------------------------------------------------
     def test_final_newline(self):
@@ -90,20 +87,14 @@ class TestAscii(unittest.TestCase):
                         "ascii output should end with newline")
 
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
-        self.fail("construction")
-        
-    # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
-    def test_which_script(self):
-        """
-        Verify that we're running the right script
-        """
-        self.fail('construction')
+        idir = U.bscr_root(sys.modules['bscr.ascii'].__file__)
+        exp = U.bscr_test_root(__file__)
+        self.assertEqual(exp, idir,
+                         "Expected '%s', got '%s'" % (exp, idir))
         
 # ---------------------------------------------------------------------------
 if __name__ == '__main__':
