@@ -3,8 +3,11 @@
 perrno tests
 """
 from bscr import perrno
-import unittest
+from bscr import util as U
+import pexpect
+import sys
 import testhelp as th
+import unittest
 
 # -----------------------------------------------------------------------------
 class TestPerrno(unittest.TestCase):
@@ -24,26 +27,31 @@ class TestPerrno(unittest.TestCase):
         self.assertEqual("    3  ESRCH            No such process", result)
 
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
     def test_perrno_help(self):
         """
         Verify that 'perrno --help' does the right thing
         """
-        pass
+        exp = ["Usage: perrno {-a|--all|number ...|errname ...}",
+               "    report errno numeric and string values",
+               "",
+               "Options:",
+               "  -h, --help   show this help message and exit",
+               "  -a, --all    list all errno values",
+               "  -d, --debug  run the debugger",
+               ]
+        cmd = U.script_location("perrno")
+        actual = pexpect.run("%s --help" % cmd)
+        for line in exp:
+            self.assertTrue(line in actual,
+                            "Expected '%s' in %s" %
+                            (line, U.lquote(actual)))
     
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
-        self.fail("construction")
-        
-    # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
-    def test_which_script(self):
-        """
-        Verify that we're running the right script
-        """
-        self.fail('construction')
-
+        idir = U.bscr_root(sys.modules['bscr.perrno'].__file__)
+        exp = U.bscr_test_root(__file__)
+        self.assertEqual(exp, idir,
+                         "Expected '%s', got '%s'" % (exp, idir))
