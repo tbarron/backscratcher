@@ -44,6 +44,22 @@ class Chdir(object):
         os.chdir(self.start)
 
 # ---------------------------------------------------------------------------
+def abspath(rpath):
+    """
+    Convenience wrapper for os.path.abspath()
+    """
+    return os.path.abspath(rpath)
+
+
+# ---------------------------------------------------------------------------
+def basename(rpath):
+    """
+    Convenience wrapper for os.path.basename()
+    """
+    return os.path.basename(rpath)
+
+
+# ---------------------------------------------------------------------------
 def contents(filename):
     '''
     Contents of filename in a list, one line per element. If filename does
@@ -53,6 +69,14 @@ def contents(filename):
     rval = f.readlines()
     f.close()
     return rval
+
+
+# ---------------------------------------------------------------------------
+def dirname(rpath):
+    """
+    Convenience wrapper for os.path.dirname()
+    """
+    return os.path.dirname(rpath)
 
 
 # -----------------------------------------------------------------------------
@@ -96,11 +120,17 @@ def dispatch_help(mname, prefix, args):
 
 # ---------------------------------------------------------------------------
 def expand(path):
+    """
+    Return a pathname with any "~" or env variables expanded.
+    """
     return os.path.expandvars(os.path.expanduser(path))
 
 
 # ---------------------------------------------------------------------------
 def fatal(msg):
+    """
+    Print an error message and exit.
+    """
     print ' '
     print '   %s' % msg
     print ' '
@@ -109,7 +139,47 @@ def fatal(msg):
 
 # ---------------------------------------------------------------------------
 def function_name():
+    """
+    Return the name of the caller.
+    """
     return sys._getframe(1).f_code.co_name
+
+
+# -----------------------------------------------------------------------------
+def in_bscr_repo():
+    try:
+        c = contents("./.git/description")
+    except IOError:
+        return False
+
+    if "backscratcher" not in "".join(c):
+        return False
+
+    return True
+
+
+# -----------------------------------------------------------------------------
+def bscr_root(filename):
+    """
+    Compute the install root for an imported module.
+    TODO: This should probably move to testhelp at some point
+    """
+    return(dirname(abspath(filename)))
+
+
+# -----------------------------------------------------------------------------
+def bscr_test_root(filename):
+    """
+    Compute the install root for a test module.
+    TODO: This should probably move to testhelp at some point
+    """
+    home = dirname(abspath(filename))
+    if basename(home) != 'test':
+        raise StandardError("'%s' should be 'test'" % basename(home))
+    rval = dirname(home)
+    if basename(rval) != 'bscr':
+        rval = pj(rval, 'bscr')
+    return rval
 
 
 # -----------------------------------------------------------------------------
@@ -118,6 +188,7 @@ def pj(*args):
     pathjoin -- convenience wrapper for os.path.join()
     """
     return os.path.join(*args)
+
 
 # ---------------------------------------------------------------------------
 def rmrf(path):
@@ -158,6 +229,28 @@ def safe_unlink(path):
     else:
         raise Exception('safe_unlink: argument must be str or list')
 
+
+# -----------------------------------------------------------------------------
+def script_location(script):
+    """
+    Compute where we expect to find the named script.
+    TODO: This should probably move to testhelp eventually.
+    """
+    if in_bscr_repo():
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        rval = "%s/bin/%s" % (root, script)
+    else:
+        site = os.path.dirname(os.path.dirname(__file__))
+        fl = glob.glob("%s/backscratcher*egg-info")
+        egg = fl[0]
+        el = glob.glob("%s/installed-files.txt" % egg)
+        z = contents(el[0])
+        for fn in z:
+            if fn.strip().endswith(script):
+                rpath = fn.strip()
+                break
+        rval = os.path.abspath(os.path.join(egg, rpath))
+    return rval
 
 # -----------------------------------------------------------------------------
 def touch(filepath, times=None):
