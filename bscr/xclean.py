@@ -10,7 +10,7 @@ def main(args=None):
     if args is None:
         args = sys.argv
 
-    p = optparse.OptionParser()
+    p = optparse.OptionParser(usage=usage())
     p.add_option('-d', '--debug',
                  action='store_true', default=False, dest='debug',
                  help='run under the debugger')
@@ -57,3 +57,7 @@ def find_files(dir, pattern=None, recursive=False):
                 if re.match(pattern, f)]
 
     return rval
+
+# -----------------------------------------------------------------------------
+def usage():
+    return("\n    xclean - remove files whose names match a regexp")

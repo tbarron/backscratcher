@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import bscr.xclean
-from bscr import util
+from bscr import util as U
 import os
+import pexpect
 import shutil
 import StringIO as sio
 import sys
@@ -12,12 +13,12 @@ import unittest
 class TestXclean(unittest.TestCase):
     drmsg = 'Without --dryrun, would remove'
     testdir = "/tmp/test_xclean"
-    tilde = [util.pj(testdir, 'xxx~'),
-             util.pj(testdir, '.yyy~')]
-    stilde = [util.pj(testdir, 'sub', 'basement~'),
-              util.pj(testdir, 'sub', '.floor~')]
-    ntilde = [util.pj(testdir, 'nomatch.txt')]
-    nstilde = [util.pj(testdir, 'sub', 'nosuchfile')]
+    tilde = [U.pj(testdir, 'xxx~'),
+             U.pj(testdir, '.yyy~')]
+    stilde = [U.pj(testdir, 'sub', 'basement~'),
+              U.pj(testdir, 'sub', '.floor~')]
+    ntilde = [U.pj(testdir, 'nomatch.txt')]
+    nstilde = [U.pj(testdir, 'sub', 'nosuchfile')]
     testfiles = tilde + stilde + ntilde + nstilde
 
     # -------------------------------------------------------------------------
@@ -27,12 +28,15 @@ class TestXclean(unittest.TestCase):
         """
         if os.path.isdir(self.testdir):
             self.tearDown()
-        os.makedirs(util.pj(self.testdir, 'sub'))
+        os.makedirs(U.pj(self.testdir, 'sub'))
         for fp in self.testfiles:
-            util.touch(fp)
+            U.touch(fp)
 
     # -------------------------------------------------------------------------
     def tearDown(self):
+        """
+        Tear down after each test
+        """
         shutil.rmtree(self.testdir)
         
     # -------------------------------------------------------------------------
@@ -154,7 +158,6 @@ class TestXclean(unittest.TestCase):
                        result,
                        [False, True, False, True])
 
-
     # -------------------------------------------------------------------------
     def test_find_files(self):
         fl = bscr.xclean.find_files(self.testdir)
@@ -219,13 +222,7 @@ class TestXclean(unittest.TestCase):
         for fn in self.nstilde:
             self.assertIn(fn, fl,
                              "Expected %s in %s" % (fn, fl))
-
         
-        
-
-
-
-
     # -------------------------------------------------------------------------
     def test_main_dr_np_nr(self):
         with th.StdoutExcursion() as getval:
@@ -324,29 +321,38 @@ class TestXclean(unittest.TestCase):
                        [False, True, False, True])
 
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
     def test_xclean_help(self):
         """
         Verify that 'xclean --help' does the right thing
         """
-        pass
+        exp = ["Usage:",
+               "    xclean - remove files whose names match a regexp",
+               "",
+               "Options:",
+               "  -h, --help            show this help message and exit",
+               "  -d, --debug           run under the debugger",
+               "  -n, --dry-run         just report",
+               "  -p PATTERN, --pattern=PATTERN",
+               "                        file matching regexp",
+               "  -r, --recursive       whether to descend directories",
+               ]
+        cmd = U.script_location("xclean")
+        actual = pexpect.run("%s --help" % cmd)
+        for line in exp:
+            self.assertTrue(line in actual,
+                            "Expected '%s' in %s" %
+                            (line, U.lquote(actual)))
     
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
-        self.fail("construction")
+        mroot = U.bscr_root(sys.modules['bscr.xclean'].__file__)
+        troot = U.bscr_test_root(__file__)
+        self.assertEqual(troot, mroot,
+                         "Expected '%s', got '%s'" % (troot, mroot))
         
-    # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
-    def test_which_script(self):
-        """
-        Verify that we're running the right script
-        """
-        self.fail('construction')
-
     # -------------------------------------------------------------------------
     def verify_exists(self, tv, rv):
         for fl, exp in zip(tv, rv):
