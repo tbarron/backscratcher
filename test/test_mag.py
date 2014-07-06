@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 from bscr import mag
-from bscr import util
+from bscr import util as U
 import os
 import pdb
+import pexpect
 import sys
 import testhelp as th
 import unittest
@@ -111,41 +112,35 @@ class TestMag(unittest.TestCase):
             print "result:   '%s'" % string
 
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
-    # -------------------------------------------------------------------------
     def test_mag_help(self):
         """
         Verify that 'mag --help' does the right thing
         """
-        pass
+        cmd = U.script_location("mag")
+        result = pexpect.run("%s --help" % cmd)
+        exp = ["Usage: mag [-b] <number>",
+               "Report the order of magnitude of <number>",
+               "Options:",
+               "-h, --help    show this help message and exit",
+               "-b, --binary  div=1024 rather than 1000",
+               ]
+        self.assertTrue("Traceback" not in result,
+                        "Traceback not expected in %s" %
+                        U.lquote(result))
+        for item in exp:
+            self.assertTrue(item in result,
+                            "Expected '%s' in %s" %
+                            (item, U.lquote(result)))
     
     # -------------------------------------------------------------------------
-    def test_which_file(self):
-        # pdb.set_trace()
-        idir = os.path.dirname(sys.modules['bscr.mag'].__file__)
-        exp = os.path.dirname(os.path.abspath(__file__))
-        self.assertEqual(os.path.basename(exp), 'test')
-        exp = os.path.dirname(exp)
-        if os.path.basename(exp) != 'bscr':
-            exp = util.pj(exp, 'bscr')
-        self.assertEqual(exp, idir,
-                         "Expected '%s', got '%s'" % (exp, idir))
-
-    # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
     def test_which_module(self):
         """
-        Verify that we're importing the right align module
+        Verify that we're importing the right mag module
         """
-        self.fail("construction")
-        
-    # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
-    def test_which_script(self):
-        """
-        Verify that we're running the right script
-        """
-        self.fail('construction')
+        idir = U.bscr_root(sys.modules['bscr.mag'].__file__)
+        exp = U.bscr_test_root(__file__)
+        self.assertEqual(exp, idir,
+                         "Expected '%s', got '%s'" % (exp, idir))
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':

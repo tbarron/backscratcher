@@ -48,7 +48,7 @@ def main(argv=None, testing=False):
     if argv is None:
         argv = sys.argv
 
-    p = optparse.OptionParser()
+    p = optparse.OptionParser(usage=usage())
     # define options here
     p.add_option('-b', '--binary',
                  action='store_true', default=False, dest='binary',
@@ -83,11 +83,10 @@ def main(argv=None, testing=False):
 
 # ---------------------------------------------------------------------------
 def usage():
-    return """
-    mag [-b] <number>
+    return """mag [-b] <number>
 
-    With -b, use a divisor of 1024. Otherwise, use 1000.
-    """
+    Report the order of magnitude of <number>
+    With -b, use a divisor of 1024. Otherwise, use 1000."""
 
 
 # ---------------------------------------------------------------------------
