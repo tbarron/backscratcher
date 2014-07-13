@@ -108,7 +108,6 @@ class TestFL(unittest.TestCase):
                         '---\n',
                         '> this is a test file\n']
             cmd = util.script_location("fl")
-            pdb.set_trace()
             got = pexpect.run("%s diff mrpm1" % cmd).split("\n")
 #             f = os.popen('fl diff mrpm1')
 #             got = f.readlines()
