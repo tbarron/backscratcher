@@ -160,7 +160,7 @@ def fl_diff(args):
                  help='just do a dry run')
     (o, a) = p.parse_args(args)
 
-    for filename in a:
+    for filename in a[2:]:
         dirname = os.path.dirname(filename)
         if dirname == '':
             dirname = '.'

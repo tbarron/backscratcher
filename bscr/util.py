@@ -2,6 +2,7 @@
 import glob
 import os
 import pdb
+import pexpect
 import re
 import sys
 import testhelp
@@ -237,21 +238,31 @@ def script_location(script):
     Compute where we expect to find the named script.
     TODO: This should probably move to testhelp eventually.
     """
-    if in_bscr_repo():
-        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        rval = "%s/bin/%s" % (root, script)
-    else:
-        site = os.path.dirname(os.path.dirname(__file__))
-        fl = glob.glob("%s/backscratcher*egg-info")
-        egg = fl[0]
-        el = glob.glob("%s/installed-files.txt" % egg)
-        z = contents(el[0])
-        for fn in z:
-            if fn.strip().endswith(script):
-                rpath = fn.strip()
-                break
-        rval = os.path.abspath(os.path.join(egg, rpath))
+    rval = pexpect.which(script)
+    if rval is None:
+        groot = os.getcwd()
+        while not os.path.exists(os.path.join(groot, ".git")) and groot != "/":
+            groot = os.path.dirname(groot)
+        if groot != "/":
+            rval = os.path.join(groot, "bin", script)
+        else:
+            raise StandardError("Can't find script %s" % script)
     return rval
+#     if in_bscr_repo():
+#         root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+#         rval = "%s/bin/%s" % (root, script)
+#     else:
+#         site = os.path.dirname(os.path.dirname(__file__))
+#         fl = glob.glob("%s/backscratcher*egg-info")
+#         egg = fl[0]
+#         el = glob.glob("%s/installed-files.txt" % egg)
+#         z = contents(el[0])
+#         for fn in z:
+#             if fn.strip().endswith(script):
+#                 rpath = fn.strip()
+#                 break
+#         rval = os.path.abspath(os.path.join(egg, rpath))
+#     return rval
 
 # -----------------------------------------------------------------------------
 def touch(filepath, times=None):

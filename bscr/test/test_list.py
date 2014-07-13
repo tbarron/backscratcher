@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import list
+from bscr import list
 import pprint
 import unittest
 
@@ -18,7 +18,7 @@ class TestList(unittest.TestCase):
         a = list.generate_list("ls")
         self.assertInList('LICENSE', a)
         self.assertInList("bin", a)
-        self.assertInList("test", a)
+        self.assertInList("dist", a)
 
     # -----------------------------------------------------------------------
     def test_list_minus(self):

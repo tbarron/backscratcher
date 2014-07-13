@@ -2,7 +2,7 @@
 """
 jcal tests
 """
-import jcal
+from bscr import jcal
 import unittest
 
 # -----------------------------------------------------------------------------

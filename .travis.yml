@@ -6,5 +6,5 @@ install:
   - "pip install ."
   - "pip install -r requirements.txt"
 #  - "pip install coveralls"
-script: nosetests -c nose.cfg -v
+script: green
 # after_success: coveralls
