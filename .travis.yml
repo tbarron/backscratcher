@@ -4,7 +4,7 @@ python:
   - "2.7"
 install:
   - "pip install ."
-#  - "pip install -r requirements.txt"
+  - "pip install -r requirements.txt"
 #  - "pip install coveralls"
 script: nosetests -c nose.cfg -v
 # after_success: coveralls
