@@ -1,4 +1,5 @@
 from bscr import filter
+from nose.plugins.skip import SkipTest
 import unittest
 
 class TestFilter(unittest.TestCase):
@@ -40,10 +41,11 @@ class TestFilter(unittest.TestCase):
         assert(not x.is_keepable('not worth nuthin'))
 
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
+    # @unittest.skip("under construction")
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
-        self.fail("construction")
+        raise SkipTest("construction")
+        # self.fail("construction")
         

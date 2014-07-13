@@ -6,7 +6,7 @@ import bscr.align
 import pdb
 import pexpect
 import testhelp
-import toolframe
+from bscr import toolframe
 import unittest
 
 

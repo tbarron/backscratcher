@@ -7,6 +7,6 @@ install:
   - "pip install -r requirements.txt"
 #  - "pip install coveralls"
 script:
-  - if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]]; then nosetests -v; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]]; then nosetests -v -c nose.cfg; fi
   - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then green -v; fi
 # after_success: coveralls
