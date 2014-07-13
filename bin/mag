@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+import bscr.mag
+import sys
+bscr.mag.main(sys.argv)

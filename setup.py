@@ -3,6 +3,7 @@ import glob
 import time
 
 scrlist = glob.glob("bin/*")
+print scrlist
 setup(name='backscratcher',
       version='learn',
       packages=['bscr', 'bscr/test'],

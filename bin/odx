@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+import bscr.odx
+import sys
+bscr.odx.main(sys.argv)

@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+import bscr.chron
+import sys
+bscr.chron.main(sys.argv)
