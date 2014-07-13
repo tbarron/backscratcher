@@ -109,7 +109,7 @@ import random
 import re
 import stat
 import sys
-import tpbtools
+import util
 import testhelp
 import time
 import toolframe
@@ -171,7 +171,7 @@ def fl_diff(args):
         cmd = 'diff %s %s' % (counterpath, filename)
         print cmd
         sys.stdout.flush()
-        tpbtools.run(cmd, o.xable)
+        util.run(cmd, o.xable)
 
 
 # ---------------------------------------------------------------------------
@@ -196,8 +196,8 @@ def fl_revert(args):
 
         counterpath = most_recent_prefix_match(dir, os.path.basename(f))
 
-        tpbtools.run('mv %s %s.new' % (f, f), o.xable)
-        tpbtools.run('mv %s %s' % (counterpath, f), o.xable)
+        util.run('mv %s %s.new' % (f, f), o.xable)
+        util.run('mv %s %s' % (counterpath, f), o.xable)
 
 
 # ---------------------------------------------------------------------------
@@ -318,6 +318,6 @@ def most_recent_prefix_match(dir, filename):
 #         os.chdir('..')
 # 
 #     if os.path.exists('./fl_tests'):
-#         tpbtools.rmrf('./fl_tests')
+#         util.rmrf('./fl_tests')
 
 

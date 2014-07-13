@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from bscr import chron
+from nose.plugins.skip import SkipTest
 import unittest
 
 # -----------------------------------------------------------------------------
@@ -17,7 +18,7 @@ class TestChron(unittest.TestCase):
         """
         Verify that 'chron --help' does the right thing
         """
-        pass
+        raise SkipTest(">>> WRITE ME <<<")
     
     # -------------------------------------------------------------------------
     @unittest.skip("under construction")
@@ -25,7 +26,7 @@ class TestChron(unittest.TestCase):
         """
         Verify that we're importing the right align module
         """
-        pass
+        raise SkipTest(">>> WRITE ME <<<")
         
     # -------------------------------------------------------------------------
     @unittest.skip("under construction")
@@ -33,7 +34,7 @@ class TestChron(unittest.TestCase):
         """
         Verify that we're running the right script
         """
-        pass
+        raise SkipTest(">>> WRITE ME <<<")
         
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':

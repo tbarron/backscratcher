@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from bscr import list
 import pprint
+from nose.plugins.skip import SkipTest
 import unittest
 
 class TestList(unittest.TestCase):
@@ -49,28 +50,28 @@ class TestList(unittest.TestCase):
         assert(a == ['two', 'four'])
 
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
+    # @unittest.skip("under construction")
     def test_list_help(self):
         """
         Verify that 'list --help' does the right thing
         """
-        pass
+        raise SkipTest(">>> WRITE ME <<<")
     
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
+    # @unittest.skip("under construction")
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
-        self.fail("construction")
+        raise SkipTest(">>> WRITE ME <<<")
         
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
+    # @unittest.skip("under construction")
     def test_which_script(self):
         """
         Verify that we're running the right script
         """
-        self.fail('construction')
+        raise SkipTest(">>> WRITE ME <<<")
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':

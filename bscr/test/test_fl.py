@@ -6,6 +6,7 @@ import os
 import pexpect
 import random
 import shutil
+from nose.plugins.skip import SkipTest
 import stat
 import testhelp
 import time
@@ -89,7 +90,7 @@ class TestFL(unittest.TestCase):
             testhelp.expectVSgot('./old/mrpm2.2009-08-31', a)
 
     # -----------------------------------------------------------------------
-    @unittest.skip("not working")
+    # @unittest.skip("not working")
     def test_diff(self):
         """
         Test diff
@@ -126,7 +127,6 @@ class TestFL(unittest.TestCase):
             self.assertEqual(expected, got)
 
     # -----------------------------------------------------------------------
-    @unittest.skip("not working")
     def test_revert(self):
         """
         Test revert
@@ -183,20 +183,20 @@ class TestFL(unittest.TestCase):
             assert(s[stat.ST_ATIME] == s[stat.ST_MTIME])
 
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
+    # @unittest.skip("under construction")
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
-        self.fail("construction")
+        raise SkipTest(">>> WRITE ME <<<")
         
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
+    # @unittest.skip("under construction")
     def test_which_script(self):
         """
         Verify that we're running the right script
         """
-        self.fail('construction')
+        raise SkipTest(">>> WRITE ME <<<")
 
 if __name__ == '__main__':
     unittest.main()

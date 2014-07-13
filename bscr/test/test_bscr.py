@@ -4,6 +4,7 @@ from bscr import bscr
 from bscr import fl
 import os
 import pexpect
+from nose.plugins.skip import SkipTest
 import unittest
 
 #------------------------------------------------------------------------------
@@ -39,20 +40,18 @@ class TestScripts(unittest.TestCase):
         self.assertTrue('With a command as argument' in result)
 
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
-        self.fail("construction")
+        raise SkipTest(">>> WRITE ME <<<")
         
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
     def test_which_script(self):
         """
         Verify that we're running the right script
         """
-        self.fail('construction')
+        raise SkipTest(">>> WRITE ME <<<")
         
 if __name__ == '__main__':
     unittest.main()

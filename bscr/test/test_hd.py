@@ -3,6 +3,7 @@
 from bscr import hd
 from bscr import util
 from StringIO import StringIO as sio
+from nose.plugins.skip import SkipTest
 import testhelp as th
 import unittest
 
@@ -38,26 +39,26 @@ class TestHd(unittest.TestCase):
                                        util.lquote(repr(result))))
         
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
+    # @unittest.skip("under construction")
     def test_hd_help(self):
         """
         Verify that 'hd --help' does the right thing
         """
-        pass
+        raise SkipTest(">>> WRITE ME <<<")
     
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
+    # @unittest.skip("under construction")
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
-        self.fail("construction")
+        raise SkipTest(">>> WRITE ME <<<")
         
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
+    # @unittest.skip("under construction")
     def test_which_script(self):
         """
         Verify that we're running the right script
         """
-        self.fail('construction')
+        raise SkipTest(">>> WRITE ME <<<")
 

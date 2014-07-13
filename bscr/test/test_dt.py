@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from bscr import dt
 import time
+from nose.plugins.skip import SkipTest
 import unittest
 
 # ---------------------------------------------------------------------------
@@ -142,28 +143,25 @@ class TestDt(unittest.TestCase):
         self.do_both(['next', 'sunday'], dt.time_to('sunday', 'next'))
 
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
     def test_dt_help(self):
         """
         Verify that 'dt --help' does the right thing
         """
-        pass
+        raise SkipTest(">>> WRITE ME <<<")
     
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
-        self.fail("construction")
+        raise SkipTest(">>> WRITE ME <<<")
         
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
     def test_which_script(self):
         """
         Verify that we're running the right script
         """
-        self.fail('construction')
+        raise SkipTest(">>> WRITE ME <<<")
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
