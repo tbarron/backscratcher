@@ -2,6 +2,7 @@
 import pexpect
 from nose.plugins.skip import SkipTest
 import unittest
+from bscr import util as U
 
 # -----------------------------------------------------------------------------
 class TestCalc(unittest.TestCase):
