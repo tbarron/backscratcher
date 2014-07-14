@@ -4,7 +4,7 @@ from bscr import hd
 from bscr import util
 from StringIO import StringIO as sio
 from nose.plugins.skip import SkipTest
-import testhelp as th
+from bscr import testhelp as th
 import unittest
 
 # -----------------------------------------------------------------------------

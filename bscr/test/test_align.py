@@ -6,7 +6,7 @@ import bscr.align
 import pdb
 import pexpect
 from nose.plugins.skip import SkipTest
-import testhelp
+from bscr import testhelp
 from bscr import toolframe
 import unittest
 

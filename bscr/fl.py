@@ -110,7 +110,6 @@ import re
 import stat
 import sys
 import util
-import testhelp
 import time
 import toolframe
 import unittest

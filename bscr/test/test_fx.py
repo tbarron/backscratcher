@@ -9,7 +9,7 @@ import pexpect
 import shutil
 import StringIO
 import sys
-import testhelp as th
+from bscr import testhelp as th
 import unittest
 
 # ---------------------------------------------------------------------------

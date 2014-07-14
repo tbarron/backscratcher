@@ -6,7 +6,7 @@ import pexpect
 import shutil
 import StringIO as sio
 import sys
-import testhelp as th
+from bscr import testhelp as th
 import unittest
 
 # -----------------------------------------------------------------------------

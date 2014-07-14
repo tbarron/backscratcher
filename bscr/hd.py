@@ -32,7 +32,6 @@ import optparse
 import os
 import re
 import sys
-import testhelp
 import toolframe
 import unittest
 

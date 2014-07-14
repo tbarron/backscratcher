@@ -232,6 +232,18 @@ class HelpedTestCase(unittest.TestCase):
         self.assertIn(exp, actual,
                       "Expected '%s' in '%s'" % (exp, actual))
 
+    def assertIn(self, member, container, msg=None):
+        if member not in container:
+            fmsg = "%s not found in %s" % (safe_repr(member),
+                                           safe_repr(container))
+            self.fail(self._formatMessage(msg,fmsg))
+
+    def assertNotIn(self, member, container, msg=None):
+        if member in container:
+            fmsg = "%s unexpectedly found in %s" % (safe_repr(member),
+                                           safe_repr(container))
+            self.fail(self._formatMessage(msg,fmsg))
+
 # ---------------------------------------------------------------------------
 class LoggingTestSuite(unittest.TestSuite):
     def __init__(self, tests=(), logfile=None):

@@ -7,7 +7,7 @@ import pdb
 import pexpect
 import StringIO as sio
 import sys
-import testhelp
+from bscr import testhelp
 import unittest
 
 # odx(25)         => 25 -> 031 / 25 / 0x19

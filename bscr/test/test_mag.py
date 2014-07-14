@@ -5,7 +5,7 @@ import os
 import pdb
 import pexpect
 import sys
-import testhelp as th
+from bscr import testhelp as th
 import unittest
 
 # ---------------------------------------------------------------------------

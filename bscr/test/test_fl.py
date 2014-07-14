@@ -8,7 +8,7 @@ import random
 import shutil
 from nose.plugins.skip import SkipTest
 import stat
-import testhelp
+from bscr import testhelp
 import time
 import unittest
 
@@ -137,13 +137,14 @@ class TestFL(unittest.TestCase):
             util.writefile('old/mrpm2.2009-08-31',
                            ['REVERTED\n'])
             
-            os.system('fl revert mrpm1')
+            fl = util.script_location("fl")
+            os.system('%s revert mrpm1' % fl)
             assert(os.path.exists('mrpm1.new'))
             assert(os.path.exists('mrpm1'))
             assert(not os.path.exists('mrpm1.2009-10-01'))
             assert(util.contents('mrpm1') == ['reverted\n'])
             
-            os.system('fl revert mrpm2')
+            os.system('%s revert mrpm2' % fl)
             assert(os.path.exists('mrpm2.new'))
             assert(os.path.exists('mrpm2'))
             assert(not os.path.exists('old/mrpm2.2009-08-31'))
