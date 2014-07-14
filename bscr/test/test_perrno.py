@@ -10,7 +10,7 @@ from bscr import testhelp as th
 import unittest
 
 # -----------------------------------------------------------------------------
-class TestPerrno(unittest.TestCase):
+class TestPerrno(th.HelpedTestCase):
     def test_all(self):
         with th.StdoutExcursion() as getval:
             perrno.main(["bin/perrno", "--all"])
