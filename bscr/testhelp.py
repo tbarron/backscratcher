@@ -6,6 +6,7 @@ import optparse
 import os
 import pdb
 import pexpect
+import pprint as pp
 import socket
 import sys
 import unittest
@@ -234,14 +235,14 @@ class HelpedTestCase(unittest.TestCase):
 
     def assertIn(self, member, container, msg=None):
         if member not in container:
-            fmsg = "%s not found in %s" % (safe_repr(member),
-                                           safe_repr(container))
+            fmsg = "%s not found in %s" % (pp.saferepr(member),
+                                           pp.saferepr(container))
             self.fail(self._formatMessage(msg,fmsg))
 
     def assertNotIn(self, member, container, msg=None):
         if member in container:
-            fmsg = "%s unexpectedly found in %s" % (safe_repr(member),
-                                           safe_repr(container))
+            fmsg = "%s unexpectedly found in %s" % (pp.saferepr(member),
+                                                    pp.saferepr(container))
             self.fail(self._formatMessage(msg,fmsg))
 
     def assertRaisesMsg(self, exctype, msg, func, *args, **kwargs):
