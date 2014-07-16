@@ -20,7 +20,7 @@ class TestList(th.HelpedTestCase):
         a = list.generate_list("ls")
         self.assertInList('LICENSE', a)
         self.assertInList("bin", a)
-        self.assertInList("dist", a)
+        self.assertInList("README.md", a)
 
     # -----------------------------------------------------------------------
     def test_list_minus(self):

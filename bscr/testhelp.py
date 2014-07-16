@@ -237,24 +237,24 @@ class HelpedTestCase(unittest.TestCase):
         if member not in container:
             fmsg = "%s not found in %s" % (pp.saferepr(member),
                                            pp.saferepr(container))
-            self.fail(self._formatMessage(msg,fmsg))
+            self.fail(msg or fmsg)
 
     def assertNotIn(self, member, container, msg=None):
         if member in container:
             fmsg = "%s unexpectedly found in %s" % (pp.saferepr(member),
                                                     pp.saferepr(container))
-            self.fail(self._formatMessage(msg,fmsg))
+            self.fail(msg or fmsg)
 
-    def assertRaisesMsg(self, exctype, msg, func, *args, **kwargs):
+    def assertRaisesMsg(self, exctype, excstr, func, *args, **kwargs):
         try:
             func(*args, **kwargs)
         except exctype, e:
-            if msg not in str(e):
-                fmsg = self._formatMessage("Expected '%s' in the exception" %
-                                           msg)
+            if excstr not in str(e):
+                fmsg = "Expected '%s' in the exception" % excstr
                 self.fail(fmsg)
         except:
-            self.fail(self._formatMessage("Expected a %s exception" % exctype))
+            self.fail("Expected an exception of type %s" % exctype)
+
 
 # -----------------------------------------------------------------------------
 class LoggingTestSuite(unittest.TestSuite):

@@ -10,7 +10,7 @@ from bscr import testhelp as th
 import unittest
 
 # -----------------------------------------------------------------------------
-class TestXclean(unittest.TestCase):
+class TestXclean(th.HelpedTestCase):
     drmsg = 'Without --dryrun, would remove'
     testdir = "/tmp/test_xclean"
     tilde = [U.pj(testdir, 'xxx~'),
@@ -44,7 +44,8 @@ class TestXclean(unittest.TestCase):
         with th.StdoutExcursion() as getval:
             bscr.xclean.cleanup(self.testdir, dryrun=True)
             result = getval()
-        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+        self.verify_exists([self.tilde, self.ntilde, self.stilde,
+                            self.nstilde],
                            [True, True, True, True])
 
         self.assertIn(self.drmsg, result)
@@ -58,7 +59,8 @@ class TestXclean(unittest.TestCase):
         with th.StdoutExcursion() as getval:
             bscr.xclean.cleanup(self.testdir, dryrun=True, recursive=True)
             result = getval()
-        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+        self.verify_exists([self.tilde, self.ntilde, self.stilde,
+                            self.nstilde],
                            [True, True, True, True])
 
         self.assertIn(self.drmsg, result)
@@ -73,7 +75,8 @@ class TestXclean(unittest.TestCase):
             bscr.xclean.cleanup(self.testdir, dryrun=True, pattern="no.*")
             result = getval()
         
-        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+        self.verify_exists([self.tilde, self.ntilde, self.stilde,
+                            self.nstilde],
                            [True, True, True, True])
 
         self.assertIn(self.drmsg, result)
@@ -89,7 +92,8 @@ class TestXclean(unittest.TestCase):
                                 recursive=True)
             result = getval()
 
-        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+        self.verify_exists([self.tilde, self.ntilde, self.stilde,
+                            self.nstilde],
                            [True, True, True, True])
 
         self.assertIn(self.drmsg, result)
@@ -104,7 +108,8 @@ class TestXclean(unittest.TestCase):
             bscr.xclean.cleanup(self.testdir)
             result = getval()
 
-        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+        self.verify_exists([self.tilde, self.ntilde, self.stilde,
+                            self.nstilde],
                            [False, True, True, True])
 
         self.assertNotIn(self.drmsg, result)
@@ -119,7 +124,8 @@ class TestXclean(unittest.TestCase):
             bscr.xclean.cleanup(self.testdir, recursive=True)
             result = getval()
 
-        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+        self.verify_exists([self.tilde, self.ntilde, self.stilde,
+                            self.nstilde],
                            [False, True, False, True])
 
         self.assertNotIn(self.drmsg, result)
@@ -134,7 +140,8 @@ class TestXclean(unittest.TestCase):
             bscr.xclean.cleanup(self.testdir, pattern="no.*")
             result = getval()
 
-        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+        self.verify_exists([self.tilde, self.ntilde, self.stilde,
+                            self.nstilde],
                            [True, False, True, True])
 
         self.assertNotIn(self.drmsg, result)
@@ -149,7 +156,8 @@ class TestXclean(unittest.TestCase):
             bscr.xclean.cleanup(self.testdir, pattern="no.*", recursive=True)
             result = getval()
 
-        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+        self.verify_exists([self.tilde, self.ntilde, self.stilde,
+                            self.nstilde],
                            [True, False, True, False])
 
         self.assertNotIn(self.drmsg, result)
@@ -229,7 +237,8 @@ class TestXclean(unittest.TestCase):
             bscr.xclean.main(['bin/xclean', '-n', self.testdir])
             result = getval()
         self.assertIn(self.drmsg, result)
-        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+        self.verify_exists([self.tilde, self.ntilde, self.stilde,
+                            self.nstilde],
                            [True, True, True, True])
         self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
                        result,
@@ -241,7 +250,8 @@ class TestXclean(unittest.TestCase):
             bscr.xclean.main(['bin/xclean', '-n', '-p', 'no.*', self.testdir])
             result = getval()
         self.assertIn(self.drmsg, result)
-        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+        self.verify_exists([self.tilde, self.ntilde, self.stilde,
+                            self.nstilde],
                            [True, True, True, True])
         self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
                        result,
@@ -253,7 +263,8 @@ class TestXclean(unittest.TestCase):
             bscr.xclean.main(['bin/xclean', '-n', '-r', self.testdir])
             result = getval()
         self.assertIn(self.drmsg, result)
-        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+        self.verify_exists([self.tilde, self.ntilde, self.stilde,
+                            self.nstilde],
                            [True, True, True, True])
         self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
                        result,
@@ -266,7 +277,8 @@ class TestXclean(unittest.TestCase):
                               '-r', self.testdir])
             result = getval()
         self.assertIn(self.drmsg, result)
-        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+        self.verify_exists([self.tilde, self.ntilde, self.stilde,
+                            self.nstilde],
                            [True, True, True, True])
         self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
                        result,
@@ -278,7 +290,8 @@ class TestXclean(unittest.TestCase):
             bscr.xclean.main(['bin/xclean', self.testdir])
             result = getval()
         self.assertNotIn(self.drmsg, result)
-        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+        self.verify_exists([self.tilde, self.ntilde, self.stilde,
+                            self.nstilde],
                            [False, True, True, True])
         self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
                        result,
@@ -290,7 +303,8 @@ class TestXclean(unittest.TestCase):
             bscr.xclean.main(['bin/xclean', '-r', self.testdir])
             result = getval()
         self.assertNotIn(self.drmsg, result)
-        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+        self.verify_exists([self.tilde, self.ntilde, self.stilde,
+                            self.nstilde],
                            [False, True, False, True])
         self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
                        result,
@@ -302,7 +316,8 @@ class TestXclean(unittest.TestCase):
             bscr.xclean.main(['bin/xclean', '-p', 'no.*', self.testdir])
             result = getval()
         self.assertNotIn(self.drmsg, result)
-        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+        self.verify_exists([self.tilde, self.ntilde, self.stilde,
+                            self.nstilde],
                            [True, False, True, True])
         self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
                        result,
@@ -314,7 +329,8 @@ class TestXclean(unittest.TestCase):
             bscr.xclean.main(['bin/xclean', '-p', 'no.*', '-r', self.testdir])
             result = getval()
         self.assertNotIn(self.drmsg, result)
-        self.verify_exists([self.tilde, self.ntilde, self.stilde, self.nstilde],
+        self.verify_exists([self.tilde, self.ntilde, self.stilde,
+                            self.nstilde],
                            [True, False, True, False])
         self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
                        result,
