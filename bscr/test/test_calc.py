@@ -5,6 +5,10 @@ import unittest
 from bscr import util as U
 
 # -----------------------------------------------------------------------------
+def setUpModule():
+    U.pythonpath_bscrroot()
+
+# -----------------------------------------------------------------------------
 class TestCalc(unittest.TestCase):
     # -------------------------------------------------------------------------
     def test_example(self):

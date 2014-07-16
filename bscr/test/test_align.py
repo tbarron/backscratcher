@@ -9,6 +9,12 @@ from nose.plugins.skip import SkipTest
 from bscr import testhelp
 from bscr import toolframe
 import unittest
+from bscr import util as U
+
+
+# ---------------------------------------------------------------------------
+def setUpModule():
+    U.pythonpath_bscrroot()
 
 
 # ---------------------------------------------------------------------------

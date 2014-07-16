@@ -8,7 +8,7 @@ import random
 import shutil
 from nose.plugins.skip import SkipTest
 import stat
-from bscr import testhelp
+from bscr import testhelp as th
 import time
 import unittest
 
@@ -20,6 +20,9 @@ def setUpModule():
     if not os.path.exists('fl_tests'):
         os.mkdir('fl_tests')
         os.mkdir('fl_tests/old')
+
+    util.pythonpath_bscrroot()
+
         
 # ---------------------------------------------------------------------------
 def tearDownModule():
@@ -28,7 +31,7 @@ def tearDownModule():
         shutil.rmtree('fl_tests')
 
 # ---------------------------------------------------------------------------
-class TestFL(unittest.TestCase):
+class TestFL(th.HelpedTestCase):
     # tests needed:
     #   'fl' -- test_command_line
     #   'fl help' -- test_fl_help
@@ -84,13 +87,12 @@ class TestFL(unittest.TestCase):
             os.system('cp mrpm2 old/mrpm2.2009-08-31')
 
             a = fl.most_recent_prefix_match('.', 'mrpm1')
-            testhelp.expectVSgot('./mrpm1.2009-10-01', a)
+            th.expectVSgot('./mrpm1.2009-10-01', a)
 
             a = fl.most_recent_prefix_match('.', 'mrpm2')
-            testhelp.expectVSgot('./old/mrpm2.2009-08-31', a)
+            th.expectVSgot('./old/mrpm2.2009-08-31', a)
 
     # -----------------------------------------------------------------------
-    # @unittest.skip("not working")
     def test_diff(self):
         """
         Test diff
@@ -102,27 +104,24 @@ class TestFL(unittest.TestCase):
             util.writefile('old/mrpm2.2009-08-31',
                            ['copy of another test file\n'])
             
-            expected = ['diff ./mrpm1.2009-10-01 mrpm1\n',
-                        '1c1\n',
-                        '< copy of test file\n',
-                        '---\n',
-                        '> this is a test file\n']
+            expected = ['diff ./mrpm1.2009-10-01 mrpm1\r',
+                        '1c1\r',
+                        '< copy of test file\r',
+                        '---\r',
+                        '> this is a test file\r',
+                        '']
+            util.pythonpath_bscrroot()
             cmd = util.script_location("fl")
             got = pexpect.run("%s diff mrpm1" % cmd).split("\n")
-#             f = os.popen('fl diff mrpm1')
-#             got = f.readlines()
-#             f.close()
             self.assertEqual(expected, got)
             
-            expected = ['diff ./old/mrpm2.2009-08-31 mrpm2\n',
-                        '1c1\n',
-                        '< copy of another test file\n',
-                        '---\n',
-                        '> this is another test file\n']
+            expected = ['diff ./old/mrpm2.2009-08-31 mrpm2\r',
+                        '1c1\r',
+                        '< copy of another test file\r',
+                        '---\r',
+                        '> this is another test file\r',
+                        '']
             got = pexpect.run("%s diff mrpm2" % cmd).split("\n")
-#             f = os.popen('fl diff mrpm2')
-#             got = f.readlines()
-#             f.close()
             self.assertEqual(expected, got)
 
     # -----------------------------------------------------------------------

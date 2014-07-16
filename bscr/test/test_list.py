@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 from bscr import list
 import pprint
+from bscr import testhelp as th
 from nose.plugins.skip import SkipTest
 import unittest
 
-class TestList(unittest.TestCase):
+class TestList(th.HelpedTestCase):
     # -----------------------------------------------------------------------
     def assertInList(self, exp, larg):
         self.assertIn(exp, larg,

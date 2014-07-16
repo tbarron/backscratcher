@@ -10,6 +10,11 @@ from bscr import toolframe
 import unittest
 
 # ---------------------------------------------------------------------------
+def setUpModule():
+    U.pythonpath_bscrroot()
+
+
+# ---------------------------------------------------------------------------
 def tearDownModule():
     flist = ['testdata']
     if os.getenv('KEEPFILES') is not None:

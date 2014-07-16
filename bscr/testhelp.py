@@ -244,7 +244,18 @@ class HelpedTestCase(unittest.TestCase):
                                            safe_repr(container))
             self.fail(self._formatMessage(msg,fmsg))
 
-# ---------------------------------------------------------------------------
+    def assertRaisesMsg(self, exctype, msg, func, *args, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except exctype, e:
+            if msg not in str(e):
+                fmsg = self._formatMessage("Expected '%s' in the exception" %
+                                           msg)
+                self.fail(fmsg)
+        except:
+            self.fail(self._formatMessage("Expected a %s exception" % exctype))
+
+# -----------------------------------------------------------------------------
 class LoggingTestSuite(unittest.TestSuite):
     def __init__(self, tests=(), logfile=None):
         super(LoggingTestSuite, self).__init__(tests)

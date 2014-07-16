@@ -2,11 +2,16 @@
 
 from bscr import bscr
 from bscr import fl
+from bscr import util as U
 import os
 import pexpect
 from nose.plugins.skip import SkipTest
 import unittest
 
+#------------------------------------------------------------------------------
+def setUpModule():
+    U.pythonpath_bscrroot()
+    
 #------------------------------------------------------------------------------
 class TestScripts(unittest.TestCase):
     # -------------------------------------------------------------------------

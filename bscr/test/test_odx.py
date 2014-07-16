@@ -27,10 +27,7 @@ class TestOdx(testhelp.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_decimal_bad(self):
         exp = "invalid literal for int() with base 10"
-        with self.assertRaises(ValueError) as v:
-            odx.odx('2ab')
-
-        self.exp_in_got(exp, str(v.exception))
+        self.assertRaisesMsg(ValueError, exp, odx.odx, '2ab')
 
     # -------------------------------------------------------------------------
     def test_octal_good(self):

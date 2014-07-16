@@ -95,7 +95,7 @@ def dispatch(mname, prefix, args):
         dispatch_help(mname, prefix, args)
     else:
         func = getattr(sys.modules[mname], "_".join([prefix,func_name]))
-        func(args)
+        func(args[2:])
 
 # ---------------------------------------------------------------------------
 def dispatch_help(mname, prefix, args):
@@ -233,6 +233,19 @@ def safe_unlink(path):
 
 
 # -----------------------------------------------------------------------------
+def pythonpath_bscrroot():
+    """
+    Find the git root and add it to $PYTHONPATH
+    TODO: This should probably move to testhelp eventually.
+    """
+    where = os.path.dirname(os.path.dirname(__file__))
+    prev = os.getenv("PYTHONPATH")
+    if prev is None:
+        os.environ["PYTHONPATH"] = where
+    elif where not in prev:
+        os.environ["PYTHONPATH"] = ":".join([where, prev])
+
+# -----------------------------------------------------------------------------
 def script_location(script):
     """
     Compute where we expect to find the named script.
@@ -245,6 +258,8 @@ def script_location(script):
             groot = os.path.dirname(groot)
         if groot != "/":
             rval = os.path.join(groot, "bin", script)
+            if groot not in sys.path:
+                sys.path.append(groot)
         else:
             raise StandardError("Can't find script %s" % script)
     return rval

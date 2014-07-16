@@ -13,7 +13,6 @@ class TestChron(unittest.TestCase):
                          "Expected %d, got %d" % (exp, act))
 
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
     def test_chron_help(self):
         """
         Verify that 'chron --help' does the right thing
@@ -21,7 +20,6 @@ class TestChron(unittest.TestCase):
         raise SkipTest(">>> WRITE ME <<<")
     
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
     def test_which_module(self):
         """
         Verify that we're importing the right align module
@@ -29,7 +27,6 @@ class TestChron(unittest.TestCase):
         raise SkipTest(">>> WRITE ME <<<")
         
     # -------------------------------------------------------------------------
-    @unittest.skip("under construction")
     def test_which_script(self):
         """
         Verify that we're running the right script
