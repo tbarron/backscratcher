@@ -37,10 +37,11 @@ class TestOdx(testhelp.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_octal_bad(self):
         exp = "invalid literal for int() with base 8"
-        with self.assertRaises(ValueError) as v:
-            odx.odx('0987')
+        self.assertRaisesMsg(ValueError, exp, odx.odx, '0987')
+        #         with self.assertRaises(ValueError) as v:
+        #             odx.odx('0987')
 
-        self.exp_in_got(exp, str(v.exception))
+        # self.exp_in_got(exp, str(v.exception))
 
     # -------------------------------------------------------------------------
     def test_hex_good(self):
@@ -50,11 +51,12 @@ class TestOdx(testhelp.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_hex_bad(self):
         exp = "invalid literal for int() with base 16"
-        with self.assertRaises(ValueError) as v:
-            odx.odx('0x5234g7')
-
-        self.exp_in_got(exp, str(v.exception))
-
+        self.assertRaisesMsg(ValueError, exp, odx.odx, '0x5234g7')
+        # with self.assertRaises(ValueError) as v:
+        #             odx.odx('0x5234g7')
+        # 
+        #         self.exp_in_got(exp, str(v.exception))
+        
     # -------------------------------------------------------------------------
     def test_odx_help(self):
         """
