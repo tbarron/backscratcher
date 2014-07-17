@@ -26,13 +26,6 @@ class TestChron(unittest.TestCase):
         """
         raise SkipTest(">>> WRITE ME <<<")
         
-    # -------------------------------------------------------------------------
-    def test_which_script(self):
-        """
-        Verify that we're running the right script
-        """
-        raise SkipTest(">>> WRITE ME <<<")
-        
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
     unittest.main()

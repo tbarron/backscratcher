@@ -28,10 +28,3 @@ class JcalTest(unittest.TestCase):
         """
         raise SkipTest(">>> WRITE ME <<<")
         
-    # -------------------------------------------------------------------------
-    # @unittest.skip("under construction")
-    def test_which_script(self):
-        """
-        Verify that we're running the right script
-        """
-        raise SkipTest(">>> WRITE ME <<<")

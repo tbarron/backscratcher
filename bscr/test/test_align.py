@@ -47,7 +47,16 @@ class TestAlign(unittest.TestCase):
         """
         Verify that 'align --help' does the right thing
         """
-        raise SkipTest(">>> WRITE ME <<<")
+        cmd = U.script_location("align")
+        result = pexpect.run("%s --help" % cmd)
+        nexp = "Traceback"
+        self.assertFalse(nexp in result,
+                         "Not expecting '%s' in %s" %
+                         (nexp, U.lquote(result)))
+        exp = "Align columns from input" 
+        self.assertTrue(exp in result,
+                        "Expected '%s' in %s" %
+                        (exp, U.lquote(result)))
     
     # -------------------------------------------------------------------------
     def test_digit_alignment(self):
@@ -99,15 +108,11 @@ class TestAlign(unittest.TestCase):
         """
         Verify that we're importing the right align module
         """
-        raise SkipTest('>>> WRITE ME <<<')
-        
-    # -------------------------------------------------------------------------
-    # @unittest.skip("under construction")
-    def test_which_script(self):
-        """
-        Verify that we're running the right script
-        """
-        raise SkipTest('>>> WRITE ME <<<')
+        mroot = U.bscr_root(sys.modules['bscr.align'].__file__)
+        troot = U.bscr_test_root(__file__)
+        self.assertEqual(troot, mroot,
+                         "Expected '%s', got '%s'" % (troot, mroot))
+
         
 # ---------------------------------------------------------------------------
 if __name__ == '__main__':

@@ -36,14 +36,22 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
+import optparse
 import pdb
 import re
 import sys
-import toolframe
 
 
 # ---------------------------------------------------------------------------
 def main(A):
+    p = optparse.OptionParser(usage=usage())
+    p.add_option('-d', '--debug',
+                 action='store_true', default=False, dest='debug',
+                 help='run under the debugger')
+    (o, a) = p.parse_args(A)
+
+    if o.debug: pdb.set_trace()
+
     if 1 < len(A):
         input = open(A[1], 'r')
     else:
@@ -73,3 +81,10 @@ def align(input):
                 fmt = '%%-%ds  ' % width[i]
             oline = oline + fmt % f[i]
         print oline
+
+
+# ---------------------------------------------------------------------------
+def usage():
+    return """align
+
+    Align columns from input."""
