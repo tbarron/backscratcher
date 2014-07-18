@@ -1,6 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python 
+from bscr import calc
 import pexpect
 from nose.plugins.skip import SkipTest
+import sys
 import unittest
 from bscr import util as U
 
@@ -41,14 +43,26 @@ class TestCalc(unittest.TestCase):
         """
         Verify that 'calc --help' does the right thing
         """
-        raise SkipTest(">>> WRITE ME <<<")
+        cmd = U.script_location("calc")
+        result = pexpect.run("%s --help" % cmd)
+        nexp = "Traceback"
+        self.assertFalse(nexp in result,
+                         "Not expecting '%s' in %s" %
+                         (nexp, U.lquote(result)))
+        exp = "Usage: calc [options]" 
+        self.assertTrue(exp in result,
+                        "Expected '%s' in %s" %
+                        (exp, U.lquote(result)))
     
     # -------------------------------------------------------------------------
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
-        raise SkipTest(">>> WRITE ME <<<")
+        mroot = U.bscr_root(sys.modules['bscr.calc'].__file__)
+        troot = U.bscr_test_root(__file__)
+        self.assertEqual(troot, mroot,
+                         "Expected '%s', got '%s'" % (troot, mroot))
         
         
 # -----------------------------------------------------------------------------

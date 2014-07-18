@@ -6,6 +6,7 @@ from bscr import util as U
 import os
 import pexpect
 from nose.plugins.skip import SkipTest
+import sys
 import unittest
 
 #------------------------------------------------------------------------------
@@ -49,8 +50,12 @@ class TestScripts(unittest.TestCase):
         """
         Verify that we're importing the right align module
         """
-        raise SkipTest(">>> WRITE ME <<<")
+        mroot = U.bscr_root(sys.modules['bscr.bscr'].__file__)
+        troot = U.bscr_test_root(__file__)
+        self.assertEqual(troot, mroot,
+                         "Expected '%s', got '%s'" % (troot, mroot))
         
         
+# ---------------------------------------------------------------------------
 if __name__ == '__main__':
     unittest.main()
