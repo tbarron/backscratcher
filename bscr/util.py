@@ -311,28 +311,3 @@ def tpb_cleanup_tests():
         os.chdir('..')
     if os.path.isdir(testdir):
         rmrf(testdir)
-
-
-# ---------------------------------------------------------------------------
-class TpbtoolsTest(unittest.TestCase):
-    # -----------------------------------------------------------------------
-    def setUp(self):
-        global testdir
-        testdir = testhelp.into_test_dir()
-
-    # -----------------------------------------------------------------------
-    def test_expand(self):
-        home = os.environ['HOME']
-        logname = os.environ['LOGNAME']
-
-        assert(expand('$HOME') == home)
-        assert(expand('~') == home)
-        assert(expand('~%s' % logname) == home)
-        assert(expand('### $PYTHONPATH ###')
-               == '### %s ###' % os.environ['PYTHONPATH'])
-
-
-# ---------------------------------------------------------------------------
-if __name__ == '__main__':
-    if not testhelp.main(sys.argv):
-        tpb_cleanup_tests()

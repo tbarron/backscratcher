@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+import bscr.list
+import sys
+bscr.list.main(sys.argv)

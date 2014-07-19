@@ -13,6 +13,7 @@ help:
 	@echo "   install    - pip install dist/backscratcher-$(VERSION).tar.gz"
 	@echo "   readme     - cp README.md README"
 	@echo "   refresh    - refresh and upgrade the distro"
+	@echo "   retag      - remove TAGS and remake it"
 	@echo "   sdist      - build the distro"
 	@echo "   tags       - create a TAGS file for emacs"
 	@echo "   uninstall  - remove backscratcher from current system"
@@ -39,6 +40,10 @@ refresh: sdist upgrade
 sdist: readme
 	find . -name "*.pyc" | xargs rm
 	python setup.py sdist -m MANIFEST
+
+retag:
+	rm TAGS
+	find . -name "*.py" | xargs etags
 
 tags:
 	find . -name "*.py" | xargs etags

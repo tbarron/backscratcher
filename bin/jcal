@@ -1,0 +1,5 @@
+#!/usr/bin/env python
+from bscr import jcal
+import sys
+from bscr import util
+util.dispatch("bscr.jcal", "jcal", sys.argv)
