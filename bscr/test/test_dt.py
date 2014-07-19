@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 from bscr import dt
-import time
+from bscr import testhelp as th
+from bscr import util as U
 from nose.plugins.skip import SkipTest
+import pexpect
+import time
 import unittest
 
 # ---------------------------------------------------------------------------
-class TestDt(unittest.TestCase):
+class TestDt(th.HelpedTestCase):
     # -----------------------------------------------------------------------
     def default_fmt(self):
         return '%Y.%m%d %H:%M:%S'
@@ -147,14 +150,15 @@ class TestDt(unittest.TestCase):
         """
         Verify that 'dt --help' does the right thing
         """
-        raise SkipTest(">>> WRITE ME <<<")
+        self.assertOptionHelp("dt", "playing with dates")
     
     # -------------------------------------------------------------------------
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
-        raise SkipTest(">>> WRITE ME <<<")
+        self.assertModule('bscr.dt', __file__)
+
         
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':

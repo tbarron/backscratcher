@@ -9,7 +9,7 @@ from bscr import testhelp as th
 import unittest
 
 # ---------------------------------------------------------------------------
-class TestMag(unittest.TestCase):
+class TestMag(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_usage(self):
         a = mag.main(['./mag'], True)
@@ -137,10 +137,8 @@ class TestMag(unittest.TestCase):
         """
         Verify that we're importing the right mag module
         """
-        idir = U.bscr_root(sys.modules['bscr.mag'].__file__)
-        exp = U.bscr_test_root(__file__)
-        self.assertEqual(exp, idir,
-                         "Expected '%s', got '%s'" % (exp, idir))
+        self.assertModule('bscr.mag', __file__)
+
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':

@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 from bscr import list
-import pprint
 from bscr import testhelp as th
+from bscr import util as U
 from nose.plugins.skip import SkipTest
+import pexpect
+import pprint
 import unittest
 
 class TestList(th.HelpedTestCase):
@@ -56,15 +58,17 @@ class TestList(th.HelpedTestCase):
         """
         Verify that 'list --help' does the right thing
         """
-        raise SkipTest(">>> WRITE ME <<<")
+        self.assertOptionHelp("list",
+                              "usage: list {minus|union|intersect} " +
+                              "<list-1> <list-2>")
     
     # -------------------------------------------------------------------------
-    # @unittest.skip("under construction")
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
-        raise SkipTest(">>> WRITE ME <<<")
+        self.assertModule('bscr.list', __file__)
+
         
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':

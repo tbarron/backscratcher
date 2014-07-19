@@ -44,7 +44,7 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    p = optparse.OptionParser()
+    p = optparse.OptionParser(usage=usage())
     p.add_option('-c', '--count',
                  action='store', default='up',
                  dest='count', type='string',
@@ -113,3 +113,10 @@ def count_up():
 def hms_seconds(hms):
     h, m, s = hms.split(':')
     return int(s) + 60 * (int(m) + 60 * int(h))
+
+
+# ---------------------------------------------------------------------------
+def usage():
+    return """chron
+
+    chronometer/stopwatch"""

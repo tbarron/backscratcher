@@ -73,11 +73,10 @@ class TestOdx(testhelp.HelpedTestCase):
         """
         Verify that we're importing the right align module
         """
-        idir = U.bscr_root(sys.modules['bscr.odx'].__file__)
-        exp = U.bscr_test_root(__file__)
-        self.assertEqual(exp, idir,
-                         "Expected '%s', got '%s'" % (exp, idir))
-        
+        self.assertModule('bscr.odx', __file__)
+
+
+# -----------------------------------------------------------------------------
 if __name__ == '__main__':
     unittest.main()
     

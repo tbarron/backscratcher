@@ -6,7 +6,7 @@ import bscr.align
 import pdb
 import pexpect
 from nose.plugins.skip import SkipTest
-from bscr import testhelp
+from bscr import testhelp as th
 from bscr import toolframe
 import unittest
 from bscr import util as U
@@ -28,7 +28,7 @@ def tearDownModule():
 
 
 # ---------------------------------------------------------------------------
-class TestAlign(unittest.TestCase):
+class TestAlign(th.HelpedTestCase):
     """
     Test suite for align
     """
@@ -108,10 +108,7 @@ class TestAlign(unittest.TestCase):
         """
         Verify that we're importing the right align module
         """
-        mroot = U.bscr_root(sys.modules['bscr.align'].__file__)
-        troot = U.bscr_test_root(__file__)
-        self.assertEqual(troot, mroot,
-                         "Expected '%s', got '%s'" % (troot, mroot))
+        self.assertModule('bscr.align', __file__)
 
         
 # ---------------------------------------------------------------------------

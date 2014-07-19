@@ -5,7 +5,7 @@ import os
 import sys
 import pdb
 import pexpect
-from bscr import testhelp
+from bscr import testhelp as th
 from bscr import toolframe
 import unittest
 
@@ -25,7 +25,7 @@ def tearDownModule():
 
 
 # ---------------------------------------------------------------------------
-class TestAscii(unittest.TestCase):
+class TestAscii(th.HelpedTestCase):
     """
     Test suite for ascii
     """
@@ -98,10 +98,8 @@ class TestAscii(unittest.TestCase):
         """
         Verify that we're importing the right align module
         """
-        idir = U.bscr_root(sys.modules['bscr.ascii'].__file__)
-        exp = U.bscr_test_root(__file__)
-        self.assertEqual(exp, idir,
-                         "Expected '%s', got '%s'" % (exp, idir))
+        self.assertModule('bscr.ascii', __file__)
+
         
 # ---------------------------------------------------------------------------
 if __name__ == '__main__':

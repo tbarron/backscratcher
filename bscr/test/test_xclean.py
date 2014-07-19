@@ -364,10 +364,7 @@ class TestXclean(th.HelpedTestCase):
         """
         Verify that we're importing the right align module
         """
-        mroot = U.bscr_root(sys.modules['bscr.xclean'].__file__)
-        troot = U.bscr_test_root(__file__)
-        self.assertEqual(troot, mroot,
-                         "Expected '%s', got '%s'" % (troot, mroot))
+        self.assertModule('bscr.xclean', __file__)
         
     # -------------------------------------------------------------------------
     def verify_exists(self, tv, rv):

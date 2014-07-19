@@ -4,14 +4,16 @@ import pexpect
 from nose.plugins.skip import SkipTest
 import sys
 import unittest
+from bscr import testhelp as th
 from bscr import util as U
+
 
 # -----------------------------------------------------------------------------
 def setUpModule():
     U.pythonpath_bscrroot()
 
 # -----------------------------------------------------------------------------
-class TestCalc(unittest.TestCase):
+class TestCalc(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_example(self):
         calc = U.script_location("calc")
@@ -59,10 +61,7 @@ class TestCalc(unittest.TestCase):
         """
         Verify that we're importing the right align module
         """
-        mroot = U.bscr_root(sys.modules['bscr.calc'].__file__)
-        troot = U.bscr_test_root(__file__)
-        self.assertEqual(troot, mroot,
-                         "Expected '%s', got '%s'" % (troot, mroot))
+        self.assertModule('bscr.calc', __file__)
         
         
 # -----------------------------------------------------------------------------

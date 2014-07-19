@@ -13,7 +13,7 @@ from bscr import testhelp as th
 import unittest
 
 # ---------------------------------------------------------------------------
-class TestFx(unittest.TestCase):
+class TestFx(th.HelpedTestCase):
     """
     Tests for code in fx.py.
     """
@@ -498,10 +498,8 @@ class TestFx(unittest.TestCase):
         """
         Verify that we're importing the right align module
         """
-        idir = U.bscr_root(sys.modules['bscr.fx'].__file__)
-        exp = U.bscr_test_root(__file__)
-        self.assertEqual(exp, idir,
-                         "Expected '%s', got '%s'" % (exp, idir))
+        self.assertModule('bscr.fx', __file__)
+
         
     # -----------------------------------------------------------------------
     def check_result(self, expr, expected, actual):

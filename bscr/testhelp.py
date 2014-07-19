@@ -11,6 +11,7 @@ import socket
 import sys
 import unittest
 import StringIO
+import util as U
 
 tlogger = None
 
@@ -223,28 +224,56 @@ def run_tests(a, final, testlist, volume, logfile=None):
     result = unittest.TextTestRunner(verbosity=volume).run(suite)
 
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class HelpedTestCase(unittest.TestCase):
+    # -------------------------------------------------------------------------
     def expgot(self, exp, actual):
         self.assertEqual(exp, actual,
                          "Expected '%s', got '%s'" % (exp, actual))
 
+    # -------------------------------------------------------------------------
     def exp_in_got(self, exp, actual):
         self.assertIn(exp, actual,
                       "Expected '%s' in '%s'" % (exp, actual))
 
+    # -------------------------------------------------------------------------
     def assertIn(self, member, container, msg=None):
         if member not in container:
             fmsg = "%s not found in %s" % (pp.saferepr(member),
                                            pp.saferepr(container))
             self.fail(msg or fmsg)
 
+    # -------------------------------------------------------------------------
+    def assertModule(self, module_name, filename):
+        mroot = U.bscr_root(sys.modules[module_name].__file__)
+        troot = U.bscr_test_root(filename)
+        self.assertEqual(troot, mroot,
+                         "Expected '%s', got '%s'" % (troot, mroot))
+
+    # -------------------------------------------------------------------------
     def assertNotIn(self, member, container, msg=None):
         if member in container:
             fmsg = "%s unexpectedly found in %s" % (pp.saferepr(member),
                                                     pp.saferepr(container))
             self.fail(msg or fmsg)
 
+    # -------------------------------------------------------------------------
+    def assertOptionHelp(self, script, explist):
+        cmd = U.script_location(script)
+        result = pexpect.run("%s --help" % cmd)
+        if type(explist) == str:
+            self.assertTrue(explist in result,
+                            "Expected '%s' in %s" %
+                            (explist, U.lquote(result)))
+        elif type(explist) == list:
+            for exp in explist:
+                self.assertTrue(exp in result,
+                                "Expected '%s' in %s" %
+                                (exp, U.lquote(result)))
+        else:
+            self.fail("Expected string or list, got %s" % type(explist))
+
+    # -------------------------------------------------------------------------
     def assertRaisesMsg(self, exctype, excstr, func, *args, **kwargs):
         try:
             func(*args, **kwargs)
@@ -254,6 +283,7 @@ class HelpedTestCase(unittest.TestCase):
                 self.fail(fmsg)
         except:
             self.fail("Expected an exception of type %s" % exctype)
+
 
 
 # -----------------------------------------------------------------------------

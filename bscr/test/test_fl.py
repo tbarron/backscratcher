@@ -187,7 +187,8 @@ class TestFL(th.HelpedTestCase):
         """
         Verify that we're importing the right align module
         """
-        raise SkipTest(">>> WRITE ME <<<")
+        self.assertModule('bscr.fl', __file__)
+
         
 if __name__ == '__main__':
     unittest.main()

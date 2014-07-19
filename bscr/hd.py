@@ -41,7 +41,7 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    p = optparse.OptionParser()
+    p = optparse.OptionParser(usage=usage())
     # define options here
     # p.add_option('-s', '--long',
     #              action='', default='',
@@ -86,3 +86,10 @@ def hexdump(input, output=sys.stdout):
                 output.write(" ")
             output.write(" ")
         output.write("\n")
+
+
+# ---------------------------------------------------------------------------
+def usage():
+    return """hd
+
+    Hexdump stdin or a file."""

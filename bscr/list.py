@@ -85,8 +85,7 @@ def main(args):
 # ---------------------------------------------------------------------------
 def usage():
     print(" ")
-    print("   usage: list <op> <liast-1> <list-2>")
-    print("     <op> may be one of 'minus', 'union' or 'intersect'")
+    print("   usage: list {minus|union|intersect} <list-1> <list-2>")
     print(" ")
     sys.exit(1)
 
@@ -125,38 +124,3 @@ def list_intersect(listA, listB):
         if x in listB:
             rval.append(x)
     return rval
-
-
-# ---------------------------------------------------------------------------
-class ListTests(unittest.TestCase):
-    # -----------------------------------------------------------------------
-    def test_generate_list(self):
-        a = generate_list("sysctl -a")
-        assert("kern.ostype = Darwin" in a)
-        assert("appleprofile.pmcs.max_thread_reservations: 20" in a)
-        try:
-            assert(len(a) == 635)
-        except AssertionError:
-            print("len(a) = %d" % len(a))
-
-    # -----------------------------------------------------------------------
-    def test_list_minus(self):
-        a = list_minus(['one', 'two', 'three', 'four', 'five'],
-                       ['two', 'four', 'six', 'eight'])
-        assert(a == ['one', 'three', 'five'])
-
-    # -----------------------------------------------------------------------
-    def test_list_union(self):
-        a = list_union(['one', 'three', 'five'],
-                       ['two', 'four', 'five', 'six', 'two'])
-        a.sort()
-        assert(a == ['five', 'four', 'one', 'six', 'three', 'two'])
-
-    # -----------------------------------------------------------------------
-    def test_list_intersect(self):
-        a = list_intersect(['one', 'two', 'three', 'four', 'five'],
-                           ['two', 'four', 'six', 'eight', 'ten'])
-        assert(a == ['two', 'four'])
-
-# ---------------------------------------------------------------------------
-toolframe.ez_launch(__name__, main)

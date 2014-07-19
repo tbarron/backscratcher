@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
 from bscr import hd
-from bscr import util
+from bscr import testhelp as th
+from bscr import util as U
 from StringIO import StringIO as sio
 from nose.plugins.skip import SkipTest
-from bscr import testhelp as th
+import pexpect
 import unittest
 
 # -----------------------------------------------------------------------------
-class TestHd(unittest.TestCase):
+class TestHd(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def test_hexdump(self):
@@ -35,8 +36,8 @@ class TestHd(unittest.TestCase):
         q.close()
 
         self.assertEqual(exp, result,
-                         "%s != %s" % (util.lquote(repr(exp)),
-                                       util.lquote(repr(result))))
+                         "%s != %s" % (U.lquote(repr(exp)),
+                                       U.lquote(repr(result))))
         
     # -------------------------------------------------------------------------
     # @unittest.skip("under construction")
@@ -44,7 +45,7 @@ class TestHd(unittest.TestCase):
         """
         Verify that 'hd --help' does the right thing
         """
-        raise SkipTest(">>> WRITE ME <<<")
+        self.assertOptionHelp("hd", "Hexdump stdin or a file")
     
     # -------------------------------------------------------------------------
     # @unittest.skip("under construction")
@@ -52,5 +53,5 @@ class TestHd(unittest.TestCase):
         """
         Verify that we're importing the right align module
         """
-        raise SkipTest(">>> WRITE ME <<<")
+        self.assertModule('bscr.hd', __file__)
         

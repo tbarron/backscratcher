@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 from bscr import chron
+from bscr import testhelp as th
+from bscr import util as U
 from nose.plugins.skip import SkipTest
+import pexpect
 import unittest
 
 # -----------------------------------------------------------------------------
-class TestChron(unittest.TestCase):
+class TestChron(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_hms_seconds(self):
         exp = 3923
@@ -17,14 +20,16 @@ class TestChron(unittest.TestCase):
         """
         Verify that 'chron --help' does the right thing
         """
-        raise SkipTest(">>> WRITE ME <<<")
+        self.assertOptionHelp("chron",
+                              "chronometer/stopwatch")
     
     # -------------------------------------------------------------------------
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
-        raise SkipTest(">>> WRITE ME <<<")
+        self.assertModule('bscr.chron', __file__)
+
         
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':

@@ -2,6 +2,7 @@
 
 from bscr import bscr
 from bscr import fl
+from bscr import testhelp as th
 from bscr import util as U
 import os
 import pexpect
@@ -14,7 +15,7 @@ def setUpModule():
     U.pythonpath_bscrroot()
     
 #------------------------------------------------------------------------------
-class TestScripts(unittest.TestCase):
+class TestScripts(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_bscr_help(self):
         where = pexpect.which('bscr')
@@ -50,10 +51,7 @@ class TestScripts(unittest.TestCase):
         """
         Verify that we're importing the right align module
         """
-        mroot = U.bscr_root(sys.modules['bscr.bscr'].__file__)
-        troot = U.bscr_test_root(__file__)
-        self.assertEqual(troot, mroot,
-                         "Expected '%s', got '%s'" % (troot, mroot))
+        self.assertModule('bscr.bscr', __file__)
         
         
 # ---------------------------------------------------------------------------

@@ -76,7 +76,7 @@ def main(argv=None):
 #     if argv == None:
 #         argv = sys.argv
 
-    p = optparse.OptionParser()
+    p = optparse.OptionParser(usage=usage())
     p.add_option('-d', '--debug', dest='debug',
                  action='store_true', default=False,
                  help='run the debugger')
@@ -264,6 +264,12 @@ def unit_size(unit):
     rval = uval[unit]
     return rval
 
+
+# ---------------------------------------------------------------------------
+def usage():
+    return """dt
+
+    playing with dates"""
 
 # ---------------------------------------------------------------------------
 def weekday_list():
