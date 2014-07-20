@@ -1,4 +1,5 @@
 from bscr import fx
+from bscr import testhelp as th
 from bscr import util as U
 import glob
 import re
@@ -9,7 +10,6 @@ import pexpect
 import shutil
 import StringIO
 import sys
-from bscr import testhelp as th
 import unittest
 
 # ---------------------------------------------------------------------------
@@ -236,7 +236,8 @@ class TestFx(th.HelpedTestCase):
         Test SubstCommand() with dryrun True and quiet False.
         """
         with U.Chdir(self.testdir):
-            v = optparse.Values({'dryrun': True, 'quiet': False, 'cmd': 'ls %'})
+            v = optparse.Values({'dryrun': True, 'quiet': False,
+                                 'cmd': 'ls %'})
             a = ['a.pl', 'b.pl', 'c.pl']
             exp = "".join(["would do 'ls %s'\n" % x for x in a])
             self.unlink(a)
@@ -253,10 +254,11 @@ class TestFx(th.HelpedTestCase):
         Test SubstCommand() with dryrun False and quiet False.
         """
         with U.Chdir(self.testdir):
-            v = optparse.Values({'dryrun': False, 'quiet': False, 'cmd': 'ls %'})
+            v = optparse.Values({'dryrun': False, 'quiet': False,
+                                 'cmd': 'ls %'})
             a = ['a.pl', 'b.pl', 'c.pl']
             exp = "".join(['ls %s\n%s\n' % (x, x) for x in a])
-            self.touch(a)
+            U.touch(a)
 
             self.redirect()
             fx.SubstCommand(v, a)
@@ -270,10 +272,11 @@ class TestFx(th.HelpedTestCase):
         Test SubstCommand() with dryrun False and quiet True.
         """
         with U.Chdir(self.testdir):
-            v = optparse.Values({'dryrun': False, 'quiet': True, 'cmd': 'ls %'})
+            v = optparse.Values({'dryrun': False, 'quiet': True,
+                                 'cmd': 'ls %'})
             a = ['a.pl', 'b.pl', 'c.pl']
             exp = "".join(['%s\n' % x for x in a])
-            self.touch(a)
+            U.touch(a)
 
             self.redirect()
             fx.SubstCommand(v, a)
@@ -289,11 +292,12 @@ class TestFx(th.HelpedTestCase):
         with U.Chdir(self.testdir):
             arglist = ['a.pl', 'b.pl', 'c.pl']
             for a in arglist:
-                self.touch(a)
+                U.touch(a)
             expected = "".join(['rename %s.pl %s.xyzzy\n' % (x, x) for x in
                                 [q.replace('.pl', '') for q in arglist]])
             exp = [re.sub('.pl', '.xyzzy', x) for x in arglist]
-            v = optparse.Values({'dryrun': True, 'quiet': True, 'edit': 's/.pl/.xyzzy'})
+            v = optparse.Values({'dryrun': True, 'quiet': True,
+                                 'edit': 's/.pl/.xyzzy'})
 
             self.redirect()
             fx.SubstRename(v, arglist)
@@ -313,11 +317,12 @@ class TestFx(th.HelpedTestCase):
         with U.Chdir(self.testdir):
             arglist = ['a.pl', 'b.pl', 'c.pl']
             for a in arglist:
-                self.touch(a)
+                U.touch(a)
             expected = "".join(['rename %s.pl %s.xyzzy\n' % (x, x) for x in
                                 [q.replace('.pl', '') for q in arglist]])
             exp = [re.sub('.pl', '.xyzzy', x) for x in arglist]
-            v = optparse.Values({'dryrun': True, 'quiet': False, 'edit': 's/.pl/.xyzzy'})
+            v = optparse.Values({'dryrun': True, 'quiet': False,
+                                 'edit': 's/.pl/.xyzzy'})
 
             self.redirect()
             fx.SubstRename(v, arglist)
@@ -337,11 +342,12 @@ class TestFx(th.HelpedTestCase):
         with U.Chdir(self.testdir):
             arglist = ['a.pl', 'b.pl', 'c.pl']
             for a in arglist:
-                self.touch(a)
+                U.touch(a)
             expected = "".join(['rename %s.pl %s.xyzzy\n' % (x, x) for x in
                                 [q.replace('.pl', '') for q in arglist]])
             exp = [re.sub('.pl', '.xyzzy', x) for x in arglist]
-            v = optparse.Values({'dryrun': False, 'quiet': False, 'edit': 's/.pl/.xyzzy'})
+            v = optparse.Values({'dryrun': False, 'quiet': False,
+                                 'edit': 's/.pl/.xyzzy'})
 
             self.redirect()
             fx.SubstRename(v, arglist)
@@ -361,11 +367,12 @@ class TestFx(th.HelpedTestCase):
         with U.Chdir(self.testdir):
             arglist = ['a.pl', 'b.pl', 'c.pl']
             for a in arglist:
-                self.touch(a)
+                U.touch(a)
             expected = "".join(['rename %s.pl %s.xyzzy\n' % (x, x) for x in
                                 [q.replace('.pl', '') for q in arglist]])
             exp = [re.sub('.pl', '.xyzzy', x) for x in arglist]
-            v = optparse.Values({'dryrun': False, 'quiet': True, 'edit': 's/.pl/.xyzzy'})
+            v = optparse.Values({'dryrun': False, 'quiet': True,
+                                 'edit': 's/.pl/.xyzzy'})
 
             self.redirect()
             fx.SubstRename(v, arglist)
@@ -425,12 +432,16 @@ class TestFx(th.HelpedTestCase):
         """
         Test routine psys with dryrun False and quiet True.
         """
-        with th.StdoutExcursion() as getval:
-            v = optparse.Values({'dryrun': False, 'quiet': True})
-            fx.psys('ls -d bscr/fx.py', v)
-            actual = getval()
-        expected = "bscr/fx.py\n"
-        self.check_result(expected == actual, expected, actual)
+        with U.Chdir(self.testdir):
+            with th.StdoutExcursion() as getval:
+                v = optparse.Values({'dryrun': False, 'quiet': True})
+                fx.psys('ls', v)
+                actual = getval()
+        expected = "a.xyzzy\nb.xyzzy\nc.xyzzy\ntmpfile\n"
+        self.assertEqual(expected, actual,
+                         "%s\n   !=\n%s" %
+                         (U.lquote(expected), U.lquote(actual)))
+        # self.check_result(expected == actual, expected, actual)
 
     # -----------------------------------------------------------------------
     def test_psys_both(self):

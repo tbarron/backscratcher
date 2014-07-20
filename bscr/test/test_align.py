@@ -64,7 +64,8 @@ class TestAlign(th.HelpedTestCase):
         Words that contain valid numeric specifications should be right
         aligned. Words containing non-numeric values should be left aligned.
         """
-        S = pexpect.spawn("bin/align")
+        script = U.script_location("align")
+        S = pexpect.spawn(script)
         S.setecho(False)
         for line in self.tdata:
             S.sendline(line)
@@ -92,7 +93,8 @@ class TestAlign(th.HelpedTestCase):
             f.write(line + "\n")
         f.close()
 
-        x = pexpect.run("bin/align %s" % tfilename)
+        script = U.script_location("align")
+        x = pexpect.run("%s %s" % (script, tfilename))
 
         self.assertEqual(self.expected, x,
                          '"""\n%s\n"""(%d)\n\n' %

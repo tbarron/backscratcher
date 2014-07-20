@@ -3,6 +3,7 @@ from bscr import list
 from bscr import testhelp as th
 from bscr import util as U
 from nose.plugins.skip import SkipTest
+import os
 import pexpect
 import pprint
 import unittest
@@ -19,10 +20,11 @@ class TestList(th.HelpedTestCase):
         """
         Generate a list from the output of a command
         """
-        a = list.generate_list("ls")
-        self.assertInList('LICENSE', a)
-        self.assertInList("bin", a)
-        self.assertInList("README.md", a)
+        with U.Chdir(U.dirname(__file__)):
+            a = list.generate_list("ls")
+            self.assertInList("__init__.py", a)
+            self.assertInList("test_list.py", a)
+            self.assertInList("test_util.py", a)
 
     # -----------------------------------------------------------------------
     def test_list_minus(self):

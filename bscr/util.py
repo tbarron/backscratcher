@@ -6,6 +6,7 @@ import pexpect
 import re
 import sys
 import testhelp
+import time
 import unittest
 
 
@@ -280,12 +281,23 @@ def script_location(script):
 #     return rval
 
 # -----------------------------------------------------------------------------
-def touch(filepath, times=None):
+def touch(touchables, times=None):
     """
     touch -- ensure file exists and update its *times* (atime, mtime)
     """
-    open(filepath, 'a').close()
-    os.utime(filepath, times)
+    if times is None:
+        now = int(time.time())
+        times = (now, now)
+    if type(touchables) == list:
+        for f in touchables:
+            open(f, 'a').close()
+            os.utime(f, times)
+    elif type(touchables) == str:
+        open(touchables, 'a').close()
+        os.utime(touchables, times)
+    else:
+        raise StandardError('argument must be list or string')
+
 
 # ---------------------------------------------------------------------------
 def writefile(filepath, lines):
