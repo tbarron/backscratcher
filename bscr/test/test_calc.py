@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 from bscr import calc
 import pexpect
 from nose.plugins.skip import SkipTest
@@ -11,6 +11,7 @@ from bscr import util as U
 # -----------------------------------------------------------------------------
 def setUpModule():
     U.pythonpath_bscrroot()
+
 
 # -----------------------------------------------------------------------------
 class TestCalc(th.HelpedTestCase):
@@ -51,20 +52,14 @@ class TestCalc(th.HelpedTestCase):
         self.assertFalse(nexp in result,
                          "Not expecting '%s' in %s" %
                          (nexp, U.lquote(result)))
-        exp = "Usage: calc [options]" 
+        exp = "Usage: calc [options]"
         self.assertTrue(exp in result,
                         "Expected '%s' in %s" %
                         (exp, U.lquote(result)))
-    
+
     # -------------------------------------------------------------------------
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
         self.assertModule('bscr.calc', __file__)
-        
-        
-# -----------------------------------------------------------------------------
-if __name__ == '__main__':
-    unittest.main()
-

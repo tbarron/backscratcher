@@ -8,6 +8,7 @@ import sys
 from bscr import testhelp as th
 import unittest
 
+
 # ---------------------------------------------------------------------------
 class TestMag(th.HelpedTestCase):
     # -------------------------------------------------------------------------
@@ -131,16 +132,10 @@ class TestMag(th.HelpedTestCase):
             self.assertTrue(item in result,
                             "Expected '%s' in %s" %
                             (item, U.lquote(result)))
-    
+
     # -------------------------------------------------------------------------
     def test_which_module(self):
         """
         Verify that we're importing the right mag module
         """
         self.assertModule('bscr.mag', __file__)
-
-
-# -----------------------------------------------------------------------------
-if __name__ == '__main__':
-    unittest.main()
-

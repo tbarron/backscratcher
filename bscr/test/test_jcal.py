@@ -9,6 +9,7 @@ from bscr import testhelp as th
 from bscr import util as U
 import unittest
 
+
 # -----------------------------------------------------------------------------
 class JcalTest(th.HelpedTestCase):
     # -------------------------------------------------------------------------
@@ -26,7 +27,7 @@ class JcalTest(th.HelpedTestCase):
         exp = "help - show this list"
         self.assertTrue(exp in result, "Expected '%s' in %s" %
                         (exp, U.lquote(result)))
-    
+
     # -------------------------------------------------------------------------
     # @unittest.skip("under construction")
     def test_which_module(self):
@@ -34,4 +35,3 @@ class JcalTest(th.HelpedTestCase):
         Verify that we're importing the right align module
         """
         self.assertModule('bscr.jcal', __file__)
-        

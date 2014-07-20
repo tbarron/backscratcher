@@ -17,6 +17,7 @@ import unittest
 # odx(0987)       => ValueError
 # odx(0x5234g7)   => ValueError
 
+
 # -----------------------------------------------------------------------------
 class TestOdx(testhelp.HelpedTestCase):
     # -------------------------------------------------------------------------
@@ -48,7 +49,7 @@ class TestOdx(testhelp.HelpedTestCase):
     def test_hex_bad(self):
         exp = "invalid literal for int() with base 16"
         self.assertRaisesMsg(ValueError, exp, odx.odx, '0x5234g7')
-        
+
     # -------------------------------------------------------------------------
     def test_odx_help(self):
         """
@@ -74,9 +75,3 @@ class TestOdx(testhelp.HelpedTestCase):
         Verify that we're importing the right align module
         """
         self.assertModule('bscr.odx', __file__)
-
-
-# -----------------------------------------------------------------------------
-if __name__ == '__main__':
-    unittest.main()
-    

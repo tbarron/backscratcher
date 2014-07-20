@@ -8,16 +8,19 @@ import subprocess as subp
 import sys
 import util
 
+
 # -----------------------------------------------------------------------------
 def main(args):
     util.dispatch(__name__, 'bscr', args)
 
+
 # -----------------------------------------------------------------------------
 def bscr_help_commands(args):
-    """help_commands - list the commands that are part of backscratcher    
+    """help_commands - list the commands that are part of backscratcher
     """
 
-    cl = ["align       - use spaces to spread input lines so that columns line up",
+    cl = ["align       - use spaces to spread input lines so that " +
+          "columns line up",
           "ascii       - display the ASCII collating sequence",
           "bscr        - help and management for the backscratcher suite",
           "calc        - simple python expression evaluator",
@@ -53,6 +56,7 @@ def bscr_help_commands(args):
         else:
             print(" * %s" % line)
 
+
 # -----------------------------------------------------------------------------
 def bscr_test(args):
     """test - run tests
@@ -75,6 +79,7 @@ def bscr_test(args):
             for t in tl:
                 p = subp.Popen([t, '-v'])
                 p.wait()
+
 
 # -----------------------------------------------------------------------------
 def bscr_uninstall(args):
@@ -114,8 +119,9 @@ def bscr_uninstall(args):
                 elif os.path.exists(afp):
                     os.unlink(afp)
             shutil.rmtree(bscrpkg)
-            
+
     return None
+
 
 # -----------------------------------------------------------------------------
 def importable(module_name):
@@ -128,6 +134,7 @@ def importable(module_name):
     except ImportError:
         return False
     return True
+
 
 # -----------------------------------------------------------------------------
 def which(program):

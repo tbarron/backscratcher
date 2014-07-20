@@ -9,6 +9,7 @@ import sys
 from bscr import testhelp as th
 import unittest
 
+
 # -----------------------------------------------------------------------------
 class TestXclean(th.HelpedTestCase):
     drmsg = 'Without --dryrun, would remove'
@@ -38,7 +39,7 @@ class TestXclean(th.HelpedTestCase):
         Tear down after each test
         """
         shutil.rmtree(self.testdir)
-        
+
     # -------------------------------------------------------------------------
     def test_cleanup_dr_np_nr(self):
         with th.StdoutExcursion() as getval:
@@ -68,13 +69,13 @@ class TestXclean(th.HelpedTestCase):
         self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
                        result,
                        [True, False, True, False])
-        
+
     # -------------------------------------------------------------------------
     def test_cleanup_dr_p_nr(self):
         with th.StdoutExcursion() as getval:
             bscr.xclean.cleanup(self.testdir, dryrun=True, pattern="no.*")
             result = getval()
-        
+
         self.verify_exists([self.tilde, self.ntilde, self.stilde,
                             self.nstilde],
                            [True, True, True, True])
@@ -133,7 +134,7 @@ class TestXclean(th.HelpedTestCase):
         self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
                        result,
                        [True, False, True, False])
-            
+
     # -------------------------------------------------------------------------
     def test_cleanup_ndr_p_nr(self):
         with th.StdoutExcursion() as getval:
@@ -181,7 +182,7 @@ class TestXclean(th.HelpedTestCase):
         for fn in self.nstilde:
             self.assertNotIn(fn, fl,
                              "Expected %s to not be in %s" % (fn, fl))
-        
+
     # -------------------------------------------------------------------------
     def test_find_files_r(self):
         fl = bscr.xclean.find_files(self.testdir, recursive=True)
@@ -197,13 +198,13 @@ class TestXclean(th.HelpedTestCase):
         for fn in self.nstilde:
             self.assertNotIn(fn, fl,
                              "Expected %s to not be in %s" % (fn, fl))
-        
+
     # -------------------------------------------------------------------------
     def test_find_files_p(self):
         fl = bscr.xclean.find_files(self.testdir, pattern='no.*')
         for fn in self.tilde:
             self.assertNotIn(fn, fl,
-                          "Expected %s to not be in %s" % (fn, fl))
+                             "Expected %s to not be in %s" % (fn, fl))
         for fn in self.stilde:
             self.assertNotIn(fn, fl,
                              "Expected %s to not be in %s" % (fn, fl))
@@ -213,24 +214,24 @@ class TestXclean(th.HelpedTestCase):
         for fn in self.nstilde:
             self.assertNotIn(fn, fl,
                              "Expected %s to not be in %s" % (fn, fl))
-        
+
     # -------------------------------------------------------------------------
     def test_find_files_p_r(self):
         fl = bscr.xclean.find_files(self.testdir, pattern='no.*',
                                     recursive=True)
         for fn in self.tilde:
             self.assertNotIn(fn, fl,
-                          "Expected %s to not be in %s" % (fn, fl))
+                             "Expected %s to not be in %s" % (fn, fl))
         for fn in self.stilde:
             self.assertNotIn(fn, fl,
-                          "Expected %s to not be in %s" % (fn, fl))
+                             "Expected %s to not be in %s" % (fn, fl))
         for fn in self.ntilde:
             self.assertIn(fn, fl,
-                             "Expected %s in %s" % (fn, fl))
+                          "Expected %s in %s" % (fn, fl))
         for fn in self.nstilde:
             self.assertIn(fn, fl,
-                             "Expected %s in %s" % (fn, fl))
-        
+                          "Expected %s in %s" % (fn, fl))
+
     # -------------------------------------------------------------------------
     def test_main_dr_np_nr(self):
         with th.StdoutExcursion() as getval:
@@ -256,7 +257,7 @@ class TestXclean(th.HelpedTestCase):
         self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
                        result,
                        [False, True, False, False])
-    
+
     # -------------------------------------------------------------------------
     def test_main_dr_np_r(self):
         with th.StdoutExcursion() as getval:
@@ -283,7 +284,7 @@ class TestXclean(th.HelpedTestCase):
         self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
                        result,
                        [False, True, False, True])
-        
+
     # -------------------------------------------------------------------------
     def test_main_ndr_np_nr(self):
         with th.StdoutExcursion() as getval:
@@ -309,7 +310,7 @@ class TestXclean(th.HelpedTestCase):
         self.verify_in([self.tilde, self.ntilde, self.stilde, self.nstilde],
                        result,
                        [True, False, True, False])
-        
+
     # -------------------------------------------------------------------------
     def test_main_ndr_p_nr(self):
         with th.StdoutExcursion() as getval:
@@ -358,14 +359,14 @@ class TestXclean(th.HelpedTestCase):
             self.assertTrue(line in actual,
                             "Expected '%s' in %s" %
                             (line, U.lquote(actual)))
-    
+
     # -------------------------------------------------------------------------
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
         self.assertModule('bscr.xclean', __file__)
-        
+
     # -------------------------------------------------------------------------
     def verify_exists(self, tv, rv):
         for fl, exp in zip(tv, rv):
@@ -373,7 +374,7 @@ class TestXclean(th.HelpedTestCase):
                 self.assertEqual(exp, os.path.exists(fp),
                                  "expected '%s' to exist" % fp if exp else
                                  "expected '%s' to not exist" % fp)
-        
+
     # -------------------------------------------------------------------------
     def verify_in(self, tv, text, rv):
         for fl, exp in zip(tv, rv):
@@ -384,8 +385,3 @@ class TestXclean(th.HelpedTestCase):
                 else:
                     self.assertNotIn(fp, text,
                                      "'%s' not expected in '%s'" % (fp, text))
-        
-# -----------------------------------------------------------------------------
-if __name__ == '__main__':
-    unittest.main()
-    

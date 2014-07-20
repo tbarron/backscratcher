@@ -285,7 +285,6 @@ class HelpedTestCase(unittest.TestCase):
             self.fail("Expected an exception of type %s" % exctype)
 
 
-
 # -----------------------------------------------------------------------------
 class LoggingTestSuite(unittest.TestSuite):
     def __init__(self, tests=(), logfile=None):

@@ -27,6 +27,7 @@ import pdb
 import sys
 import toolframe
 
+
 # ---------------------------------------------------------------------------
 def main(argv=None):
     p = optparse.OptionParser(usage=usage())
@@ -35,7 +36,8 @@ def main(argv=None):
                  help='run under the debugger')
     (o, a) = p.parse_args(argv)
 
-    if o.debug: pdb.set_trace()
+    if o.debug:
+        pdb.set_trace()
 
     asc = ['NUL', 'SOH', 'STX', 'ETX', 'EOT', 'ENQ', 'ACK', 'BEL', 'BS',
            'TAB', 'LF', 'VT', 'FF', 'CR', 'SO', 'SI', 'DLE', 'DC1', 'DC2',
@@ -53,12 +55,10 @@ def main(argv=None):
             sys.stdout.write('\n')
 
     sys.stdout.write("\n")
-    
+
+
 # ---------------------------------------------------------------------------
 def usage():
     return """ascii
 
     Display ASCII collating sequence."""
-
-# ---------------------------------------------------------------------------
-#toolframe.ez_launch(__name__, main)

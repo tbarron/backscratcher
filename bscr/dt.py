@@ -73,8 +73,8 @@ import unittest
 
 # ---------------------------------------------------------------------------
 def main(argv=None):
-#     if argv == None:
-#         argv = sys.argv
+    if argv is None:
+        argv = sys.argv
 
     p = optparse.OptionParser(usage=usage())
     p.add_option('-d', '--debug', dest='debug',
@@ -270,6 +270,7 @@ def usage():
     return """dt
 
     playing with dates"""
+
 
 # ---------------------------------------------------------------------------
 def weekday_list():

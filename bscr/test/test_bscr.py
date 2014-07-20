@@ -10,11 +10,13 @@ from nose.plugins.skip import SkipTest
 import sys
 import unittest
 
-#------------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
 def setUpModule():
     U.pythonpath_bscrroot()
-    
-#------------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
 class TestScripts(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_bscr_help(self):
@@ -24,13 +26,13 @@ class TestScripts(th.HelpedTestCase):
             cmd = "bin/bscr"
         else:
             cmd = "bscr"
-            
+
         result = pexpect.run('%s help' % cmd)
         self.assertFalse('Traceback' in result)
         for f in [x for x in dir(bscr) if x.startswith('bscr_')]:
             subc = f.replace('bscr_', '')
             self.assertTrue('%s - ' % subc in result)
-        
+
     # -------------------------------------------------------------------------
     def test_bscr_help_help(self):
         where = pexpect.which('bscr')
@@ -39,7 +41,7 @@ class TestScripts(th.HelpedTestCase):
             cmd = "bin/bscr"
         else:
             cmd = "bscr"
-            
+
         result = pexpect.run('%s help help' % cmd)
         self.assertFalse('Traceback' in result)
         self.assertTrue('help - show a list' in result)
@@ -52,8 +54,3 @@ class TestScripts(th.HelpedTestCase):
         Verify that we're importing the right align module
         """
         self.assertModule('bscr.bscr', __file__)
-        
-        
-# ---------------------------------------------------------------------------
-if __name__ == '__main__':
-    unittest.main()

@@ -36,7 +36,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
 import optparse
-#import toolframe
 
 
 # -----------------------------------------------------------------------------
@@ -54,6 +53,7 @@ def main(args):
         result = odx(str)
         print(result)
 
+
 # -----------------------------------------------------------------------------
 def odx(str):
     if str.startswith("0x"):
@@ -64,11 +64,9 @@ def odx(str):
         val = int(str)
     return "%s -> 0%o / %d / 0x%x" % (str, val, val, val)
 
+
 # -----------------------------------------------------------------------------
 def usage():
     return """odx {0<octal-value>|<decimal-value>|0x<hex-value>} ...
 
     report each argument in octal, decimal, and hex format"""
-
-# -----------------------------------------------------------------------------
-#toolframe.ez_launch(__name__, main)

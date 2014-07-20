@@ -241,7 +241,7 @@ def ez_launch(modname,
             if test is None:
                 unittest.main()
             else:
-                if setup != None:
+                if setup is not None:
                     setup()
                 keep = testhelp.main(sys.argv, test, logfile=logfile)
                 if not keep and cleanup is not None:

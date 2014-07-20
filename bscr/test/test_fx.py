@@ -12,13 +12,14 @@ import StringIO
 import sys
 import unittest
 
+
 # ---------------------------------------------------------------------------
 class TestFx(th.HelpedTestCase):
     """
     Tests for code in fx.py.
     """
     testdir = "/tmp/fx_test"
-    
+
     # -----------------------------------------------------------------------
     @classmethod
     def setUpClass(cls):
@@ -31,7 +32,7 @@ class TestFx(th.HelpedTestCase):
         kf = os.getenv("KEEPFILES")
         if kf is None or not int(kf):
             shutil.rmtree(TestFx.testdir)
-        
+
     # -----------------------------------------------------------------------
     def test_BatchCommand_both(self):
         """
@@ -87,7 +88,7 @@ class TestFx(th.HelpedTestCase):
             actual = self.undirect()
 
             self.check_result(exp == actual, exp, actual)
-    
+
     # -----------------------------------------------------------------------
     def test_BatchCommand_neither(self):
         """
@@ -100,8 +101,8 @@ class TestFx(th.HelpedTestCase):
                 f.write(str(x) + '\n')
             f.close()
 
-            v = optparse.Values({'dryrun': False, 'quiet': False, 'xargs': True,
-                                 'cmd': 'echo %'})
+            v = optparse.Values({'dryrun': False, 'quiet': False,
+                                 'xargs': True, 'cmd': 'echo %'})
 
             x = StringIO.StringIO(" ".join([str(z) for z in range(1, 250)]))
             q = fx.xargs_wrap("echo %", x)
@@ -400,7 +401,7 @@ class TestFx(th.HelpedTestCase):
             fx.psys('ls -d %s/fx.py' % root, v)
             actual = getval()
         # actual = self.undirect()
-        expected = "ls -d %s/fx.py\n%s/fx.py\n" % (root,root)
+        expected = "ls -d %s/fx.py\n%s/fx.py\n" % (root, root)
         self.assertEqual(expected, actual)
 
     # -----------------------------------------------------------------------
@@ -492,7 +493,7 @@ class TestFx(th.HelpedTestCase):
             self.assertTrue(exp_s in result,
                             "Expected '%s' in %s" %
                             (exp_s, U.lquote(result)))
-    
+
     # -------------------------------------------------------------------------
     def test_which_module(self):
         """
@@ -500,7 +501,6 @@ class TestFx(th.HelpedTestCase):
         """
         self.assertModule('bscr.fx', __file__)
 
-        
     # -----------------------------------------------------------------------
     def check_result(self, expr, expected, actual):
         """
@@ -568,4 +568,3 @@ class TestFx(th.HelpedTestCase):
                 os.unlink(args)
         else:
             raise StandardError('argument must be list or string')
-

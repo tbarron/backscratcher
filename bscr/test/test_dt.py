@@ -7,6 +7,7 @@ import pexpect
 import time
 import unittest
 
+
 # ---------------------------------------------------------------------------
 class TestDt(th.HelpedTestCase):
     # -----------------------------------------------------------------------
@@ -72,12 +73,12 @@ class TestDt(th.HelpedTestCase):
     # -----------------------------------------------------------------------
     def test_next(self):
         self.do_both(['next'],
-                       'next: expected unit or weekday, found nothing')
+                     'next: expected unit or weekday, found nothing')
 
     # -----------------------------------------------------------------------
     def test_last(self):
         self.do_both(['last'],
-                       'last: expected unit or weekday, found nothing')
+                     'last: expected unit or weekday, found nothing')
 
     # -----------------------------------------------------------------------
     def test_plus5day(self):
@@ -98,12 +99,12 @@ class TestDt(th.HelpedTestCase):
     # -----------------------------------------------------------------------
     def test_next_minus3(self):
         self.do_both(['next', '-3', 'hour'],
-                       'next: expected unit or weekday, got number')
+                     'next: expected unit or weekday, got number')
 
     # -----------------------------------------------------------------------
     def test_last_plus2day(self):
         self.do_both(['last', '+2', 'day'],
-                       'last: expected unit or weekday, got number')
+                     'last: expected unit or weekday, got number')
 
     # -----------------------------------------------------------------------
     def test_minus3hour(self):
@@ -151,16 +152,10 @@ class TestDt(th.HelpedTestCase):
         Verify that 'dt --help' does the right thing
         """
         self.assertOptionHelp("dt", "playing with dates")
-    
+
     # -------------------------------------------------------------------------
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
         self.assertModule('bscr.dt', __file__)
-
-        
-# -----------------------------------------------------------------------------
-if __name__ == '__main__':
-    unittest.main()
-

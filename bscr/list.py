@@ -89,6 +89,7 @@ def usage():
     print(" ")
     sys.exit(1)
 
+
 # ---------------------------------------------------------------------------
 def generate_list(cmd):
     f = os.popen(cmd, 'r')

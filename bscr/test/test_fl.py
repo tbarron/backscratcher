@@ -12,6 +12,7 @@ from bscr import testhelp as th
 import time
 import unittest
 
+
 # ---------------------------------------------------------------------------
 def setUpModule():
     if os.path.basename(os.getcwd()) == 'fl_tests':
@@ -23,12 +24,13 @@ def setUpModule():
 
     util.pythonpath_bscrroot()
 
-        
+
 # ---------------------------------------------------------------------------
 def tearDownModule():
     kf = os.getenv('KEEPFILES')
     if not kf:
         shutil.rmtree('fl_tests')
+
 
 # ---------------------------------------------------------------------------
 class TestFL(th.HelpedTestCase):
@@ -58,7 +60,7 @@ class TestFL(th.HelpedTestCase):
         for f in [x for x in dir(fl) if x.startswith('bscr_')]:
             subc = f.replace('bscr_', '')
             self.assertTrue('%s - ' % subc in result)
-        
+
     # -------------------------------------------------------------------------
     def test_fl_help_help(self):
         where = pexpect.which('fl')
@@ -67,14 +69,15 @@ class TestFL(th.HelpedTestCase):
             cmd = "bin/fl"
         else:
             cmd = "fl"
-            
+
         result = pexpect.run('%s help help' % cmd)
         self.assertFalse('Traceback' in result)
         for f in ['help - show a list of available commands',
                   'With no arguments, show a list of commands',
-                  'With a command as argument, show help for that command',]:
+                  'With a command as argument, show help for that command',
+                  ]:
             self.assertTrue(f in result)
-        
+
     # -----------------------------------------------------------------------
     def test_most_recent_prefix_match(self):
         """
@@ -103,7 +106,7 @@ class TestFL(th.HelpedTestCase):
             util.writefile('mrpm1.2009-10-01', ['copy of test file\n'])
             util.writefile('old/mrpm2.2009-08-31',
                            ['copy of another test file\n'])
-            
+
             expected = ['diff ./mrpm1.2009-10-01 mrpm1\r',
                         '1c1\r',
                         '< copy of test file\r',
@@ -114,7 +117,7 @@ class TestFL(th.HelpedTestCase):
             cmd = util.script_location("fl")
             got = pexpect.run("%s diff mrpm1" % cmd).split("\n")
             self.assertEqual(expected, got)
-            
+
             expected = ['diff ./old/mrpm2.2009-08-31 mrpm2\r',
                         '1c1\r',
                         '< copy of another test file\r',
@@ -135,14 +138,14 @@ class TestFL(th.HelpedTestCase):
             util.writefile('mrpm1.2009-10-01', ['reverted\n'])
             util.writefile('old/mrpm2.2009-08-31',
                            ['REVERTED\n'])
-            
+
             fl = util.script_location("fl")
             os.system('%s revert mrpm1' % fl)
             assert(os.path.exists('mrpm1.new'))
             assert(os.path.exists('mrpm1'))
             assert(not os.path.exists('mrpm1.2009-10-01'))
             assert(util.contents('mrpm1') == ['reverted'])
-            
+
             os.system('%s revert mrpm2' % fl)
             assert(os.path.exists('mrpm2.new'))
             assert(os.path.exists('mrpm2'))
@@ -188,7 +191,3 @@ class TestFL(th.HelpedTestCase):
         Verify that we're importing the right align module
         """
         self.assertModule('bscr.fl', __file__)
-
-        
-if __name__ == '__main__':
-    unittest.main()

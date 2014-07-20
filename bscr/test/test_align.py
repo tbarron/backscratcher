@@ -41,8 +41,8 @@ class TestAlign(th.HelpedTestCase):
                 "mno          qprs         \r\n" +
                 "foobard  simplification  denomination  vituperation" +
                 "  spalshy      \r\n")
+
     # -------------------------------------------------------------------------
-    # @unittest.skip("under construction")
     def test_align_help(self):
         """
         Verify that 'align --help' does the right thing
@@ -53,11 +53,11 @@ class TestAlign(th.HelpedTestCase):
         self.assertFalse(nexp in result,
                          "Not expecting '%s' in %s" %
                          (nexp, U.lquote(result)))
-        exp = "Align columns from input" 
+        exp = "Align columns from input"
         self.assertTrue(exp in result,
                         "Expected '%s' in %s" %
                         (exp, U.lquote(result)))
-    
+
     # -------------------------------------------------------------------------
     def test_digit_alignment(self):
         """
@@ -111,8 +111,3 @@ class TestAlign(th.HelpedTestCase):
         Verify that we're importing the right align module
         """
         self.assertModule('bscr.align', __file__)
-
-        
-# ---------------------------------------------------------------------------
-if __name__ == '__main__':
-    unittest.main()

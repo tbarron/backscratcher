@@ -8,14 +8,16 @@ import pexpect
 import pprint
 import unittest
 
+
+# -----------------------------------------------------------------------------
 class TestList(th.HelpedTestCase):
-    # -----------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     def assertInList(self, exp, larg):
         self.assertIn(exp, larg,
                       "'%s' is not in list '%s'" %
                       (exp, pprint.pformat(larg)))
-        
-    # -----------------------------------------------------------------------
+
+    # -------------------------------------------------------------------------
     def test_generate_list(self):
         """
         Generate a list from the output of a command
@@ -63,15 +65,10 @@ class TestList(th.HelpedTestCase):
         self.assertOptionHelp("list",
                               "usage: list {minus|union|intersect} " +
                               "<list-1> <list-2>")
-    
+
     # -------------------------------------------------------------------------
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
         self.assertModule('bscr.list', __file__)
-
-        
-# -----------------------------------------------------------------------------
-if __name__ == '__main__':
-    unittest.main()

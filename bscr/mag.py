@@ -172,4 +172,3 @@ class MagTest(unittest.TestCase):
         except AssertionError:
             print "\nexpected: '%s'" % a
             print "result:   '%s'" % string
-

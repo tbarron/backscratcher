@@ -50,7 +50,8 @@ def main(A):
                  help='run under the debugger')
     (o, a) = p.parse_args(A)
 
-    if o.debug: pdb.set_trace()
+    if o.debug:
+        pdb.set_trace()
 
     if 1 < len(A):
         input = open(A[1], 'r')

@@ -48,6 +48,7 @@ class Chdir(object):
         """
         os.chdir(self.start)
 
+
 # ---------------------------------------------------------------------------
 def abspath(rpath, start=None):
     """
@@ -105,10 +106,11 @@ def dispatch(mname, prefix, args):
     if func_name == 'help':
         dispatch_help(mname, prefix, args)
     else:
-        func = getattr(sys.modules[mname], "_".join([prefix,func_name]))
+        func = getattr(sys.modules[mname], "_".join([prefix, func_name]))
         func(args[2:])
 
-# ---------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
 def dispatch_help(mname, prefix, args):
     mod = sys.modules[mname]
     if 3 <= len(args) and args[1] == 'help' and args[2] == "help":
@@ -131,6 +133,7 @@ def dispatch_help(mname, prefix, args):
         dlist.sort()
         for line in dlist:
             print("   %s" % line)
+
 
 # ---------------------------------------------------------------------------
 def expand(path):
@@ -250,12 +253,13 @@ def pythonpath_bscrroot():
     Find the git root and add it to $PYTHONPATH
     TODO: This should probably move to testhelp eventually.
     """
-    where = os.path.dirname(os.path.dirname(__file__))
+    where = dirname(dirname(abspath(__file__)))
     prev = os.getenv("PYTHONPATH")
     if prev is None:
         os.environ["PYTHONPATH"] = where
     elif where not in prev:
         os.environ["PYTHONPATH"] = ":".join([where, prev])
+
 
 # -----------------------------------------------------------------------------
 def script_location(script):
@@ -306,6 +310,7 @@ def writefile(filepath, lines):
 # ---------------------------------------------------------------------------
 def lquote(text):
     return '\n'.join(['"""', text.rstrip(), '"""'])
+
 
 # ---------------------------------------------------------------------------
 def findroot():

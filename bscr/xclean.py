@@ -4,6 +4,7 @@ import pdb
 import re
 import sys
 
+
 # -----------------------------------------------------------------------------
 def main(args=None):
 
@@ -31,6 +32,7 @@ def main(args=None):
         for dir in a[1:]:
             cleanup(dir, o.dryrun, o.pattern, o.recursive)
 
+
 # -----------------------------------------------------------------------------
 def cleanup(dir, dryrun=False, pattern=None, recursive=False):
     flist = find_files(dir, pattern, recursive)
@@ -42,6 +44,7 @@ def cleanup(dir, dryrun=False, pattern=None, recursive=False):
         for fname in flist:
             print("   removing %s" % fname)
             os.unlink(fname)
+
 
 # -----------------------------------------------------------------------------
 def find_files(dir, pattern=None, recursive=False):
@@ -57,6 +60,7 @@ def find_files(dir, pattern=None, recursive=False):
                 if re.match(pattern, f)]
 
     return rval
+
 
 # -----------------------------------------------------------------------------
 def usage():

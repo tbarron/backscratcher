@@ -3,6 +3,7 @@ import optparse
 import os
 import pdb
 
+
 # -----------------------------------------------------------------------------
 def main(args):
     p = optparse.OptionParser(usage=usage())
@@ -23,6 +24,7 @@ def main(args):
     for errval in a[1:]:
         print etranslate(errval)
 
+
 # -----------------------------------------------------------------------------
 def etranslate(errval):
     rval = ''
@@ -40,9 +42,9 @@ def etranslate(errval):
     rval = fmt % (nval, sval, os.strerror(nval))
     return rval
 
+
 # -----------------------------------------------------------------------------
 def usage():
     return("""perrno {-a|--all|number ...|errname ...}
 
     report errno numeric and string values""")
-

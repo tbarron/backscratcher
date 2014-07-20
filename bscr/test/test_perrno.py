@@ -9,6 +9,7 @@ import sys
 from bscr import testhelp as th
 import unittest
 
+
 # -----------------------------------------------------------------------------
 class TestPerrno(th.HelpedTestCase):
     def test_all(self):
@@ -45,7 +46,7 @@ class TestPerrno(th.HelpedTestCase):
             self.assertTrue(line in actual,
                             "Expected '%s' in %s" %
                             (line, U.lquote(actual)))
-    
+
     # -------------------------------------------------------------------------
     def test_which_module(self):
         """

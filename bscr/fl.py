@@ -114,37 +114,6 @@ import time
 import toolframe
 import unittest
 
-# from optparse import *
-
-
-# ---------------------------------------------------------------------------
-# def fl_help(args):
-#     """help - show this list
-# 
-#     usage: fl help [function-name]
-# 
-#     If a function name is given, show the __doc__ member of the function.
-#     Otherwise, show a list of functions based on the first line of
-#     each __doc__ member.
-#     """
-#     global d
-# 
-#     p = optparse.OptionParser()
-#     # p = add_option('-e', '--exec',
-#     #                action='store_true', default=False, dest='xable',
-#     #                help='otherwise dryrun')
-#     (o, a) = p.parse_args(args)
-#     if 0 < len(a) and 'fl_%s' % a[0] in d:
-#         x = eval('fl_%s.__doc__' % a[0])
-#         print '\n    ' + x
-#         return
-# 
-#     for fcn in d:
-#         if 'fl_' in fcn:
-#             x = eval('%s.__doc__' % fcn)
-#             f = x.split('\n')[0]
-#             print '   %s' % f
-
 
 # ---------------------------------------------------------------------------
 def fl_diff(args):
@@ -309,14 +278,3 @@ def most_recent_prefix_match(dir, filename):
     if recent_file != '':
         # print 'mrpm returning %s/%s' % (dir, recent_file)
         return '%s/%s' % (dir, recent_file)
-
-
-# ---------------------------------------------------------------------------
-# def cleanup_tests():
-#     if os.path.basename(os.getcwd()) == 'fl_tests':
-#         os.chdir('..')
-# 
-#     if os.path.exists('./fl_tests'):
-#         util.rmrf('./fl_tests')
-
-

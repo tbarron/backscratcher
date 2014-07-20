@@ -3,6 +3,7 @@ from nose.plugins.skip import SkipTest
 from bscr import testhelp as th
 import unittest
 
+
 class TestFilter(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_constructor(self):
@@ -47,4 +48,3 @@ class TestFilter(th.HelpedTestCase):
         Verify that we're importing the right align module
         """
         self.assertModule('bscr.filter', __file__)
-        

@@ -6,6 +6,7 @@ from nose.plugins.skip import SkipTest
 import pexpect
 import unittest
 
+
 # -----------------------------------------------------------------------------
 class TestChron(th.HelpedTestCase):
     # -------------------------------------------------------------------------
@@ -22,15 +23,10 @@ class TestChron(th.HelpedTestCase):
         """
         self.assertOptionHelp("chron",
                               "chronometer/stopwatch")
-    
+
     # -------------------------------------------------------------------------
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
         self.assertModule('bscr.chron', __file__)
-
-        
-# -----------------------------------------------------------------------------
-if __name__ == '__main__':
-    unittest.main()

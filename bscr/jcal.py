@@ -2,11 +2,9 @@
 """
 generate calendars (pronounced "jackal")
 
-Supported formats:
-    workflowy
+Formats to be supported:
     analog
     analog-html
-    
 """
 
 import sys
@@ -16,9 +14,10 @@ import unittest
 
 from optparse import *
 
+
 # -----------------------------------------------------------------------------
-def main(argv = None):
-    if argv == None:
+def main(argv=None):
+    if argv is None:
         argv = sys.argv
 
     p = OptionParser()
@@ -66,20 +65,23 @@ def load_cal_info(filename):
     Read filename and load the information into a dict and return it
     """
     pass
-    
+
+
 # -----------------------------------------------------------------------------
 def month_ceiling(date=time.time()):
     """
     Compute the epoch time of the last day of the month in which date falls
     """
     pass
-    
+
+
 # -----------------------------------------------------------------------------
 def month_floor(date=time.time()):
     """
     Compute the epoch time of the first day of the month in which date falls
     """
     pass
+
 
 # -----------------------------------------------------------------------------
 def parse_date(dspec, dfmt="%Y.%m%d", default_func=month_floor):

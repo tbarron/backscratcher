@@ -6,10 +6,8 @@ import shutil
 import stat
 import time
 
+
 # ---------------------------------------------------------------------------
-# tests to be added
-#   test_lquote()
-#
 class TestUtil(th.HelpedTestCase):
     tmp = "/tmp"
     if os.path.islink(tmp):
@@ -50,7 +48,7 @@ class TestUtil(th.HelpedTestCase):
             U.touch("empty_file")
             z = U.contents("empty_file")
         self.assertEqual([], z)
-        
+
     # -----------------------------------------------------------------------
     def test_contents_something(self):
         testdata = ["line 1", "line 2", "line 3"]
@@ -58,13 +56,13 @@ class TestUtil(th.HelpedTestCase):
             th.write_file("something", content=testdata)
             z = U.contents("something")
         self.assertEqual(testdata, z)
-        
+
     # -----------------------------------------------------------------------
     def test_expand(self):
         home = os.environ['HOME']
         logname = os.environ['LOGNAME']
         os.environ['UPATH'] = "~%s/prj/backscratcher" % logname
-        
+
         self.assertEqual(U.expand('$HOME'), home)
         self.assertEqual(U.expand('~'), home)
         self.assertEqual(U.expand('~%s' % logname), home)
@@ -82,7 +80,7 @@ class TestUtil(th.HelpedTestCase):
         testdata = "The quick brown fox jumps over the lazy dog"
         self.assertEqual('"""\n%s\n"""' % testdata,
                          U.lquote(testdata))
-        
+
     # -----------------------------------------------------------------------
     def test_touch_list(self):
         with U.Chdir(self.testdir):
