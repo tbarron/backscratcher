@@ -141,13 +141,13 @@ class TestFL(th.HelpedTestCase):
             assert(os.path.exists('mrpm1.new'))
             assert(os.path.exists('mrpm1'))
             assert(not os.path.exists('mrpm1.2009-10-01'))
-            assert(util.contents('mrpm1') == ['reverted\n'])
+            assert(util.contents('mrpm1') == ['reverted'])
             
             os.system('%s revert mrpm2' % fl)
             assert(os.path.exists('mrpm2.new'))
             assert(os.path.exists('mrpm2'))
             assert(not os.path.exists('old/mrpm2.2009-08-31'))
-            assert(util.contents('mrpm2') == ['REVERTED\n'])
+            assert(util.contents('mrpm2') == ['REVERTED'])
 
     # -----------------------------------------------------------------------
     def test_atom(self):

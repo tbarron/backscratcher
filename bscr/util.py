@@ -30,6 +30,7 @@ class Chdir(object):
         """
         self.start = os.getcwd()
         self.target = target
+
     # ------------------------------------------------------------------------
     def __enter__(self):
         """
@@ -38,6 +39,7 @@ class Chdir(object):
         """
         os.chdir(self.target)
         return self.target
+
     # ------------------------------------------------------------------------
     def __exit__(self, type, value, traceback):
         """
@@ -47,11 +49,19 @@ class Chdir(object):
         os.chdir(self.start)
 
 # ---------------------------------------------------------------------------
-def abspath(rpath):
+def abspath(rpath, start=None):
     """
-    Convenience wrapper for os.path.abspath()
+    Convenience wrapper for os.path.abspath(), plus the ability to compute the
+    absolute path from a starting path other than cwd.
     """
-    return os.path.abspath(rpath)
+    if start is None:
+        path = os.path.abspath(rpath)
+    elif not os.path.isabs(rpath):
+        if isinstance(rpath, unicode):
+            start = unicode(start)
+        path = os.path.join(start, rpath)
+
+    return os.path.normpath(path)
 
 
 # ---------------------------------------------------------------------------
@@ -69,7 +79,7 @@ def contents(filename):
     not exist or is not readable, an IOError is thrown.
     '''
     f = open(filename, 'r')
-    rval = f.readlines()
+    rval = [l.rstrip() for l in f.readlines()]
     f.close()
     return rval
 
@@ -105,7 +115,8 @@ def dispatch_help(mname, prefix, args):
         print("\n".join(["help - show a list of available commands",
                          "",
                          "   With no arguments, show a list of commands",
-                         "   With a command as argument, show help for that command",
+                         "   With a command as argument, show help for " +
+                         "that command",
                          ""
                          ]))
     elif 3 <= len(args) and args[1] == 'help':
@@ -126,7 +137,7 @@ def expand(path):
     """
     Return a pathname with any "~" or env variables expanded.
     """
-    return os.path.expandvars(os.path.expanduser(path))
+    return os.path.expanduser(os.path.expandvars(path))
 
 
 # ---------------------------------------------------------------------------
@@ -264,21 +275,7 @@ def script_location(script):
         else:
             raise StandardError("Can't find script %s" % script)
     return rval
-#     if in_bscr_repo():
-#         root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-#         rval = "%s/bin/%s" % (root, script)
-#     else:
-#         site = os.path.dirname(os.path.dirname(__file__))
-#         fl = glob.glob("%s/backscratcher*egg-info")
-#         egg = fl[0]
-#         el = glob.glob("%s/installed-files.txt" % egg)
-#         z = contents(el[0])
-#         for fn in z:
-#             if fn.strip().endswith(script):
-#                 rpath = fn.strip()
-#                 break
-#         rval = os.path.abspath(os.path.join(egg, rpath))
-#     return rval
+
 
 # -----------------------------------------------------------------------------
 def touch(touchables, times=None):
@@ -315,11 +312,3 @@ def findroot():
     afile = os.path.abspath(__file__)
     bscr = os.path.dirname(afile)
     return bscr
-    
-# ---------------------------------------------------------------------------
-def tpb_cleanup_tests():
-    global testdir
-    if os.path.basename(os.getcwd()) == testdir:
-        os.chdir('..')
-    if os.path.isdir(testdir):
-        rmrf(testdir)

@@ -89,7 +89,7 @@ import sys
 import StringIO
 import textwrap
 import unittest
-
+import util
 
 # ---------------------------------------------------------------------------
 def main(argv=None):
@@ -141,14 +141,6 @@ def main(argv=None):
 
 
 # ---------------------------------------------------------------------------
-def expand(cmd):
-    """
-    Expand environment variables and user notation in a command string.
-    """
-    return os.path.expandvars(os.path.expanduser(cmd))
-
-
-# ---------------------------------------------------------------------------
 def BatchCommand(options, arglist):
     """
     Bundle arguments into command lines similarly to xargs.
@@ -170,7 +162,7 @@ def IterateCommand(options, arglist):
     """
     (low, high) = options.irange.split(':')
     for idx in range(int(low), int(high)):
-        cmd = expand(re.sub('%', str(idx), options.cmd))
+        cmd = util.expand(re.sub('%', str(idx), options.cmd))
         psys(cmd, options)
 
 
@@ -207,7 +199,7 @@ def SubstCommand(options, arglist):
     Run the command for each filename in arglist.
     """
     for filename in arglist:
-        cmd = expand(re.sub('%', filename, options.cmd))
+        cmd = util.expand(re.sub('%', filename, options.cmd))
         psys(cmd, options)
 
 
@@ -247,7 +239,7 @@ def xargs_wrap(cmd, input):
     for line in input:
         l = line.strip()
         for item in l.split(" "):
-            tcmd = expand(re.sub('%', item + ' %', tcmd))
+            tcmd = util.expand(re.sub('%', item + ' %', tcmd))
             pending = True
 
             if 240 < len(tcmd):

@@ -389,17 +389,6 @@ class TestFx(th.HelpedTestCase):
             self.check_result(q == exp, exp, q)
 
     # -----------------------------------------------------------------------
-    def test_expand(self):
-        """
-        Test the expand routine.
-        """
-        home = os.environ['HOME']
-        input = '~/$PWD'
-        expected = '%s/%s' % (home, os.environ['PWD'])
-        actual = fx.expand(input)
-        assert(expected == actual)
-
-    # -----------------------------------------------------------------------
     def test_psys_neither(self):
         """
         Test routine psys with dryrun False and quiet False.
