@@ -1,12 +1,12 @@
 MANIFEST
 README
 attic
-# bscr/test
 dist
 test_*.clps*
 testhome
 TAGS
 cmsg
+.bscr_version
 *.org
 *.log
 *.pyc

@@ -49,6 +49,14 @@ class TestScripts(th.HelpedTestCase):
         self.assertTrue('With a command as argument' in result)
 
     # -------------------------------------------------------------------------
+    def test_bscr_version(self):
+        bscr = U.script_location("bscr")
+        cmd = "%s version" % bscr
+        result = pexpect.run(cmd)
+        self.assertTrue("Traceback" not in result)
+        self.assertTrue("Backscratcher version" in result)
+
+    # -------------------------------------------------------------------------
     def test_which_module(self):
         """
         Verify that we're importing the right align module

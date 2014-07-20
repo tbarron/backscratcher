@@ -10,11 +10,6 @@ import util
 
 
 # -----------------------------------------------------------------------------
-def main(args):
-    util.dispatch(__name__, 'bscr', args)
-
-
-# -----------------------------------------------------------------------------
 def bscr_help_commands(args):
     """help_commands - list the commands that are part of backscratcher
     """
@@ -121,6 +116,25 @@ def bscr_uninstall(args):
             shutil.rmtree(bscrpkg)
 
     return None
+
+
+# -----------------------------------------------------------------------------
+def bscr_version(args):
+    """version - report the version of this backscratcher instance
+
+    usage: bscr version
+    """
+    filename = ".bscr_version"
+    groot = util.git_root()
+    broot = util.bscr_root()
+    if groot:
+        vpath = util.pj(groot, filename)
+    elif broot:
+        vpath = util.pj(broot, filename)
+    else:
+        raise StandardError("Can't find the version file")
+    version = util.contents(vpath)
+    print("Backscratcher version %s" % version[0])
 
 
 # -----------------------------------------------------------------------------

@@ -163,6 +163,22 @@ def function_name():
 
 
 # -----------------------------------------------------------------------------
+def git_root(path=None):
+    if path is None:
+        path = os.getcwd()
+    dotgit = os.path.join(path, ".git")
+    while not os.path.isdir(dotgit) and path != "/":
+        path = os.path.dirname(path)
+
+    if os.path.isdir(dotgit):
+        rval = path
+    else:
+        rval = None
+
+    return rval
+
+
+# -----------------------------------------------------------------------------
 def in_bscr_repo():
     try:
         c = contents("./.git/description")
@@ -176,11 +192,13 @@ def in_bscr_repo():
 
 
 # -----------------------------------------------------------------------------
-def bscr_root(filename):
+def bscr_root(filename=None):
     """
     Compute the install root for an imported module.
     TODO: This should probably move to testhelp at some point
     """
+    if filename is None:
+        filename = __file__
     return(dirname(abspath(filename)))
 
 
