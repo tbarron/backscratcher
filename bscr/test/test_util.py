@@ -61,6 +61,7 @@ class TestUtil(th.HelpedTestCase):
     def test_expand(self):
         home = os.environ['HOME']
         logname = os.environ['LOGNAME']
+        U.pythonpath_bscrroot()
         os.environ['UPATH'] = "~%s/prj/backscratcher" % logname
 
         self.assertEqual(U.expand('$HOME'), home)
