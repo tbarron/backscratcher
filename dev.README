@@ -42,8 +42,11 @@ Directories and Files
         Where setup.py puts generated distribution files.
 
     githooks
-        git hooks provided with the repo. Run githooks/mklinks to
-        install the hooks.
+        git hooks provided with the repo. Run 'githooks/links' to
+        manage the hooks:
+            githooks/links make   - install the hooks
+            githooks/links rm     - remove the hooks
+            githooks/links show   - check the hooks
 
     nose.cfg
         Config file for nosetests.
