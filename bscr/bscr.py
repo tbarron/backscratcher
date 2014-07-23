@@ -53,6 +53,30 @@ def bscr_help_commands(args):
 
 
 # -----------------------------------------------------------------------------
+def bscr_readme(args):
+    """readme - display the package README file
+
+    usage: bscr readme
+    """
+    filename = "README"
+    groot = util.git_root()
+    broot = util.bscr_root()
+    if groot:
+        readme = util.pj(groot, filename)
+    elif broot:
+        readme = util.pj(broot, filename)
+    else:
+        raise StandardError("Can't find the README file")
+
+    w, h = util.terminal_size()
+    if sys.stdout.isatty():
+        p = pexpect.spawn("less -z %d %s" % (h, readme))
+        p.interact()
+    else:
+        shutil.copyfileobj(open(readme, 'r'), sys.stdout)
+
+
+# -----------------------------------------------------------------------------
 def bscr_test(args):
     """test - run tests
 

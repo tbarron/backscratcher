@@ -74,6 +74,16 @@ def basename(rpath):
 
 
 # ---------------------------------------------------------------------------
+def terminal_size():
+    if not sys.stdout.isatty():
+        return -1, -1
+    import fcntl, termios, struct
+    h, w, hp, wp = struct.unpack('HHHH',
+        fcntl.ioctl(sys.stdout.fileno(), termios.TIOCGWINSZ,
+        struct.pack('HHHH', 0, 0, 0, 0)))
+    return w, h
+
+# ---------------------------------------------------------------------------
 def contents(filename):
     '''
     Contents of filename in a list, one line per element. If filename does
