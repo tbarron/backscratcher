@@ -1,10 +1,13 @@
 #!/usr/bin/env python
+import fcntl
 import glob
 import os
 import pdb
 import pexpect
 import re
+import struct
 import sys
+import termios
 import testhelp
 import time
 import unittest
@@ -77,11 +80,13 @@ def basename(rpath):
 def terminal_size():
     if not sys.stdout.isatty():
         return -1, -1
-    import fcntl, termios, struct
+    # import fcntl, termios, struct
     h, w, hp, wp = struct.unpack('HHHH',
-        fcntl.ioctl(sys.stdout.fileno(), termios.TIOCGWINSZ,
-        struct.pack('HHHH', 0, 0, 0, 0)))
+                                 fcntl.ioctl(sys.stdout.fileno(),
+                                             termios.TIOCGWINSZ,
+                                             struct.pack('HHHH', 0, 0, 0, 0)))
     return w, h
+
 
 # ---------------------------------------------------------------------------
 def contents(filename):
@@ -122,6 +127,7 @@ def dispatch(mname, prefix, args):
         func(args[2:])
     except AttributeError:
         fatal("Subcommand '%s' not found" % func_name)
+
 
 # -----------------------------------------------------------------------------
 def dispatch_help(mname, prefix, args):
