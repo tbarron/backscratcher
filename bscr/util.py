@@ -105,10 +105,13 @@ def dispatch(mname, prefix, args):
 
     if func_name == 'help':
         dispatch_help(mname, prefix, args)
-    else:
+        return
+
+    try:
         func = getattr(sys.modules[mname], "_".join([prefix, func_name]))
         func(args[2:])
-
+    except AttributeError:
+        fatal("Subcommand '%s' not found" % func_name)
 
 # -----------------------------------------------------------------------------
 def dispatch_help(mname, prefix, args):
