@@ -180,15 +180,15 @@ class workrptTest(th.HelpedTestCase):
         s = wr.stringify(time.localtime(wr.day_plus(1)))
         assert(wr.parse_ymd('tomorrow') == s[0:3])
 
-        self.parse_ymd_test('monday', 'M')
-        self.parse_ymd_test('tuesday', 'T')
-        self.parse_ymd_test('wednesday', 'W')
-        self.parse_ymd_test('thursday', 't')
-        self.parse_ymd_test('friday', 'F')
-        self.parse_ymd_test('saturday', 's')
-        self.parse_ymd_test('sunday', 'S')
+        self.parse_ymd('monday', 'M')
+        self.parse_ymd('tuesday', 'T')
+        self.parse_ymd('wednesday', 'W')
+        self.parse_ymd('thursday', 't')
+        self.parse_ymd('friday', 'F')
+        self.parse_ymd('saturday', 's')
+        self.parse_ymd('sunday', 'S')
 
-    def parse_ymd_test(self, target, t):
+    def parse_ymd(self, target, t):
         n = time.localtime()
         d = wr.week_diff(n[6], wr.day_offset(t))
         s = wr.stringify(time.localtime(wr.day_plus(d)))
@@ -327,13 +327,13 @@ class workrptTest(th.HelpedTestCase):
 
     def test_week_starting_last(self):
         # monday -> monday
-        self.wsl_test(0, 0, 1173070800.0, '2007.0305', '2007.0311')
+        self.wsl(0, 0, 1173070800.0, '2007.0305', '2007.0311')
         # tuesday -> monday
-        self.wsl_test(0, 0, 1177995600.0, '2007.0430', '2007.0506')
+        self.wsl(0, 0, 1177995600.0, '2007.0430', '2007.0506')
         # wednesday -> monday
         # thurday -> monday
         # friday -> monday
-        self.wsl_test(0, 0, 1230872400.0, '2008.1229', '2009.0104')
+        self.wsl(0, 0, 1230872400.0, '2008.1229', '2009.0104')
         # saturday -> monday
         # sunday -> monday
 
@@ -385,7 +385,7 @@ class workrptTest(th.HelpedTestCase):
         # saturday -> sunday
         # sunday -> sunday
 
-    def wsl_test(self, target, offset, now, should_start, should_end):
+    def wsl(self, target, offset, now, should_start, should_end):
         (s, e) = wr.week_starting_last(target, offset, now)
         # print s, should_start
         # print e, should_end
