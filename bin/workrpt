@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+import bscr.workrpt
+import sys
+bscr.workrpt.main(sys.argv)
