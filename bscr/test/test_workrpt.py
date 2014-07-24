@@ -1,6 +1,7 @@
 import os
 from bscr import testhelp as th
 import time
+from bscr import util as U
 from bscr import workrpt as wr
 
 
@@ -37,12 +38,12 @@ class workrptTest(th.HelpedTestCase):
         # print "exception as a string: '%s'" % str(e)
 
     def test_default_input_filename(self):
-        year = time.strftime('%Y')
-        uname = os.getenv('LOGNAME')
-        name = '/Users/tbarron/Dropbox/journal/%s/WORKLOG' % (year)
-        self.assertEqual(name, wr.default_input_filename(),
-                         "Expected '%s', got '%s'" %
-                         (name, wr.default_input_filename()))
+        home = os.getenv("HOME")
+        exp = U.pj(home, "Dropbox", "journal",
+                   time.strftime("%Y"), "WORKLOG")
+        actual = wr.default_input_filename()
+        self.assertEqual(exp, actual,
+                         "Expected '%s', got '%s'" % (exp, actual))
 
     def test_hms(self):
         assert(wr.hms(72) == '00:01:12')
