@@ -2,10 +2,14 @@ import errno
 import optparse
 import os
 import pdb
+import sys
 
 
 # -----------------------------------------------------------------------------
-def main(args):
+def main(args=None):
+    if args is None:
+        args = sys.argv
+
     p = optparse.OptionParser(usage=usage())
     p.add_option('-a', '--all', dest='all',
                  action='store_true', default=False,

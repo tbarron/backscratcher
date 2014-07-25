@@ -6,13 +6,38 @@ import os
 import time
 
 bscr_root = os.path.join(get_python_lib(), "bscr")
-scrlist = glob.glob("bin/*")
 copy_file("README.md", "README")
+scripts = ["align",
+           "ascii",
+           "bscr",
+           "calc",
+           "chron",
+           "dt",
+           "fl",
+           "fx",
+           "hd",
+           "jcal",
+           "list",
+           "mag",
+           "odx",
+           "perrno",
+           "workrpt",
+           "xclean",
+           ]
+ep_d = {
+    'console_scripts':
+    ["%s = bscr.%s:main" % (x, x) for x in scripts]
+    }
+
+f = open(".bscr_version", 'r')
+version = f.read().strip()
+f.close()
+
 # print scrlist
 setup(name='backscratcher',
-      version='learn',
+      version=version,
       packages=['bscr', 'bscr/test'],
-      scripts=scrlist,
+      entry_points = ep_d,
       author="Tom Barron",
       author_email='tom.barron@comcast.net',
       url='https://github.com/tbarron/backscratcher/',

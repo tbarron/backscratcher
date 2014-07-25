@@ -1,5 +1,0 @@
-#!/usr/bin/env python
-from bscr import bscr
-import sys
-from bscr import util
-util.dispatch("bscr.bscr", "bscr", sys.argv)

@@ -43,7 +43,9 @@ import sys
 
 
 # ---------------------------------------------------------------------------
-def main(A):
+def main(A=None):
+    if A is None:
+        A = sys.argv
     p = optparse.OptionParser(usage=usage())
     p.add_option('-d', '--debug',
                  action='store_true', default=False, dest='debug',

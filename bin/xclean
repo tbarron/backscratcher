@@ -1,4 +1,0 @@
-#!/usr/bin/env python
-import bscr.xclean
-import sys
-bscr.xclean.main(sys.argv)

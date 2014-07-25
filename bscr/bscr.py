@@ -10,6 +10,13 @@ import util
 
 
 # -----------------------------------------------------------------------------
+def main(args=None):
+    if args is None:
+        args = sys.argv
+    util.dispatch('bscr.bscr', 'bscr', args)
+
+
+# -----------------------------------------------------------------------------
 def bscr_help_commands(args):
     """help_commands - list the commands that are part of backscratcher
     """

@@ -30,6 +30,8 @@ import toolframe
 
 # ---------------------------------------------------------------------------
 def main(argv=None):
+    if argv is None:
+        argv = sys.argv
     p = optparse.OptionParser(usage=usage())
     p.add_option('-d', '--debug',
                  action='store_true', default=False, dest='debug',

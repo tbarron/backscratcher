@@ -118,7 +118,7 @@ def dispatch(mname, prefix, args):
         dispatch_help(mname, prefix, args)
         return
 
-    if func_name == 'help':
+    if func_name in ['help', '-h', '--help']:
         dispatch_help(mname, prefix, args)
         return
 
@@ -144,7 +144,7 @@ def dispatch_help(mname, prefix, args):
         fname = "_".join([prefix, args[2]])
         func = getattr(mod, fname)
         print func.__doc__
-    elif len(args) < 2 or args[1] == 'help':
+    elif len(args) < 2 or args[1] in ['help', '-h', '--help']:
         fnlist = [x for x in dir(mod) if x.startswith(prefix)]
         clist = [getattr(mod, x) for x in fnlist]
         dlist = [x.__doc__.split("\n")[0] for x in clist]

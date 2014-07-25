@@ -1,4 +1,0 @@
-#!/usr/bin/env python
-import bscr.align
-import sys
-bscr.align.main(sys.argv)

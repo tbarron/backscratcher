@@ -1,4 +1,0 @@
-#!/usr/bin/env python
-import bscr.fx
-import sys
-bscr.fx.main(sys.argv)

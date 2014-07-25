@@ -11,6 +11,7 @@ import sys
 import time
 import toolframe
 import unittest
+import util as U
 
 from optparse import *
 
@@ -19,7 +20,11 @@ from optparse import *
 def main(argv=None):
     if argv is None:
         argv = sys.argv
+    U.dispatch('bscr.jcal', 'jcal', argv)
 
+
+# -----------------------------------------------------------------------------
+def old_main():
     p = OptionParser()
     p.add_option('-f', '--format',
                  action='store', default='workflowy', dest='format',

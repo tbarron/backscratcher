@@ -36,10 +36,13 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
 import optparse
+import sys
 
 
 # -----------------------------------------------------------------------------
-def main(args):
+def main(args=None):
+    if args is None:
+        args = sys.argv
     p = optparse.OptionParser(usage=usage())
     p.add_option('-d', '--debug',
                  action='store_true', default=False, dest='debug',

@@ -61,7 +61,9 @@ import unittest
 
 
 # ---------------------------------------------------------------------------
-def main(args):
+def main(args=None):
+    if args is None:
+        args = sys.argv
     try:
         operation = args[1]
         Acmd = args[2]

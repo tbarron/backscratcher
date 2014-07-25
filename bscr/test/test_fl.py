@@ -63,13 +63,7 @@ class TestFL(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def test_fl_help_help(self):
-        where = pexpect.which('fl')
-        here = os.path.basename(os.getcwd())
-        if where is None or here == 'backscratcher':
-            cmd = "bin/fl"
-        else:
-            cmd = "fl"
-
+        cmd = pexpect.which('fl')
         result = pexpect.run('%s help help' % cmd)
         self.assertFalse('Traceback' in result)
         for f in ['help - show a list of available commands',

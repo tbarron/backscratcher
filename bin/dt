@@ -1,4 +1,0 @@
-#!/usr/bin/env python
-import bscr.dt
-import sys
-bscr.dt.main(sys.argv)

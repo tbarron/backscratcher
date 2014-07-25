@@ -1,4 +1,0 @@
-#!/usr/bin/env python
-import bscr.ascii
-import sys
-bscr.ascii.main(sys.argv)

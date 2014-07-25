@@ -115,6 +115,13 @@ import toolframe
 import unittest
 
 
+# -----------------------------------------------------------------------------
+def main(args=None):
+    if args is None:
+        args = sys.argv
+    util.dispatch('bscr.fl', 'fl', args)
+
+
 # ---------------------------------------------------------------------------
 def fl_diff(args):
     """diff - compare file to its most recently 'saved' version

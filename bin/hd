@@ -1,4 +1,0 @@
-#!/usr/bin/env python
-import bscr.hd
-import sys
-bscr.hd.main(sys.argv)
