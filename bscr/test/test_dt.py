@@ -81,6 +81,14 @@ class TestDt(th.HelpedTestCase):
                      'last: expected unit or weekday, found nothing')
 
     # -----------------------------------------------------------------------
+    def test_last_week(self):
+        self.do_both(['last', 'week'], -7 * 24 * 3600)
+
+    # -----------------------------------------------------------------------
+    def test_next_week(self):
+        self.do_both(['next', 'week'], 7 * 24 * 3600)
+
+    # -----------------------------------------------------------------------
     def test_plus5day(self):
         self.do_both(['+5', 'day'], 5 * 24 * 3600)
 

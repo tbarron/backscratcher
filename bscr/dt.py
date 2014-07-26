@@ -177,7 +177,7 @@ def last(args):
         raise StandardError('last: expected unit or weekday, got number')
     elif args[0] in ['second', 'minute', 'hour', 'day',
                      'week', 'month', 'year']:
-        rval = unit_size(args[0])
+        rval = -1 * unit_size(args[0])
     elif 0 <= weekday_number(args[0]) and weekday_number(args[0]) <= 6:
         rval = time_to(args[0], dir='last')
 
