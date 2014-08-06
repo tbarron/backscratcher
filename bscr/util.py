@@ -249,19 +249,19 @@ def pj(*args):
 
 
 # ---------------------------------------------------------------------------
-def rmrf(path):
-    '''
-    Remove the tree rooted at path.
-    '''
-    if os.path.isdir(path):
-        for d in os.listdir(path):
-            # print("rmrf directory %s/%s" % (path, d))
-            rmrf('%s/%s' % (path, d))
-        # print("os.rmdir(%s)" % path)
-        os.rmdir(path)
-    else:
-        # print("os.unlink(%s)" % path)
-        os.unlink(path)
+# def rmrf(path):
+#     '''
+#     Remove the tree rooted at path.
+#     '''
+#     if os.path.isdir(path):
+#         for d in os.listdir(path):
+#             # print("rmrf directory %s/%s" % (path, d))
+#             rmrf('%s/%s' % (path, d))
+#         # print("os.rmdir(%s)" % path)
+#         os.rmdir(path)
+#     else:
+#         # print("os.unlink(%s)" % path)
+#         os.unlink(path)
 
 
 # ---------------------------------------------------------------------------
