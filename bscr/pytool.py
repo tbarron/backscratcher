@@ -33,11 +33,15 @@ import sys
 import testhelp
 import time
 import toolframe
-import tpbtools
+import util as U
 import unittest
 
-# from optparse import *
-# from tpbtools import *
+
+# ---------------------------------------------------------------------------
+def main(args=None):
+    if args is None:
+        args = sys.argv
+    U.dispatch(__name__, 'pt', args)
 
 
 # ---------------------------------------------------------------------------
@@ -114,7 +118,7 @@ def pt_newtool(args):
     (o, a) = p.parse_args(args)
 
     if a == [] or len(a) != 2:
-        raise Exception('usage: pytool newtool <program-name> <prefix>')
+        U.fatal('usage: pytool newtool <program-name> <prefix>')
     else:
         pname = a[0]
         prefix = a[1]
@@ -384,74 +388,9 @@ def cleanup():
 
 
 # ---------------------------------------------------------------------------
-def expected_testtool_py():
-    expected = ['#!/usr/bin/python\n',
-                '"""\n',
-                'testtool - program description\n',
-                '"""\n',
-                '\n',
-                'import os\n',
-                'import re\n',
-                'import sys\n',
-                'import toolframe\n',
-                '\n',
-                'from optparse import *\n',
-                '\n',
-                '# ----------------------------------------------------'
-                + '-----------------------\n',
-                'def tt_example(argv):\n',
-                '    print("this is an example")\n',
-                "\n",
-                '# ----------------------------------------------------'
-                + '-----------------------\n',
-                "toolframe.tf_launch(\"tt\")"]
-
-    return expected
-
-
-# ---------------------------------------------------------------------------
-def expected_xyzzy_py():
-    expected = ['#!/usr/bin/python\n',
-                '"""\n',
-                'xyzzy - program description\n',
-                '"""\n',
-                '\n',
-                # 'import getopt\n',
-                'import sys\n',
-                'import toolframe\n',
-                'import unittest\n',
-                '\n',
-                'from optparse import *\n',
-                '\n',
-                'def main(argv = None):\n',
-                '    if argv == None:\n',
-                '        argv = sys.argv\n',
-                '\n',
-                '    p = OptionParser()\n',
-                '    # define options here\n',
-                "    # p.add_option('-s', '--long',\n",
-                "    #              action='', default='',\n",
-                "    #              dest='', type='',\n",
-                "    #              help='')\n",
-                '    (o, a) = p.parse_args(argv)\n',
-                '\n',
-                '    # process arguments\n',
-                '    for a in args:\n',
-                '        process(a)\n',
-                '\n',
-                'class XyzzyTest(unittest.TestCase):\n',
-                '    def test_example(self):\n',
-                '        pass\n',
-                '\n',
-                'toolframe.ez_launch(__name__, main)\n', ]
-
-    return expected
-
-
-# ---------------------------------------------------------------------------
 def prepare_tests():
     global testdir
     testdir = testhelp.into_test_dir()
 
 # ---------------------------------------------------------------------------
-toolframe.tf_launch('pt', cleanup)
+# toolframe.tf_launch('pt', cleanup)

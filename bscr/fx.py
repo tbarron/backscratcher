@@ -142,14 +142,14 @@ def main(argv=None):
 
 
 # ---------------------------------------------------------------------------
-def BatchCommand(options, arglist):
+def BatchCommand(options, arglist, f=sys.stdin):
     """
     Bundle arguments into command lines similarly to xargs.
 
     Unlink xargs, this version allows for static values following the
     list of arguments on each command line.
     """
-    for cmd in xargs_wrap(options.cmd, sys.stdin):
+    for cmd in xargs_wrap(options.cmd, f):
         psys(cmd, options)
 
 

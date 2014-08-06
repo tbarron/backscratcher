@@ -17,7 +17,10 @@ class Test_PEP8(th.HelpedTestCase):
             root = U.bscr_test_root(__file__)
             for r, d, f in os.walk(root):
                 pylist = [U.pj(r, x) for x in f if x.endswith(".py")]
-                cmd = "pep8 %s" % " ".join(pylist)
-                result = pexpect.run(cmd)
-                self.assertEqual('', result,
-                                 "Pep8 report: %s" % result)
+                args = " ".join(pylist)
+                if args != '':
+                    cmd = "pep8 %s" % args
+                    # print cmd
+                    result = pexpect.run(cmd)
+                    self.assertEqual('', result,
+                                     "Pep8 report: %s" % result)

@@ -147,7 +147,11 @@ def dispatch_help(mname, prefix, args):
     elif len(args) < 2 or args[1] in ['help', '-h', '--help']:
         fnlist = [x for x in dir(mod) if x.startswith(prefix)]
         clist = [getattr(mod, x) for x in fnlist]
-        dlist = [x.__doc__.split("\n")[0] for x in clist]
+        try:
+            dlist = [x.__doc__.split("\n")[0] for x in clist]
+        except AttributeError:
+            fatal("Function %s.%s() needs a __doc__ string" % (mname,
+                                                               x.func_name))
         dlist.append("help - show this list")
         dlist.sort()
         for line in dlist:

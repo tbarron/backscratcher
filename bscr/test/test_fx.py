@@ -8,6 +8,7 @@ import os
 import pdb
 import pexpect
 import shutil
+from nose.plugins.skip import SkipTest
 import StringIO
 import sys
 import unittest
@@ -39,25 +40,20 @@ class TestFx(th.HelpedTestCase):
         Test BatchCommand with dryrun True and quiet True.
         """
         with U.Chdir(self.testdir):
-            inlist = range(1, 250)
-            f = open('tmpfile', 'w')
-            for x in inlist:
-                f.write(str(x) + '\n')
-            f.close()
+            U.writefile('tmpfile',
+                        [str(x) + '\n' for x in range(1, 250)])
 
-            v = optparse.Values({'dryrun': True, 'quiet': False, 'xargs': True,
-                                 'cmd': 'echo %'})
-
-            x = StringIO.StringIO(" ".join([str(z) for z in range(1, 250)]))
-            q = fx.xargs_wrap("echo %", x)
+            v = optparse.Values({'dryrun': True, 'quiet': True,
+                                 'xargs': True, 'cmd': 'echo %'})
+            with open('tmpfile', 'r') as f:
+                q = fx.xargs_wrap("echo %", f)
             exp = ''
             for chunk in q:
                 exp += re.sub('^echo ', "would do 'echo ", chunk) + "'\n"
-
-            self.indirect('tmpfile')
-            self.redirect()
-            fx.BatchCommand(v, [])
-            actual = self.undirect()
+            with th.StdoutExcursion() as getval:
+                with open('tmpfile', 'r') as f:
+                    fx.BatchCommand(v, [], f)
+                actual = getval()
 
             self.check_result(exp == actual, exp, actual)
 
@@ -67,25 +63,20 @@ class TestFx(th.HelpedTestCase):
         Test BatchCommand with dryrun True and quiet False.
         """
         with U.Chdir(self.testdir):
-            inlist = range(1, 250)
-            f = open('tmpfile', 'w')
-            for x in inlist:
-                f.write(str(x) + '\n')
-            f.close()
-
+            U.writefile('tmpfile',
+                        [str(x) + '\n' for x in range(1, 250)])
             v = optparse.Values({'dryrun': True, 'quiet': False, 'xargs': True,
                                  'cmd': 'echo %'})
-
-            x = StringIO.StringIO(" ".join([str(z) for z in range(1, 250)]))
-            q = fx.xargs_wrap("echo %", x)
+            with open('tmpfile', 'r') as f:
+                q = fx.xargs_wrap("echo %", f)
             exp = ''
             for chunk in q:
                 exp += re.sub('^echo ', "would do 'echo ", chunk) + "'\n"
 
-            self.indirect('tmpfile')
-            self.redirect()
-            fx.BatchCommand(v, [])
-            actual = self.undirect()
+            with th.StdoutExcursion() as getval:
+                with open('tmpfile', 'r') as f:
+                    fx.BatchCommand(v, [], f)
+                actual = getval()
 
             self.check_result(exp == actual, exp, actual)
 
@@ -95,26 +86,21 @@ class TestFx(th.HelpedTestCase):
         Test BatchCommand with dryrun and quiet both False.
         """
         with U.Chdir(self.testdir):
-            inlist = range(1, 250)
-            f = open('tmpfile', 'w')
-            for x in inlist:
-                f.write(str(x) + '\n')
-            f.close()
-
+            U.writefile('tmpfile',
+                        [str(x) + '\n' for x in range(1, 250)])
             v = optparse.Values({'dryrun': False, 'quiet': False,
                                  'xargs': True, 'cmd': 'echo %'})
-
-            x = StringIO.StringIO(" ".join([str(z) for z in range(1, 250)]))
-            q = fx.xargs_wrap("echo %", x)
+            with open('tmpfile', 'r') as f:
+                q = fx.xargs_wrap("echo %", f)
             exp = ''
             for chunk in q:
                 exp += chunk + '\n'
                 exp += re.sub('^echo ', '', chunk) + '\n'
 
-            self.indirect('tmpfile')
-            self.redirect()
-            fx.BatchCommand(v, [])
-            actual = self.undirect()
+            with th.StdoutExcursion() as getval:
+                with open('tmpfile', 'r') as f:
+                    fx.BatchCommand(v, [], f)
+                actual = getval()
 
             self.check_result(exp == actual, exp, actual)
 
@@ -124,26 +110,22 @@ class TestFx(th.HelpedTestCase):
         Test BatchCommand with dryrun False and quiet True.
         """
         with U.Chdir(self.testdir):
-            inlist = range(1, 250)
-            f = open('tmpfile', 'w')
-            for x in inlist:
-                f.write(str(x) + '\n')
-            f.close()
-
+            U.writefile('tmpfile',
+                        [str(x) + '\n' for x in range(1, 250)])
             v = optparse.Values({'dryrun': False, 'quiet': True, 'xargs': True,
                                  'cmd': 'echo %'})
 
-            x = StringIO.StringIO(" ".join([str(z) for z in range(1, 250)]))
-            q = fx.xargs_wrap("echo %", x)
+            with open('tmpfile', 'r') as f:
+                q = fx.xargs_wrap("echo %", f)
             exp = ''
             for chunk in q:
                 # exp += chunk + '\n'
                 exp += re.sub('^echo ', '', chunk) + '\n'
 
-            self.indirect('tmpfile')
-            self.redirect()
-            fx.BatchCommand(v, [])
-            actual = self.undirect()
+            with th.StdoutExcursion() as getval:
+                with open('tmpfile', 'r') as f:
+                    fx.BatchCommand(v, [], f)
+                actual = getval()
 
             self.check_result(exp == actual, exp, actual)
 
@@ -158,9 +140,9 @@ class TestFx(th.HelpedTestCase):
                                  'irange': '5:10'})
             exp = "".join(["would do 'echo %d'\n" % i for i in range(5, 10)])
 
-            self.redirect()
-            fx.IterateCommand(v, [])
-            actual = self.undirect()
+            with th.StdoutExcursion() as getval:
+                fx.IterateCommand(v, [])
+                actual = getval()
 
             self.check_result(exp == actual, exp, actual)
 
@@ -175,9 +157,9 @@ class TestFx(th.HelpedTestCase):
                                  'irange': '5:10'})
             exp = "".join(["would do 'echo %d'\n" % i for i in range(5, 10)])
 
-            self.redirect()
-            fx.IterateCommand(v, [])
-            actual = self.undirect()
+            with th.StdoutExcursion() as getval:
+                fx.IterateCommand(v, [])
+                actual = getval()
 
             self.check_result(exp == actual, exp, actual)
 
@@ -192,9 +174,9 @@ class TestFx(th.HelpedTestCase):
                                  'irange': '5:10'})
             exp = "".join(["echo %d\n%d\n" % (i, i) for i in range(5, 10)])
 
-            self.redirect()
-            fx.IterateCommand(v, [])
-            actual = self.undirect()
+            with th.StdoutExcursion() as getval:
+                fx.IterateCommand(v, [])
+                actual = getval()
             self.check_result(exp == actual, exp, actual)
 
     # -----------------------------------------------------------------------
@@ -209,9 +191,9 @@ class TestFx(th.HelpedTestCase):
                                  'irange': '5:10'})
             exp = "".join(["%d\n" % i for i in range(5, 10)])
 
-            self.redirect()
-            fx.IterateCommand(v, [])
-            actual = self.undirect()
+            with th.StdoutExcursion() as getval:
+                fx.IterateCommand(v, [])
+                actual = getval()
             self.check_result(exp == actual, exp, actual)
 
     # -----------------------------------------------------------------------
@@ -225,9 +207,9 @@ class TestFx(th.HelpedTestCase):
             exp = "".join(["would do 'ls %s'\n" % x for x in a])
             self.unlink(a)
 
-            self.redirect()
-            fx.SubstCommand(v, a)
-            actual = self.undirect()
+            with th.StdoutExcursion() as getval:
+                fx.SubstCommand(v, a)
+                actual = getval()
 
             self.check_result(exp == actual, exp, actual)
 
@@ -243,9 +225,9 @@ class TestFx(th.HelpedTestCase):
             exp = "".join(["would do 'ls %s'\n" % x for x in a])
             self.unlink(a)
 
-            self.redirect()
-            fx.SubstCommand(v, a)
-            actual = self.undirect()
+            with th.StdoutExcursion() as getval:
+                fx.SubstCommand(v, a)
+                actual = getval()
 
             self.check_result(exp == actual, exp, actual)
 
@@ -261,9 +243,9 @@ class TestFx(th.HelpedTestCase):
             exp = "".join(['ls %s\n%s\n' % (x, x) for x in a])
             U.touch(a)
 
-            self.redirect()
-            fx.SubstCommand(v, a)
-            actual = self.undirect()
+            with th.StdoutExcursion() as getval:
+                fx.SubstCommand(v, a)
+                actual = getval()
 
             self.check_result(exp == actual, exp, actual)
 
@@ -279,9 +261,9 @@ class TestFx(th.HelpedTestCase):
             exp = "".join(['%s\n' % x for x in a])
             U.touch(a)
 
-            self.redirect()
-            fx.SubstCommand(v, a)
-            actual = self.undirect()
+            with th.StdoutExcursion() as getval:
+                fx.SubstCommand(v, a)
+                actual = getval()
 
             self.check_result(exp == actual, exp, actual)
 
@@ -300,9 +282,9 @@ class TestFx(th.HelpedTestCase):
             v = optparse.Values({'dryrun': True, 'quiet': True,
                                  'edit': 's/.pl/.xyzzy'})
 
-            self.redirect()
-            fx.SubstRename(v, arglist)
-            actual = self.undirect()
+            with th.StdoutExcursion() as getval:
+                fx.SubstRename(v, arglist)
+                actual = getval()
 
             self.check_result(expected == actual, expected, actual)
 
@@ -325,9 +307,9 @@ class TestFx(th.HelpedTestCase):
             v = optparse.Values({'dryrun': True, 'quiet': False,
                                  'edit': 's/.pl/.xyzzy'})
 
-            self.redirect()
-            fx.SubstRename(v, arglist)
-            actual = self.undirect()
+            with th.StdoutExcursion() as getval:
+                fx.SubstRename(v, arglist)
+                actual = getval()
 
             self.check_result(expected == actual, expected, actual)
 
@@ -350,9 +332,9 @@ class TestFx(th.HelpedTestCase):
             v = optparse.Values({'dryrun': False, 'quiet': False,
                                  'edit': 's/.pl/.xyzzy'})
 
-            self.redirect()
-            fx.SubstRename(v, arglist)
-            actual = self.undirect()
+            with th.StdoutExcursion() as getval:
+                fx.SubstRename(v, arglist)
+                actual = getval()
 
             self.check_result(expected == actual, expected, actual)
 
@@ -375,9 +357,9 @@ class TestFx(th.HelpedTestCase):
             v = optparse.Values({'dryrun': False, 'quiet': True,
                                  'edit': 's/.pl/.xyzzy'})
 
-            self.redirect()
-            fx.SubstRename(v, arglist)
-            actual = self.undirect()
+            with th.StdoutExcursion() as getval:
+                fx.SubstRename(v, arglist)
+                actual = getval()
 
             self.check_result(expected == actual, expected, actual)
 
