@@ -60,47 +60,51 @@ def pt_newpy(args):
     if a == []:
         raise Exception('usage: pytool newpy <program-name>')
     else:
-        pname = a[0]
-        are_we_overwriting([pname, '%s.py' % pname])
+        lname = a[0]
+        pname = lname + '.py'
+        are_we_overwriting([lname, '%s.py' % pname])
 
-        f = open('%s.py' % pname, 'w')
-        f.writelines(['#!/usr/bin/python\n',
+        f = open(pname, 'w')
+        f.writelines(['#!/usr/bin/env python\n',
                       '"""\n',
-                      '%s - program description\n' % pname,
+                      '%s - program description\n' % lname,
                       '"""\n',
                       '\n',
-                      # 'import getopt\n',
+                      'import optparse\n',
+                      'import pdb\n',
                       'import sys\n',
-                      'import toolframe\n',
+                      'from bscr import toolframe\n',
                       'import unittest\n',
-                      '\n',
-                      'from optparse import *\n',
                       '\n',
                       'def main(argv = None):\n',
                       '    if argv == None:\n',
                       '        argv = sys.argv\n',
                       '\n',
-                      '    p = OptionParser()\n',
-                      '    # define options here\n',
-                      "    # p.add_option('-s', '--long',\n",
-                      "    #              action='', default='',\n",
-                      "    #              dest='', type='',\n",
-                      "    #              help='')\n",
+                      '    p = optparse.OptionParser()\n',
+                      "    p.add_option('-d', '--debug',\n",
+                      "                 action='store_true', default=False,\n",
+                      "                 dest='debug',\n",
+                      "                 help='run the debugger')\n",
                       '    (o, a) = p.parse_args(argv)\n',
+                      '\n',
+                      '    if o.debug:\n',
+                      '        pdb.set_trace()',
+                      '\n',
                       '\n',
                       '    # process arguments\n',
                       '    for a in args:\n',
                       '        process(a)\n',
                       '\n',
                       'class %sTest(unittest.TestCase):\n' %
-                      pname.capitalize(),
+                      lname.capitalize(),
                       '    def test_example(self):\n',
                       '        pass\n',
                       '\n',
                       'toolframe.ez_launch(__name__, main)\n'])
         f.close()
 
-        os.chmod('%s.py' % pname, 0755)
+        os.chmod(pname, 0755)
+        os.symlink(os.path.abspath(pname), lname)
 
 
 # ---------------------------------------------------------------------------
@@ -120,35 +124,37 @@ def pt_newtool(args):
     if a == [] or len(a) != 2:
         U.fatal('usage: pytool newtool <program-name> <prefix>')
     else:
-        pname = a[0]
+        lname = a[0]
+        pname = lname + '.py'
         prefix = a[1]
-        are_we_overwriting([pname, '%s.py' % pname])
+        are_we_overwriting([lname, pname])
 
-        f = open('%s.py' % pname, 'w')
-        f.writelines(['#!/usr/bin/python\n',
+        f = open(pname, 'w')
+        f.writelines(['#!/usr/bin/env python\n',
                       '"""\n',
-                      '%s - program description\n' % pname,
+                      '%s - program description\n' % lname,
                       '"""\n',
                       '\n',
+                      'from bscr import util as U\n',
+                      'import optparse\n',
                       'import os\n',
                       'import re\n',
                       'import sys\n',
-                      'import toolframe\n',
-                      '\n',
-                      'from optparse import *\n',
                       '\n',
                       '# ----------------------------------------------------'
                       + '-----------------------\n',
-                      'def tt_example(argv):\n',
+                      'def %s_example(argv):\n' % prefix,
                       '    print("this is an example")\n',
                       "\n",
                       '# ----------------------------------------------------'
                       + '-----------------------\n',
-                      "toolframe.tf_launch(\"tt\")"
+                      "if __name__ == '__main__':\n",
+                      "    U.dispatch('__main__', '%s', sys.argv)\n" % prefix,
                       ])
         f.close()
 
-        os.chmod('%s.py' % pname, 0755)
+        os.chmod(pname, 0755)
+        os.symlink(os.path.abspath(pname), lname)
 
 
 # ---------------------------------------------------------------------------
@@ -177,3 +183,5 @@ def are_we_overwriting(flist):
 
     if not re.search(r'^\s*[Yy]', answer):
         sys.exit(1)
+
+    U.safe_unlink(already)

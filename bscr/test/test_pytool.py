@@ -26,18 +26,25 @@ class TestPytool(th.HelpedTestCase):
 
     # -----------------------------------------------------------------------
     def test_newpy_x(self):
-        '''
-        Run "pytool newpy xyzzy". Verify that xyzzy and xyzzy.py are created
+        """
+        Run 'pytool newpy xyzzy'. Verify that xyzzy and xyzzy.py are created
         and have the right contents.
-        '''
+        """
         with U.Chdir(self.testdir):
-            U.safe_unlink(['xyzzy', 'xyzzy.py'])
+            lname = 'xyzzy'
+            pname = lname + '.py'
+            U.safe_unlink([lname, pname])
             cmd = pexpect.which("pytool")
-            r = pexpect.run('%s newpy xyzzy' % cmd)
-            assert(not os.path.exists('xyzzy'))
-            assert(os.path.exists('xyzzy.py'))
+            r = pexpect.run('%s newpy %s' % (cmd, lname))
 
-            got = U.contents('xyzzy.py')
+            self.assertTrue(os.path.exists(pname))
+            exp = os.path.abspath(pname)
+            act = os.readlink(lname)
+            self.assertEqual(exp, act,
+                             "\nExpected '%s'\n     got '%s'" %
+                             (exp, act))
+
+            got = U.contents(pname)
             exp = self.expected_xyzzy_py()
             th.expectVSgot(exp, got)
 
@@ -81,11 +88,15 @@ class TestPytool(th.HelpedTestCase):
         Verify that confirmation is requested. Answer "yes" and verify
         that the existing file IS overwritten.
         '''
+        lname = "xyzzy"
+        pname = lname + ".py"
+        name_l = [lname, pname]
         with U.Chdir(self.testdir):
-            U.safe_unlink(['xyzzy', 'xyzzy.py'])
-            U.writefile('xyzzy.py', ['original xyzzy\n'])
+            U.safe_unlink(name_l)
+            for name in name_l:
+                U.writefile(name, ['original %s\n' % name])
             cmd = pexpect.which('pytool')
-            S = pexpect.spawn('%s newpy xyzzy' % cmd)
+            S = pexpect.spawn('%s newpy %s' % (cmd, lname))
             which = S.expect([r'Are you sure\? >',
                               'Error:',
                               pexpect.EOF])
@@ -98,24 +109,30 @@ class TestPytool(th.HelpedTestCase):
             else:
                 self.fail('should have asked about overwriting xyzzy')
 
-            assert(not os.path.exists('xyzzy'))
+            exp = os.path.abspath(pname)
+            got = os.readlink(lname)
+            self.assertEqual(exp, got,
+                             "\nExpected '%s',\n     got '%s'" %
+                             (exp, got))
 
             expected = self.expected_xyzzy_py()
-            got = U.contents('xyzzy.py')
+            got = U.contents(pname)
             th.expectVSgot(expected, got)
 
     # -----------------------------------------------------------------------
     def test_newtool(self):
         '''
-        Run "pytool newtool testtool tt". Verify that testtool.py
-        is created and has the right contents.
+        Run "pytool newtool testtool tt" while testtool.py does not exist.
+        Verify that testtool.py is created and has the right contents.
         '''
+        toolname = "testtool.py"
+        toollink = "testtool"
         with U.Chdir(self.testdir):
-            U.safe_unlink(['testtool', 'testtool.py'])
+            U.safe_unlink([toollink, toolname])
             cmd = pexpect.which("pytool")
             if cmd is None:
                 raise SkipTest
-            S = pexpect.spawn('%s newtool testtool tt' % cmd)
+            S = pexpect.spawn('%s newtool %s tt' % (cmd, toollink))
             S.logfile = sys.stdout
             which = S.expect([r'Are you sure\? >',
                               'Error:',
@@ -128,10 +145,93 @@ class TestPytool(th.HelpedTestCase):
                 print S.before + S.after
                 self.fail('unexpected exception')
 
-            assert(not os.path.exists('testtool'))
+            # assert(not os.path.exists('testtool'))
+            exp = os.path.abspath(toolname)
+            actual = os.readlink(toollink)
+            self.assertEqual(exp, actual,
+                             "\nExpected '%s'\n     got '%s'" %
+                             (exp, actual))
 
             expected = self.expected_testtool_py()
             got = U.contents('testtool.py')
+            th.expectVSgot(expected, got)
+
+    # -----------------------------------------------------------------------
+    def test_newtool_overwriting_no(self):
+        """
+        Run "pytool newtool testtool tt" while testtool.py does exist. Verify
+        that we are prompted about overwriting. Answer "no" and verify that the
+        original file is not overwritten.
+        """
+        tlink = "testtool"
+        tname = tlink + ".py"
+        with U.Chdir(self.testdir):
+            U.safe_unlink([tlink, tname])
+            U.writefile(tname, ["original %s\n" % tname])
+            U.writefile(tlink, ["original %s\n" % tlink])
+            cmd = pexpect.which("pytool")
+            if cmd is None:
+                raise SkipTest
+            S = pexpect.spawn('%s newtool %s tt' % (cmd, tlink))
+            S.logfile = sys.stdout
+            which = S.expect([r'Are you sure\? >',
+                              'Error:',
+                              pexpect.EOF])
+            if which == 0:
+                S.sendline('no')
+                S.expect(pexpect.EOF)
+                # self.fail('should not have asked about overwriting')
+            elif which == 1:
+                print S.before + S.after
+                self.fail('unexpected exception')
+            else:
+                self.fail("should have asked about overwriting %s" % tname)
+
+            for fname in [tlink, tname]:
+                exp = ["original %s" % fname]
+                got = U.contents(fname)
+                self.assertEqual(exp, got,
+                                 "\nExpected '%s'\n     got '%s'" %
+                                 (exp, got))
+
+    # -----------------------------------------------------------------------
+    def test_newtool_overwriting_yes(self):
+        """
+        Run 'pytool newtool testtool tt' while testtool.py exists. Verify that
+        we are prompted about overwriting. Answer 'yes' and verify that the
+        original file is overwritten.
+        """
+        tlink = "testtool"
+        tname = tlink + ".py"
+        with U.Chdir(self.testdir):
+            U.safe_unlink([tlink, tname])
+            U.writefile(tname, ["original %s\n" % tname])
+            U.writefile(tlink, ["original %s\n" % tlink])
+            cmd = pexpect.which("pytool")
+            if cmd is None:
+                raise SkipTest
+            S = pexpect.spawn('%s newtool %s tt' % (cmd, tlink))
+            S.logfile = sys.stdout
+            which = S.expect([r'Are you sure\? >',
+                              'Error:',
+                              pexpect.EOF])
+            if which == 0:
+                S.sendline('yes')
+                S.expect(pexpect.EOF)
+            elif which == 1:
+                print S.before + S.after
+                self.fail('unexpected exception')
+            else:
+                self.fail("should have asked about overwriting %s" % tname)
+
+            exp = os.path.abspath(tname)
+            actual = os.readlink(tlink)
+            self.assertEqual(exp, actual,
+                             "\nExpected '%s'\n     got '%s'" %
+                             (exp, actual))
+
+            expected = self.expected_testtool_py()
+            got = U.contents(tname)
             th.expectVSgot(expected, got)
 
     # -----------------------------------------------------------------------
@@ -227,17 +327,16 @@ class TestPytool(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def expected_testtool_py(self):
-        expected = ['#!/usr/bin/python',
+        expected = ['#!/usr/bin/env python',
                     '"""',
                     'testtool - program description',
                     '"""',
                     '',
+                    'from bscr import util as U',
+                    'import optparse',
                     'import os',
                     'import re',
                     'import sys',
-                    'import toolframe',
-                    '',
-                    'from optparse import *',
                     '',
                     '# ----------------------------------------------------'
                     + '-----------------------',
@@ -246,35 +345,38 @@ class TestPytool(th.HelpedTestCase):
                     "",
                     '# ----------------------------------------------------'
                     + '-----------------------',
-                    "toolframe.tf_launch(\"tt\")"]
+                    "if __name__ == '__main__':",
+                    "    U.dispatch('__main__', 'tt', sys.argv)",
+                    ]
 
         return expected
 
     # -------------------------------------------------------------------------
     def expected_xyzzy_py(self):
-        expected = ['#!/usr/bin/python',
+        expected = ['#!/usr/bin/env python',
                     '"""',
                     'xyzzy - program description',
                     '"""',
                     '',
-                    # 'import getopt',
+                    'import optparse',
+                    'import pdb',
                     'import sys',
-                    'import toolframe',
+                    'from bscr import toolframe',
                     'import unittest',
-                    '',
-                    'from optparse import *',
                     '',
                     'def main(argv = None):',
                     '    if argv == None:',
                     '        argv = sys.argv',
                     '',
-                    '    p = OptionParser()',
-                    '    # define options here',
-                    "    # p.add_option('-s', '--long',",
-                    "    #              action='', default='',",
-                    "    #              dest='', type='',",
-                    "    #              help='')",
+                    '    p = optparse.OptionParser()',
+                    "    p.add_option('-d', '--debug',",
+                    "                 action='store_true', default=False,",
+                    "                 dest='debug',",
+                    "                 help='run the debugger')",
                     '    (o, a) = p.parse_args(argv)',
+                    "",
+                    "    if o.debug:",
+                    "        pdb.set_trace()",
                     '',
                     '    # process arguments',
                     '    for a in args:',
