@@ -1,10 +1,16 @@
-from bscr import testhelp as th
-from bscr import util as U
-from nose.plugins.skip import SkipTest
+import glob
+from importlib import import_module
+import inspect
 import os
 import pdb
 import pexpect
 import re
+import sys
+from nose.plugins.skip import SkipTest
+from bscr import testhelp as th
+import types
+import unittest
+from bscr import util as U
 
 """
 This file checks for best practice compliance.
@@ -36,6 +42,54 @@ class Test_BEST(th.HelpedTestCase):
                     result = pexpect.run(cmd)
                     self.assertEqual('', result,
                                      "Pep8 report: %s" % result)
+
+    # -------------------------------------------------------------------------
+    def test_nodoc(self):
+        bscr = sys.modules['bscr']
+        result = self.nodoc_check(bscr, 0, 't')
+        if result != '':
+            self.fail(result)
+
+    # -------------------------------------------------------------------------
+    def nodoc_check(self, mod, depth, why):
+        try:
+            already = self.already
+        except AttributeError:
+            self.already = ['glob', 'fcntl', 're', 'pexpect', 'unittest',
+                            'difflib', 'pprint', 'warnings', 'heapq', 'os',
+                            'pdb', 'optparse', 'traceback', 'linecache',
+                            'bdb', 'logging', 'StringIO', 'inspect', 'stat',
+                            'tokenize', 'socket', 'dis', 'getopt', 'shlex',
+                            'pickle', 'shutil',
+                            ]
+            already = self.already
+        rval = ''
+        for name, item in inspect.getmembers(mod,
+                                             inspect.isroutine):
+            if all([not inspect.isbuiltin(item),
+                    name not in dir(unittest.TestCase),
+                    item.__name__ not in already,
+                    not name.startswith('_')]):
+                already.append(":".join([mod.__name__, name]))
+                if item.__doc__ is None:
+                    rval += "\n%s(%s): %s" % (mod.__name__, why, name)
+        for name, item in inspect.getmembers(mod,
+                                             inspect.isclass):
+            if all([hasattr(item, 'tearDown'),
+                    item.__name__ not in already,
+                    depth < 5]):
+                already.append(item.__name__)
+                rval += self.nodoc_check(item, depth+1, 'c')
+        for name, item in inspect.getmembers(mod,
+                                             inspect.ismodule):
+            if all([not inspect.isbuiltin(item),
+                    item.__name__ not in already,
+                    not name.startswith('@'),
+                    not name.startswith('_'),
+                    depth < 5]):
+                already.append(item.__name__)
+                rval += self.nodoc_check(item, depth+1, 'm')
+        return rval
 
     # -------------------------------------------------------------------------
     def test_duplicates(self):

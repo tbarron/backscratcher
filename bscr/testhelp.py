@@ -18,6 +18,10 @@ tlogger = None
 
 # -----------------------------------------------------------------------------
 def main(args=None, filter=None, logfile=None):
+    """
+    This could be used as our own test runner, although I don't think it ever
+    is. We could probably get rid of this routine.
+    """
     if args is None:
         args = sys.argv
     p = optparse.OptionParser()
@@ -98,6 +102,10 @@ def all_tests(name, filter=None):
 
 # ---------------------------------------------------------------------------
 def debug_flag(value=None):
+    """
+    Used in main() to decide whether --debug occurred on command line. This
+    could go away with main().
+    """
     global dval
 
     if value is not None:
@@ -114,6 +122,10 @@ def debug_flag(value=None):
 
 # ---------------------------------------------------------------------------
 def expectVSgot(expected, got):
+    """
+    Raise an assertion error if *expected* != *got*. Deprecate this in favor of
+    HelpedTestCase.expgot().
+    """
     try:
         assert(expected == got)
     except AssertionError, e:
@@ -139,12 +151,19 @@ def expectVSgot(expected, got):
 
 # ---------------------------------------------------------------------------
 def get_logger():
+    """
+    Get the singleton test logger
+    """
     global tlogger
     return tlogger
 
 
 # ---------------------------------------------------------------------------
 def into_test_dir():
+    """
+    Create the test dir if needed, then cd into it. Deprecated in favor of
+    setUp* plus 'with Chdir()'
+    """
     tdname = '_test.%d' % os.getpid()
     bname = os.path.basename(os.getcwd())
     if bname != tdname:
@@ -174,6 +193,10 @@ def keepfiles(value=None):
 
 # ---------------------------------------------------------------------------
 def list_tests(a, final, testlist):
+    """
+    This goes away with main(). If called through the main() test runner, this
+    will list the tests available without running them.
+    """
     # pdb.set_trace()
     if len(a) <= 1:
         for c in testlist:
@@ -193,12 +216,16 @@ def list_tests(a, final, testlist):
 def name_of(obj=None):
     """
     Return the caller's function name (with an optional class prefix).
+    Is this used anywhere? Can we get rid of it?
     """
     return str(obj).split()[0]
 
 
 # ---------------------------------------------------------------------------
 def run_tests(a, final, testlist, volume, logfile=None):
+    """
+    This goes with the main() test runner. Probably not needed.
+    """
     mainmod = sys.modules['__main__']
     if len(a) <= 1:
         suite = LoggingTestSuite(logfile=logfile)
@@ -228,16 +255,27 @@ def run_tests(a, final, testlist, volume, logfile=None):
 class HelpedTestCase(unittest.TestCase):
     # -------------------------------------------------------------------------
     def expgot(self, exp, actual):
+        """
+        *exp* and *actual* should be equal. If they are not, report an
+         assertion failure.
+        """
         self.assertEqual(exp, actual,
                          "Expected '%s', got '%s'" % (exp, actual))
 
     # -------------------------------------------------------------------------
     def exp_in_got(self, exp, actual):
+        """
+        *exp* is expected to be in *actual*. If it is not, report an assertion
+         failure.
+        """
         self.assertIn(exp, actual,
                       "Expected '%s' in '%s'" % (exp, actual))
 
     # -------------------------------------------------------------------------
     def assertIn(self, member, container, msg=None):
+        """
+        Report an assertion failure if *member* is not in *container*.
+        """
         if member not in container:
             fmsg = "%s not found in %s" % (pp.saferepr(member),
                                            pp.saferepr(container))
@@ -245,6 +283,10 @@ class HelpedTestCase(unittest.TestCase):
 
     # -------------------------------------------------------------------------
     def assertModule(self, module_name, filename):
+        """
+        The root directory for the module and the associated test file should
+        be the same. If not, report an assertion failure.
+        """
         mroot = U.bscr_root(sys.modules[module_name].__file__)
         troot = U.bscr_test_root(filename)
         self.assertEqual(troot, mroot,
@@ -252,6 +294,9 @@ class HelpedTestCase(unittest.TestCase):
 
     # -------------------------------------------------------------------------
     def assertNotIn(self, member, container, msg=None):
+        """
+        Report an assertion failure if *member* IS in *container*.
+        """
         if member in container:
             fmsg = "%s unexpectedly found in %s" % (pp.saferepr(member),
                                                     pp.saferepr(container))
@@ -259,6 +304,9 @@ class HelpedTestCase(unittest.TestCase):
 
     # -------------------------------------------------------------------------
     def assertOptionHelp(self, script, explist):
+        """
+        Test '*script* --help', comparing the result against *explist*.
+        """
         cmd = U.script_location(script)
         result = pexpect.run("%s --help" % cmd)
         if type(explist) == str:
@@ -275,6 +323,11 @@ class HelpedTestCase(unittest.TestCase):
 
     # -------------------------------------------------------------------------
     def assertRaisesMsg(self, exctype, excstr, func, *args, **kwargs):
+        """
+        The call *func*(* *args*, ** *kwargs*) should raise an exception of
+        *exctype* containing the message *excstr*. If not, we report the
+        assertion failure.
+        """
         try:
             func(*args, **kwargs)
         except exctype, e:
@@ -288,12 +341,20 @@ class HelpedTestCase(unittest.TestCase):
 # -----------------------------------------------------------------------------
 class LoggingTestSuite(unittest.TestSuite):
     def __init__(self, tests=(), logfile=None):
+        """
+        This initializes my version of the TestSuite class that does test
+        logging. I think this can be deprecated in favor of a scheme where we
+        override unittest.TestResult.stopTest() and do the logging there.
+        """
         super(LoggingTestSuite, self).__init__(tests)
         self._logger = None
         if None != logfile:
             self.setup_logging(logfile)
 
     def setup_logging(self, logfile):
+        """
+        Initialize test logging.
+        """
         self._logger = logging.getLogger('TestSuite')
         self._logger.setLevel(logging.INFO)
         host = socket.gethostname().split('.')[0]
@@ -308,6 +369,9 @@ class LoggingTestSuite(unittest.TestSuite):
         self._logger.info('-' * (55 - len(host)))
 
     def run(self, result):
+        """
+        Run the tests in the suite.
+        """
         errs = 0
         fails = 0
         for test in self._tests:
@@ -377,6 +441,10 @@ def show_stdout(value=None):
 
 # ---------------------------------------------------------------------------
 def skip_check(skipfunc):
+    """
+    My attempt at implementing skipping. Superceded by the options offered in
+    py.test, nosetests, etc.
+    """
     if skipfunc is None:
         return False
     func = getattr(sys.modules['__main__'], skipfunc)
@@ -388,16 +456,28 @@ def skip_check(skipfunc):
 
 # ---------------------------------------------------------------------------
 def testlog(mname):
+    """
+    Get a test log file name.
+    """
     return "%s/test.log" % os.path.dirname(sys.modules[mname].__file__)
 
 
 # ---------------------------------------------------------------------------
 def touch(pathname):
+    """
+    Do the same sort of thing as touch(1), except that this does not actually
+    update the file time if it already exists. It just creates *pathname* if it
+    does not exist.
+    """
     open(pathname, 'a').close()
 
 
 # ---------------------------------------------------------------------------
 def write_file(filename, mode=0644, content=None):
+    """
+    Write *content* to *filename* and set the file's mode to *mode*. This looks
+    to be the same as util.writefile().
+    """
     f = open(filename, 'w')
     if type(content) == str:
         f.write(content)
@@ -414,6 +494,9 @@ def write_file(filename, mode=0644, content=None):
 class UnderConstructionError(Exception):
     # -------------------------------------------------------------------------
     def __init__(self, value=""):
+        """
+        Deprecated in favor of 'self.fail('construction')'
+        """
         if value == '':
             self.value = 'under construction'
         else:
@@ -421,6 +504,9 @@ class UnderConstructionError(Exception):
 
     # -------------------------------------------------------------------------
     def __str__(self):
+        """
+        Deprecated in favor of 'self.fail('construction')'
+        """
         return repr(self.value)
 
 # -----------------------------------------------------------------------------
