@@ -72,7 +72,12 @@ class Test_BEST(th.HelpedTestCase):
                     not name.startswith('_')]):
                 already.append(":".join([mod.__name__, name]))
                 if item.__doc__ is None:
-                    rval += "\n%s(%s): %s" % (mod.__name__, why, name)
+                    try:
+                        filename = U.basename(mod.__file__)
+                    except AttributeError:
+                        tmod = sys.modules[mod.__module__]
+                        filename = U.basename(tmod.__file__)
+                    rval += "\n%s(%s): %s" % (filename, why, name)
         for name, item in inspect.getmembers(mod,
                                              inspect.isclass):
             if all([hasattr(item, 'tearDown'),

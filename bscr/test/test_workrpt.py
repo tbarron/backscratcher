@@ -5,20 +5,25 @@ from bscr import util as U
 from bscr import workrpt as wr
 
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class workrptTest(th.HelpedTestCase):
-    # things to test
-    #  - week_starting_last()
-    #  - day_plus()
-    #  - package()
-    #  - tally()
-    #  - category()
-    #  - reset_category_total()
-    #  - increment_category_total()
-    #  - week_diff()
-    #  - write_report()
-
+    """
+    things to test
+     - week_starting_last()
+     - day_plus()
+     - package()
+     - tally()
+     - category()
+     - reset_category_total()
+     - increment_category_total()
+     - week_diff()
+     - write_report()
+    """
+    # -------------------------------------------------------------------------
     def test_day_offset(self):
+        """
+        Check each weekday offset.
+        """
         assert(wr.day_offset('f') == 3)
         assert(wr.day_offset('c') == 4)
         assert(wr.day_offset('M') == 0)
@@ -37,7 +42,12 @@ class workrptTest(th.HelpedTestCase):
         assert(str(e) == "'x'")
         # print "exception as a string: '%s'" % str(e)
 
+    # -------------------------------------------------------------------------
     def test_default_input_filename(self):
+        """
+        Make sure workrpt agrees with where we think the default input file
+        should be.
+        """
         home = os.getenv("HOME")
         exp = U.pj(home, "Dropbox", "journal",
                    time.strftime("%Y"), "WORKLOG")
@@ -45,12 +55,21 @@ class workrptTest(th.HelpedTestCase):
         self.assertEqual(exp, actual,
                          "Expected '%s', got '%s'" % (exp, actual))
 
+    # -------------------------------------------------------------------------
     def test_hms(self):
+        """
+        Test the workrpt hms() routine which is supposed to convert an epoch
+        time to HH:MM:SS format.
+        """
         assert(wr.hms(72) == '00:01:12')
         assert(wr.hms(120) == '00:02:00')
         assert(wr.hms(4000) == '01:06:40')
 
+    # -------------------------------------------------------------------------
     def test_interpret_options_defaults(self):
+        """
+        Check default start and end times.
+        """
         (o, a) = wr.makeOptionParser([])
         (start, end) = wr.interpret_options(o)
         assert(not o.dayflag)
@@ -59,7 +78,12 @@ class workrptTest(th.HelpedTestCase):
         assert(start == start_should_be)
         assert(end == end_should_be)
 
+    # -------------------------------------------------------------------------
     def test_interpret_options_dayflag(self):
+        """
+        Verify that setting the day flag does not disrupt the default start/end
+        time.
+        """
         (o, a) = wr.makeOptionParser(['-d'])
         (start, end) = wr.interpret_options(o)
         assert(o.dayflag)
@@ -68,7 +92,10 @@ class workrptTest(th.HelpedTestCase):
         assert(start == start_should_be)
         assert(end == end_should_be)
 
+    # -------------------------------------------------------------------------
     def test_interpret_options_end(self):
+        """
+        """
         (o, a) = wr.makeOptionParser(['-e', '2009.0401'])
         (start, end) = wr.interpret_options(o)
         start_should_be = '2009.0326'
@@ -78,6 +105,7 @@ class workrptTest(th.HelpedTestCase):
         self.validate(end, end_should_be,
                       'end incorrect for -e 2009.0401')
 
+    # -------------------------------------------------------------------------
     def test_interpret_options_last_start(self):
         (o, a) = wr.makeOptionParser(['-l', '-s', '2009.0501'])
         self.assertRaisesMsg(StandardError,
@@ -85,6 +113,7 @@ class workrptTest(th.HelpedTestCase):
                              wr.interpret_options,
                              o)
 
+    # -------------------------------------------------------------------------
     def test_interpret_options_last_end(self):
         (o, a) = wr.makeOptionParser(['-l', '-e', '2009.0501'])
         self.assertRaisesMsg(StandardError,
@@ -92,6 +121,7 @@ class workrptTest(th.HelpedTestCase):
                              wr.interpret_options,
                              o)
 
+    # -------------------------------------------------------------------------
     def test_interpret_options_since(self):
         (o, a) = wr.makeOptionParser(['--since', '2009.0501'])
         (start, end) = wr.interpret_options(o)
@@ -104,6 +134,7 @@ class workrptTest(th.HelpedTestCase):
                              wr.interpret_options,
                              o)
 
+    # -------------------------------------------------------------------------
     def test_interpret_options_week_start(self):
         (o, a) = wr.makeOptionParser(['-w', 'M', '-s', '2009.0501'])
         self.assertRaisesMsg(StandardError,
@@ -111,6 +142,7 @@ class workrptTest(th.HelpedTestCase):
                              wr.interpret_options,
                              o)
 
+    # -------------------------------------------------------------------------
     def test_interpret_options_week_end(self):
         (o, a) = wr.makeOptionParser(['-w', 'T', '-e', '2009.0501'])
         self.assertRaisesMsg(StandardError,
@@ -128,12 +160,14 @@ class workrptTest(th.HelpedTestCase):
 #         lm = last_wednesday()
 #         assert(abs(lm - now) <= 24*3600)
 
+    # -------------------------------------------------------------------------
     def test_next_tuesday(self):  # never called
         now = self.next_wkday(wr.day_offset('T'))
         nm = time.strftime('%Y.%m%d', time.localtime(now))
         lm = wr.next_tuesday()
         assert(nm == lm)
 
+    # -------------------------------------------------------------------------
     def last_wkday(self, weekday):
         now = time.time()
         tm = time.localtime(now)
@@ -142,6 +176,7 @@ class workrptTest(th.HelpedTestCase):
             tm = time.localtime(now)
         return now
 
+    # -------------------------------------------------------------------------
     def next_wkday(self, weekday):
         now = time.time()
         tm = time.localtime(now)
@@ -150,6 +185,7 @@ class workrptTest(th.HelpedTestCase):
             tm = time.localtime(now)
         return now
 
+    # -------------------------------------------------------------------------
     def test_next_day(self):
         assert(wr.next_day('2009.1231') == '2010.0101')
         assert(wr.next_day('2009.0228') == '2009.0301')
@@ -162,6 +198,7 @@ class workrptTest(th.HelpedTestCase):
             result = 'next_day threw ValueError'
         assert(result == 'next_day threw ValueError')
 
+    # -------------------------------------------------------------------------
     def test_parse_timeline(self):
         assert(['2009', '05', '13', '09', '20', '26', 'admin: setup'] ==
                wr.parse_timeline('2009-05-13 09:20:26 admin: setup'))
@@ -174,6 +211,7 @@ class workrptTest(th.HelpedTestCase):
                                            '15:30:40 ' +
                                            '3opsarst: fro-oble 8.1'))
 
+    # -------------------------------------------------------------------------
     def test_parse_ymd(self):
         s = wr.stringify(time.localtime(wr.day_plus(-1)))
         assert(wr.parse_ymd('yesterday') == s[0:3])
@@ -188,6 +226,7 @@ class workrptTest(th.HelpedTestCase):
         self.parse_ymd('saturday', 's')
         self.parse_ymd('sunday', 'S')
 
+    # -------------------------------------------------------------------------
     def parse_ymd(self, target, t):
         n = time.localtime()
         d = wr.week_diff(n[6], wr.day_offset(t))
@@ -196,6 +235,7 @@ class workrptTest(th.HelpedTestCase):
         # print 'p = ', wr.parse_ymd(target)
         assert(wr.parse_ymd(target) == s[0:3])
 
+    # -------------------------------------------------------------------------
     def test_standalone_category(self):
         # pdb.set_trace()
         lines = '''-- Tuesday
