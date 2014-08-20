@@ -332,7 +332,8 @@ class HelpedTestCase(unittest.TestCase):
             func(*args, **kwargs)
         except exctype, e:
             if excstr not in str(e):
-                fmsg = "Expected '%s' in the exception" % excstr
+                fmsg = ("Expected '%s' in the exception, got '%s'"
+                        % (excstr, str(e)))
                 self.fail(fmsg)
         except:
             self.fail("Expected an exception of type %s" % exctype)

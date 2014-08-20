@@ -30,6 +30,9 @@ import toolframe
 
 # ---------------------------------------------------------------------------
 def main(argv=None):
+    """
+    Entry point for ascii(1) command.
+    """
     if argv is None:
         argv = sys.argv
     p = optparse.OptionParser(usage=usage())

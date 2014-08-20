@@ -52,9 +52,11 @@ class Test_BEST(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def nodoc_check(self, mod, depth, why):
+        global count
         try:
             already = self.already
         except AttributeError:
+            count = 0
             self.already = ['glob', 'fcntl', 're', 'pexpect', 'unittest',
                             'difflib', 'pprint', 'warnings', 'heapq', 'os',
                             'pdb', 'optparse', 'traceback', 'linecache',
@@ -77,7 +79,11 @@ class Test_BEST(th.HelpedTestCase):
                     except AttributeError:
                         tmod = sys.modules[mod.__module__]
                         filename = U.basename(tmod.__file__)
-                    rval += "\n%s(%s): %s" % (filename, why, name)
+                    rval += "\n%3d. %s(%s): %s" % (count, filename, why, name)
+                    try:
+                        count += 1
+                    except NameError:
+                        count = 1
         for name, item in inspect.getmembers(mod,
                                              inspect.isclass):
             if all([hasattr(item, 'tearDown'),

@@ -95,18 +95,25 @@ class workrptTest(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_interpret_options_end(self):
         """
+        If the user provides option -e <date>, wr.interpret_options should
+        return a start date one week before and an end date of <date>.
         """
         (o, a) = wr.makeOptionParser(['-e', '2009.0401'])
         (start, end) = wr.interpret_options(o)
         start_should_be = '2009.0326'
         end_should_be = '2009.0401'
-        self.validate(start, start_should_be,
-                      'start incorrect for -e 2009.0401')
-        self.validate(end, end_should_be,
-                      'end incorrect for -e 2009.0401')
+        self.assertEqual(start_should_be, start,
+                         'start incorrect for -e 2009.0401: %s =?= %s'
+                         % (start_should_be, start))
+        self.assertEqual(end_should_be, end,
+                      'end incorrect for -e 2009.0401: %s =?= %s'
+                      % (end_should_be, end))
 
     # -------------------------------------------------------------------------
     def test_interpret_options_last_start(self):
+        """
+        Verify mutual exclusion of -l and -s
+        """
         (o, a) = wr.makeOptionParser(['-l', '-s', '2009.0501'])
         self.assertRaisesMsg(StandardError,
                              '--last and --start or --end are not compatible',
@@ -115,6 +122,9 @@ class workrptTest(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def test_interpret_options_last_end(self):
+        """
+        Verify mutual exclusion of -l and -e
+        """
         (o, a) = wr.makeOptionParser(['-l', '-e', '2009.0501'])
         self.assertRaisesMsg(StandardError,
                              '--last and --start or --end are not compatible',
@@ -123,6 +133,9 @@ class workrptTest(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def test_interpret_options_since(self):
+        """
+        Verify that option --since works as expected
+        """
         (o, a) = wr.makeOptionParser(['--since', '2009.0501'])
         (start, end) = wr.interpret_options(o)
         self.assertEqual(start, '2009.0501')
@@ -136,6 +149,9 @@ class workrptTest(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def test_interpret_options_week_start(self):
+        """
+        Verify mutual exclusion of -w and -s
+        """
         (o, a) = wr.makeOptionParser(['-w', 'M', '-s', '2009.0501'])
         self.assertRaisesMsg(StandardError,
                              '--week and --start or --end are not compatible',
@@ -144,6 +160,9 @@ class workrptTest(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def test_interpret_options_week_end(self):
+        """
+        Verify mutual exclusion of -w and -e
+        """
         (o, a) = wr.makeOptionParser(['-w', 'T', '-e', '2009.0501'])
         self.assertRaisesMsg(StandardError,
                              '--week and --start or --end are not compatible',
@@ -162,6 +181,9 @@ class workrptTest(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def test_next_tuesday(self):  # never called
+        """
+        Routine wr.next_tuesday() should return the date of next tuesday
+        """
         now = self.next_wkday(wr.day_offset('T'))
         nm = time.strftime('%Y.%m%d', time.localtime(now))
         lm = wr.next_tuesday()
@@ -169,6 +191,9 @@ class workrptTest(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def last_wkday(self, weekday):
+        """
+        Brute force the last occurrence of *weekday* for verifying tests
+        """
         now = time.time()
         tm = time.localtime(now)
         while tm[6] != weekday:
@@ -178,6 +203,9 @@ class workrptTest(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def next_wkday(self, weekday):
+        """
+        Brute force the next occurrence of *weekday* for verifying tests
+        """
         now = time.time()
         tm = time.localtime(now)
         while tm[6] != weekday:
@@ -187,19 +215,23 @@ class workrptTest(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def test_next_day(self):
+        """
+        test the next_day() routine
+        """
         assert(wr.next_day('2009.1231') == '2010.0101')
         assert(wr.next_day('2009.0228') == '2009.0301')
         assert(wr.next_day('2008.0228') == '2008.0229')
         assert(wr.next_day('2007.1231', '%Y.%m%d') == '2008.0101')
-        result = 'no exception'
-        try:
-            q = wr.next_day('2006-02-28')
-        except ValueError:
-            result = 'next_day threw ValueError'
-        assert(result == 'next_day threw ValueError')
+        self.assertRaisesMsg(ValueError,
+                             "next_day threw ValueError",
+                             wr.next_day,
+                             "2006.0228")
 
     # -------------------------------------------------------------------------
     def test_parse_timeline(self):
+        """
+        test parse_timeline()
+        """
         assert(['2009', '05', '13', '09', '20', '26', 'admin: setup'] ==
                wr.parse_timeline('2009-05-13 09:20:26 admin: setup'))
         assert(['2009', '05', '14', '10', '20', '19', 'foobar: plugh'] ==
@@ -213,6 +245,9 @@ class workrptTest(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def test_parse_ymd(self):
+        """
+        test parse_ymd() for each weekday, yesterday, and tomorrow
+        """
         s = wr.stringify(time.localtime(wr.day_plus(-1)))
         assert(wr.parse_ymd('yesterday') == s[0:3])
         s = wr.stringify(time.localtime(wr.day_plus(1)))
@@ -228,6 +263,9 @@ class workrptTest(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def parse_ymd(self, target, t):
+        """
+        test parse_ymd for one day
+        """
         n = time.localtime()
         d = wr.week_diff(n[6], wr.day_offset(t))
         s = wr.stringify(time.localtime(wr.day_plus(d)))
@@ -237,6 +275,9 @@ class workrptTest(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def test_standalone_category(self):
+        """
+        test standalone categories like 'vacation' and 'holiday'
+        """
         # pdb.set_trace()
         lines = '''-- Tuesday
 2009-07-21 08:30:28 admin: setup
@@ -267,7 +308,12 @@ class workrptTest(th.HelpedTestCase):
         except AssertionError:
             print r
 
+    # -------------------------------------------------------------------------
     def test_rounding(self):
+        """
+        Test that calculations round properly (except that they don't always --
+        this needs work -- !@!)
+        """
         # pdb.set_trace()
         lines = '''-- Tuesday
 2009-07-21 08:30:28 admin: setup
@@ -305,7 +351,11 @@ class workrptTest(th.HelpedTestCase):
             print r
             raise
 
+    # -------------------------------------------------------------------------
     def test_start_date_missing(self):
+        """
+        Calculate a week when the first few dates are missing
+        """
         lines = '''-- Friday
 2012-04-13 08:30:48 3op3arst: trouble-shooting production logc
 2012-04-13 14:16:34 3op3sysp: e-mail
@@ -331,7 +381,11 @@ class workrptTest(th.HelpedTestCase):
             print r
             raise
 
+    # -------------------------------------------------------------------------
     def test_week_ending(self):
+        """
+        test calculating the beginning of a week from its end?
+        """
         tlist = {'yesterday': time.time() - 24*3600,
                  'today': time.time(),
                  'tomorrow': time.time() + 24*3600,
@@ -343,12 +397,16 @@ class workrptTest(th.HelpedTestCase):
                                           time.localtime(tlist[t]))
             start_should_be = time.strftime('%Y.%m%d',
                                             time.localtime(tlist[t]-6*24*3600))
-            self.validate(start, start_should_be,
-                          'start is incorrect for %s' % t)
-            self.validate(end, end_should_be,
-                          'end is incorrect for %s' % t)
+            self.assertEqual(start, start_should_be,
+                             'start is incorrect for %s' % t)
+            self.assertEqual(end, end_should_be,
+                             'end is incorrect for %s' % t)
 
+    # -------------------------------------------------------------------------
     def test_week_starting(self):
+        """
+        test calculating the end of a week from its start
+        """
         tlist = {'yesterday': time.time() - 24*3600,
                  'today': time.time(),
                  'tomorrow': time.time() + 24*3600,
@@ -360,12 +418,16 @@ class workrptTest(th.HelpedTestCase):
                                             time.localtime(tlist[t]))
             end_should_be = time.strftime('%Y.%m%d',
                                           time.localtime(tlist[t]+6*24*3600))
-            self.validate(start, start_should_be,
-                          'start is incorrect for %s' % t)
-            self.validate(end, end_should_be,
-                          'end is incorrect for %s' % t)
+            self.assertEqual(start_should_be, start,
+                             'start is incorrect for %s' % t)
+            self.assertEqual(end_should_be, end, 
+                             'end is incorrect for %s' % t)
 
+    # -------------------------------------------------------------------------
     def test_week_starting_last(self):
+        """
+        See docstring for wsl()
+        """
         # monday -> monday
         self.wsl(0, 0, 1173070800.0, '2007.0305', '2007.0311')
         # tuesday -> monday
@@ -425,33 +487,42 @@ class workrptTest(th.HelpedTestCase):
         # saturday -> sunday
         # sunday -> sunday
 
+    # -------------------------------------------------------------------------
     def wsl(self, target, offset, now, should_start, should_end):
+        """
+        Routine week_starting_last() takes time index *now*, *target* weekday
+        (0 = Monday), and *offset* seconds. It computes, say,"last Monday" from
+        *now*, adds *offset* seconds, and returns a tuple containing the day
+        indicated in %Y.%m%d format and a week later in the same format.
+        """
         (s, e) = wr.week_starting_last(target, offset, now)
         # print s, should_start
         # print e, should_end
         assert(s == should_start)
         assert(e == should_end)
 
+    # -------------------------------------------------------------------------
     def test_weekday_num(self):
+        """
+        Verify the numeric correspondences of the weekdays -- monday == 0,
+        sunday == 6.
+        """
         count = 0
         for d in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday',
                   'saturday', 'sunday']:
-            self.validate(wr.weekday_num(d), count,
-                          'weekday_num() fails for %s' % d)
+            self.assertEqual(wr.weekday_num(d), count,
+                             'weekday_num(%d) fails for %s' % (count,d))
             count = count + 1
 
-        success = False
-        try:
-            x = wr.weekday_num('notaday')
-        except KeyError:
-            success = True
-        self.validate(success, True,
-                      'should have gotten a KeyError for notaday')
+        self.assertRaisesMsg(KeyError,
+                             "notaday",
+                             wr.weekday_num,
+                             'notaday')
 
-    def validate(self, v1, v2, msg):
-        try:
-            assert(v1 == v2)
-        except AssertionError:
-            print msg
-            print '%s =?= %s' % (v1, v2)
-            raise
+#     def validate(self, v1, v2, msg):
+#         try:
+#             assert(v1 == v2)
+#         except AssertionError:
+#             print msg
+#             print '%s =?= %s' % (v1, v2)
+#             raise

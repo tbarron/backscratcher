@@ -44,6 +44,9 @@ import sys
 
 # ---------------------------------------------------------------------------
 def main(A=None):
+    """
+    Program entry point
+    """
     if A is None:
         A = sys.argv
     p = optparse.OptionParser(usage=usage())
