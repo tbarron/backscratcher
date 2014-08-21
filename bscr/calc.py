@@ -37,6 +37,9 @@ import unittest
 
 # ---------------------------------------------------------------------------
 def main(argv=None):
+    """
+    Command line entry point
+    """
     if argv is None:
         argv = sys.argv
 

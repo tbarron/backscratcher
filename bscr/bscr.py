@@ -11,6 +11,9 @@ import util
 
 # -----------------------------------------------------------------------------
 def main(args=None):
+    """
+    Command line entry point
+    """
     if args is None:
         args = sys.argv
     util.dispatch('bscr.bscr', 'bscr', args)

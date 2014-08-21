@@ -64,6 +64,9 @@ def main(argv=None):
 
 # ---------------------------------------------------------------------------
 def usage():
+    """
+    Report usage
+    """
     return """ascii
 
     Display ASCII collating sequence."""

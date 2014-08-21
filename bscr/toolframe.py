@@ -76,6 +76,9 @@ import unittest
 
 # ---------------------------------------------------------------------------
 def tf_main(args, prefix=None, noarg='help'):
+    """
+    Command line entry point
+    """
     if prefix is None:
         prefix = sys.modules['__main__'].prefix()
 
@@ -99,6 +102,9 @@ def tf_main(args, prefix=None, noarg='help'):
 
 # ---------------------------------------------------------------------------
 def tf_dispatch(prefix, args):
+    """
+    Dispatch a subfunction call
+    """
     if args[0] == 'help':
         tf_help(args[1:], prefix=prefix)
     else:
@@ -122,6 +128,9 @@ def tf_dispatch(prefix, args):
 
 # ---------------------------------------------------------------------------
 def tf_dispatch_epilog(prefix, args):
+    """
+    What to do after each dispatched function returns
+    """
     try:
         eval("sys.modules['__main__'].%s_epilog(args)" % prefix)
     except:
@@ -131,6 +140,9 @@ def tf_dispatch_epilog(prefix, args):
 
 # ---------------------------------------------------------------------------
 def tf_dispatch_prolog(prefix, args):
+    """
+    What to do before calling each dispatched function
+    """
     rval = args
     try:
         rval = eval("sys.modules['__main__'].%s_prolog(args)" % prefix)
@@ -185,6 +197,9 @@ def tf_help(A, prefix=None):
 # -----------------------------------------------------------------------------
 def tf_launch(prefix, noarg='help', cleanup_tests=None, testclass='',
               logfile=''):
+    """
+    Launch a toolframe'd program
+    """
     if len(sys.argv) == 1 and sys.argv[0] == '':
         return
     sname = sys.argv[0]
@@ -203,6 +218,9 @@ def tf_launch(prefix, noarg='help', cleanup_tests=None, testclass='',
 
 # ---------------------------------------------------------------------------
 def tf_shell(prefix, args):
+    """
+    Provide a shell in which subfunctions can be run
+    """
     prompt = "%s> " % prefix
     req = raw_input(prompt)
     while req != 'quit':

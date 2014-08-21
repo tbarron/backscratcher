@@ -67,6 +67,9 @@ def main(A=None):
 
 # ---------------------------------------------------------------------------
 def align(input):
+    """
+    Payload routine
+    """
     lines = [l.strip() for l in input.readlines()]
     width = []
     for l in lines:
@@ -91,6 +94,9 @@ def align(input):
 
 # ---------------------------------------------------------------------------
 def usage():
+    """
+    Report usage
+    """
     return """align
 
     Align columns from input."""
