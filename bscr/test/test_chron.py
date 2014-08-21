@@ -11,6 +11,9 @@ import unittest
 class TestChron(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_hms_seconds(self):
+        """
+        Converting %H:%M:%S to an epoch time
+        """
         exp = 3923
         act = chron.hms_seconds("1:05:23")
         self.assertEqual(exp, act,

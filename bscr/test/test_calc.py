@@ -10,6 +10,9 @@ from bscr import util as U
 
 # -----------------------------------------------------------------------------
 def setUpModule():
+    """
+    Run once before any of the tests in this module
+    """
     U.pythonpath_bscrroot()
 
 
@@ -17,6 +20,9 @@ def setUpModule():
 class TestCalc(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_example(self):
+        """
+        Example calc session
+        """
         calc = U.script_location("calc")
         S = pexpect.spawn(calc)
         # S.logfile = sys.stdout

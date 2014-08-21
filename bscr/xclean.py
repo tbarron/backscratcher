@@ -7,7 +7,9 @@ import sys
 
 # -----------------------------------------------------------------------------
 def main(args=None):
-
+    """
+    Command line entrypoint
+    """
     if args is None:
         args = sys.argv
 
@@ -35,6 +37,9 @@ def main(args=None):
 
 # -----------------------------------------------------------------------------
 def cleanup(dir, dryrun=False, pattern=None, recursive=False):
+    """
+    Payload routine
+    """
     flist = find_files(dir, pattern, recursive)
     if dryrun:
         print("Without --dryrun, would remove:")
@@ -48,6 +53,9 @@ def cleanup(dir, dryrun=False, pattern=None, recursive=False):
 
 # -----------------------------------------------------------------------------
 def find_files(dir, pattern=None, recursive=False):
+    """
+    Helper for finding files
+    """
     if pattern is None:
         pattern = '.*~'
     rval = []
@@ -64,4 +72,7 @@ def find_files(dir, pattern=None, recursive=False):
 
 # -----------------------------------------------------------------------------
 def usage():
+    """
+    Usage
+    """
     return("\n    xclean - remove files whose names match a regexp")

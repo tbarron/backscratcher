@@ -15,6 +15,9 @@ import unittest
 
 # ---------------------------------------------------------------------------
 def setUpModule():
+    """
+    Run once before any of the tests in this module
+    """
     if os.path.basename(os.getcwd()) == 'fl_tests':
         return
 
@@ -27,6 +30,9 @@ def setUpModule():
 
 # ---------------------------------------------------------------------------
 def tearDownModule():
+    """
+    Run once after all the tests in this module
+    """
     kf = os.getenv('KEEPFILES')
     if not kf:
         shutil.rmtree('fl_tests')
@@ -43,6 +49,9 @@ class TestFL(th.HelpedTestCase):
     #   'fl nosuchcmd'
     # -----------------------------------------------------------------------
     def test_command_line(self):
+        """
+        Running the command with no arguments should get help output
+        """
         thisone = util.script_location("fl")
 
         # print(thisone)
@@ -54,6 +63,9 @@ class TestFL(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def test_fl_help(self):
+        """
+        'fl help' should get help output
+        """
         cmd = util.script_location("fl")
         result = pexpect.run('%s help' % cmd)
         self.assertFalse('Traceback' in result)
@@ -63,6 +75,9 @@ class TestFL(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def test_fl_help_help(self):
+        """
+        'fl help help' should get help for the help command
+        """
         cmd = pexpect.which('fl')
         result = pexpect.run('%s help help' % cmd)
         self.assertFalse('Traceback' in result)

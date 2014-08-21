@@ -13,6 +13,9 @@ import unittest
 
 # -----------------------------------------------------------------------------
 def setUpModule():
+    """
+    Run once before any of the tests in this module
+    """
     U.pythonpath_bscrroot()
 
 
@@ -20,6 +23,9 @@ def setUpModule():
 class TestScripts(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_bscr_help(self):
+        """
+        Test 'bscr help'
+        """
         cmd = pexpect.which('bscr')
         result = pexpect.run('%s help' % cmd)
         self.assertFalse('Traceback' in result)
@@ -29,6 +35,9 @@ class TestScripts(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def test_bscr_help_help(self):
+        """
+        Test 'bscr help help'
+        """
         cmd = pexpect.which('bscr')
         result = pexpect.run('%s help help' % cmd)
         self.assertFalse('Traceback' in result)
@@ -38,6 +47,9 @@ class TestScripts(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def test_bscr_version(self):
+        """
+        Test 'bscr version'
+        """
         bscr = U.script_location("bscr")
         cmd = "%s version" % bscr
         result = pexpect.run(cmd)

@@ -45,6 +45,9 @@ class Test_BEST(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def test_nodoc(self):
+        """
+        Report routines with no doc string
+        """
         bscr = sys.modules['bscr']
         result = self.nodoc_check(bscr, 0, 't')
         if result != '':
@@ -52,6 +55,10 @@ class Test_BEST(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def nodoc_check(self, mod, depth, why):
+        """
+        Walk the tree of modules and classes looking for routines with no doc
+        string and report them
+        """
         global count
         try:
             already = self.already
@@ -104,6 +111,9 @@ class Test_BEST(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def test_duplicates(self):
+        """
+        Hunt for duplicate functions in the .py files
+        """
         root = U.bscr_test_root(__file__)
         rpt = ''
         for r, d, f in os.walk(root):
@@ -117,6 +127,9 @@ class Test_BEST(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def duplicate_check(self, filename):
+        """
+        Check one .py file for duplicate functions
+        """
         rval = ''
         with open(filename, 'r') as f:
             d = f.readlines()
