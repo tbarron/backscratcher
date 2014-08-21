@@ -14,6 +14,9 @@ class TestHd(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def test_hexdump(self):
+        """
+        Routine hexdump() reads one file and hexdumps it to another.
+        """
         exp = "\n".join([
             " 54 77 61 73  20 62 72 69  6c 6c 69 67  20 61 6e 64    " +
             "Twas bri llig and",

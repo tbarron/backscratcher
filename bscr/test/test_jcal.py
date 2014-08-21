@@ -14,6 +14,9 @@ import unittest
 class JcalTest(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_EMPTY(self):
+        """
+        Nothing to test yet
+        """
         pass
 
     # -------------------------------------------------------------------------

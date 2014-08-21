@@ -12,18 +12,30 @@ import unittest
 
 # -----------------------------------------------------------------------------
 class TestPerrno(th.HelpedTestCase):
+    # -------------------------------------------------------------------------
     def test_all(self):
+        """
+        Test 'perrno --all'
+        """
         with th.StdoutExcursion() as getval:
             perrno.main(["bin/perrno", "--all"])
             result = getval()
         self.assertIn("13  EACCES           Permission denied", result)
         self.assertNotIn("['EACCES']", result)
 
+    # -------------------------------------------------------------------------
     def test_mnemonic(self):
+        """
+        Calling perrno for a particular error name
+        """
         result = perrno.etranslate("EBADF")
         self.assertEqual("    9  EBADF            Bad file descriptor", result)
 
+    # -------------------------------------------------------------------------
     def test_numeric(self):
+        """
+        Calling perrno for a particular error number
+        """
         result = perrno.etranslate("3")
         self.assertEqual("    3  ESRCH            No such process", result)
 

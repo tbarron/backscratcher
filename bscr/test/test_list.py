@@ -13,6 +13,9 @@ import unittest
 class TestList(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def assertInList(self, exp, larg):
+        """
+        Assert that *exp* is in *larg*
+        """
         self.assertIn(exp, larg,
                       "'%s' is not in list '%s'" %
                       (exp, pprint.pformat(larg)))

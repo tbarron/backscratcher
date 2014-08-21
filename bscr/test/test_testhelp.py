@@ -7,6 +7,10 @@ import sys
 class TesthelpTest(th.HelpedTestCase):
     # -----------------------------------------------------------------------
     def test_all_tests(self):
+        """
+        Routine all_tests() should collect testables in a TestCase object. The
+        optional second argument is used as a filter to match test names
+        """
         all = ['TesthelpTest.test_all_tests',
                'TesthelpTest.test_list_tests',
                'TesthelpTest.test_expected_vs_got'].sort()
@@ -18,6 +22,10 @@ class TesthelpTest(th.HelpedTestCase):
         th.expectVSgot(all, l)
 
     def test_list_tests(self):
+        """
+        Routine list_tests() sends a list of tests to stdout. The second
+        element of the first argument filters the tests
+        """
         tlist = [['one', None],
                  ['two', None],
                  ['three', None],
@@ -37,6 +45,9 @@ class TesthelpTest(th.HelpedTestCase):
                            "one\nthree\nfive\n")
 
     def redirect_list(self, args, final, testlist, expected):
+        """
+        Manage the stdout redirection for one test
+        """
         with th.StdoutExcursion() as getval:
             th.list_tests(args, final, testlist)
             result = getval()
@@ -44,12 +55,19 @@ class TesthelpTest(th.HelpedTestCase):
                          "Expected '%s', got '%s'" % (expected, result))
 
     def test_expected_vs_got(self):
+        """
+        Testing routine expected_vs_got(), which I think can probably be
+        replaced with a simple self.assertEqual()
+        """
         self.redirected_evg('', '', '')
         self.redirected_evg('one', 'two',
                             "EXPECTED: 'one'\n" +
                             "GOT:      'two'\n")
 
     def redirected_evg(self, exp, got, expected):
+        """
+        Rune one test of expected_vs_got()
+        """
         s = StringIO.StringIO()
         save_stdout = sys.stdout
         sys.stdout = s

@@ -14,12 +14,18 @@ class TestPytool(th.HelpedTestCase):
     # -----------------------------------------------------------------------
     @classmethod
     def setUpClass(cls):
+        """
+        Called before each test
+        """
         if not os.path.exists(TestPytool.testdir):
             os.mkdir(TestPytool.testdir)
 
     # -----------------------------------------------------------------------
     @classmethod
     def tearDownClass(cls):
+        """
+        Called after each test
+        """
         kf = os.getenv("KEEPFILES")
         if kf is None or not int(kf):
             shutil.rmtree(TestPytool.testdir)
@@ -327,6 +333,9 @@ class TestPytool(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def expected_testtool_py(self):
+        """
+        The expected output of a new tool request
+        """
         expected = ['#!/usr/bin/env python',
                     '"""',
                     'testtool - program description',
@@ -353,6 +362,9 @@ class TestPytool(th.HelpedTestCase):
 
     # -------------------------------------------------------------------------
     def expected_xyzzy_py(self):
+        """
+        The expected output of a new py request
+        """
         expected = ['#!/usr/bin/env python',
                     '"""',
                     'xyzzy - program description',

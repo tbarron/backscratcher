@@ -106,8 +106,8 @@ class workrptTest(th.HelpedTestCase):
                          'start incorrect for -e 2009.0401: %s =?= %s'
                          % (start_should_be, start))
         self.assertEqual(end_should_be, end,
-                      'end incorrect for -e 2009.0401: %s =?= %s'
-                      % (end_should_be, end))
+                         'end incorrect for -e 2009.0401: %s =?= %s'
+                         % (end_should_be, end))
 
     # -------------------------------------------------------------------------
     def test_interpret_options_last_start(self):
@@ -420,7 +420,7 @@ class workrptTest(th.HelpedTestCase):
                                           time.localtime(tlist[t]+6*24*3600))
             self.assertEqual(start_should_be, start,
                              'start is incorrect for %s' % t)
-            self.assertEqual(end_should_be, end, 
+            self.assertEqual(end_should_be, end,
                              'end is incorrect for %s' % t)
 
     # -------------------------------------------------------------------------
@@ -511,18 +511,10 @@ class workrptTest(th.HelpedTestCase):
         for d in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday',
                   'saturday', 'sunday']:
             self.assertEqual(wr.weekday_num(d), count,
-                             'weekday_num(%d) fails for %s' % (count,d))
+                             'weekday_num(%d) fails for %s' % (count, d))
             count = count + 1
 
         self.assertRaisesMsg(KeyError,
                              "notaday",
                              wr.weekday_num,
                              'notaday')
-
-#     def validate(self, v1, v2, msg):
-#         try:
-#             assert(v1 == v2)
-#         except AssertionError:
-#             print msg
-#             print '%s =?= %s' % (v1, v2)
-#             raise
