@@ -288,7 +288,7 @@ class HelpedTestCase(unittest.TestCase):
         be the same. If not, report an assertion failure.
         """
         mroot = U.bscr_root(sys.modules[module_name].__file__)
-        troot = U.bscr_test_root(filename)
+        troot = U.bscr_root()
         self.assertEqual(troot, mroot,
                          "Expected '%s', got '%s'" % (troot, mroot))
 

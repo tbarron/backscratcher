@@ -63,7 +63,7 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_cleanup_dr_np_r(self):
         """
-        !@!
+        xclean --dry-run --recursive
         """
         with th.StdoutExcursion() as getval:
             bscr.xclean.cleanup(self.testdir, dryrun=True, recursive=True)
@@ -81,7 +81,7 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_cleanup_dr_p_nr(self):
         """
-        !@!
+        xclean --dry-run --pattern "no.*"
         """
         with th.StdoutExcursion() as getval:
             bscr.xclean.cleanup(self.testdir, dryrun=True, pattern="no.*")
@@ -100,7 +100,7 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_cleanup_dr_p_r(self):
         """
-        !@!
+        xclean --dry-run --pattern "no.*" --recursive
         """
         with th.StdoutExcursion() as getval:
             bscr.xclean.cleanup(self.testdir, dryrun=True, pattern="no.*",
@@ -120,7 +120,7 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_cleanup_ndr_np_nr(self):
         """
-        !@!
+        xclean
         """
         with th.StdoutExcursion() as getval:
             bscr.xclean.cleanup(self.testdir)
@@ -139,7 +139,7 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_cleanup_ndr_np_r(self):
         """
-        !@!
+        xclean --recursive
         """
         with th.StdoutExcursion() as getval:
             bscr.xclean.cleanup(self.testdir, recursive=True)
@@ -158,7 +158,7 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_cleanup_ndr_p_nr(self):
         """
-        !@!
+        xclean --pattern "no.*"
         """
         with th.StdoutExcursion() as getval:
             bscr.xclean.cleanup(self.testdir, pattern="no.*")
@@ -177,7 +177,7 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_cleanup_ndr_p_r(self):
         """
-        !@!
+        xclean --pattern "no.*" --recursive
         """
         with th.StdoutExcursion() as getval:
             bscr.xclean.cleanup(self.testdir, pattern="no.*", recursive=True)
@@ -196,7 +196,7 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_find_files(self):
         """
-        !@!
+        Finding files without recursion
         """
         fl = bscr.xclean.find_files(self.testdir)
         for fn in self.tilde:
@@ -215,7 +215,7 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_find_files_r(self):
         """
-        !@!
+        find files with recursion
         """
         fl = bscr.xclean.find_files(self.testdir, recursive=True)
         for fn in self.tilde:
@@ -234,7 +234,7 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_find_files_p(self):
         """
-        !@!
+        find files that match a pattern
         """
         fl = bscr.xclean.find_files(self.testdir, pattern='no.*')
         for fn in self.tilde:
@@ -253,7 +253,7 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_find_files_p_r(self):
         """
-        !@!
+        find files that match a pattern, recursively
         """
         fl = bscr.xclean.find_files(self.testdir, pattern='no.*',
                                     recursive=True)
@@ -273,7 +273,7 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_main_dr_np_nr(self):
         """
-        !@!
+        calling main: xclean --dry-run
         """
         with th.StdoutExcursion() as getval:
             bscr.xclean.main(['bin/xclean', '-n', self.testdir])
@@ -289,7 +289,7 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_main_dr_p_nr(self):
         """
-        !@!
+        calling main: xclean --dry-run --pattern "no.*"
         """
         with th.StdoutExcursion() as getval:
             bscr.xclean.main(['bin/xclean', '-n', '-p', 'no.*', self.testdir])
@@ -305,7 +305,7 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_main_dr_np_r(self):
         """
-        !@!
+        calling main: xclean --dry-run --recursive
         """
         with th.StdoutExcursion() as getval:
             bscr.xclean.main(['bin/xclean', '-n', '-r', self.testdir])
@@ -321,7 +321,7 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_main_dr_p_r(self):
         """
-        !@!
+        calling main: xclean --dry-run --pattern "no.*" --recursive
         """
         with th.StdoutExcursion() as getval:
             bscr.xclean.main(['bin/xclean', '-n', '-p', 'no.*',
@@ -338,7 +338,7 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_main_ndr_np_nr(self):
         """
-        !@!
+        calling main: xclean
         """
         with th.StdoutExcursion() as getval:
             bscr.xclean.main(['bin/xclean', self.testdir])
@@ -354,7 +354,7 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_main_ndr_np_r(self):
         """
-        !@!
+        calling main: xclean --recursive
         """
         with th.StdoutExcursion() as getval:
             bscr.xclean.main(['bin/xclean', '-r', self.testdir])
@@ -370,7 +370,7 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_main_ndr_p_nr(self):
         """
-        !@!
+        calling main: xclean --pattern "no.*"
         """
         with th.StdoutExcursion() as getval:
             bscr.xclean.main(['bin/xclean', '-p', 'no.*', self.testdir])
@@ -386,7 +386,7 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_main_ndr_p_r(self):
         """
-        !@!
+        calling main: xclean --pattern "no.*" --recursive
         """
         with th.StdoutExcursion() as getval:
             bscr.xclean.main(['bin/xclean', '-p', 'no.*', '-r', self.testdir])
@@ -432,7 +432,9 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def verify_exists(self, tv, rv):
         """
-        !@!
+        tv is a list of file paths, rv is a list of truth values.
+        If rv[i] is True, we expect tv[i] to be an existing file,
+        otherwise not.
         """
         for fl, exp in zip(tv, rv):
             for fp in fl:
@@ -443,7 +445,8 @@ class TestXclean(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def verify_in(self, tv, text, rv):
         """
-        !@!
+        tv is a list of strings, rv is a list of truth values. If r[i] is True,
+        we expect that tv[i] will appear in text, otherwise not.
         """
         for fl, exp in zip(tv, rv):
             for fp in fl:

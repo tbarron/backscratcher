@@ -241,42 +241,11 @@ def bscr_root(filename=None):
 
 
 # -----------------------------------------------------------------------------
-def bscr_test_root(filename):
-    """
-    Compute the install root for a test module.
-    TODO: This should probably move to testhelp at some point
-    """
-    home = dirname(abspath(filename))
-    if basename(home) != 'test':
-        raise StandardError("'%s' should be 'test'" % basename(home))
-    rval = dirname(home)
-    if basename(rval) != 'bscr':
-        rval = pj(rval, 'bscr')
-    return rval
-
-
-# -----------------------------------------------------------------------------
 def pj(*args):
     """
     pathjoin -- convenience wrapper for os.path.join()
     """
     return os.path.join(*args)
-
-
-# ---------------------------------------------------------------------------
-# def rmrf(path):
-#     '''
-#     Remove the tree rooted at path.
-#     '''
-#     if os.path.isdir(path):
-#         for d in os.listdir(path):
-#             # print("rmrf directory %s/%s" % (path, d))
-#             rmrf('%s/%s' % (path, d))
-#         # print("os.rmdir(%s)" % path)
-#         os.rmdir(path)
-#     else:
-#         # print("os.unlink(%s)" % path)
-#         os.unlink(path)
 
 
 # ---------------------------------------------------------------------------

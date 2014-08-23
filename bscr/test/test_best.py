@@ -32,7 +32,7 @@ class Test_BEST(th.HelpedTestCase):
         if pep8 is None:
             raise SkipTest("Pep8 tool not found")
         else:
-            root = U.bscr_test_root(__file__)
+            root = U.bscr_root()
             for r, d, f in os.walk(root):
                 pylist = [U.pj(r, x) for x in f if x.endswith(".py")]
                 args = " ".join(pylist)
@@ -114,7 +114,7 @@ class Test_BEST(th.HelpedTestCase):
         """
         Hunt for duplicate functions in the .py files
         """
-        root = U.bscr_test_root(__file__)
+        root = U.bscr_root()
         rpt = ''
         for r, d, f in os.walk(root):
             pylist = [U.pj(r, x) for x in f if x.endswith(".py")]
