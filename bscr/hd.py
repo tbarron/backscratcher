@@ -38,6 +38,9 @@ import unittest
 
 # -----------------------------------------------------------------------------
 def main(argv=None):
+    """
+    CLEP
+    """
     if argv is None:
         argv = sys.argv
 
@@ -63,6 +66,9 @@ def main(argv=None):
 
 # -----------------------------------------------------------------------------
 def hexdump(input, output=sys.stdout):
+    """
+    Read input, format the stream as a hexdump, and send it to output.
+    """
     d = input.read()
     for b in range(0, len(d), 16):
         for o in range(0, min(len(d)-b, 16)):
@@ -90,6 +96,9 @@ def hexdump(input, output=sys.stdout):
 
 # ---------------------------------------------------------------------------
 def usage():
+    """
+    usage
+    """
     return """hd
 
     Hexdump stdin or a file."""

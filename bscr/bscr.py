@@ -173,6 +173,9 @@ def bscr_version(args):
 
 # -----------------------------------------------------------------------------
 def importable(module_name):
+    """
+    Module *module_name* is importable? True or False
+    """
     pdb.set_trace()
     try:
         m = __import__(module_name)
@@ -186,6 +189,9 @@ def importable(module_name):
 
 # -----------------------------------------------------------------------------
 def which(program):
+    """
+    Figure out where program is. !@!DERPRECATED in favor of pexpect.which()
+    """
     def is_exe(fpath):
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 

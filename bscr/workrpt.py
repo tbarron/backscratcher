@@ -255,6 +255,9 @@ def fph(seconds):
 
 # ---------------------------------------------------------------------------
 def intify(list):
+    """
+    Turn everything in the list into an int
+    """
     rval = [int(item) for item in list]
     return rval
 

@@ -73,6 +73,9 @@ import unittest
 
 # ---------------------------------------------------------------------------
 def main(argv=None):
+    """
+    CLEP
+    """
     if argv is None:
         argv = sys.argv
 
@@ -92,12 +95,18 @@ def main(argv=None):
 
 # -----------------------------------------------------------------------------
 def fatal(msg):
+    """
+    !@!DERPRECATED -- should this be in util?
+    """
     # raise DtError(msg)
     raise StandardError(msg)
 
 
 # -----------------------------------------------------------------------------
 def report_date(format, args):
+    """
+    Parse *args* to get a time and return it formatted according to *format*
+    """
     # print args
     argstr = ' '.join(args).lower()
     argstr = re.sub(r'(\+|-)\s+', r'\1', argstr)
@@ -115,6 +124,9 @@ def report_date(format, args):
 
 # ---------------------------------------------------------------------------
 def is_numeric(strval):
+    """
+    True if strval can be converted to float, otherwise False
+    """
     try:
         float(strval)
     except:
@@ -124,6 +136,9 @@ def is_numeric(strval):
 
 # ---------------------------------------------------------------------------
 def parse_whenspec(args):
+    """
+    Parse a time specification from *args*
+    """
     if is_numeric(args[0]) and (1 == len(args)):
         rval = int(args[0]) - int(time.time())
     elif args[0] == 'next':
@@ -148,6 +163,9 @@ def parse_whenspec(args):
 
 # ---------------------------------------------------------------------------
 def next(args):
+    """
+    Apply 'next' to the unit
+    """
     if len(args) < 1:
         # raise DtError('next: expected unit or weekday, found nothing')
         raise StandardError('next: expected unit or weekday, found nothing')
@@ -169,6 +187,9 @@ def next(args):
 
 # ---------------------------------------------------------------------------
 def last(args):
+    """
+    Apply 'last' to the unit
+    """
     if len(args) < 1:
         # raise DtError('last: expected unit or weekday, found nothing')
         raise StandardError('last: expected unit or weekday, found nothing')
@@ -190,6 +211,10 @@ def last(args):
 
 # ---------------------------------------------------------------------------
 def weekday_number(day):
+    """
+    Convert from weekday to a number. !@! This could probably be done better
+    with a dict indexed by day names.
+    """
     wdl = weekday_list()
     for num in range(len(wdl)):
         if wdl[num].startswith(day):
@@ -199,6 +224,9 @@ def weekday_number(day):
 
 # ---------------------------------------------------------------------------
 def time_to(day, dir):
+    """
+    Figure out the time to the next or previous *day*
+    """
     wdl = weekday_list()
     # daynum = wdl.index(day)
     daynum = weekday_number(day)
@@ -215,6 +243,9 @@ def time_to(day, dir):
 
 # ---------------------------------------------------------------------------
 def today(args):
+    """
+    What does this do?
+    """
     if len(args) == 0:
         return 0
     elif args[0] == '':
@@ -233,6 +264,9 @@ def today(args):
 
 # ---------------------------------------------------------------------------
 def tomorrow(args):
+    """
+    This does it for 24 hours from now
+    """
     if len(args) == 0:
         return 24 * 3600
 
@@ -249,11 +283,17 @@ def tomorrow(args):
 
 # ---------------------------------------------------------------------------
 def unit_list():
+    """
+    list of units
+    """
     return ['second', 'minute', 'hour', 'day', 'week', 'month', 'year']
 
 
 # ---------------------------------------------------------------------------
 def unit_size(unit):
+    """
+    size of units
+    """
     uval = {'second': 1,
             'minute': 60,
             'hour': 3600,
@@ -267,6 +307,9 @@ def unit_size(unit):
 
 # ---------------------------------------------------------------------------
 def usage():
+    """
+    usage
+    """
     return """dt
 
     playing with dates"""
@@ -274,12 +317,18 @@ def usage():
 
 # ---------------------------------------------------------------------------
 def weekday_list():
+    """
+    list of weekday names
+    """
     return ['monday', 'tuesday', 'wednesday', 'thursday', 'friday',
             'saturday', 'sunday']
 
 
 # ---------------------------------------------------------------------------
 def yesterday(args):
+    """
+    offset computation for 24 hours ago
+    """
     if len(args) == 0:
         return -24 * 3600
 

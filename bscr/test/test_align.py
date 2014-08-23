@@ -14,11 +14,17 @@ from bscr import util as U
 
 # ---------------------------------------------------------------------------
 def setUpModule():
+    """
+    Guess what
+    """
     U.pythonpath_bscrroot()
 
 
 # ---------------------------------------------------------------------------
 def tearDownModule():
+    """
+    This one too
+    """
     flist = ['testdata']
     if os.getenv('KEEPFILES') is not None:
         return

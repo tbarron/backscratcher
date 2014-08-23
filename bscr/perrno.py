@@ -7,6 +7,9 @@ import sys
 
 # -----------------------------------------------------------------------------
 def main(args=None):
+    """
+    CLEP
+    """
     if args is None:
         args = sys.argv
 
@@ -31,6 +34,9 @@ def main(args=None):
 
 # -----------------------------------------------------------------------------
 def etranslate(errval):
+    """
+    Get all the informatio about an error and format it for display
+    """
     rval = ''
     fmt = "%5d  %-15s  %s"
     if type(errval) == int:
@@ -49,6 +55,9 @@ def etranslate(errval):
 
 # -----------------------------------------------------------------------------
 def usage():
+    """
+    usage message
+    """
     return("""perrno {-a|--all|number ...|errname ...}
 
     report errno numeric and string values""")

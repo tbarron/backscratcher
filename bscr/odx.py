@@ -41,6 +41,9 @@ import sys
 
 # -----------------------------------------------------------------------------
 def main(args=None):
+    """
+    CLEP
+    """
     if args is None:
         args = sys.argv
     p = optparse.OptionParser(usage=usage())
@@ -59,6 +62,9 @@ def main(args=None):
 
 # -----------------------------------------------------------------------------
 def odx(str):
+    """
+    Figure out the format of the input and compute the value
+    """
     if str.startswith("0x"):
         val = int(str, 16)
     elif str.startswith("0"):
@@ -70,6 +76,9 @@ def odx(str):
 
 # -----------------------------------------------------------------------------
 def usage():
+    """
+    usage
+    """
     return """odx {0<octal-value>|<decimal-value>|0x<hex-value>} ...
 
     report each argument in octal, decimal, and hex format"""

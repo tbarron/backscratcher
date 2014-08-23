@@ -62,6 +62,9 @@ import unittest
 
 # ---------------------------------------------------------------------------
 def main(args=None):
+    """
+    CLEP
+    """
     if args is None:
         args = sys.argv
     try:
@@ -86,6 +89,9 @@ def main(args=None):
 
 # ---------------------------------------------------------------------------
 def usage():
+    """
+    usage
+    """
     print(" ")
     print("   usage: list {minus|union|intersect} <list-1> <list-2>")
     print(" ")
@@ -94,6 +100,9 @@ def usage():
 
 # ---------------------------------------------------------------------------
 def generate_list(cmd):
+    """
+    Run a command and turn its output into a list
+    """
     f = os.popen(cmd, 'r')
     rval = [x.strip() for x in f.readlines()]
     f.close()
@@ -102,6 +111,9 @@ def generate_list(cmd):
 
 # ---------------------------------------------------------------------------
 def list_minus(listA, listB):
+    """
+    compute the difference of two lists
+    """
     rval = listA
     for item in listB:
         if item in rval:
@@ -111,6 +123,9 @@ def list_minus(listA, listB):
 
 # ---------------------------------------------------------------------------
 def list_union(listA, listB):
+    """
+    compute the union of two lists
+    """
     m = {}
     for x in listA:
         m[x] = 1
@@ -122,6 +137,9 @@ def list_union(listA, listB):
 
 # ---------------------------------------------------------------------------
 def list_intersect(listA, listB):
+    """
+    compute the intersection of two lists
+    """
     rval = []
     for x in listA:
         if x in listB:

@@ -78,6 +78,9 @@ def basename(rpath):
 
 # ---------------------------------------------------------------------------
 def terminal_size():
+    """
+    Best effort to determine and return the width and height of the terminal
+    """
     if not sys.stdout.isatty():
         return -1, -1
     # import fcntl, termios, struct
@@ -110,6 +113,9 @@ def dirname(rpath):
 
 # -----------------------------------------------------------------------------
 def dispatch(mname, prefix, args):
+    """
+    Call a subfunction from module *mname* based on *prefix* and *args*
+    """
     # pdb.set_trace()
     called_as = args[0]
     try:
@@ -131,6 +137,9 @@ def dispatch(mname, prefix, args):
 
 # -----------------------------------------------------------------------------
 def dispatch_help(mname, prefix, args):
+    """
+    Standard help function for dispatch-based tool programs
+    """
     mod = sys.modules[mname]
     if 3 <= len(args) and args[1] == 'help' and args[2] == "help":
         print("\n".join(["help - show a list of available commands",
@@ -187,6 +196,9 @@ def function_name():
 
 # -----------------------------------------------------------------------------
 def git_root(path=None):
+    """
+    If we're in a git repository, return its root. Otherwise return None.
+    """
     if path is None:
         path = os.getcwd()
     dotgit = os.path.join(path, ".git")
@@ -203,6 +215,9 @@ def git_root(path=None):
 
 # -----------------------------------------------------------------------------
 def in_bscr_repo():
+    """
+    We are in a backscratcher repo -- true or false?
+    """
     try:
         c = contents("./.git/description")
     except IOError:
@@ -266,6 +281,9 @@ def pj(*args):
 
 # ---------------------------------------------------------------------------
 def run(cmd, xable, verbose=False):
+    """
+    Run *cmd* if *xable*, otherwise just report what would happen
+    """
     # print "run: cmd='%s', %s" % (cmd, xable)
     if xable:
         if verbose:
@@ -277,6 +295,11 @@ def run(cmd, xable, verbose=False):
 
 # ---------------------------------------------------------------------------
 def safe_unlink(path):
+    """
+    As long as *path* is a string or a list, this will not throw an exception.
+    Unlink all the file(s) named if they exist.
+    """
+
     if type(path) == str:
         if os.path.exists(path):
             os.unlink(path)
@@ -343,6 +366,9 @@ def touch(touchables, times=None):
 
 # ---------------------------------------------------------------------------
 def writefile(filepath, lines):
+    """
+    Write the contents of *lines* to *filepath*
+    """
     f = open(filepath, 'w')
     f.writelines(lines)
     f.close()
@@ -350,11 +376,17 @@ def writefile(filepath, lines):
 
 # ---------------------------------------------------------------------------
 def lquote(text):
+    """
+    Return *text* wrapped in triple-quotes
+    """
     return '\n'.join(['"""', text.rstrip(), '"""'])
 
 
 # ---------------------------------------------------------------------------
 def findroot():
+    """
+    Best effort to find the install root of this file
+    """
     afile = os.path.abspath(__file__)
     bscr = os.path.dirname(afile)
     return bscr

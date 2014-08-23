@@ -117,6 +117,9 @@ import unittest
 
 # -----------------------------------------------------------------------------
 def main(args=None):
+    """
+    CLEP
+    """
     if args is None:
         args = sys.argv
     util.dispatch('bscr.fl', 'fl', args)

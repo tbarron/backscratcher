@@ -41,6 +41,9 @@ import unittest
 
 # ---------------------------------------------------------------------------
 def main(argv=None):
+    """
+    CLEP
+    """
     if argv is None:
         argv = sys.argv
 
@@ -65,6 +68,9 @@ def main(argv=None):
 
 # ---------------------------------------------------------------------------
 def count_down(hms, action):
+    """
+    Count from high to low -- countdown timer
+    """
     print 'hms = ', hms
     print 'action = ', action
     if ':' in hms:
@@ -87,6 +93,9 @@ def count_down(hms, action):
 
 # ---------------------------------------------------------------------------
 def count_up():
+    """
+    Count from low to high -- stopwatch
+    """
     m = 0
     sys.stdout.write('%02d: ' % m)
     m = m + 1
@@ -111,12 +120,19 @@ def count_up():
 
 # ---------------------------------------------------------------------------
 def hms_seconds(hms):
+    """
+    Convert HH:MM:SS to seconds
+    !@! should this go in util?
+    """
     h, m, s = hms.split(':')
     return int(s) + 60 * (int(m) + 60 * int(h))
 
 
 # ---------------------------------------------------------------------------
 def usage():
+    """
+    usage
+    """
     return """chron
 
     chronometer/stopwatch"""

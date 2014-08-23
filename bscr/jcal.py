@@ -18,6 +18,9 @@ from optparse import *
 
 # -----------------------------------------------------------------------------
 def main(argv=None):
+    """
+    CLEP
+    """
     if argv is None:
         argv = sys.argv
     U.dispatch('bscr.jcal', 'jcal', argv)
@@ -25,6 +28,9 @@ def main(argv=None):
 
 # -----------------------------------------------------------------------------
 def old_main():
+    """
+    !@!DERPRECATED?
+    """
     p = OptionParser()
     p.add_option('-f', '--format',
                  action='store', default='workflowy', dest='format',
