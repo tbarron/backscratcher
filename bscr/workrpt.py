@@ -41,7 +41,6 @@ import pdb
 import re
 import sys
 import time
-# from bscr import toolframe
 import toolframe
 import unittest
 from bscr import util as U
@@ -49,6 +48,9 @@ from bscr import util as U
 
 # ---------------------------------------------------------------------------
 def main(argv=None):
+    """
+    Command line entry point (CLEP)
+    """
     if argv is None:
         argv = sys.argv
 
@@ -81,6 +83,10 @@ def main(argv=None):
 
 # ---------------------------------------------------------------------------
 def copy_me(source, dest):
+    """
+    Copy a file. This should probably be replaced with something from shutil.
+    !@!DEPRECATE
+    """
     dir = os.path.dirname(source)
     flist = ['%s/workrpt' % dir, '%s/workrpt.py' % dir]
     for f in flist:
@@ -102,6 +108,9 @@ def day_offset(weektype):
 
 # ---------------------------------------------------------------------------
 def default_input_filename():
+    """
+    Defines the default input file
+    """
     # rval = "%s/diary/journal/work/%s/WORKLOG" \
     #        % (os.getenv('HOME'), time.strftime('%Y', time.localtime()))
     # rval = time.strftime('/Volumes/ZAPHOD/journal/%Y/WORKLOG',
@@ -116,12 +125,18 @@ def default_input_filename():
 
 # ---------------------------------------------------------------------------
 def dst():
+    """
+    Daylight Saving Time? True or False
+    """
     now = time.localtime(time.time())
     return now[8]
 
 
 # ---------------------------------------------------------------------------
 def dst_adjusted_time():
+    """
+    DST adjustment
+    """
     now = time.localtime()
     rval = time.time()
     if now[8] == 0:
@@ -131,6 +146,9 @@ def dst_adjusted_time():
 
 # ---------------------------------------------------------------------------
 def dump_struct(C):
+    """
+    Dump the structure (duh!). Where/why is this used?
+    """
     klist = C.keys()
     klist.sort()
     for k in klist:
@@ -142,20 +160,20 @@ def dump_struct(C):
 
 # ---------------------------------------------------------------------------
 def dump_options(o):
+    """
+    Where/why is this used?
+    """
     ignore_list = ['ensure_value', 'read_file', 'read_module']
     for item in dir(o):
         if item not in ignore_list and not item.startswith('_'):
             print('dump_options: %s = %s' % (item, getattr(o, item)))
 
-# # ---------------------------------------------------------------------------
-# def fatal(msg):
-#     raise Exception(msg)
-#     # print msg
-#     # sys.exit(1)
-
 
 # ---------------------------------------------------------------------------
 def format_report(start, end, C, testing=False):
+    """
+    Put the report together
+    """
     if verbose():
         dump_struct(C)
     rval = '%s - %s ' % (start, end) + '-' * 44 + '\n'
@@ -204,12 +222,18 @@ def format_report(start, end, C, testing=False):
 
 # ---------------------------------------------------------------------------
 def help():
+    """
+    Display a usage message based on the module docstring
+    """
     print __doc__
     sys.exit()
 
 
 # ---------------------------------------------------------------------------
 def hms(seconds):
+    """
+    Convert seconds to HH:MM:SS
+    """
     minutes = int(seconds/60)
     seconds = seconds - 60 * minutes
 
@@ -221,6 +245,9 @@ def hms(seconds):
 
 # ---------------------------------------------------------------------------
 def fph(seconds):
+    """
+    Convert seconds to hours
+    """
     hours = float(seconds)/3600.0
 
     return '%3.1f' % (hours)
@@ -340,6 +367,9 @@ def makeOptionParser(argv):
 
 # ---------------------------------------------------------------------------
 def next_tuesday():
+    """
+    Relative weekday
+    """
     now = time.time()
     tm = time.localtime(now)
     delta = (1 + 7 - tm[6]) % 7    # !@!here
@@ -349,6 +379,9 @@ def next_tuesday():
 
 # ---------------------------------------------------------------------------
 def next_day(ymd, format=None):
+    """
+    Day offset
+    """
     if format is None:
         format = '%Y.%m%d'
     now = time.mktime(time.strptime(ymd, format))
@@ -358,6 +391,9 @@ def next_day(ymd, format=None):
 
 # ---------------------------------------------------------------------------
 def day_plus(offset):
+    """
+    Compute a day offset
+    """
     now = time.time()
     then = now + offset*24*3600
     return then
@@ -365,6 +401,9 @@ def day_plus(offset):
 
 # ---------------------------------------------------------------------------
 def package(source, filename):
+    """
+    What!? Something about making a tarball? !@!DEPRECATE
+    """
     print 'source = ', source
     print 'filename = ', filename
     dir = os.path.dirname(source)
@@ -379,6 +418,10 @@ def package(source, filename):
 
 # ---------------------------------------------------------------------------
 def parse_timeline(line):
+    """
+    Break a line down into timestamp and activity. Date can be YYYY-mm-dd or
+    YYYY.mmdd.
+    """
     rval = None
     lfmt = (r'(\d{4})(-(\d{2})-(\d{2})|.(\d{2})(\d{2})) ' +
             r'(\d{2}):(\d{2}):(\d{2}) (.*)')
@@ -396,6 +439,10 @@ def parse_timeline(line):
 
 # ---------------------------------------------------------------------------
 def parse_ymd(dayname):
+    """
+    Given a relative day reference or weekday name, compute the nearby
+    subsequent ymd date that matches and return it as a list of three elements.
+    """
     if dayname == 'yesterday':
         ymd = time.strftime("%Y.%m%d", time.localtime(time.time() - 24*3600))
     elif dayname == 'today':
@@ -423,6 +470,9 @@ def parse_ymd(dayname):
 
 # ---------------------------------------------------------------------------
 def stringify(list):
+    """
+    !@!DEPRECATED -- apparently unused
+    """
     rval = []
     for item in list:
         rval.append('%02d' % item)
@@ -517,6 +567,9 @@ def timeclose(C, last, when, all=False):
 
 # ---------------------------------------------------------------------------
 def reset_category_total(C, cat):
+    """
+    Start over
+    """
     if cat != '':
         try:
             C[cat]['total'] = 0
@@ -526,6 +579,9 @@ def reset_category_total(C, cat):
 
 # ---------------------------------------------------------------------------
 def increment_category_total(C, cat, lapse):
+    """
+    Accumulate some time
+    """
     if cat != '':
         try:
             C[cat]['total'] = C[cat]['total'] + lapse
@@ -573,6 +629,9 @@ def verbose(value=None, set=False):
 
 # ---------------------------------------------------------------------------
 def week_diff(a, b):
+    """
+    !@!DERPRECATED -- apparently unused
+    """
     # rval = (a + 7 - b) % 7
     rval = -1 * (((a + 6 - b) % 7) + 1)
     return rval
