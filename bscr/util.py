@@ -1,8 +1,8 @@
 #!/usr/bin/env python
+import pdb
 import fcntl
 import glob
 import os
-import pdb
 import pexpect
 import re
 import struct
@@ -92,14 +92,16 @@ def terminal_size():
 
 
 # ---------------------------------------------------------------------------
-def contents(filename):
+def contents(filename, string=False):
     '''
     Contents of filename in a list, one line per element. If filename does
     not exist or is not readable, an IOError is thrown.
     '''
-    f = open(filename, 'r')
-    rval = [l.rstrip() for l in f.readlines()]
-    f.close()
+    with open(filename, 'r') as f:
+        if string:
+            rval = "".join(f.readlines())
+        else:
+            rval = [l.rstrip() for l in f.readlines()]
     return rval
 
 
@@ -168,6 +170,14 @@ def dispatch_help(mname, prefix, args):
 
 
 # ---------------------------------------------------------------------------
+def exists(path):
+    """
+    Shortcut wrapper for os.path.exists()
+    """
+    return os.path.exists(path)
+
+
+# ---------------------------------------------------------------------------
 def expand(path):
     """
     Return a pathname with any "~" or env variables expanded.
@@ -195,6 +205,15 @@ def function_name():
 
 
 # -----------------------------------------------------------------------------
+def git_describe():
+    """
+    Last resort retrieval of the current version
+    """
+    result = pexpect.run("git describe")
+    return result.strip()
+
+
+# -----------------------------------------------------------------------------
 def git_root(path=None):
     """
     If we're in a git repository, return its root. Otherwise return None.
@@ -214,16 +233,26 @@ def git_root(path=None):
 
 
 # -----------------------------------------------------------------------------
-def in_bscr_repo():
+def in_bscr_repo(path=None):
     """
     We are in a backscratcher repo -- true or false?
     """
-    try:
-        c = contents("./.git/description")
-    except IOError:
-        return False
+    if path is None:
+        here = os.getcwd()
+    else:
+        here = path
 
-    if "backscratcher" not in "".join(c):
+    while not exists(pj(here, ".git")) and here != "/":
+        here = dirname(here)
+
+    if exists(pj(here, ".git")):
+        try:
+            c = contents(pj(here, ".git", "description"))
+        except IOError:
+            return False
+        if "backscratcher" not in "".join(c):
+            return False
+    else:
         return False
 
     return True
@@ -278,20 +307,6 @@ def safe_unlink(path):
                 os.unlink(item)
     else:
         raise Exception('safe_unlink: argument must be str or list')
-
-
-# -----------------------------------------------------------------------------
-def pythonpath_bscrroot():
-    """
-    Find the git root and add it to $PYTHONPATH
-    TODO: This should probably move to testhelp eventually.
-    """
-    where = dirname(dirname(abspath(__file__)))
-    prev = os.getenv("PYTHONPATH")
-    if prev is None:
-        os.environ["PYTHONPATH"] = where
-    elif where not in prev:
-        os.environ["PYTHONPATH"] = ":".join([where, prev])
 
 
 # -----------------------------------------------------------------------------

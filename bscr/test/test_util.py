@@ -1,8 +1,11 @@
+from bscr import Error as bscrError
 from bscr import testhelp as th
 from bscr import util as U
 import os
 import pdb
+import re
 import shutil
+from nose.plugins.skip import SkipTest
 import stat
 import time
 
@@ -80,14 +83,13 @@ class TestUtil(th.HelpedTestCase):
         """
         home = os.environ['HOME']
         logname = os.environ['LOGNAME']
-        U.pythonpath_bscrroot()
         os.environ['UPATH'] = "~%s/prj/backscratcher" % logname
 
         self.assertEqual(U.expand('$HOME'), home)
         self.assertEqual(U.expand('~'), home)
         self.assertEqual(U.expand('~%s' % logname), home)
-        self.assertEqual(U.expand('### $PYTHONPATH ###'),
-                         '### %s ###' % os.environ['PYTHONPATH'])
+        self.assertEqual(U.expand('### $TERM ###'),
+                         '### %s ###' % os.environ['TERM'])
         self.assertEqual(U.expand("$UPATH"),
                          "%s/prj/backscratcher" % home)
 
@@ -97,6 +99,19 @@ class TestUtil(th.HelpedTestCase):
         Routine function_name() should return the name of its caller
         """
         self.assertEqual(U.function_name(), "test_function_name")
+
+    # -----------------------------------------------------------------------
+    def test_git_describe(self):
+        """
+        Test running git_describe and grabbing its output
+        """
+        if not U.in_bscr_repo():
+            raise SkipTest
+
+        got = U.git_describe()
+        result = re.findall("\d{4}\.\d{4}\w*", got)
+        self.assertTrue(0 < len(result),
+                        "Expected something, got an empty list")
 
     # -----------------------------------------------------------------------
     def test_lquote(self):

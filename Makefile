@@ -1,4 +1,5 @@
 VERSION=learn
+TEST_OPTIONS=-x
 
 clean:
 	rm -f MANIFEST README TAGS
@@ -7,9 +8,11 @@ clean:
 help:
 	@echo "targets in this makefile:"
 	@echo "   clean      - remove generated files"
+	@echo "   desc       - set up .git/description"
 	@echo "   help       - provide this list"
 	@echo "   green      - use green to run the tests"
 	@echo "   nose       - use nosetests to run the tests"
+	@echo "   py.test    - use py.test to run the tests"
 	@echo "   install    - pip install dist/backscratcher-$(VERSION).tar.gz"
 	@echo "   readme     - cp README.md README"
 	@echo "   refresh    - refresh and upgrade the distro"
@@ -19,12 +22,19 @@ help:
 	@echo "   uninstall  - remove backscratcher from current system"
 	@echo "   upgrade    - pip install --upgrade dist/backscratcher-$(VERSION).tar.gz"
 	@echo "   utest      - use unittest to run the tests"
+	@echo "   version    - git describe > .bscr_version"
+
+desc:
+	echo "backscratcher" > .git/description
 
 green:
-	green -v test
+	green $(TEST_OPTIONS)
 
 nose:
-	nosetests -v -c nose.cfg test/test_*.py
+	nosetests -c nose.cfg $(TEST_OPTIONS)
+
+py.test: upgrade
+	py.test $(TEST_OPTIONS)
 
 install:
 	pip install dist/backscratcher-$(VERSION).tar.gz
@@ -49,7 +59,10 @@ tags:
 	find . -name "*.py" | xargs etags
 
 upgrade:
-	pip install --upgrade dist/backscratcher-$(VERSION).tar.gz
+	pip install --upgrade .
 
 utest:
 	for fn in `ls test/test_*.py`; do echo ==== $$fn ====; $$fn -v; done
+
+version:
+	git describe > .bscr_version

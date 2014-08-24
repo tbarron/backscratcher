@@ -1,4 +1,5 @@
 import glob
+import optparse
 import os
 import pdb
 import pexpect
@@ -69,14 +70,11 @@ def bscr_readme(args):
     usage: bscr readme
     """
     filename = "README"
-    groot = util.git_root()
     broot = util.bscr_root()
-    if groot:
-        readme = util.pj(groot, filename)
-    elif broot:
+    if broot:
         readme = util.pj(broot, filename)
     else:
-        raise StandardError("Can't find the README file")
+        raise bscr.Error("Can't find the README file")
 
     w, h = util.terminal_size()
     if sys.stdout.isatty():
@@ -84,6 +82,26 @@ def bscr_readme(args):
         p.interact()
     else:
         shutil.copyfileobj(open(readme, 'r'), sys.stdout)
+
+
+# -----------------------------------------------------------------------------
+def bscr_roots(args):
+    """roots - display bscr root and git repo location
+
+    usage: bscr roots
+    """
+    p = optparse.OptionParser()
+    p.add_option('-d', '--debug',
+                 action='store_true', default=False, dest='debug',
+                 help='run under the debugger')
+    (o, a) = p.parse_args(args)
+
+    if o.debug:
+        pdb.set_trace()
+
+    print("bscr root: %s" % util.bscr_root())
+    print(" git root: %s" % util.git_root())
+    print("in_bscr_repo: %s" % util.in_bscr_repo())
 
 
 # -----------------------------------------------------------------------------
@@ -158,17 +176,30 @@ def bscr_version(args):
 
     usage: bscr version
     """
+    p = optparse.OptionParser()
+    p.add_option('-d', '--debug',
+                 action='store_true', default=False, dest='debug',
+                 help='run under the debugger')
+    p.add_option('-v', '--verbose',
+                 action='store_true', default=False, dest='verbose',
+                 help='show more info')
+    (o, a) = p.parse_args(args)
+
+    if o.debug:
+        pdb.set_trace()
+
     filename = ".bscr_version"
-    groot = util.git_root()
-    broot = util.bscr_root()
-    if groot:
-        vpath = util.pj(groot, filename)
-    elif broot:
-        vpath = util.pj(broot, filename)
+    bpath = util.pj(util.bscr_root(), filename)
+    if util.exists(bpath):
+        version = util.contents(bpath, string=True)
+        source = bpath
     else:
-        raise StandardError("Can't find the version file")
-    version = util.contents(vpath)
-    print("Backscratcher version %s" % version[0])
+        version = "???"
+        source = "<missing>"
+
+    print("Backscratcher version %s" % version.strip())
+    if o.verbose:
+        print("    (source = %s)" % source)
 
 
 # -----------------------------------------------------------------------------
@@ -176,7 +207,6 @@ def importable(module_name):
     """
     Module *module_name* is importable? True or False
     """
-    pdb.set_trace()
     try:
         m = __import__(module_name)
         if sys.getrefcount(module_name) <= 3:

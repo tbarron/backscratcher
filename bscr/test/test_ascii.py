@@ -11,14 +11,6 @@ import unittest
 
 
 # ---------------------------------------------------------------------------
-def setUpModule():
-    """
-    Run once before any of the tests in this module
-    """
-    U.pythonpath_bscrroot()
-
-
-# ---------------------------------------------------------------------------
 def tearDownModule():
     """
     Run once after all of the tests in this module

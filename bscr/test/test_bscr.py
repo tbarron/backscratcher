@@ -1,22 +1,15 @@
 #!/usr/bin/env python
 
+import pdb
+import os
+import sys
 from bscr import bscr
 from bscr import fl
 from bscr import testhelp as th
 from bscr import util as U
-import os
 import pexpect
 from nose.plugins.skip import SkipTest
-import sys
 import unittest
-
-
-# -----------------------------------------------------------------------------
-def setUpModule():
-    """
-    Run once before any of the tests in this module
-    """
-    U.pythonpath_bscrroot()
 
 
 # -----------------------------------------------------------------------------
@@ -50,11 +43,16 @@ class TestScripts(th.HelpedTestCase):
         """
         Test 'bscr version'
         """
-        bscr = U.script_location("bscr")
-        cmd = "%s version" % bscr
+        cmd = "bscr version -v"
         result = pexpect.run(cmd)
-        self.assertTrue("Traceback" not in result)
+        self.assertTrue("Traceback" not in result,
+                        "Not expecting 'Traceback' in %s" %
+                        U.lquote(result))
         self.assertTrue("Backscratcher version" in result)
+        self.assertTrue("source =" in result)
+        self.assertEqual(3, len(result.split("\n")),
+                         "Expected only 2 newlines in %s" %
+                         U.lquote(result))
 
     # -------------------------------------------------------------------------
     def test_which_module(self):

@@ -139,7 +139,6 @@ class TestPytool(th.HelpedTestCase):
             if cmd is None:
                 raise SkipTest
             S = pexpect.spawn('%s newtool %s tt' % (cmd, toollink))
-            S.logfile = sys.stdout
             which = S.expect([r'Are you sure\? >',
                               'Error:',
                               pexpect.EOF])
@@ -179,7 +178,6 @@ class TestPytool(th.HelpedTestCase):
             if cmd is None:
                 raise SkipTest
             S = pexpect.spawn('%s newtool %s tt' % (cmd, tlink))
-            S.logfile = sys.stdout
             which = S.expect([r'Are you sure\? >',
                               'Error:',
                               pexpect.EOF])
@@ -217,7 +215,6 @@ class TestPytool(th.HelpedTestCase):
             if cmd is None:
                 raise SkipTest
             S = pexpect.spawn('%s newtool %s tt' % (cmd, tlink))
-            S.logfile = sys.stdout
             which = S.expect([r'Are you sure\? >',
                               'Error:',
                               pexpect.EOF])
@@ -250,7 +247,6 @@ class TestPytool(th.HelpedTestCase):
             U.safe_unlink(outputs)
             cmd = pexpect.which('pytool')
             S = pexpect.spawn('%s help' % cmd)
-            # S.logfile = sys.stdout
             which = S.expect([r'Are you sure\? >',
                               'Error:',
                               pexpect.EOF])

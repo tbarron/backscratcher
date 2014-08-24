@@ -9,14 +9,6 @@ from bscr import util as U
 
 
 # -----------------------------------------------------------------------------
-def setUpModule():
-    """
-    Run once before any of the tests in this module
-    """
-    U.pythonpath_bscrroot()
-
-
-# -----------------------------------------------------------------------------
 class TestCalc(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     def test_example(self):

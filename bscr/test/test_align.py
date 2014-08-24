@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
-sys.path.insert(0, os.getcwd())
-import bscr.align
+from bscr import align
 import pdb
 import pexpect
 from nose.plugins.skip import SkipTest
@@ -10,14 +9,6 @@ from bscr import testhelp as th
 from bscr import toolframe
 import unittest
 from bscr import util as U
-
-
-# ---------------------------------------------------------------------------
-def setUpModule():
-    """
-    Guess what
-    """
-    U.pythonpath_bscrroot()
 
 
 # ---------------------------------------------------------------------------

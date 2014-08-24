@@ -25,8 +25,6 @@ def setUpModule():
         os.mkdir('fl_tests')
         os.mkdir('fl_tests/old')
 
-    util.pythonpath_bscrroot()
-
 
 # ---------------------------------------------------------------------------
 def tearDownModule():
@@ -122,7 +120,6 @@ class TestFL(th.HelpedTestCase):
                         '---\r',
                         '> this is a test file\r',
                         '']
-            util.pythonpath_bscrroot()
             cmd = util.script_location("fl")
             got = pexpect.run("%s diff mrpm1" % cmd).split("\n")
             self.assertEqual(expected, got)

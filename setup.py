@@ -1,8 +1,12 @@
 from distutils.core import setup
 from distutils.sysconfig import get_python_lib
 from distutils.file_util import copy_file
+from distutils.spawn import spawn
 import glob
 import os
+import pdb
+import pexpect
+import sys
 import time
 
 bscr_root = os.path.join(get_python_lib(), "bscr")

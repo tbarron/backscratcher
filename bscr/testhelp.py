@@ -335,8 +335,9 @@ class HelpedTestCase(unittest.TestCase):
                 fmsg = ("Expected '%s' in the exception, got '%s'"
                         % (excstr, str(e)))
                 self.fail(fmsg)
-        except:
-            self.fail("Expected an exception of type %s" % exctype)
+        except Exception, e:
+            self.fail("Expected an exception of type %s, got %s" %
+                      (exctype, type(e)))
 
 
 # -----------------------------------------------------------------------------
