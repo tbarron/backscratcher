@@ -44,6 +44,7 @@ import time
 import toolframe
 import unittest
 from bscr import util as U
+bscr = U.package_module(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -66,7 +67,7 @@ def main(argv=None):
         dump_options(o)
 
     if o.tarball != '' and o.copy != '':
-        raise Exception('--pkg and --copy are not compatible')
+        raise bscr.Error('--pkg and --copy are not compatible')
     elif o.tarball != '' and o.copy == '':
         package(sys.argv[0], o.tarball)
     elif o.tarball == '' and o.copy != '':
@@ -268,11 +269,11 @@ def interpret_options(o):
     Parse the program options and set things up for the rest of the program.
     '''
     if o.lastweek and ((o.start_ymd != '') or (o.end_ymd != '')):
-        raise StandardError('--last and --start or --end are not compatible')
+        raise bscr.Error('--last and --start or --end are not compatible')
     elif (o.weektype != '') and ((o.start_ymd != '') or (o.end_ymd != '')):
-        raise StandardError('--week and --start or --end are not compatible')
+        raise bscr.Error('--week and --start or --end are not compatible')
     elif (o.since != '') and (o.start_ymd != ''):
-        raise StandardError('--since and --start are not compatible')
+        raise bscr.Error('--since and --start are not compatible')
     elif (re.search('^[fcMTWtFsS]$', o.weektype)
           and (o.start_ymd == '')
           and (o.end_ymd == '')):

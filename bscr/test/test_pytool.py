@@ -52,7 +52,7 @@ class TestPytool(th.HelpedTestCase):
 
             got = U.contents(pname)
             exp = self.expected_xyzzy_py()
-            th.expectVSgot(exp, got)
+            self.assertEq(exp, got)
 
     # -----------------------------------------------------------------------
     def test_newpy_overwriting_no(self):
@@ -123,7 +123,7 @@ class TestPytool(th.HelpedTestCase):
 
             expected = self.expected_xyzzy_py()
             got = U.contents(pname)
-            th.expectVSgot(expected, got)
+            self.assertEq(expected, got)
 
     # -----------------------------------------------------------------------
     def test_newtool(self):
@@ -159,7 +159,7 @@ class TestPytool(th.HelpedTestCase):
 
             expected = self.expected_testtool_py()
             got = U.contents('testtool.py')
-            th.expectVSgot(expected, got)
+            self.assertEq(expected, got)
 
     # -----------------------------------------------------------------------
     def test_newtool_overwriting_no(self):
@@ -235,7 +235,7 @@ class TestPytool(th.HelpedTestCase):
 
             expected = self.expected_testtool_py()
             got = U.contents(tname)
-            th.expectVSgot(expected, got)
+            self.assertEq(expected, got)
 
     # -----------------------------------------------------------------------
     def test_help(self):
@@ -292,7 +292,7 @@ class TestPytool(th.HelpedTestCase):
                         + ' link <program-name>.',
                         '    ',
                         '']
-            th.expectVSgot(expected, got)
+            self.assertEq(expected, got)
 
     # -----------------------------------------------------------------------
     def test_help_newtool(self):
@@ -325,7 +325,7 @@ class TestPytool(th.HelpedTestCase):
                         '    to add and describe new subfunctions.',
                         '    ',
                         '']
-            th.expectVSgot(expected, got)
+            self.assertEq(expected, got)
 
     # -------------------------------------------------------------------------
     def expected_testtool_py(self):

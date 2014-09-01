@@ -12,7 +12,7 @@ import sys
 import unittest
 import StringIO
 import util as U
-
+bscr = U.package_module(__name__)
 tlogger = None
 
 
@@ -118,35 +118,6 @@ def debug_flag(value=None):
         rval = dval
 
     return rval
-
-
-# ---------------------------------------------------------------------------
-def expectVSgot(expected, got):
-    """
-    Raise an assertion error if *expected* != *got*. Deprecate this in favor of
-    HelpedTestCase.expgot().
-    """
-    try:
-        assert(expected == got)
-    except AssertionError, e:
-        if type(expected) == list:
-            if 5 < len(expected):
-                for i in range(0, len(expected)):
-                    try:
-                        if expected[i] != got[i]:
-                            print "EXPECTED: '%s'" % expected[i]
-                            print "GOT:      '%s'" % got[i]
-                    except IndexError:
-                        print "EXPECTED: '%s'" % expected[i]
-                        print "GOT:      None"
-            else:
-                print "EXPECTED '%s'" % expected
-                print "GOT      '%s'" % got
-            raise e
-        elif type(expected) == str:
-            print "EXPECTED: '%s'" % expected
-            print "GOT:      '%s'" % got
-            raise e
 
 
 # ---------------------------------------------------------------------------
@@ -270,6 +241,44 @@ class HelpedTestCase(unittest.TestCase):
         """
         self.assertIn(exp, actual,
                       "Expected '%s' in '%s'" % (exp, actual))
+
+    # -----------------------------------------------------------------------
+    def assertEq(self, expected, actual):
+        """
+        Calling this is similar to saying 'assert(expected == actual)'.
+
+        If it fails, we report expected and actual. Otherwise, just return.
+        """
+        self.assertEqual(expected, actual,
+                         self._generate_msg(expected, actual))
+
+    # -------------------------------------------------------------------------
+    def _generate_msg(self, exp, act):
+        """
+        Generate a message to report how *exp* and *act* differ
+        """
+        rval = "\n"
+        if type(exp) == list:
+            if 5 < len(exp):
+                for i in range(0, len(exp)):
+                    try:
+                        if exp[i] != act[i]:
+                            rval += "EXPECTED: '%s'\n" % exp[i]
+                            rval += "     GOT: '%s'\n" % act[i]
+                    except IndexError:
+                        rval += "EXPECTED: '%s'\n" % exp[i]
+                        rval += "     GOT: None\n"
+            else:
+                rval += "EXPECTED '%s'\n" % exp
+                rval += "     GOT '%s'\n" % act
+        elif type(exp) == str:
+            rval += "EXPECTED: '%s'\n" % exp
+            rval += "     GOT: '%s'\n" % act
+        else:
+            rval += "EXPECTED: %s\n" % repr(exp)
+            rval += "     GOT: %s\n" % repr(act)
+
+        return rval
 
     # -------------------------------------------------------------------------
     def assertIn(self, member, container, msg=None):
@@ -486,8 +495,8 @@ def write_file(filename, mode=0644, content=None):
     elif type(content) == list:
         f.writelines([x.rstrip() + '\n' for x in content])
     else:
-        raise StandardError("content is not of a suitable type (%s)"
-                            % type(content))
+        raise bscr.Error("content is not of a suitable type (%s)"
+                         % type(content))
     f.close()
     os.chmod(filename, mode)
 

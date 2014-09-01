@@ -35,6 +35,7 @@ import time
 import toolframe
 import util as U
 import unittest
+bscr = U.package_module(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -58,7 +59,7 @@ def pt_newpy(args):
     (o, a) = p.parse_args(args)
 
     if a == []:
-        raise Exception('usage: pytool newpy <program-name>')
+        raise bscr.Error('usage: pytool newpy <program-name>')
     else:
         lname = a[0]
         pname = lname + '.py'

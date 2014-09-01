@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import bscr
 from bscr import dt
 from bscr import testhelp as th
 from bscr import util as U
@@ -34,7 +35,7 @@ class TestDt(th.HelpedTestCase):
             a = dt.parse_whenspec(testargs)
             self.assertEqual(a, expected)
         elif type(expected) == str:
-            self.assertRaisesMsg(StandardError,
+            self.assertRaisesMsg(bscr.Error,
                                  expected,
                                  dt.parse_whenspec,
                                  testargs)
@@ -52,7 +53,7 @@ class TestDt(th.HelpedTestCase):
                               time.localtime(time.time() + expected))
             self.assertEqual(a, b)
         elif type(expected) == str:
-            self.assertRaisesMsg(StandardError,
+            self.assertRaisesMsg(bscr.Error,
                                  expected,
                                  dt.report_date,
                                  self.default_fmt(),

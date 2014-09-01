@@ -55,7 +55,7 @@ class TestFx(th.HelpedTestCase):
                     fx.BatchCommand(v, [], f)
                 actual = getval()
 
-            self.check_result(exp == actual, exp, actual)
+            self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
     def test_BatchCommand_dryrun(self):
@@ -78,7 +78,7 @@ class TestFx(th.HelpedTestCase):
                     fx.BatchCommand(v, [], f)
                 actual = getval()
 
-            self.check_result(exp == actual, exp, actual)
+            self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
     def test_BatchCommand_neither(self):
@@ -102,7 +102,7 @@ class TestFx(th.HelpedTestCase):
                     fx.BatchCommand(v, [], f)
                 actual = getval()
 
-            self.check_result(exp == actual, exp, actual)
+            self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
     def test_BatchCommand_quiet(self):
@@ -127,7 +127,7 @@ class TestFx(th.HelpedTestCase):
                     fx.BatchCommand(v, [], f)
                 actual = getval()
 
-            self.check_result(exp == actual, exp, actual)
+            self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
     def test_IterateCommand_both(self):
@@ -144,7 +144,7 @@ class TestFx(th.HelpedTestCase):
                 fx.IterateCommand(v, [])
                 actual = getval()
 
-            self.check_result(exp == actual, exp, actual)
+            self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
     def test_IterateCommand_dryrun(self):
@@ -161,7 +161,7 @@ class TestFx(th.HelpedTestCase):
                 fx.IterateCommand(v, [])
                 actual = getval()
 
-            self.check_result(exp == actual, exp, actual)
+            self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
     def test_IterateCommand_neither(self):
@@ -177,7 +177,7 @@ class TestFx(th.HelpedTestCase):
             with th.StdoutExcursion() as getval:
                 fx.IterateCommand(v, [])
                 actual = getval()
-            self.check_result(exp == actual, exp, actual)
+            self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
     def test_IterateCommand_quiet(self):
@@ -194,7 +194,7 @@ class TestFx(th.HelpedTestCase):
             with th.StdoutExcursion() as getval:
                 fx.IterateCommand(v, [])
                 actual = getval()
-            self.check_result(exp == actual, exp, actual)
+            self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
     def test_SubstCommand_both(self):
@@ -205,13 +205,13 @@ class TestFx(th.HelpedTestCase):
             v = optparse.Values({'dryrun': True, 'quiet': True, 'cmd': 'ls %'})
             a = ['a.pl', 'b.pl', 'c.pl']
             exp = "".join(["would do 'ls %s'\n" % x for x in a])
-            self.unlink(a)
+            U.safe_unlink(a)
 
             with th.StdoutExcursion() as getval:
                 fx.SubstCommand(v, a)
                 actual = getval()
 
-            self.check_result(exp == actual, exp, actual)
+            self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
     def test_SubstCommand_dryrun(self):
@@ -223,13 +223,13 @@ class TestFx(th.HelpedTestCase):
                                  'cmd': 'ls %'})
             a = ['a.pl', 'b.pl', 'c.pl']
             exp = "".join(["would do 'ls %s'\n" % x for x in a])
-            self.unlink(a)
+            U.safe_unlink(a)
 
             with th.StdoutExcursion() as getval:
                 fx.SubstCommand(v, a)
                 actual = getval()
 
-            self.check_result(exp == actual, exp, actual)
+            self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
     def test_SubstCommand_neither(self):
@@ -247,7 +247,7 @@ class TestFx(th.HelpedTestCase):
                 fx.SubstCommand(v, a)
                 actual = getval()
 
-            self.check_result(exp == actual, exp, actual)
+            self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
     def test_SubstCommand_quiet(self):
@@ -265,7 +265,7 @@ class TestFx(th.HelpedTestCase):
                 fx.SubstCommand(v, a)
                 actual = getval()
 
-            self.check_result(exp == actual, exp, actual)
+            self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
     def test_SubstRename_both(self):
@@ -286,11 +286,11 @@ class TestFx(th.HelpedTestCase):
                 fx.SubstRename(v, arglist)
                 actual = getval()
 
-            self.check_result(expected == actual, expected, actual)
+            self.assertEq(expected, actual)
 
             q = glob.glob('*.pl')
             q.sort()
-            self.check_result(q == arglist, arglist, q)
+            self.assertEq(q, arglist)
 
     # -----------------------------------------------------------------------
     def test_SubstRename_dryrun(self):
@@ -311,11 +311,11 @@ class TestFx(th.HelpedTestCase):
                 fx.SubstRename(v, arglist)
                 actual = getval()
 
-            self.check_result(expected == actual, expected, actual)
+            self.assertEq(expected, actual)
 
             q = glob.glob('*.pl')
             q.sort()
-            self.check_result(q == arglist, arglist, q)
+            self.assertEq(q, arglist)
 
     # -----------------------------------------------------------------------
     def test_SubstRename_neither(self):
@@ -336,11 +336,11 @@ class TestFx(th.HelpedTestCase):
                 fx.SubstRename(v, arglist)
                 actual = getval()
 
-            self.check_result(expected == actual, expected, actual)
+            self.assertEq(expected, actual)
 
             q = glob.glob('*.xyzzy')
             q.sort()
-            self.check_result(q == exp, exp, q)
+            self.assertEq(exp, q)
 
     # -----------------------------------------------------------------------
     def test_SubstRename_quiet(self):
@@ -361,43 +361,40 @@ class TestFx(th.HelpedTestCase):
                 fx.SubstRename(v, arglist)
                 actual = getval()
 
-            self.check_result(expected == actual, expected, actual)
+            self.assertEq(expected, actual)
 
             q = glob.glob('*.pl')
             q.sort()
-            self.check_result(q == [], [], q)
+            self.assertEq([], q)
 
             q = glob.glob('*.xyzzy')
             q.sort()
-            self.check_result(q == exp, exp, q)
+            self.assertEq(exp, q)
 
     # -----------------------------------------------------------------------
     def test_psys_neither(self):
         """
         Test routine psys with dryrun False and quiet False.
         """
-        # self.redirect()
         root = U.findroot()
         with th.StdoutExcursion() as getval:
             v = optparse.Values({'dryrun': False, 'quiet': False})
             fx.psys('ls -d %s/fx.py' % root, v)
             actual = getval()
-        # actual = self.undirect()
         expected = "ls -d %s/fx.py\n%s/fx.py\n" % (root, root)
-        self.assertEqual(expected, actual)
+        self.assertEq(expected, actual)
 
     # -----------------------------------------------------------------------
     def test_psys_dryrun(self):
         """
         Test routine psys with dryrun True and quiet False.
         """
-        # self.redirect()
         with th.StdoutExcursion() as getval:
             v = optparse.Values({'dryrun': True, 'quiet': False})
             fx.psys('ls -d nosuchfile', v)
             actual = getval()
         expected = "would do 'ls -d nosuchfile'\n"
-        self.assertEqual(expected, actual)
+        self.assertEq(expected, actual)
 
     # -----------------------------------------------------------------------
     def test_psys_quiet(self):
@@ -413,7 +410,6 @@ class TestFx(th.HelpedTestCase):
         self.assertEqual(expected, actual,
                          "%s\n   !=\n%s" %
                          (U.lquote(expected), U.lquote(actual)))
-        # self.check_result(expected == actual, expected, actual)
 
     # -----------------------------------------------------------------------
     def test_psys_both(self):
@@ -482,71 +478,3 @@ class TestFx(th.HelpedTestCase):
         Verify that we're importing the right align module
         """
         self.assertModule('bscr.fx', __file__)
-
-    # -----------------------------------------------------------------------
-    def check_result(self, expr, expected, actual):
-        """
-        Calling this is similar to saying 'assert(expected == actual)'.
-
-        If it fails, we report expected and actual. Otherwise, just return.
-        """
-        if not expr:
-            raise AssertionError("'''\n%s\n''' != '''\n%s\n'''"
-                                 % (expected, actual))
-
-    # -----------------------------------------------------------------------
-    def indirect(self, filename):
-        """
-        Arrange stdin to read from filename.
-        """
-        self.stdin = sys.stdin
-        sys.stdin = open(filename, 'r')
-
-    # -----------------------------------------------------------------------
-    def redirect(self):
-        """
-        Aim stdout at a memory string so we can capture a function's output.
-        """
-        self.stdout = sys.stdout
-        sys.stdout = StringIO.StringIO()
-
-    # -----------------------------------------------------------------------
-    def touch(self, touchables):
-        """
-        Touch the file or files named in touchables (string or list).
-        """
-        if type(touchables) == list:
-            for f in touchables:
-                open(f, 'a').close()
-        elif type(touchables) == str:
-            open(touchables, 'a').close()
-        else:
-            raise StandardError('argument must be list or string')
-
-    # -----------------------------------------------------------------------
-    def undirect(self):
-        """
-        Reset stdout (and stdin if needed) back to the terminal.
-        """
-        rval = sys.stdout.getvalue()
-        sys.stdout.close()
-        sys.stdout = self.stdout
-        if (not os.isatty(sys.stdin.fileno()) and
-                os.isatty(self.stdin.fileno())):
-            sys.stdin = self.stdin
-        return rval
-
-    # -----------------------------------------------------------------------
-    def unlink(self, args):
-        """
-        Unlink the file or files named in args (may be string or list).
-        """
-        if type(args) == list:
-            for f in args:
-                if os.path.exists(f):
-                    os.unlink(f)
-        elif type(args) == str:
-            if os.path.exists(args):
-                os.unlink(args)
-        else:
-            raise StandardError('argument must be list or string')

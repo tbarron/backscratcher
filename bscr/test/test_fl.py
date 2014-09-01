@@ -97,10 +97,10 @@ class TestFL(th.HelpedTestCase):
             os.system('cp mrpm2 old/mrpm2.2009-08-31')
 
             a = fl.most_recent_prefix_match('.', 'mrpm1')
-            th.expectVSgot('./mrpm1.2009-10-01', a)
+            self.assertEq('./mrpm1.2009-10-01', a)
 
             a = fl.most_recent_prefix_match('.', 'mrpm2')
-            th.expectVSgot('./old/mrpm2.2009-08-31', a)
+            self.assertEq('./old/mrpm2.2009-08-31', a)
 
     # -----------------------------------------------------------------------
     def test_diff(self):

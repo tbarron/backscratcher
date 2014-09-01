@@ -1,3 +1,4 @@
+import bscr
 import os
 from bscr import testhelp as th
 import time
@@ -115,7 +116,7 @@ class workrptTest(th.HelpedTestCase):
         Verify mutual exclusion of -l and -s
         """
         (o, a) = wr.makeOptionParser(['-l', '-s', '2009.0501'])
-        self.assertRaisesMsg(StandardError,
+        self.assertRaisesMsg(bscr.Error,
                              '--last and --start or --end are not compatible',
                              wr.interpret_options,
                              o)
@@ -126,7 +127,7 @@ class workrptTest(th.HelpedTestCase):
         Verify mutual exclusion of -l and -e
         """
         (o, a) = wr.makeOptionParser(['-l', '-e', '2009.0501'])
-        self.assertRaisesMsg(StandardError,
+        self.assertRaisesMsg(bscr.Error,
                              '--last and --start or --end are not compatible',
                              wr.interpret_options,
                              o)
@@ -142,7 +143,7 @@ class workrptTest(th.HelpedTestCase):
         self.assertEqual(end, time.strftime('%Y.%m%d'))
 
         (o, a) = wr.makeOptionParser(['-s', '2010.0101', '-S', '2010.1231'])
-        self.assertRaisesMsg(StandardError,
+        self.assertRaisesMsg(bscr.Error,
                              '--since and --start are not compatible',
                              wr.interpret_options,
                              o)
@@ -153,7 +154,7 @@ class workrptTest(th.HelpedTestCase):
         Verify mutual exclusion of -w and -s
         """
         (o, a) = wr.makeOptionParser(['-w', 'M', '-s', '2009.0501'])
-        self.assertRaisesMsg(StandardError,
+        self.assertRaisesMsg(bscr.Error,
                              '--week and --start or --end are not compatible',
                              wr.interpret_options,
                              o)
@@ -164,7 +165,7 @@ class workrptTest(th.HelpedTestCase):
         Verify mutual exclusion of -w and -e
         """
         (o, a) = wr.makeOptionParser(['-w', 'T', '-e', '2009.0501'])
-        self.assertRaisesMsg(StandardError,
+        self.assertRaisesMsg(bscr.Error,
                              '--week and --start or --end are not compatible',
                              wr.interpret_options,
                              o)
@@ -339,17 +340,10 @@ class workrptTest(th.HelpedTestCase):
 
         r = wr.write_report('XYZ', '2009.0721', '2009.0724', False, True)
         os.unlink('XYZ')
-        try:
-            assert('23.10' not in r)
-        except AssertionError:
-            print r
-            raise
-
-        try:
-            assert('24.0' in r)
-        except AssertionError:
-            print r
-            raise
+        self.assertFalse('23.10' in r,
+                         "'23.10' not expected in '%s'" % r)
+        self.assertTrue('24.0' in r,
+                        "'24.0' expected in '%s'" % r)
 
     # -------------------------------------------------------------------------
     def test_start_date_missing(self):
@@ -369,17 +363,12 @@ class workrptTest(th.HelpedTestCase):
 
         r = wr.write_report('XYZ', '2012.0407', '2012.0413', True, True)
         os.unlink('XYZ')
-        try:
-            assert('23.10' not in r)
-        except AssertionError:
-            print r
-            raise
-
-        try:
-            assert('09:24:12 (9.4)' in r)
-        except AssertionError:
-            print r
-            raise
+        nexp = '23.10'
+        self.assertFalse(nexp in r,
+                         "'%s' not expected in '%s'" % (nexp, r))
+        exp = '09:24:12 (9.4)'
+        self.assertTrue(exp in r,
+                        "'%s' expected in '%s'" % (exp, r))
 
     # -------------------------------------------------------------------------
     def test_week_ending(self):

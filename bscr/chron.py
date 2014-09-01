@@ -37,6 +37,8 @@ import sys
 import time
 import toolframe
 import unittest
+import util as U
+bscr = U.package_module(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -58,7 +60,7 @@ def main(argv=None):
     (o, a) = p.parse_args(argv)
 
     if o.count.lower() != 'down' and o.action != '':
-        raise Exception('--action is only meaningful for --count down')
+        raise bscr.Error('--action is only meaningful for --count down')
 
     if o.count.lower() == 'down':
         count_down(a[1], o.action)

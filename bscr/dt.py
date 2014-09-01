@@ -69,6 +69,8 @@ import sys
 import time
 import toolframe
 import unittest
+import util as U
+bscr = U.package_module(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -98,8 +100,7 @@ def fatal(msg):
     """
     !@!DERPRECATED -- should this be in util?
     """
-    # raise DtError(msg)
-    raise StandardError(msg)
+    raise bscr.Error(msg)
 
 
 # -----------------------------------------------------------------------------
@@ -167,11 +168,9 @@ def next(args):
     Apply 'next' to the unit
     """
     if len(args) < 1:
-        # raise DtError('next: expected unit or weekday, found nothing')
-        raise StandardError('next: expected unit or weekday, found nothing')
+        raise bscr.Error('next: expected unit or weekday, found nothing')
     elif re.match(r'[+-]?\d+', args[0]):
-        # raise DtError('next: expected unit or weekday, got number')
-        raise StandardError('next: expected unit or weekday, got number')
+        raise bscr.Error('next: expected unit or weekday, got number')
     elif args[0] in ['second', 'minute', 'hour', 'day',
                      'week', 'month', 'year']:
         rval = unit_size(args[0])
@@ -181,8 +180,7 @@ def next(args):
     try:
         return rval
     except UnboundLocalError:
-        # raise DtError('next: no return value set')
-        raise StandardError('next: no return value set')
+        raise bscr.Error('next: no return value set')
 
 
 # ---------------------------------------------------------------------------
@@ -191,11 +189,9 @@ def last(args):
     Apply 'last' to the unit
     """
     if len(args) < 1:
-        # raise DtError('last: expected unit or weekday, found nothing')
-        raise StandardError('last: expected unit or weekday, found nothing')
+        raise bscr.Error('last: expected unit or weekday, found nothing')
     elif re.match(r'[+-]?\d+', args[0]):
-        # raise DtError('last: expected unit or weekday, got number')
-        raise StandardError('last: expected unit or weekday, got number')
+        raise bscr.Error('last: expected unit or weekday, got number')
     elif args[0] in ['second', 'minute', 'hour', 'day',
                      'week', 'month', 'year']:
         rval = -1 * unit_size(args[0])
@@ -205,8 +201,7 @@ def last(args):
     try:
         return rval
     except UnboundLocalError:
-        # raise DtError('last: no return value set')
-        raise StandardError('last: no return value set')
+        raise bscr.Error('last: no return value set')
 
 
 # ---------------------------------------------------------------------------
@@ -236,8 +231,7 @@ def time_to(day, dir):
     elif dir == 'next':
         then = 24*60*60 * ((7 + daynum - tup[6] - 1) % 7 + 1)
     else:
-        # raise DtError('time_to: invalid direction')
-        raise StandardError('time_to: invalid direction')
+        raise bscr.Error('time_to: invalid direction')
     return then
 
 

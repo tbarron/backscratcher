@@ -15,11 +15,11 @@ class TesthelpTest(th.HelpedTestCase):
                'TesthelpTest.test_list_tests',
                'TesthelpTest.test_expected_vs_got'].sort()
         l = th.all_tests('__main__').sort()
-        th.expectVSgot(all, l)
+        self.assertEq(all, l)
         l = th.all_tests('__main__', 'no such tests')
-        th.expectVSgot([], l)
+        self.assertEq([], l)
         l = th.all_tests('__main__', 'helpTest').sort()
-        th.expectVSgot(all, l)
+        self.assertEq(all, l)
 
     def test_list_tests(self):
         """
@@ -53,34 +53,3 @@ class TesthelpTest(th.HelpedTestCase):
             result = getval()
         self.assertEqual(expected, result,
                          "Expected '%s', got '%s'" % (expected, result))
-
-    def test_expected_vs_got(self):
-        """
-        Testing routine expected_vs_got(), which I think can probably be
-        replaced with a simple self.assertEqual()
-        """
-        self.redirected_evg('', '', '')
-        self.redirected_evg('one', 'two',
-                            "EXPECTED: 'one'\n" +
-                            "GOT:      'two'\n")
-
-    def redirected_evg(self, exp, got, expected):
-        """
-        Rune one test of expected_vs_got()
-        """
-        s = StringIO.StringIO()
-        save_stdout = sys.stdout
-        sys.stdout = s
-        try:
-            th.expectVSgot(exp, got)
-        except AssertionError:
-            pass
-        r = s.getvalue()
-        s.close()
-        sys.stdout = save_stdout
-
-        try:
-            assert(r.startswith(expected))
-        except AssertionError:
-            print "expected: '''\n%s'''" % expected
-            print "got:      '''\n%s'''" % r

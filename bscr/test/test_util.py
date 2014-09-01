@@ -1,4 +1,4 @@
-from bscr import Error as bscrError
+import bscr
 from bscr import testhelp as th
 from bscr import util as U
 import os
@@ -165,7 +165,7 @@ class TestUtil(th.HelpedTestCase):
         """
         with U.Chdir(self.testdir):
             now = int(time.time())
-            self.assertRaisesMsg(StandardError,
+            self.assertRaisesMsg(bscr.Error,
                                  "argument must be list or string",
                                  U.touch,
                                  17)

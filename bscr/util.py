@@ -306,7 +306,7 @@ def safe_unlink(path):
             if os.path.exists(item):
                 os.unlink(item)
     else:
-        raise Exception('safe_unlink: argument must be str or list')
+        raise bscr.Error('safe_unlink: argument must be str or list')
 
 
 # -----------------------------------------------------------------------------
@@ -325,7 +325,7 @@ def script_location(script):
             if groot not in sys.path:
                 sys.path.append(groot)
         else:
-            raise StandardError("Can't find script %s" % script)
+            raise bscr.Error("Can't find script %s" % script)
     return rval
 
 
@@ -345,7 +345,7 @@ def touch(touchables, times=None):
         open(touchables, 'a').close()
         os.utime(touchables, times)
     else:
-        raise StandardError('argument must be list or string')
+        raise bscr.Error('argument must be list or string')
 
 
 # ---------------------------------------------------------------------------
@@ -356,6 +356,15 @@ def writefile(filepath, lines):
     f = open(filepath, 'w')
     f.writelines(lines)
     f.close()
+
+
+# ---------------------------------------------------------------------------
+def package_module(module_name):
+    """
+    Return the parent package module for the named module
+    """
+    rval = sys.modules[sys.modules[module_name].__package__]
+    return rval
 
 
 # ---------------------------------------------------------------------------
@@ -374,3 +383,6 @@ def findroot():
     afile = os.path.abspath(__file__)
     bscr = os.path.dirname(afile)
     return bscr
+
+
+bscr = package_module(__name__)
