@@ -108,11 +108,13 @@ import pdb
 import random
 import re
 import stat
+import string
 import sys
-import util
 import time
 import toolframe
 import unittest
+import util
+bscr = util.package_module(__name__)
 
 
 # -----------------------------------------------------------------------------
@@ -150,6 +152,91 @@ def fl_diff(args):
         print cmd
         sys.stdout.flush()
         util.run(cmd, o.xable)
+
+
+# ---------------------------------------------------------------------------
+def fl_edit(args):
+    """edit - edit files in place
+
+    usage: fl edit [-i <suffix>] -e <edit-cmd> file1 file2 file3 ...
+
+    """
+    p = optparse.OptionParser()
+    p.add_option('-d', '--debug',
+                 default=False, action='store_true', dest='debug',
+                 help='run the debugger')
+    p.add_option('-e', '--edit',
+                 default='', action='store', dest='edit_cmd',
+                 help='edit command')
+    p.add_option('-i', '--init',
+                 default='', action='store', dest='suffix',
+                 help='suffix for original files')
+    (o, a) = p.parse_args(args)
+
+    if o.debug:
+        pdb.set_trace()
+
+    if o.suffix == '':
+        suffix = 'original'
+    else:
+        suffix = o.suffix
+
+    if o.edit_cmd == '':
+        util.fatal("usage: fl edit [-i <suffix>] -e <cmd> f1 f2 ...")
+
+    ec = o.edit_cmd.split(o.edit_cmd[1])
+    if all([ec[0] != 's', ec[0] != 'y']):
+        raise bscr.Error("Only 's' and 'y' supported for -e right now")
+
+    if 4 != len(ec):
+        raise bscr.Error("usage: ... -e '[sy]/before/after/' ...")
+
+    (op, prev, post) = ec[0:3]
+
+    if 0 == len(a):
+        util.fatal("no files on command line to edit")
+    else:
+        for filename in a:
+            editfile(filename, op, prev, post, suffix)
+
+
+# ---------------------------------------------------------------------------
+def editfile(filename, op, prev, post, suffix=None):
+    """
+    Edit *filename*, replacing *prev* with *post* and renaming the original
+    file by appending *suffix* to its name
+    """
+    if op != 's' and op != 'y':
+        raise bscr.Error("Invalid operation: '%s'" % op)
+    if suffix is None or suffix == '':
+        suffix = 'original'
+
+    fn_orig = "%s.%s" % (filename, suffix)
+    fn_new = "%s.%s" % (filename, "new")
+    n = open(filename, 'r')
+    o = open(fn_new, 'w')
+
+    if op == 's':
+        for line in n.readlines():
+            nline = re.sub(prev, post, line)
+            o.write(nline)
+    elif op == 'y':
+        prev = prev.decode('string_escape')
+        if post == '':
+            for line in n.readlines():
+                nline = line.translate(None, prev)
+                o.write(nline)
+        else:
+            tbl = string.maketrans(prev, post)
+            for line in n.readlines():
+                nline = line.translate(tbl)
+                o.write(nline)
+
+    o.close()
+    n.close()
+
+    os.rename(filename, fn_orig)
+    os.rename(fn_new, filename)
 
 
 # ---------------------------------------------------------------------------
@@ -279,8 +366,9 @@ def most_recent_prefix_match(dir, filename):
     for file in list:
         s = os.stat('%s/%s' % (dir, file))
         bfile = os.path.basename(file)
-        if (file != filename and bfile.startswith(filename)
-                and recent_time < s[stat.ST_MTIME]):
+        if all([file != filename,
+                bfile.startswith(filename),
+                recent_time < s[stat.ST_MTIME]]):
             recent_time = s[stat.ST_MTIME]
             recent_file = file
 

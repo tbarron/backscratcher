@@ -1,16 +1,20 @@
 #!/usr/bin/env python
+import bscr
 import pdb
 from bscr import fl
 from bscr import util
 import os
 import pexpect
 import random
+import re
 import shutil
 from nose.plugins.skip import SkipTest
 import stat
+import tempfile
 from bscr import testhelp as th
 import time
 import unittest
+from bscr import util as U
 
 
 # ---------------------------------------------------------------------------
@@ -36,7 +40,7 @@ def tearDownModule():
         shutil.rmtree('fl_tests')
 
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class TestFL(th.HelpedTestCase):
     # tests needed:
     #   'fl' -- test_command_line
@@ -45,7 +49,7 @@ class TestFL(th.HelpedTestCase):
     #   'fl help rm_cr'
     #   'fl times'
     #   'fl nosuchcmd'
-    # -----------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     def test_command_line(self):
         """
         Running the command with no arguments should get help output
@@ -191,9 +195,306 @@ class TestFL(th.HelpedTestCase):
             assert(s[stat.ST_ATIME] == s[stat.ST_MTIME])
 
     # -------------------------------------------------------------------------
-    # @unittest.skip("under construction")
     def test_which_module(self):
         """
         Verify that we're importing the right align module
         """
         self.assertModule('bscr.fl', __file__)
+
+
+# -----------------------------------------------------------------------------
+class TestFL_edit(th.HelpedTestCase):
+    testdir = tempfile.mkdtemp(dir="/tmp")
+    testdata = ["one foo two foo three\n",
+                "foo four five foo\n",
+                "six seven eight foo nine\n"]
+
+    # -------------------------------------------------------------------------
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.testdir)
+
+    # -------------------------------------------------------------------------
+    def test_editfile_nosuch(self):
+        """
+        fl.editfile('nosuchfile', 'foo', 'bar', None)
+         => should throw an exception
+        """
+        self.assertRaisesMsg(IOError,
+                             "No such file or directory: 'nosuchfile'",
+                             fl.editfile,
+                             'nosuchfile',
+                             's',
+                             'foo',
+                             'bar',
+                             None)
+
+    # -------------------------------------------------------------------------
+    def test_editfile_empty(self):
+        """
+        fl.editfile('emptyfile', 's', 'foo', 'bar', None)
+         => rename emptyfile emptyfile.original, both empty
+        """
+        fpath = U.pj(self.testdir, 'emptyfile')
+        forig = fpath + ".original"
+        U.touch(fpath)
+
+        fl.editfile(fpath, 's', 'foo', 'bar', None)
+
+        self.assertEq(True, U.exists(fpath))
+        self.assertEq(True, U.exists(forig))
+        self.assertEq([], U.contents(fpath))
+        self.assertEq([], U.contents(forig))
+
+    # -------------------------------------------------------------------------
+    def test_editfile_legit(self):
+        """
+        fl.editfile('legit', 's', 'foo', 'bar', None)
+        """
+        fp = U.pj(self.testdir, 'legit')
+        forig = fp + ".original"
+        tdata = ["foo bar",
+                 "bar foo",
+                 "barfoo",
+                 "foobar foo",
+                 "loofafool"]
+        xdata = [z.replace('foo', 'bar') for z in tdata]
+        U.writefile(fp, tdata, newlines=True)
+
+        fl.editfile(fp, 's', 'foo', 'bar', None)
+
+        self.assertEq(True, U.exists(fp))
+        self.assertEq(True, U.exists(forig))
+        self.assertEq(xdata, U.contents(fp))
+        self.assertEq(tdata, U.contents(forig))
+
+    # -------------------------------------------------------------------------
+    def test_editfile_suffix(self):
+        """
+        fl.editfile('legit', 's', 'foo', 'bar', 'old')
+        """
+        fp = U.pj(self.testdir, U.function_name())
+        forig = fp + ".old"
+        tdata = ["foo bar",
+                 "bar foo",
+                 "barfoo",
+                 "foobar foo",
+                 "loofafool"]
+        xdata = [z.replace('foo', 'bar') for z in tdata]
+        U.writefile(fp, tdata, newlines=True)
+
+        fl.editfile(fp, 's', 'foo', 'bar', 'old')
+
+        self.assertEq(True, U.exists(fp))
+        self.assertEq(True, U.exists(forig))
+        self.assertEq(xdata, U.contents(fp))
+        self.assertEq(tdata, U.contents(forig))
+
+    # -------------------------------------------------------------------------
+    def test_editfile_rgx(self):
+        """
+        fl.editfile('legit', 's', 'foo', 'bar', None)
+        """
+        fp = U.pj(self.testdir, U.function_name())
+        forig = fp + ".original"
+        tdata = ["foo bar",
+                 "bar foo",
+                 "barfoo",
+                 "foobar foo",
+                 "loofafool"]
+        xdata = [re.sub('^foo', 'bar', z) for z in tdata]
+        U.writefile(fp, tdata, newlines=True)
+
+        fl.editfile(fp, 's', '^foo', 'bar', None)
+
+        self.assertEq(True, U.exists(fp))
+        self.assertEq(True, U.exists(forig))
+        self.assertEq(xdata, U.contents(fp))
+        self.assertEq(tdata, U.contents(forig))
+
+    # -------------------------------------------------------------------------
+    def test_editfile_delete(self):
+        """
+        fl.editfile('legit', 's', 'foo', '', None)
+        """
+        fp = U.pj(self.testdir, U.function_name())
+        forig = fp + ".original"
+        tdata = ["foo bar",
+                 "bar foo",
+                 "barfoo",
+                 "foobar foo",
+                 "loofafool"]
+        xdata = [re.sub('^foo', '', z) for z in tdata]
+        U.writefile(fp, tdata, newlines=True)
+
+        fl.editfile(fp, 's', '^foo', '', None)
+
+        self.assertEq(True, U.exists(fp))
+        self.assertEq(True, U.exists(forig))
+        self.assertEq(xdata, U.contents(fp))
+        self.assertEq(tdata, U.contents(forig))
+
+    # -------------------------------------------------------------------------
+    def test_fl_edit_noarg(self):
+        """
+        fl edit                          => help msg
+        """
+        self.fl_edit_flawed("fl edit",
+                            "usage: fl edit [-i <suffix>] -e <cmd> f1 f2 ...")
+
+    # -------------------------------------------------------------------------
+    def test_fl_edit_e_reqarg(self):
+        """
+        fl edit -e                       => -e requires argument
+        check for
+         - message that -e requires an argument
+        """
+        self.fl_edit_flawed("fl edit -e",
+                            "-e option requires an argument")
+
+    # -------------------------------------------------------------------------
+    def test_fl_edit_i_reqarg(self):
+        """
+        fl edit -i                       => -i requires argument
+        check for message that -i requires argument
+        """
+        self.fl_edit_flawed("fl edit -i",
+                            "-i option requires an argument")
+
+    # -------------------------------------------------------------------------
+    def test_fl_edit_nofiles(self):
+        """
+        fl edit -e "s/foo/bar/"          => no files to edit
+        check for message that there are no files to edit
+        """
+        self.fl_edit_flawed("fl edit -e 's/foo/bar/'",
+                            "no files on command line to edit")
+
+    # -------------------------------------------------------------------------
+    def test_fl_edit_sub_mid(self):
+        """
+        fl edit -e "s/foo/bar/" f1 f2    => change "foo" to "bar" in f1, f2
+        check for
+         - f{1,2} edited correctly
+         - f{1,2}.original exists with unchanged content
+        """
+        self.fl_edit_ok(eopt="s/foo/bar/",
+                        files=2,
+                        inp=self.testdata,
+                        exp=["one bar two bar three",
+                             "bar four five bar",
+                             "six seven eight bar nine"])
+
+    # -------------------------------------------------------------------------
+    def test_fl_edit_sub_bol(self):
+        """
+        fl edit -e "s/^foo/bar/" f1 f2   => edit at beginning of line
+         - f1 edited correctly
+         - f2 edited correctly
+         - f{1,2}.original have unchanged content
+        """
+        self.fl_edit_ok(eopt="s/^foo/bar/",
+                        files=2,
+                        inp=self.testdata,
+                        exp=["one foo two foo three",
+                             "bar four five foo",
+                             "six seven eight foo nine"])
+
+    # -------------------------------------------------------------------------
+    def test_fl_edit_i_old(self):
+        """
+        fl edit -i old -e "s/x/y/" f1    => rename original to f1.old
+         - f1 edited correctly
+         - f1.old exists
+         - f1.original does not exist
+        """
+        self.fl_edit_ok(eopt="s/[rv]e/n/",
+                        iopt="old",
+                        files=1,
+                        inp=self.testdata,
+                        exp=["one foo two foo thne",
+                             "foo four fin foo",
+                             "six senn eight foo nine"])
+
+    # -------------------------------------------------------------------------
+    def test_fl_edit_xlate_rot13(self):
+        """
+        fl edit -e "y/a-z/n-za-m/" f1 f2 => rot13
+        check for
+         - f{1,2} edited correctly
+         - f{1,2}.original exist with correct content
+        """
+        prev = "abcdefghijklmnopqrstuvwxyz"
+        post = "nopqrstuvwxyzabcdefghijklm"
+        self.fl_edit_ok(eopt="y/%s/%s/" % (prev, post),
+                        files=2,
+                        inp=self.testdata,
+                        exp=["bar sbb gjb sbb guerr",
+                             "sbb sbhe svir sbb",
+                             "fvk frira rvtug sbb avar"])
+
+    # -------------------------------------------------------------------------
+    def test_fl_edit_xlate_ret(self):
+        """
+        fl edit -e "y/\r//" f1 f2        => remove \r characters
+         - f{1,2} edited correctly
+         - f{1,2}.original have correct original content
+        """
+        rdata = [x.rstrip() + "\r\n" for x in self.testdata]
+        self.fl_edit_ok(eopt="y/\r//",
+                        files=2,
+                        inp=rdata,
+                        exp=["one foo two foo three",
+                             "foo four five foo",
+                             "six seven eight foo nine"])
+
+    # -------------------------------------------------------------------------
+    def fl_edit_flawed(self, cmd, exp):
+        """
+        Attempt to run an 'fl edit' command with something missing
+        """
+        result = pexpect.run(cmd)
+        self.assertFalse("Traceback" in result,
+                         "Traceback not expected in %s" % result)
+        self.assertTrue(exp in result,
+                        "\nExpected '%s' in \n%s" %
+                        (exp, util.lquote(result)))
+
+    # -------------------------------------------------------------------------
+    def fl_edit_ok(self, eopt='', iopt='', files=0, inp=[], exp=[]):
+        """
+        Common code for all the test_fl_edit_* routines
+        """
+        fl = []
+        for idx in range(files):
+            (fd, fp) = tempfile.mkstemp(dir=self.testdir)
+            os.close(fd)
+            fl.append(fp)
+            util.writefile(fp, inp)
+
+        suffix = 'original'
+        with util.Chdir(self.testdir):
+            cmd = "fl edit "
+            if eopt != '':
+                cmd += '-e "%s" ' % eopt
+            if iopt != '':
+                cmd += '-i %s ' % iopt
+                suffix = iopt
+            if 0 < len(fl):
+                cmd += " ".join(fl)
+            result = pexpect.run(cmd)
+
+            self.assertTrue(result == "",
+                            "Expected '%s' to be empty" % result)
+            for fp in fl:
+                forig = fp + "." + suffix
+                self.assertTrue(util.exists(forig),
+                                "Expected %s to exist" % forig)
+                self.assertTrue("foo four five foo" in util.contents(forig),
+                                "Contents of %s have changed" % forig)
+                self.assertTrue(util.exists(fp),
+                                "Expected %s to exist" % fp)
+                self.assertEq(exp, util.contents(fp))
+
+            for fp in fl:
+                util.safe_unlink(fp)

@@ -8,7 +8,6 @@ import re
 import struct
 import sys
 import termios
-import testhelp
 import time
 import unittest
 
@@ -349,12 +348,20 @@ def touch(touchables, times=None):
 
 
 # ---------------------------------------------------------------------------
-def writefile(filepath, lines):
+def writefile(filepath, lines, newlines=False):
     """
     Write the contents of *lines* to *filepath*
     """
     f = open(filepath, 'w')
-    f.writelines(lines)
+    if newlines:
+        if type(lines) == str:
+            f.writelines(lines + '\n')
+        elif type(lines) == list:
+            f.writelines([z.rstrip() + '\n' for z in lines])
+        else:
+            f.writelines(str(lines))
+    else:
+        f.writelines(lines)
     f.close()
 
 
