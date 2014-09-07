@@ -65,8 +65,7 @@ def ln_show(args):
 
 # -----------------------------------------------------------------------------
 def linklist():
-    links = {'post-commit': 'post-commit',
-             'post-checkout': 'post-commit'}
+    links = {'pre-commit': 'pre-commit'}
     return links
 
 

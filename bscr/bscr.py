@@ -8,7 +8,7 @@ import shutil
 import subprocess as subp
 import sys
 import util
-
+from version import __version__
 
 # -----------------------------------------------------------------------------
 def main(args=None):
@@ -188,18 +188,7 @@ def bscr_version(args):
     if o.debug:
         pdb.set_trace()
 
-    filename = ".bscr_version"
-    bpath = util.pj(util.bscr_root(), filename)
-    if util.exists(bpath):
-        version = util.contents(bpath, string=True)
-        source = bpath
-    else:
-        version = "???"
-        source = "<missing>"
-
-    print("Backscratcher version %s" % version.strip())
-    if o.verbose:
-        print("    (source = %s)" % source)
+    print("Backscratcher version %s" % __version__)
 
 
 # -----------------------------------------------------------------------------

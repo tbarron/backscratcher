@@ -1,0 +1,7 @@
+#!/usr/bin/env python
+import pexpect
+z = [x.strip() for x in pexpect.run("git describe").split('-')]
+z[1] = str(int(z[1])+1)
+version = '.'.join(z)
+with open("bscr/version.py", 'w') as f:
+     f.write("__version__ = '%s'\n" % version)
