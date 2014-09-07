@@ -46,5 +46,10 @@ setup(name='backscratcher',
       author="Tom Barron",
       author_email='tom.barron@comcast.net',
       url='https://github.com/tbarron/backscratcher/',
-      data_files=[(bscr_root, [".bscr_version", "README"])]
+      data_files=[(bscr_root, [".bscr_version", "README"])],
+      requires=['pep8==1.5.7',
+                'python-termstyle==0.1.10',
+                'virtualenv==1.11.6',
+                'wsgiref==0.1.2',
+                'pexpect==3.3']
       )
