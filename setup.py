@@ -30,15 +30,16 @@ ep_d = {
     ["%s = bscr.%s:main" % (x, x) for x in scripts]
     }
 
-if not os.path.exists(".bscr_version"):
-    os.system("git describe > .bscr_version")
-f = open(".bscr_version", 'r')
-version = f.read().strip()
-f.close()
+exec(open(os.path.join(bscr_root, "version.py")).read())
+# if not os.path.exists(".bscr_version"):
+#     os.system("git describe > .bscr_version")
+# f = open(".bscr_version", 'r')
+# version = f.read().strip()
+# f.close()
 
 # print scrlist
 setup(name='backscratcher',
-      version=version,
+      version=__version__,
       packages=['bscr', 'bscr/test'],
       entry_points = ep_d,
       author="Tom Barron",
