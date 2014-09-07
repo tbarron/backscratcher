@@ -1,14 +1,12 @@
-from distutils.core import setup
-from distutils.sysconfig import get_python_lib
-from distutils.file_util import copy_file
-from distutils.spawn import spawn
+from setuptools import setup
+from setuptools import distutils
 import glob
 import os
 import sys
 import time
 
-bscr_root = os.path.join(get_python_lib(), "bscr")
-copy_file("README.md", "README")
+bscr_root = os.path.join(distutils.old_get_python_lib(), "bscr")
+distutils.file_util.copy_file("README.md", "README")
 scripts = ["align",
            "ascii",
            "bscr",
@@ -47,9 +45,10 @@ setup(name='backscratcher',
       author_email='tom.barron@comcast.net',
       url='https://github.com/tbarron/backscratcher/',
       data_files=[(bscr_root, [".bscr_version", "README"])],
-      requires=['pep8==1.5.7',
-                'python-termstyle==0.1.10',
-                'virtualenv==1.11.6',
-                'wsgiref==0.1.2',
-                'pexpect==3.3']
+      install_requires=['pexpect == 3.3'],
+      tests_require=['pep8==1.5.7',
+                     'python-termstyle==0.1.10',
+                     'virtualenv==1.11.6',
+                     'wsgiref==0.1.2',
+                     'pexpect==3.3']
       )
