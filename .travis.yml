@@ -4,10 +4,9 @@ python:
   - "2.7"
 install:
   - "git describe > .bscr_version"
-  - "pip install ."
   - "pip install -r requirements.txt"
+  - "pip install ."
 #  - "pip install coveralls"
 script:
-  - if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]]; then nosetests -v -c nose.cfg; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then green -v; fi
+  - py.test -v
 # after_success: coveralls
