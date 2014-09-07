@@ -30,7 +30,7 @@ ep_d = {
     ["%s = bscr.%s:main" % (x, x) for x in scripts]
     }
 
-exec(open(os.path.join(bscr_root, "version.py")).read())
+exec(open(os.path.join("bscr", "version.py")).read())
 # if not os.path.exists(".bscr_version"):
 #     os.system("git describe > .bscr_version")
 # f = open(".bscr_version", 'r')
