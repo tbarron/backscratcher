@@ -34,6 +34,8 @@ ep_d = {
     ["%s = bscr.%s:main" % (x, x) for x in scripts]
     }
 
+if not os.path.exists(".bscr_version"):
+    os.system("git describe > .bscr_version")
 f = open(".bscr_version", 'r')
 version = f.read().strip()
 f.close()

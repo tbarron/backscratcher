@@ -60,9 +60,9 @@ Tests go in directory tests in a file called test_COMPONENT.py.
 
 To run the tests, use one of
 
+  py.test [-v] [-x] [bscr/test] [-k regexp] (preferred)
   green [-v] [bscr/test]
   nosetests [-v] [-x] [bscr/test]
-  py.test [-v] [-x] [bscr/test] [-k regexp]
 
 Test options:
   -v    verbose output (list tests as they are run)
@@ -86,3 +86,11 @@ To install a new one over the top of an old one, use one of
 To uninstall
 
   pip uninstall backscratcher
+
+Release Process
+
+ * Get things working the way you want in the feature branch, with all
+   the tests passing and travis-ci.org showing the project as green for
+   all environments.
+
+ * Merge the feature branch into master.
