@@ -4,8 +4,6 @@ from distutils.file_util import copy_file
 from distutils.spawn import spawn
 import glob
 import os
-import pdb
-import pexpect
 import sys
 import time
 
