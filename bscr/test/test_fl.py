@@ -212,6 +212,9 @@ class TestFL_edit(th.HelpedTestCase):
     # -------------------------------------------------------------------------
     @classmethod
     def tearDownClass(cls):
+        """
+        Clean up test directory
+        """
         shutil.rmtree(cls.testdir)
 
     # -------------------------------------------------------------------------

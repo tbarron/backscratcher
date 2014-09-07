@@ -24,12 +24,18 @@ class TestFx(th.HelpedTestCase):
     # -----------------------------------------------------------------------
     @classmethod
     def setUpClass(cls):
+        """
+        Create test directory if necessary
+        """
         if not os.path.exists(TestFx.testdir):
             os.mkdir(TestFx.testdir)
 
     # -----------------------------------------------------------------------
     @classmethod
     def tearDownClass(cls):
+        """
+        Clean up after tests if appropriate (KEEPFILES not set)
+        """
         kf = os.getenv("KEEPFILES")
         if kf is None or not int(kf):
             shutil.rmtree(TestFx.testdir)
