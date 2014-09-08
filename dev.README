@@ -93,4 +93,10 @@ Release Process
    the tests passing and travis-ci.org showing the project as green for
    all environments.
 
+ * Commit the updates with the desired version in place.
+
  * Merge the feature branch into master.
+
+ * Tag the release on the master branch with the version already set.
+
+ * Install the master branch somewhere and run the tests.

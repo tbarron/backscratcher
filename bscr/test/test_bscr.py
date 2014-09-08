@@ -49,9 +49,8 @@ class TestScripts(th.HelpedTestCase):
                         "Not expecting 'Traceback' in %s" %
                         U.lquote(result))
         self.assertTrue("Backscratcher version" in result)
-        self.assertTrue("source =" in result)
-        self.assertEqual(3, len(result.split("\n")),
-                         "Expected only 2 newlines in %s" %
+        self.assertEqual(2, len(result.split("\n")),
+                         "Expected only 1 newlines in %s" %
                          U.lquote(result))
 
     # -------------------------------------------------------------------------
