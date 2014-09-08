@@ -75,6 +75,8 @@ def bscr_readme(args):
         readme = resource_string(__name__, "README")
     except:
         raise bscr.Error("Can't find the README file")
+
+    print readme
 #     broot = util.bscr_root()
 #     if broot:
 #         readme = util.pj(broot, filename)
@@ -82,12 +84,12 @@ def bscr_readme(args):
 #     else:
 #         raise bscr.Error("Can't find the README file")
 
-    w, h = util.terminal_size()
-    if sys.stdout.isatty():
-        p = pexpect.spawn("less -z %d %s" % (h, readme))
-        p.interact()
-    else:
-        shutil.copyfileobj(open(readme, 'r'), sys.stdout)
+#     w, h = util.terminal_size()
+#     if sys.stdout.isatty():
+#         p = pexpect.spawn("less -z %d %s" % (h, readme))
+#         p.interact()
+#     else:
+#         shutil.copyfileobj(open(readme, 'r'), sys.stdout)
 
 
 # -----------------------------------------------------------------------------
