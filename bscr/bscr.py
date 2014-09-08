@@ -4,6 +4,7 @@ import os
 import pdb
 import pexpect
 import re
+from pkg_resources import resource_string
 import shutil
 import subprocess as subp
 import sys
@@ -70,12 +71,16 @@ def bscr_readme(args):
 
     usage: bscr readme
     """
-    filename = "README"
-    broot = util.bscr_root()
-    if broot:
-        readme = util.pj(broot, filename)
-    else:
+    try:
+        readme = resource_string(__name__, "README")
+    except:
         raise bscr.Error("Can't find the README file")
+#     broot = util.bscr_root()
+#     if broot:
+#         readme = util.pj(broot, filename)
+#         readme = resource_string(__name__, filename)
+#     else:
+#         raise bscr.Error("Can't find the README file")
 
     w, h = util.terminal_size()
     if sys.stdout.isatty():
