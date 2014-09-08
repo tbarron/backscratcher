@@ -56,7 +56,7 @@ Directories and Files
 
 
 
-Tests go in directory tests in a file called test_COMPONENT.py. 
+Tests go in directory bscr/tests in files called test_COMPONENT.py.
 
 To run the tests, use one of
 
@@ -67,7 +67,7 @@ To run the tests, use one of
 Test options:
   -v    verbose output (list tests as they are run)
   -x    fast fail: give up on first failure (green doesn't have this)
-  -k    only run tests whose names match the regexp
+  -k    only run tests whose names match the regexp (py.test only)
 
 To generate a distribution tarball
 
@@ -75,17 +75,29 @@ To generate a distribution tarball
 
 To install the package, use one of
 
-  pip install dist/backscratcher-VERSION.tar.gz
+  pip install https://github.com/tbarron/backscratcher/zipball/<branch>
   pip install .
 
 To install a new one over the top of an old one, use one of
 
-  pip install --upgrade dist/backscratcher-VERSION.tar.gz
+  pip install --upgrade \
+      https://github.com/tbarron/backscratcher/zipball/<branch>
   pip install --upgrade .
 
 To uninstall
 
   pip uninstall backscratcher
+
+For general use on this machine:
+
+  deactivate
+  sudo pip install [--upgrade] .
+
+For testing from the git repo:
+
+  activate bscr
+  pip install [--upgrade] .
+
 
 Release Process
 

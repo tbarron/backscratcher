@@ -9,7 +9,10 @@ v = __version__.split('.')
 g_pfx = g[0]
 v_pfx = '.'.join(v[0:2])
 
-g_cmt = int(g[-2])
+if 1 == len(g):
+     g_cmt = 0
+else:
+     g_cmt = int(g[-2])
 v_cmt = int(v[-1])
 
 if g_pfx == v_pfx and v_cmt != g_cmt + 1:

@@ -5,7 +5,7 @@ import os
 import sys
 import time
 
-bscr_root = os.path.join(distutils.old_get_python_lib(), "bscr")
+# bscr_root = os.path.join(distutils.old_get_python_lib(), "bscr")
 distutils.file_util.copy_file("README.md", "README")
 scripts = ["align",
            "ascii",
@@ -31,13 +31,6 @@ ep_d = {
     }
 
 exec(open(os.path.join("bscr", "version.py")).read())
-# if not os.path.exists(".bscr_version"):
-#     os.system("git describe > .bscr_version")
-# f = open(".bscr_version", 'r')
-# version = f.read().strip()
-# f.close()
-
-# print scrlist
 setup(name='backscratcher',
       version=__version__,
       packages=['bscr', 'bscr/test'],
@@ -45,7 +38,7 @@ setup(name='backscratcher',
       author="Tom Barron",
       author_email='tom.barron@comcast.net',
       url='https://github.com/tbarron/backscratcher/',
-      data_files=[(bscr_root, ["README"])],
+      data_files=[('', ["README"])],
       install_requires=['pexpect == 3.3'],
       tests_require=['pep8==1.5.7',
                      'python-termstyle==0.1.10',
