@@ -2,6 +2,7 @@ from setuptools import setup
 from setuptools import distutils
 import glob
 import os
+import setuptools
 import site
 import sys
 import time
