@@ -7,6 +7,7 @@ import os
 import pdb
 import pexpect
 import pprint as pp
+import re
 import socket
 import sys
 import unittest
@@ -190,6 +191,19 @@ def name_of(obj=None):
     Is this used anywhere? Can we get rid of it?
     """
     return str(obj).split()[0]
+
+
+# ---------------------------------------------------------------------------
+def rm_cov_warn(string):
+    """
+    Return the input string with the coverage warning removed if it was
+    present.
+    """
+    rval = string
+    covwarn = "Coverage.py.warning:.No.data.was collected.\r?\n?"
+    if re.findall(covwarn, string):
+        rval = re.sub(covwarn, "", string)
+    return rval
 
 
 # ---------------------------------------------------------------------------

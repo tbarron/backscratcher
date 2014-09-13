@@ -71,7 +71,7 @@ class TestAscii(th.HelpedTestCase):
         """
         # pdb.set_trace()
         ascii = U.script_location("ascii")
-        result = pexpect.run(ascii)
+        result = th.rm_cov_warn(pexpect.run(ascii))
         eidx = 0
         for rline in result.split("\r\n"):
             rline = rline.rstrip(" ")

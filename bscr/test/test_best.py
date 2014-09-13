@@ -38,7 +38,7 @@ class Test_BEST(th.HelpedTestCase):
                 if args != '':
                     cmd = "pep8 %s" % args
                     # print cmd
-                    result = pexpect.run(cmd)
+                    result = th.rm_cov_warn(pexpect.run(cmd))
                     self.assertEqual('', result,
                                      "Pep8 report: %s" % result)
 

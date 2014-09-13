@@ -44,7 +44,7 @@ class TestScripts(th.HelpedTestCase):
         Test 'bscr version'
         """
         cmd = "bscr version -v"
-        result = pexpect.run(cmd)
+        result = th.rm_cov_warn(pexpect.run(cmd))
         self.assertTrue("Traceback" not in result,
                         "Not expecting 'Traceback' in %s" %
                         U.lquote(result))

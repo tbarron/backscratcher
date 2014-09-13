@@ -68,16 +68,10 @@ class TestAlign(th.HelpedTestCase):
             S.sendline(line)
         S.send("\004")
         S.expect(pexpect.EOF)
-        x = S.before
+        x = th.rm_cov_warn(S.before)
         S.close()
 
-        self.assertEqual(self.expected, x,
-                         '"""\n%s\n"""(%d)\n\n' %
-                         (self.expected.replace(' ', '-'),
-                          len(self.expected)) +
-                         ' does not match' +
-                         '\n\n"""\n%s\n"""(%d)' %
-                         (x.replace(' ', '-'), len(x)))
+        self.assertEq(self.expected, x)
 
     # -------------------------------------------------------------------------
     def test_named_input(self):
@@ -91,15 +85,9 @@ class TestAlign(th.HelpedTestCase):
         f.close()
 
         script = U.script_location("align")
-        x = pexpect.run("%s %s" % (script, tfilename))
+        x = th.rm_cov_warn(pexpect.run("%s %s" % (script, tfilename)))
 
-        self.assertEqual(self.expected, x,
-                         '"""\n%s\n"""(%d)\n\n' %
-                         (self.expected.replace(' ', '-'),
-                          len(self.expected)) +
-                         ' does not match' +
-                         '\n\n"""\n%s\n"""(%d)' %
-                         (x.replace(' ', '-'), len(x)))
+        self.assertEq(self.expected, x)
 
     # -------------------------------------------------------------------------
     # @unittest.skip("under construction")
