@@ -5,7 +5,9 @@ import glob
 import os
 import pexpect
 import re
+import shlex
 import struct
+import subprocess as subp
 import sys
 import termios
 import time
@@ -285,7 +287,9 @@ def run(cmd, xable, verbose=False):
     if xable:
         if verbose:
             print cmd
-        os.system(cmd)
+        p = subp.Popen(shlex.split(cmd))
+        p.wait()
+        # os.system(cmd)
     else:
         print "would do '%s'" % cmd
 
@@ -370,6 +374,10 @@ def package_module(module_name):
     """
     Return the parent package module for the named module
     """
+#     print module_name
+#     print sys.modules[module_name]
+#     print sys.modules[module_name].__package__
+#     print sys.modules[sys.modules[module_name].__package__]
     rval = sys.modules[sys.modules[module_name].__package__]
     return rval
 

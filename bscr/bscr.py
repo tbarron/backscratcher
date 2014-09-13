@@ -116,24 +116,59 @@ def bscr_roots(args):
 def bscr_test(args):
     """test - run tests
 
-    If green is available, we use it. Otherwise, if nosetests is available, we
-    use it. Otherwise, just call unittest.main for each test file.
+    usage: bscr test [-t py.test|green|nosetests|unittest] [-n] [-d]
+
+    Without -t, we use the first available of py.test, green, nosetests, or
+    unittest. With -t, we attempt to run the tests with the specified test
+    runner.
     """
-    with util.Chdir("/tmp"):
+    p = optparse.OptionParser()
+    p.add_option('-d', '--debug',
+                 action='store_true', default=False, dest='debug',
+                 help='run under the debugger')
+    p.add_option('-n', '--dry-run',
+                 action='store_true', default=False, dest='dryrun',
+                 help='select a tester')
+    p.add_option('-t', '--tester',
+                 action='store', default='', dest='tester',
+                 help='select a tester')
+    (o, a) = p.parse_args(args)
+
+    if o.debug:
+        pdb.set_trace()
+
+    with util.Chdir(util.dirname(__file__)):
         target = util.pj(os.path.dirname(__file__), 'test')
         print("Running tests in %s" % target)
-        if which('green'):
-            p = subp.Popen(['green', '-v', target])
-            p.wait()
-        elif which('nosetests') and importable('nose_ignoredoc'):
+        if o.tester == '':
+            if which('py.test'):
+                util.run('py.test %s' % target, not o.dryrun)
+            elif which('green'):
+                util.run('green -v %s' % target, not o.dryrun)
+            elif which('nosetests') and importable('nose_ignoredoc'):
+                tl = glob.glob(util.pj(target, 'test_*.py'))
+                util.run('nosetests -v -c nose.cfg %s' % " ".join(tl),
+                         not o.dryrun)
+            else:
+                tl = glob.glob(util.pj(target, 'test_*.py'))
+                for t in tl:
+                    util.run("%s -v" % t, not o.dryrun)
+                    # p = subp.Popen([t, '-v'])
+                    # p.wait()
+        elif o.tester == 'py.test':
+            util.run('py.test %s' % target, not o.dryrun)
+        elif o.tester == 'green':
+            util.run('green -v %s' % target, not o.dryrun)
+        elif o.tester == 'nose':
             tl = glob.glob(util.pj(target, 'test_*.py'))
-            p = subp.Popen(['nosetests', '-v', '-c', 'nose.cfg'] + tl)
-            p.wait()
-        else:
+            util.run('nosetests -v -c nose.cfg %s' % " ".join(tl),
+                     not o.dryrun)
+        elif o.tester == 'unittest':
             tl = glob.glob(util.pj(target, 'test_*.py'))
             for t in tl:
-                p = subp.Popen([t, '-v'])
-                p.wait()
+                util.run("%s -v" % t, not o.dryrun)
+        else:
+            raise SystemExit("unrecognized tester: '%s'" % o.tester)
 
 
 # -----------------------------------------------------------------------------
