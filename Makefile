@@ -20,7 +20,7 @@ help:
 	@echo "   sdist      - build the distro"
 	@echo "   tags       - create a TAGS file for emacs"
 	@echo "   uninstall  - remove backscratcher from current system"
-	@echo "   upgrade    - pip install --upgrade dist/backscratcher-$(VERSION).tar.gz"
+	@echo "   up         - pip install --upgrade dist/backscratcher-$(VERSION).tar.gz"
 	@echo "   utest      - use unittest to run the tests"
 	@echo "   version    - git describe > .bscr_version"
 
@@ -33,7 +33,7 @@ green:
 nose:
 	nosetests -c nose.cfg $(TEST_OPTIONS)
 
-py.test: upgrade
+py.test: up
 	py.test $(TEST_OPTIONS)
 
 install:
@@ -45,7 +45,7 @@ uninstall:
 readme:
 	cp README.md README
 
-refresh: sdist upgrade
+refresh: sdist up
 
 sdist: readme
 	find . -name "*.pyc" | xargs rm
@@ -58,7 +58,7 @@ retag:
 tags:
 	find . -name "*.py" | xargs etags
 
-upgrade:
+up:
 	pip install --upgrade .
 
 utest:

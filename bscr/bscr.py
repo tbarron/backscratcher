@@ -1,11 +1,16 @@
 import glob
 import optparse
 import os
+try:
+    import pager
+except ImportError:
+    pass
 import pdb
 import pexpect
 import re
 from pkg_resources import resource_string
 import shutil
+import StringIO
 import subprocess as subp
 import sys
 import util
@@ -76,20 +81,11 @@ def bscr_readme(args):
     except:
         raise bscr.Error("Can't find the README file")
 
-    print readme
-#     broot = util.bscr_root()
-#     if broot:
-#         readme = util.pj(broot, filename)
-#         readme = resource_string(__name__, filename)
-#     else:
-#         raise bscr.Error("Can't find the README file")
-
-#     w, h = util.terminal_size()
-#     if sys.stdout.isatty():
-#         p = pexpect.spawn("less -z %d %s" % (h, readme))
-#         p.interact()
-#     else:
-#         shutil.copyfileobj(open(readme, 'r'), sys.stdout)
+    try:
+        pager.page(StringIO.StringIO(readme))
+    except NameError:
+        print(readme)
+        print("(*** 'pip install pager' to get internal paging ***)")
 
 
 # -----------------------------------------------------------------------------
