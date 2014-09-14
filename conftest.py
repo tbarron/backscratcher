@@ -2,6 +2,7 @@ import os
 import pdb
 import pytest
 import time
+from bscr.version import __version__
 
 
 # -----------------------------------------------------------------------------
@@ -18,9 +19,9 @@ def pytest_report_header(config):
     """
     Put marker in the log file to show where the test run started
     """
-    # pdb.set_trace()
-    bscr_writelog(config, "-" * 60)
     
+    bscr_writelog(config, "-" * 60)
+    return("Backscratcher version %s" % __version__)
 
 # -----------------------------------------------------------------------------
 def pytest_unconfigure(config):
