@@ -1,0 +1,3 @@
+[run]
+
+omit = bscr/test/test_*.py

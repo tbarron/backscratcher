@@ -7,6 +7,7 @@ testhome
 TAGS
 cmsg
 .bscr_version
+.coverage
 *.org
 *.log
 *.pyc
