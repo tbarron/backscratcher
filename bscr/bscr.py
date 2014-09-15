@@ -57,6 +57,7 @@ def bscr_help_commands(args):
           "tps         - look up processes by fragments of ps line",
           "truth_table - generate a truth table",
           "wcal        - show a wide calendar of three months",
+          "whych       - find python, perl, and bash modules",
           "workrpt     - time reports",
           "xclean      - remove files by pattern, optionally walking trees",
           ]

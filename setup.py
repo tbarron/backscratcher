@@ -30,7 +30,8 @@ scripts = ["align",
            ]
 ep_d = {
     'console_scripts':
-    ["%s = bscr.%s:main" % (x, x) for x in scripts]
+    ["%s = bscr.%s:main" % (x, x) for x in scripts] +
+    ["whych = bscr:whych"]
     }
 
 exec(open(os.path.join("bscr", "version.py")).read())
