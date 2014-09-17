@@ -69,6 +69,7 @@ class TestScripts(th.HelpedTestCase):
         """
         self.assertEq(U.dirname(unittest.__file__),
                       bscr.python_which('unittest'))
+        self.assertEq(U.__file__, bscr.python_which('util'))
 
     # -------------------------------------------------------------------------
     def test_perl_which(self):

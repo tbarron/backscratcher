@@ -62,8 +62,12 @@ def python_which(module_name):
     for path in sys.path:
         dname = U.pj(path, module_name)
         pname = dname + ".py"
+        cname = dname + ".pyc"
         if U.exists(dname):
             rval = dname
+            break
+        elif U.exists(cname):
+            rval = cname
             break
         elif U.exists(pname):
             rval = pname
