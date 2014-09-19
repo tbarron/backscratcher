@@ -118,6 +118,9 @@ def bscr_test(args):
     Without -t, we use the first available of py.test, green, nosetests, or
     unittest. With -t, we attempt to run the tests with the specified test
     runner.
+
+    The tests are optimized for py.test. They may not work well under green
+    or nose.
     """
     p = optparse.OptionParser()
     p.add_option('-d', '--debug',
