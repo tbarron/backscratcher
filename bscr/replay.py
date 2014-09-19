@@ -57,6 +57,13 @@ import toolframe
 
 # -----------------------------------------------------------------------------
 def main(argv=None):
+    """
+    Main entry point for replay program.
+
+    Run a command repeatedly to view its changing output on a time scheule
+    (say, once every five seconds) or to regenerate an output when a file
+    is updated.
+    """
     p = optparse.OptionParser()
     p.add_option('-c', '--change',
                  action='store_true', default=False, dest='change',
@@ -75,30 +82,38 @@ def main(argv=None):
     if o.debug:
         pdb.set_trace()
 
-    start = time.time()
-    cmd = " ".join(a[1:])
-    old_stuff_s = ""
-    while True:
-        f = os.popen(cmd, "r")
-        stuff = f.readlines()
-        f.close()
-        stuff_s = " ".join(stuff)
+    try:
+        start = time.time()
+        cmd = " ".join(a)
+        old_stuff_s = ""
+        while True:
+            f = os.popen(cmd, "r")
+            stuff = f.readlines()
+            f.close()
+            stuff_s = " ".join(stuff)
 
-        if o.prompt:
-            report(start, cmd, stuff_s)
-            x = raw_input('Press ENTER to continue...')
-        elif o.change:
-            if stuff_s != old_stuff_s:
+            if o.prompt:
                 report(start, cmd, stuff_s)
-                old_stuff_s = stuff_s
-            time.sleep(1.0)
-        else:
-            report(start, cmd, stuff_s)
-            time.sleep(o.interval)
+                x = raw_input('Press ENTER to continue...')
+            elif o.change:
+                if stuff_s != old_stuff_s:
+                    report(start, cmd, stuff_s)
+                    old_stuff_s = stuff_s
+                time.sleep(1.0)
+            else:
+                report(start, cmd, stuff_s)
+                time.sleep(o.interval)
+    except KeyboardInterrupt:
+        print("")
+        sys.exit()
 
 
 # -----------------------------------------------------------------------------
 def report(start, cmd, stuff_s):
+    """
+    Clear the screen and output 1) info about how long we've been going,
+    2) the command we're running, and 3) the command's output
+    """
     os.system("clear")
     print("Running %s since %s" % (ymdhms(time.time() - start),
                                    time.strftime("%Y.%m%d %H:%M:%S",
@@ -109,6 +124,10 @@ def report(start, cmd, stuff_s):
 
 # -----------------------------------------------------------------------------
 def ymdhms(seconds):
+    """
+    Convert a number of seconds to day-HH:MM:SS. This might be replaceable
+    with something from util.
+    """
     S = seconds % 60
     minutes = (seconds - S)/60
     rval = "%02d" % S
@@ -129,7 +148,7 @@ def ymdhms(seconds):
     return rval
 
 # -----------------------------------------------------------------------------
-try:
-    toolframe.ez_launch(__name__, main)
-except KeyboardInterrupt:
-    sys.exit(0)
+# try:
+#     toolframe.ez_launch(__name__, main)
+# except KeyboardInterrupt:
+#     sys.exit(0)

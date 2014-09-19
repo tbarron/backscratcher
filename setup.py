@@ -25,6 +25,7 @@ scripts = ["align",
            "odx",
            "perrno",
            "pytool",
+           "replay",
            "workrpt",
            "xclean",
            ]
