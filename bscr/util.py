@@ -314,6 +314,9 @@ def safe_unlink(path):
 
 # -----------------------------------------------------------------------------
 def mtime(pathname):
+    """
+    Return the mtime of pathname
+    """
     s = os.stat(pathname)
     return s.st_mtime
 

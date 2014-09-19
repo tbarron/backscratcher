@@ -53,7 +53,7 @@ import pdb
 import sys
 import time
 import toolframe
-
+import util as U
 
 # -----------------------------------------------------------------------------
 def main(argv=None):
@@ -104,9 +104,9 @@ def main(argv=None):
                     old_stuff_s = stuff_s
                 time.sleep(1.0)
             elif o.pathname != '':
-                when = mtime(o.pathname)
+                when = U.mtime(o.pathname)
                 report(start, cmd, stuff_s)
-                while when == mtime(o.pathname):
+                while when == U.mtime(o.pathname):
                     time.sleep(1.0)
             else:
                 report(start, cmd, stuff_s)
