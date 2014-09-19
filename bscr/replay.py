@@ -77,6 +77,9 @@ def main(argv=None):
     p.add_option('-p', '--prompt',
                  action='store_true', default=False, dest='prompt',
                  help='update on user input')
+    p.add_option('-t', '--trigger',
+                 action='store', default='', dest='pathname',
+                 help='update when mtime on pathname changes')
     (o, a) = p.parse_args(argv)
 
     if o.debug:
@@ -100,6 +103,11 @@ def main(argv=None):
                     report(start, cmd, stuff_s)
                     old_stuff_s = stuff_s
                 time.sleep(1.0)
+            elif o.pathname != '':
+                when = mtime(o.pathname)
+                report(start, cmd, stuff_s)
+                while when == mtime(o.pathname):
+                    time.sleep(1.0)
             else:
                 report(start, cmd, stuff_s)
                 time.sleep(o.interval)

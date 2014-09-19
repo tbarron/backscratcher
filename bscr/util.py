@@ -313,6 +313,12 @@ def safe_unlink(path):
 
 
 # -----------------------------------------------------------------------------
+def mtime(pathname):
+    s = os.stat(pathname)
+    return s.st_mtime
+
+
+# -----------------------------------------------------------------------------
 def script_location(script):
     """
     Compute where we expect to find the named script.
