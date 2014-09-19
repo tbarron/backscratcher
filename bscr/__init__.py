@@ -59,8 +59,9 @@ def python_which(module_name):
     Look up *module_name* in sys.path and return it if found
     """
     rval = ''
+    mname = module_name.replace('.', '/')
     for path in sys.path:
-        dname = U.pj(path, module_name)
+        dname = U.pj(path, mname)
         pname = dname + ".py"
         cname = dname + ".pyc"
         if U.exists(dname):
