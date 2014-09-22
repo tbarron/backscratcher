@@ -4,6 +4,7 @@ TEST_OPTIONS=-x
 clean:
 	rm -f MANIFEST README TAGS
 	find . -name "*~" | xargs rm
+	xclean -r -p ".*.pyc"
 
 help:
 	@echo "targets in this makefile:"
