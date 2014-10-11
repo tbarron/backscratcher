@@ -66,6 +66,53 @@ def nv_deped(argv):
     x = argv[0].split(':')
     print(':'.join(x[:-1]))
 
+
+# ---------------------------------------------------------------------------
+def nv_stash(argv):
+    """stash - write an env var contents in a format suitable for editing
+
+    usage: nvtool stash VARNAME > filename
+    """
+    p = OptionParser()
+    p.add_option('-d', '--debug',
+                 action='store_true', default=False, dest='debug',
+                 help='start the debugger')
+    (o, a) = p.parse_args(argv)
+
+    if o.debug:
+        pdb.set_trace()
+
+    varname = a[0]
+    val = os.getenv(varname)
+    if val is None:
+        print "No value for $%s" % varname
+    else:
+        for v in val.split(":"):
+            print v
+
+
+# ---------------------------------------------------------------------------
+def nv_load(argv):
+    """load - read a file to set the content of a variable
+
+    usage: export PATH=`nvtool load <filename>`
+    """
+    p = OptionParser()
+    p.add_option('-d', '--debug',
+                 action='store_true', default=False, dest='debug',
+                 help='start the debugger')
+    (o, a) = p.parse_args(argv)
+
+    if o.debug:
+        pdb.set_trace()
+
+    fname = a[0]
+    f = open(fname, 'r')
+    result = ":".join([x.strip() for x in f.readlines()])
+    f.close()
+    print result
+
+
 # ---------------------------------------------------------------------------
 def nv_show(argv):
     """show - display the contents of a PATH variable in an easy to read format
