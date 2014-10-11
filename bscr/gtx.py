@@ -12,9 +12,19 @@ import re
 import shlex
 import subprocess
 import time
-import xtoolframe
 import traceback
 import unittest
+import util
+
+
+# ---------------------------------------------------------------------------
+def main(args=None):
+    """
+    Command line entry point
+    """
+    if args is None:
+        args = sys.argv
+    util.dispatch("bscr.gtx", "gtx", args)
 
 
 # -----------------------------------------------------------------------------
@@ -664,6 +674,3 @@ class GtxTest(unittest.TestCase):
         Create all links, some already there
         """
         self.fail('construction')
-
-# -----------------------------------------------------------------------------
-xtoolframe.tf_launch('gtx')

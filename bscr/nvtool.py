@@ -7,9 +7,21 @@ import os
 import pdb
 import re
 import sys
-import xtoolframe
+import tempfile
+import util
 
 from optparse import *
+
+
+# ---------------------------------------------------------------------------
+def main(args=None):
+    """
+    Command line entry point
+    """
+    if args is None:
+        args = sys.argv
+    util.dispatch("bscr.nvtool", "nv", args)
+
 
 # ---------------------------------------------------------------------------
 def nv_decap(argv):
@@ -17,6 +29,7 @@ def nv_decap(argv):
     """
     x = argv[0].split(':')
     print(':'.join(x[1:]))
+
 
 # ---------------------------------------------------------------------------
 def nv_dedup(argv):
@@ -33,18 +46,19 @@ def nv_dedup(argv):
                  action='store_true', default=False, dest='show',
                  help='newline separated format')
     (o, a) = p.parse_args(argv)
-    
+
     dup = []
     for item in a[0].split(':'):
         if item not in dup:
-           dup.append(item)
+            dup.append(item)
 
     if o.show:
         for item in dup:
             print "   " + item
     else:
         print ':'.join(dup)
-        
+
+
 # ---------------------------------------------------------------------------
 def nv_deped(argv):
     """deped - remove the foot (last entry) of a PATH type variable
@@ -58,6 +72,7 @@ def nv_show(argv):
     """
     for item in argv[0].split(':'):
         print "   " + item
+
 
 # ---------------------------------------------------------------------------
 def nv_remove(argv):
@@ -75,7 +90,8 @@ def nv_remove(argv):
                  help='newline separated format')
     (o, a) = p.parse_args(argv)
 
-    if o.debug: pdb.set_trace()
+    if o.debug:
+        pdb.set_trace()
 
     A = argv[1].split(':')
     result = [x for x in A if argv[0] not in x]
@@ -86,4 +102,4 @@ def nv_remove(argv):
             print "   " + item
 
 # ---------------------------------------------------------------------------
-xtoolframe.tf_launch("nv")
+# xtoolframe.tf_launch("nv")
