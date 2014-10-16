@@ -72,6 +72,13 @@ def nv_stash(argv):
     """stash - write an env var contents in a format suitable for editing
 
     usage: nvtool stash VARNAME > filename
+
+    With load, stash can be used to edit environment variables like $PATH.
+    For example,
+
+        $ nvtool stash PATH > mypath
+        $ vi mypath
+        $ export PATH=`nvtool load mypath`
     """
     p = OptionParser()
     p.add_option('-d', '--debug',
@@ -96,6 +103,13 @@ def nv_load(argv):
     """load - read a file to set the content of a variable
 
     usage: export PATH=`nvtool load <filename>`
+
+    With stash, load can be used to edit environment variables like $PATH.
+    For example,
+
+        $ nvtool stash PATH > mypath
+        $ vi mypath
+        $ export PATH=`nvtool load mypath`
     """
     p = OptionParser()
     p.add_option('-d', '--debug',
