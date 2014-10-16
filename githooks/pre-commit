@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import pexpect
 import time
-# from bscr.version import __version__
 
 exec(open('bscr/version.py').read())
 g = [x.strip() for x in pexpect.run("git describe").split('-')]
@@ -20,6 +19,6 @@ if g_pfx == v_pfx and v_cmt != g_cmt + 1:
      Looks like the version should be %s.%d
                              but it's %s.%d
 
-     I'd do update it for you, but git won't let me. >:(
+     I would update it for you, but git won't let me. >:(
      """ % (v_pfx, g_cmt+1, v_pfx, v_cmt))
 
