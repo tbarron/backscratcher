@@ -12,6 +12,7 @@ import re
 import shlex
 import subprocess
 import time
+# import xtoolframe
 import traceback
 import unittest
 import util
@@ -32,12 +33,18 @@ def gtx_addem(args):
     """addem - add pending files to git index for commit
     """
     p = optparse.OptionParser()
+    p.add_option('-a',  '--add',
+                 action='append', default=[], dest='add',
+                 help='which statuses to add')
     p.add_option('-d',  '--debug',
                  action='store_true', default=False, dest='debug',
                  help='start the debugger')
     p.add_option('-f',  '--force',
                  action='store_true', default=False, dest='force',
                  help='add -f to the git add command')
+    p.add_option('-i',  '--ignore',
+                 action='append', default=[], dest='ignore',
+                 help='which statuses to ignore')
     p.add_option('-n',  '--dryrun',
                  action='store_true', default=False, dest='dryrun',
                  help='show what would happen')
@@ -48,14 +55,40 @@ def gtx_addem(args):
 
     fl = []
     r = pexpect.run("git status --porcelain")
+    ignlist = ["??", "R"]
+    addlist = ["UU", "AA", "AU", "UA", "M"]
+
+    for st in o.add:
+        if st in ignlist:
+            ignlist.remove(st)
+        if st not in addlist:
+            addlist.append(st)
+    for st in o.ignore:
+        if st in addlist:
+            addlist.remove(st)
+        if st not in ignlist:
+            ignlist.append(st)
+
     for line in r.strip().split("\r\n"):
         if line.strip() == '':
             continue
         (status, filename) = line.strip().split(None, 1)
-        if status in ["??", "M", "R"]:
+        if status in ignlist:
             continue
-        if status in ["UU", "AA", "AU", "UA"]:
+        if status in addlist:
             fl.append(filename)
+
+    if fl == []:
+        msg = ["Nothing to add. 'git status --porcelain' to see status flags.",
+               "Use 'gtx addem -a/--add ST -i/--ignore ST' to select statuses",
+               "to add or ignore.",
+               "Defaults:"
+               "   ignore '??', 'M', 'R'",
+               "   add    'UU', 'AA', 'AU', 'UA'",
+               ]
+        for line in msg:
+            print line
+        raise SystemExit
     cmd = "git add "
     if o.force:
         cmd += "-f "
@@ -368,7 +401,7 @@ def gtx_fl(args):
 
 # -----------------------------------------------------------------------------
 def gtx_progress(args):
-    """progress - show rebase progress
+    """progress - show rebase progress 
 
     usage: gtx progress refdir rebasedir
 
@@ -399,7 +432,6 @@ def gtx_progress(args):
         r = pexpect.run("gtx depth -- \"%s\"" % needle)
     print r
     pass
-
 
 # -----------------------------------------------------------------------------
 def gtx_recover(args):
@@ -499,7 +531,7 @@ def resolve_file(which, filename, suffix):
     write = True
     with open(filename, 'r') as i:
         for line in i.readlines():
-            if line.startswith("<<<<<<< HEAD"):
+            if line.startswith("<<<<<<< HEAD") :
                 write = (which == 'head')
                 continue
             elif line.startswith("======="):
@@ -545,7 +577,7 @@ def gtx_nochid(args):
                 current += "\n" + line
         if "Change-Id:" not in current:
             print current
-    except IOError as e:
+    except IOError,e:
         if "Broken pipe" not in str(e):
             raise
 
@@ -574,6 +606,31 @@ def gtx_nodoc(args):
 
 
 # -----------------------------------------------------------------------------
+def gtx_rm_untrack(args):
+    """rm_untrack - remove untracked files
+    """
+    p = optparse.OptionParser()
+    p.add_option('-d',  '--debug',
+                 action='store_true', default=False, dest='debug',
+                 help='start the debugger')
+    p.add_option('-n',  '--dry-run',
+                 action='store_true', default=False, dest='dryrun',
+                 help='show what would happen')
+    (o, a) = p.parse_args(args)
+
+    if o.debug:
+        pdb.set_trace()
+
+    r = [z.split()
+         for z in pexpect.run("git status --porcelain").strip().split("\r\n")]
+    for x in r:
+        if x[0] == '??':
+            print("os.unlink(%s)" % x[1])
+            if not o.dryrun:
+                os.unlink(x[1])
+
+
+# -----------------------------------------------------------------------------
 def contents(path):
     with open(path, 'r') as f:
         rval = f.readlines()
@@ -599,7 +656,7 @@ def call_editor(filename):
 #         f.write(">>> %s <<<\n" % (time.strftime("%Y.%m%d %H:%M:%S")))
 #         f.write("".join(traceback.format_tb(tb)))
 #         f.write("%s: %s\n" % (t.__name__, str(v)))
-#
+# 
 #     print(str(v))
 # sys.excepthook = exc_handler
 
@@ -674,3 +731,6 @@ class GtxTest(unittest.TestCase):
         Create all links, some already there
         """
         self.fail('construction')
+
+# -----------------------------------------------------------------------------
+# xtoolframe.tf_launch('gtx')
