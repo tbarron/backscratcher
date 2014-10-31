@@ -34,6 +34,7 @@ workrpt - report work times
     -c/--copy      copy this code to <dir>
 '''
 
+import copy
 import getopt
 import optparse
 import os
@@ -125,12 +126,18 @@ def default_input_filename():
 
 
 # ---------------------------------------------------------------------------
-def dst():
+def dst(mark=0):
     """
-    Daylight Saving Time? True or False
+    Daylight Saving Time? True or False. With no *mark* (i.e., mark of 0),
+    return current status. Otherwise return status of epoch time *mark*.
     """
-    now = time.localtime(time.time())
-    return now[8]
+    if time == 0:
+        when = time.time()
+    else:
+        when = mark
+
+    tm = time.localtime(when)
+    return tm[8]
 
 
 # ---------------------------------------------------------------------------
@@ -367,6 +374,25 @@ def makeOptionParser(argv):
                  help='display debugging info')
     (o, a) = p.parse_args(argv)
     return(o, a)
+
+
+# ---------------------------------------------------------------------------
+# def maketime(tm=[]):
+#     """
+#     With no *tm* (i.e., == []), return the current epoch time (time.time()).
+#     With *mark*, use it as an arg to time.mktime() in a way that gives an
+#     accurate dst result.
+#     """
+#     if tm:
+#         x = list(tm)
+#         x[3] = 12
+#         x[4] = 0
+#         x[5] = 0
+#         x[8] = 0
+#         z = time.mktime(x)
+#         y = time.localtime(z)
+#         x[8] = y.tm_isdst
+#     return time.mktime(tm)
 
 
 # ---------------------------------------------------------------------------
@@ -666,14 +692,18 @@ def week_starting_last(weekday, offset, now=time.time()):
 
 # ---------------------------------------------------------------------------
 def week_starting(ymd):
-    '''
+    """
     Return start and end %Y.%m%d dates for the week starting on <ymd>.
 
     <ymd> is one of 'yesterday', 'today', 'tomorrow', 'monday', 'tuesday', etc.
-    '''
+
+    We extend the end time by 2 hours (7200 seconds) so that if the week spans
+    the beginning or end of DST, we land within the last day of the week, not
+    just shy of its early edge.
+    """
     (y, m, d) = parse_ymd(ymd)
-    start_time = time.mktime([int(y), int(m), int(d), 0, 0, 0, 0, 0, dst()])
-    end_time = start_time + 6 * 24 * 3600
+    start_time = time.mktime([int(y), int(m), int(d), 0, 0, 0, 0, 0, 0])
+    end_time = start_time + 6 * 24 * 3600 + 7200
     start = time.strftime('%Y.%m%d', time.localtime(start_time))
     end = time.strftime('%Y.%m%d', time.localtime(end_time))
     return(start, end)
@@ -681,14 +711,14 @@ def week_starting(ymd):
 
 # ---------------------------------------------------------------------------
 def week_ending(ymd):
-    '''
+    """
     Return start and end %Y.%m%d dates for the week ending on <ymd>.
 
     <ymd> is one of 'yesterday', 'today', 'tomorrow', 'monday', 'tuesday', etc.
-    '''
+    """
     (y, m, d) = parse_ymd(ymd)
-    end_time = time.mktime([int(y), int(m), int(d), 0, 0, 0, 0, 0, dst()])
-    start_time = end_time - 6 * 24 * 3600
+    end_time = time.mktime([int(y), int(m), int(d), 0, 0, 0, 0, 0, 0])
+    start_time = end_time - (6 * 24 * 3600 - 7200)
     start = time.strftime('%Y.%m%d', time.localtime(start_time))
     end = time.strftime('%Y.%m%d', time.localtime(end_time))
     return(start, end)

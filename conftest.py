@@ -12,7 +12,8 @@ def pytest_addoption(parser):
     """
     parser.addoption("--logpath", action="store", default="",
                      help="where to write a test log")
-
+    parser.addoption("--dbg", action="append", default=[],
+                     help="start debugger on test named or ALL")
 
 # -----------------------------------------------------------------------------
 def pytest_report_header(config):

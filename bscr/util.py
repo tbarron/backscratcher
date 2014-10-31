@@ -171,6 +171,15 @@ def dispatch_help(mname, prefix, args):
 
 
 # ---------------------------------------------------------------------------
+def epoch(ymd):
+    """
+    Convert a YYYY.mmdd date into an epoch (seconds since 1970.0101)
+    """
+    tm = time.strptime(ymd, "%Y.%m%d")
+    return time.mktime(tm)
+
+
+# ---------------------------------------------------------------------------
 def exists(path):
     """
     Shortcut wrapper for os.path.exists()

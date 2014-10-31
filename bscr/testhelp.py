@@ -10,6 +10,7 @@ import pprint as pp
 import re
 import socket
 import sys
+import pytest
 import unittest
 import StringIO
 import util as U
@@ -248,6 +249,15 @@ class HelpedTestCase(unittest.TestCase):
                          "Expected '%s', got '%s'" % (exp, actual))
 
     # -------------------------------------------------------------------------
+    def expected(self, exp, actual):
+        """
+        *exp* and *actual* should be equal. If they are not, report an
+         assertion failure.
+        """
+        self.assertEqual(exp, actual,
+                         "Expected '%s', got '%s'" % (exp, actual))
+
+    # -------------------------------------------------------------------------
     def exp_in_got(self, exp, actual):
         """
         *exp* is expected to be in *actual*. If it is not, report an assertion
@@ -361,6 +371,17 @@ class HelpedTestCase(unittest.TestCase):
         except Exception, e:
             self.fail("Expected an exception of type %s, got %s" %
                       (exctype, type(e)))
+
+    # -------------------------------------------------------------------------
+    def setUp(self):
+        """
+        """
+        dbgopt = pytest.config.getoption("dbg")
+        if any(["all" in x.lower() for x in dbgopt] +
+               [self._testMethodName in dbgopt]):
+            self.dbgfunc = pdb.set_trace
+        else:
+            self.dbgfunc = lambda: None
 
 
 # -----------------------------------------------------------------------------

@@ -181,6 +181,17 @@ class workrptTest(th.HelpedTestCase):
 #         assert(abs(lm - now) <= 24*3600)
 
     # -------------------------------------------------------------------------
+#     def test_maketime(self):
+#         """
+#         """
+#         self.dbgfunc()
+#         td = ["2014.1031", "2014.1105"]
+#         for ymd in td:
+#             mktime_out = U.epoch(ymd)
+#             wr_out = wr.maketime(time.strptime(ymd, "%Y.%m%d"))
+#             self.expected(mktime_out, wr_out)
+
+    # -------------------------------------------------------------------------
     def test_next_tuesday(self):  # never called
         """
         Routine wr.next_tuesday() should return the date of next tuesday
@@ -378,39 +389,43 @@ class workrptTest(th.HelpedTestCase):
         tlist = {'yesterday': time.time() - 24*3600,
                  'today': time.time(),
                  'tomorrow': time.time() + 24*3600,
+                 '2014.1104': U.epoch("2014.1104"),
                  '2009.0401': time.mktime(time.strptime('2009.0401',
                                                         '%Y.%m%d'))}
         for t in tlist.keys():
             (start, end) = wr.week_ending(t)
-            end_should_be = time.strftime('%Y.%m%d',
-                                          time.localtime(tlist[t]))
-            start_should_be = time.strftime('%Y.%m%d',
-                                            time.localtime(tlist[t]-6*24*3600))
-            self.assertEqual(start, start_should_be,
-                             'start is incorrect for %s' % t)
-            self.assertEqual(end, end_should_be,
-                             'end is incorrect for %s' % t)
+            tm = time.localtime(tlist[t])
+            end_exp = time.strftime('%Y.%m%d', tm)
+
+            tm = time.localtime(tlist[t] - (6*24*3600-7200))
+            start_exp = time.strftime('%Y.%m%d', tm)
+
+            self.expected(start_exp, start)
+            self.expected(end_exp, end)
 
     # -------------------------------------------------------------------------
     def test_week_starting(self):
         """
-        test calculating the end of a week from its start
+        test calculating the end of a week from its start. The test for
+        2014.1031 spans the beginning of DST.
         """
+        self.dbgfunc()
         tlist = {'yesterday': time.time() - 24*3600,
                  'today': time.time(),
                  'tomorrow': time.time() + 24*3600,
+                 '2014.1028': U.epoch("2014.1028"),
                  '2009.0401': time.mktime(time.strptime('2009.0401',
                                                         '%Y.%m%d'))}
         for t in tlist.keys():
             (start, end) = wr.week_starting(t)
-            start_should_be = time.strftime('%Y.%m%d',
-                                            time.localtime(tlist[t]))
-            end_should_be = time.strftime('%Y.%m%d',
-                                          time.localtime(tlist[t]+6*24*3600))
-            self.assertEqual(start_should_be, start,
-                             'start is incorrect for %s' % t)
-            self.assertEqual(end_should_be, end,
-                             'end is incorrect for %s' % t)
+            tm = time.localtime(tlist[t])
+            start_should_be = time.strftime('%Y.%m%d', tm)
+
+            tm = time.localtime(tlist[t] + 6*24*3600 + 7200)
+            end_should_be = time.strftime('%Y.%m%d', tm)
+
+            self.expected(start_should_be, start)
+            self.expected(end_should_be, end)
 
     # -------------------------------------------------------------------------
     def test_week_starting_last(self):
