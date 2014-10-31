@@ -8,6 +8,9 @@ def main(args):
 
     msg = contents(filename)
     (payload, comments) = split_msg(msg)
+    payload_str = '\n'.join(payload).strip()
+    if 0 == len(payload_str) or 'Version:' in payload_str:
+        return
     version = get_version()
     newname = save_new(filename, payload, version, comments)
     os.rename(filename, filename + ".old")
