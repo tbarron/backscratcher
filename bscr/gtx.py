@@ -175,6 +175,9 @@ def gtx_gerrit_issues(args):
 # -----------------------------------------------------------------------------
 def gtx_hooks(args):
     """hooks - check hooks and offer to add any missing links
+
+    usage: gtx hooks [-d] [-n] [-C|-D] [-H dir]
+
     """
     p = optparse.OptionParser()
     p.add_option('-d',  '--debug',
@@ -188,7 +191,10 @@ def gtx_hooks(args):
                  help='delete hooks')
     p.add_option('-H',  '--hookdir',
                  action='store', default='', dest='hookdir',
-                 help='hook scripts under git control')
+                 help='where to look for hook scripts')
+    p.add_option('-l',  '--linkdir',
+                 action='store', default='', dest='linkdir',
+                 help='link dir for testing')
     p.add_option('-n',  '--dryrun',
                  action='store_true', default=False, dest='dryrun',
                  help='show what would happen')
@@ -201,7 +207,9 @@ def gtx_hooks(args):
     if srcdir == '':
         srcdir = 'githooks'
 
-    lnkdir = ".git/hooks"
+    lnkdir = o.linkdir
+    if lnkdir == '':
+        lnkdir = ".git/hooks"
 
     if o.delete:
         hooks_delete(a, lnkdir)
@@ -401,7 +409,7 @@ def gtx_fl(args):
 
 # -----------------------------------------------------------------------------
 def gtx_progress(args):
-    """progress - show rebase progress 
+    """progress - show rebase progress
 
     usage: gtx progress refdir rebasedir
 
@@ -432,6 +440,7 @@ def gtx_progress(args):
         r = pexpect.run("gtx depth -- \"%s\"" % needle)
     print r
     pass
+
 
 # -----------------------------------------------------------------------------
 def gtx_recover(args):
@@ -531,7 +540,7 @@ def resolve_file(which, filename, suffix):
     write = True
     with open(filename, 'r') as i:
         for line in i.readlines():
-            if line.startswith("<<<<<<< HEAD") :
+            if line.startswith("<<<<<<< HEAD"):
                 write = (which == 'head')
                 continue
             elif line.startswith("======="):
@@ -577,7 +586,7 @@ def gtx_nochid(args):
                 current += "\n" + line
         if "Change-Id:" not in current:
             print current
-    except IOError,e:
+    except IOError as e:
         if "Broken pipe" not in str(e):
             raise
 
@@ -656,7 +665,7 @@ def call_editor(filename):
 #         f.write(">>> %s <<<\n" % (time.strftime("%Y.%m%d %H:%M:%S")))
 #         f.write("".join(traceback.format_tb(tb)))
 #         f.write("%s: %s\n" % (t.__name__, str(v)))
-# 
+#
 #     print(str(v))
 # sys.excepthook = exc_handler
 
