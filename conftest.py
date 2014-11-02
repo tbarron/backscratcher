@@ -10,6 +10,8 @@ def pytest_addoption(parser):
     """
     Add the --logpath option to the command line
     """
+#     parser.addoption("--keepfiles", action="store_true", default=False,
+#                      help="whether to keep or remove test outputs")
     parser.addoption("--logpath", action="store", default="",
                      help="where to write a test log")
     parser.addoption("--dbg", action="append", default=[],
@@ -20,12 +22,29 @@ def pytest_report_header(config):
     """
     Put marker in the log file to show where the test run started
     """
-    
+
     bscr_writelog(config, "-" * 60)
     return("Backscratcher version %s" % __version__)
 
+
+# -----------------------------------------------------------------------------
+def pytest_runtest_setup(item):
+    """
+    For each test, just before it runs...
+    """
+    if any([item.name in item.config.getoption("--dbg"),
+            'all' in item.config.getoption("--dbg")]):
+        pytest.debug_func = pdb.set_trace
+    else:
+        pytest.debug_func = lambda: None
+    setattr(pytest.debug_func, "__doc__", "Run debugger or no/op")
+
+
 # -----------------------------------------------------------------------------
 def pytest_unconfigure(config):
+    """
+    At the end of the run, log a summary
+    """
     bscr_writelog(config,
                   "passed: %d; FAILED: %d" % (bscr_writelog._passcount,
                                               bscr_writelog._failcount))

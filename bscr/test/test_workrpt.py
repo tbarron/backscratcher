@@ -382,13 +382,23 @@ class workrptTest(th.HelpedTestCase):
                         "'%s' expected in '%s'" % (exp, r))
 
     # -------------------------------------------------------------------------
+    def daystart(self, mark):
+        """
+        Given *mark* compute the beginning of the day mark falls in
+        """
+        t = time.localtime(mark)
+        rval = time.mktime([t.tm_year, t.tm_mon, t.tm_mday, 0, 0, 0, 0, 0, 0])
+        return rval
+
+    # -------------------------------------------------------------------------
     def test_week_ending(self):
         """
         test calculating the beginning of a week from its end?
         """
-        tlist = {'yesterday': time.time() - 24*3600,
-                 'today': time.time(),
-                 'tomorrow': time.time() + 24*3600,
+        self.dbgfunc()
+        tlist = {'yesterday': self.daystart(time.time() - 24*3600),
+                 'today': self.daystart(time.time()),
+                 'tomorrow': self.daystart(time.time() + 24*3600),
                  '2014.1104': U.epoch("2014.1104"),
                  '2009.0401': time.mktime(time.strptime('2009.0401',
                                                         '%Y.%m%d'))}
