@@ -99,16 +99,49 @@ For testing from the git repo:
   pip install [--upgrade] .
 
 
-Release Process
+Development/Release Process
+
+ * git checkout master
+
+   Branch master should always be at a major version -- one that ends
+   in '0' (e.g., 2014.0913.0).
+
+ * git checkout -b FEATURE
+
+   At each commit, the pre-commit hook enforces updating the version
+   -- 2014.0913.0 -> 2014.0913.1 -> .2 -> .3, etc.
 
  * Get things working the way you want in the feature branch, with all
    the tests passing and travis-ci.org showing the project as green for
    all environments.
 
- * Commit the updates with the desired version in place.
+   For testing at each commit,
 
- * Merge the feature branch into master.
+    > activate bscr-dev
+    > pip install --upgrade .
 
- * Tag the release on the master branch with the version already set.
+ * Commit everything so the working copy of the feature branch is clean.
 
- * Install the master branch somewhere and run the tests.
+ * py.test
+
+ * git checkout master
+
+ * git merge FEATURE
+
+ * py.test (fix and commit any failures with version updates as needed)
+
+ * Update bscr/version.py to the current major version (YYYY.mmdd.0)
+
+ * git commit
+
+ * git tag -a YYYY.mmdd
+
+ * git push --tags origin
+
+ * Fetch the release from github and unpack it
+
+ * activate bscr
+
+ * pip install .
+
+ * py.test
