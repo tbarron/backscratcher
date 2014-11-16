@@ -1,11 +1,13 @@
 #!/usr/bin/env python
+import pdb
 import pexpect
 import time
 
-exec(open('bscr/version.py').read())
+vfname = 'bscr/version.py'
+exec(open(vfname).read())
 g = [x.strip() for x in pexpect.run("git describe").split('-')]
 v = __version__.split('.')
-g_pfx = g[0]
+g_pfx = '.'.join(g[0].split('.')[0:2])
 v_pfx = '.'.join(v[0:2])
 
 if 1 == len(g):
@@ -16,9 +18,24 @@ v_cmt = int(v[-1])
 
 if g_pfx == v_pfx and v_cmt != g_cmt + 1:
      raise SystemExit("""
-     Looks like the version should be %s.%d
-                             but it's %s.%d
+     Looks like %s should contain %s.%d
+                                  but it's got %s.%d
 
-     I would update it for you, but git won't let me. >:(
-     """ % (v_pfx, g_cmt+1, v_pfx, v_cmt))
+     I'd update it for you, but git won't let me. >:(
+     """ % (vfname, v_pfx, g_cmt+1, v_pfx, v_cmt))
 
+status = pexpect.run("git status --porc")
+staged = False
+for line in status.split("\n"):
+     if vfname in line and line.startswith("M  "):
+          staged = True
+
+if not staged:
+     raise SystemExit("""
+     %s is not staged. Looks like you need to make sure it
+     contains the right version and do
+          
+         git add %s
+
+     then try your commit again.
+     """ % (vfname, vfname))
