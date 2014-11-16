@@ -40,6 +40,7 @@ def bscr_help_commands(args):
           "chron       - stopwatch and timer",
           "dt          - date and time manipulations",
           "fl          - retrieve and report information about files",
+          "gtx         - git helper extensions",
           "fx          - command line special effects",
           "hd          - hexdump",
           "jcal        - generate various kinds of calendars",
