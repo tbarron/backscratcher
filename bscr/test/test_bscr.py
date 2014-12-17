@@ -9,7 +9,6 @@ from bscr import fl
 from bscr import testhelp as th
 from bscr import util as U
 import pexpect
-# from nose.plugins.skip import SkipTest
 import pytest
 import unittest
 
@@ -68,7 +67,7 @@ class TestScripts(th.HelpedTestCase):
         Calling python_which('sys') should get back a string containing the
         same path as sys.__file__
         """
-        pytest.skip('not portable')
+        # pytest.skip('not portable')
         self.assertEq(U.dirname(unittest.__file__),
                       bscr.python_which('unittest'))
         self.assertEq(U.__file__, bscr.python_which('bscr/util'))
@@ -80,7 +79,7 @@ class TestScripts(th.HelpedTestCase):
         Calling perl_which('Digest::MD5') should get back a string containing
         the same path as sys.__file__
         """
-        pytest.skip('not portable')
+        # pytest.skip('not portable')
         exp = ("/System/Library/Perl/5.16/darwin-thread-multi-2level/" +
                "Digest/MD5.pm")
         self.assertEq(exp, bscr.perl_which('Digest::MD5'))

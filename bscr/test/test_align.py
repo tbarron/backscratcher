@@ -4,7 +4,6 @@ import sys
 from bscr import align
 import pdb
 import pexpect
-from nose.plugins.skip import SkipTest
 from bscr import testhelp as th
 from bscr import toolframe
 import unittest

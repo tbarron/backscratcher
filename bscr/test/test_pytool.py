@@ -2,7 +2,6 @@ import os
 import pdb
 import pexpect
 import shutil
-from nose.plugins.skip import SkipTest
 import sys
 from bscr import testhelp as th
 from bscr import util as U
@@ -137,7 +136,7 @@ class TestPytool(th.HelpedTestCase):
             U.safe_unlink([toollink, toolname])
             cmd = pexpect.which("pytool")
             if cmd is None:
-                raise SkipTest
+                pytest.skip("pytool not found")
             S = pexpect.spawn('%s newtool %s tt' % (cmd, toollink))
             which = S.expect([r'Are you sure\? >',
                               'Error:',
@@ -176,7 +175,7 @@ class TestPytool(th.HelpedTestCase):
             U.writefile(tlink, ["original %s\n" % tlink])
             cmd = pexpect.which("pytool")
             if cmd is None:
-                raise SkipTest
+                pytest.skip("pytool not found")
             S = pexpect.spawn('%s newtool %s tt' % (cmd, tlink))
             which = S.expect([r'Are you sure\? >',
                               'Error:',
@@ -213,7 +212,7 @@ class TestPytool(th.HelpedTestCase):
             U.writefile(tlink, ["original %s\n" % tlink])
             cmd = pexpect.which("pytool")
             if cmd is None:
-                raise SkipTest
+                pytest.skip("pytool not found")
             S = pexpect.spawn('%s newtool %s tt' % (cmd, tlink))
             which = S.expect([r'Are you sure\? >',
                               'Error:',

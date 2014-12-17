@@ -1,5 +1,4 @@
 from bscr import filter
-from nose.plugins.skip import SkipTest
 from bscr import testhelp as th
 import unittest
 

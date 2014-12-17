@@ -3,7 +3,6 @@
 jcal tests
 """
 from bscr import jcal
-from nose.plugins.skip import SkipTest
 import pexpect
 from bscr import testhelp as th
 from bscr import util as U

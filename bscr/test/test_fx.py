@@ -8,7 +8,6 @@ import os
 import pdb
 import pexpect
 import shutil
-from nose.plugins.skip import SkipTest
 import StringIO
 import sys
 import unittest

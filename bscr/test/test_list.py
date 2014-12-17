@@ -2,7 +2,6 @@
 from bscr import list
 from bscr import testhelp as th
 from bscr import util as U
-from nose.plugins.skip import SkipTest
 import os
 import pexpect
 import pprint

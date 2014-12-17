@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from bscr import calc
 import pexpect
-from nose.plugins.skip import SkipTest
 import sys
 import unittest
 from bscr import testhelp as th

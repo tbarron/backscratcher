@@ -8,7 +8,6 @@ import pexpect
 import random
 import re
 import shutil
-from nose.plugins.skip import SkipTest
 import stat
 import tempfile
 from bscr import testhelp as th

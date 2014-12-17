@@ -5,7 +5,6 @@ import os
 import pdb
 import re
 import shutil
-from nose.plugins.skip import SkipTest
 import stat
 import time
 
@@ -106,7 +105,7 @@ class TestUtil(th.HelpedTestCase):
         Test running git_describe and grabbing its output
         """
         if not U.in_bscr_repo():
-            raise SkipTest
+            pytest.skip("not in backscratcher repo")
 
         got = U.git_describe()
         result = re.findall("\d{4}\.\d{4}\w*", got)

@@ -5,7 +5,6 @@ import pdb
 import pexpect
 import re
 import sys
-from nose.plugins.skip import SkipTest
 from bscr import testhelp as th
 import types
 import unittest
@@ -29,7 +28,7 @@ class Test_BEST(th.HelpedTestCase):
         # pdb.set_trace()
         pep8 = pexpect.which('pep8')
         if pep8 is None:
-            raise SkipTest("Pep8 tool not found")
+            pytest.skip("Pep8 tool not found")
         else:
             root = U.bscr_root()
             for r, d, f in os.walk(root):
