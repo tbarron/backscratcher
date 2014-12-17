@@ -273,6 +273,10 @@ class HelpedTestCase(unittest.TestCase):
 
         If it fails, we report expected and actual. Otherwise, just return.
         """
+
+        covmsg = "Coverage.py.warning:.No.data.was collected.\r?\n?"
+        if re.findall(covmsg,actual):
+            actual = re.sub(covmsg, "", actual)
         self.assertEqual(expected, actual,
                          self._generate_msg(expected, actual))
 
