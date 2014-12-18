@@ -1,5 +1,14 @@
 This file describes how I manage development of backscratcher.
 
+Rules
+
+ * Keep exactly one working copy locally. If you clone a temporary
+   repo for reference, remove it when you're done.
+
+ * Keep the working copy open on a feature branch, not master. When
+   you're ready to make a release, do it all in one sitting so things
+   are not left half baked.
+
 Directories and Files
 (Starred entries are not in git)
 
@@ -31,8 +40,8 @@ Directories and Files
     cmsg*
         A place to compose commit messages.
 
-    ~/Dropbox/prj/backscratcher/dev.README*
-        This file. It may wind up in git yet.
+    ~/Dropbox/prj/backscratcher/dev.README
+        This file.
 
     dist
         Where setup.py puts generated distribution files.
@@ -58,90 +67,81 @@ Directories and Files
 
 Tests go in directory bscr/tests in files called test_COMPONENT.py.
 
-To run the tests, use one of
+Running tests
 
-  py.test [-v] [-x] [bscr/test] [-k regexp] (preferred)
-  green [-v] [bscr/test]
-  nosetests [-v] [-x] [bscr/test]
+  py.test [-v] [-x] [bscr/test] [-k regexp] [--cov bscr]
+
 
 Test options:
   -v    verbose output (list tests as they are run)
-  -x    fast fail: give up on first failure (green doesn't have this)
-  -k    only run tests whose names match the regexp (py.test only)
+  -x    fast fail: give up on first failure
+  -k    only run tests whose names match the expression
 
-To generate a distribution tarball
+
+To generate a distribution tarball (not generally necessary)
 
   python setup sdist
 
-To install the package, use one of
 
-  pip install https://github.com/tbarron/backscratcher/zipball/<branch>
-  pip install .
+Install the package for development:
 
-To install a new one over the top of an old one, use one of
+  virtualenv $HOME/venv/bscr
+  . $HOME/venv/bscr/bin/activate
+  pip install --edit .
+
+
+Install the package for use in my account:
+
+  pip install --user https://github.com/tbarron/backscratcher/zipball/master
+
+
+Upgrade already installed package
 
   pip install --upgrade \
-      https://github.com/tbarron/backscratcher/zipball/<branch>
-  pip install --upgrade .
+      https://github.com/tbarron/backscratcher/zipball/master
+
 
 To uninstall
 
   pip uninstall backscratcher
 
+
 For general use on this machine:
 
   deactivate
-  sudo pip install [--upgrade] .
-
-For testing from the git repo:
-
-  activate bscr
-  pip install [--upgrade] .
+  sudo pip install [--upgrade] \
+     https://github.com/tbarron/backscratcher/zipball/master
 
 
 Development/Release Process
 
+ * The working copy should normally be left sitting on a feature
+   branch, not master.
+
+ * Iterate making changes in the feature branch and testing until
+   satisfied that we're ready for the next release.
+
  * git checkout master
 
    Branch master should always be at a major version -- one that ends
-   in '0' (e.g., 2014.0913.0).
-
- * git checkout -b FEATURE
-
-   At each commit, the pre-commit hook enforces updating the version
-   -- 2014.0913.0 -> 2014.0913.1 -> .2 -> .3, etc.
-
- * Get things working the way you want in the feature branch, with all
-   the tests passing and travis-ci.org showing the project as green for
-   all environments.
-
-   For testing at each commit,
-
-    > activate bscr-dev
-    > pip install --upgrade .
-
- * Commit everything so the working copy of the feature branch is clean.
-
- * py.test
-
- * git checkout master
+   in '0' (e.g., 2014.0913.0). In this case, we're retrieving the
+   previous release.
 
  * git merge FEATURE
 
- * py.test (fix and commit any failures with version updates as needed)
+   Merge the new changes into master. (What would this look like if I
+   wanted to use rebase here instead?)
 
- * Update bscr/version.py to the current major version (YYYY.mmdd.0)
+ * py.test --cov bscr
+
+ * Update bscr/version.py to reflect the new release
 
  * git commit
 
- * git tag -a YYYY.mmdd
+ * git tag -a VERSION
 
- * git push --tags origin
+ * git push --tags origin master
 
- * Fetch the release from github and unpack it
-
- * activate bscr
-
- * pip install .
-
- * py.test
+ * activate bscr-install-test
+   pip install https://github.com/tbarron/backscratcher/archive/VERSION.tar.gz
+   py.test
