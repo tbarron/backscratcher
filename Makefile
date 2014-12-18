@@ -4,6 +4,7 @@ TEST_OPTIONS=-x
 clean:
 	rm -f MANIFEST README TAGS
 	find . -name "*~" | xargs rm
+	rm -rf bscr/test/__pycache__
 	xclean -r -p ".*.pyc"
 
 help:
@@ -22,6 +23,7 @@ help:
 	@echo "   tags       - create a TAGS file for emacs"
 	@echo "   uninstall  - remove backscratcher from current system"
 	@echo "   up         - pip install --upgrade dist/backscratcher-$(VERSION).tar.gz"
+	@echo "   user_install - install --user"
 	@echo "   utest      - use unittest to run the tests"
 	@echo "   version    - git describe > .bscr_version"
 
@@ -61,6 +63,9 @@ tags:
 
 up:
 	pip install --upgrade .
+
+user_install:
+	pip install --user .
 
 utest:
 	for fn in `ls test/test_*.py`; do echo ==== $$fn ====; $$fn -v; done
