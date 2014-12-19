@@ -108,7 +108,7 @@ def test_gtx_hooks_create_all_nothing(tmpdir):
             S.expect(r"Shall I add one\? >")
             S.sendline("y")
         elif 1 == which:
-            assert(False, "Found 'already has link' when we should not have")
+            self.unexpected_in("already has link", S.before)
         else:
             break
 

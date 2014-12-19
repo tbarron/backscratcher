@@ -300,8 +300,8 @@ class HelpedTestCase(unittest.TestCase):
                 rval += "EXPECTED '%s'\n" % exp
                 rval += "     GOT '%s'\n" % act
         elif type(exp) == str:
-            rval += "EXPECTED: '%s'\n" % exp
-            rval += "     GOT: '%s'\n" % act
+            rval += "EXPECTED: '%s'\n" % exp.replace(' ', '.')
+            rval += "     GOT: '%s'\n" % act.replace(' ', '.')
         else:
             rval += "EXPECTED: %s\n" % repr(exp)
             rval += "     GOT: %s\n" % repr(act)

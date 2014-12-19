@@ -31,12 +31,12 @@ class TestAlign(th.HelpedTestCase):
     tdata = [" 1234  -12342 2342.9324 -1234.9238 7.82734E+25 -2.2343E-17",
              "abc  def ghi jkl mno qprs",
              "foobard simplification denomination vituperation spalshy"]
-    expected = ("   1234          -12342     2342.9324    -1234.9238  " +
-                "7.82734E+25  -2.2343E-17  \r\n" +
-                "abc      def             ghi           jkl           " +
-                "mno          qprs         \r\n" +
-                "foobard  simplification  denomination  vituperation" +
-                "  spalshy      \r\n")
+    exp = ("   1234          -12342     2342.9324    -1234.9238  " +
+           "7.82734E+25  -2.2343E-17  \r\n" +
+           "abc      def             ghi           jkl           " +
+           "mno          qprs         \r\n" +
+           "foobard  simplification  denomination  vituperation" +
+           "  spalshy      \r\n")
 
     # -------------------------------------------------------------------------
     def test_align_help(self):
@@ -69,8 +69,7 @@ class TestAlign(th.HelpedTestCase):
         S.expect(pexpect.EOF)
         x = th.rm_cov_warn(S.before)
         S.close()
-
-        self.assertEq(self.expected, x)
+        self.assertEq(self.exp, x)
 
     # -------------------------------------------------------------------------
     def test_named_input(self):
@@ -85,8 +84,7 @@ class TestAlign(th.HelpedTestCase):
 
         script = U.script_location("align")
         x = th.rm_cov_warn(pexpect.run("%s %s" % (script, tfilename)))
-
-        self.assertEq(self.expected, x)
+        self.assertEq(self.exp, x)
 
     # -------------------------------------------------------------------------
     # @unittest.skip("under construction")
