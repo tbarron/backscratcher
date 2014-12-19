@@ -67,7 +67,7 @@ class Test_BEST(th.HelpedTestCase):
                             'pdb', 'optparse', 'traceback', 'linecache',
                             'bdb', 'logging', 'StringIO', 'inspect', 'stat',
                             'tokenize', 'socket', 'dis', 'getopt', 'shlex',
-                            'pickle', 'shutil',
+                            'pickle', 'shutil', 'pytest',
                             ]
             already = self.already
         rval = ''

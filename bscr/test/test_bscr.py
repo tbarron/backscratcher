@@ -20,6 +20,7 @@ class TestScripts(th.HelpedTestCase):
         """
         Test 'bscr help'
         """
+        self.dbgfunc()
         cmd = pexpect.which('bscr')
         result = pexpect.run('%s help' % cmd)
         self.assertFalse('Traceback' in result)
@@ -32,6 +33,7 @@ class TestScripts(th.HelpedTestCase):
         """
         Test 'bscr help help'
         """
+        self.dbgfunc()
         cmd = pexpect.which('bscr')
         result = pexpect.run('%s help help' % cmd)
         self.assertFalse('Traceback' in result)
@@ -44,6 +46,7 @@ class TestScripts(th.HelpedTestCase):
         """
         Test 'bscr version'
         """
+        self.dbgfunc()
         cmd = "bscr version -v"
         result = th.rm_cov_warn(pexpect.run(cmd))
         self.assertTrue("Traceback" not in result,
@@ -59,6 +62,7 @@ class TestScripts(th.HelpedTestCase):
         """
         Verify that we're importing the right align module
         """
+        self.dbgfunc()
         self.assertModule('bscr.bscr', __file__)
 
     # -------------------------------------------------------------------------
@@ -67,7 +71,7 @@ class TestScripts(th.HelpedTestCase):
         Calling python_which('sys') should get back a string containing the
         same path as sys.__file__
         """
-        # pytest.skip('not portable')
+        self.dbgfunc()
         self.assertEq(U.dirname(unittest.__file__),
                       bscr.python_which('unittest'))
         self.assertEq(U.__file__, bscr.python_which('bscr/util'))
@@ -79,7 +83,7 @@ class TestScripts(th.HelpedTestCase):
         Calling perl_which('Digest::MD5') should get back a string containing
         the same path as sys.__file__
         """
-        # pytest.skip('not portable')
+        self.dbgfunc()
         exp = ("/System/Library/Perl/5.16/darwin-thread-multi-2level/" +
                "Digest/MD5.pm")
         self.assertEq(exp, bscr.perl_which('Digest::MD5'))
@@ -90,5 +94,6 @@ class TestScripts(th.HelpedTestCase):
         Calling bash_which('emacs') should get back a string with a path to the
         emacs executable
         """
+        self.dbgfunc()
         self.assertEq("/usr/bin/emacs",
                       bscr.bash_which("emacs"))

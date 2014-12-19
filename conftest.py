@@ -37,7 +37,6 @@ def pytest_runtest_setup(item):
         pytest.debug_func = pdb.set_trace
     else:
         pytest.debug_func = lambda: None
-    setattr(pytest.debug_func, "__doc__", "Run debugger or no/op")
 
 
 # -----------------------------------------------------------------------------
