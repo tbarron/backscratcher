@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
-import pdb
-import os
-import sys
 import bscr
 import bscr.bscr
 from bscr import fl
+import glob
+import pdb
+import os
+import sys
 from bscr import testhelp as th
 from bscr import util as U
 import pexpect
@@ -84,9 +85,17 @@ class TestScripts(th.HelpedTestCase):
         the same path as sys.__file__
         """
         self.dbgfunc()
-        exp = ("/System/Library/Perl/5.16/darwin-thread-multi-2level/" +
-               "Digest/MD5.pm")
-        self.assertEq(exp, bscr.perl_which('Digest::MD5'))
+        perlinc = pexpect.run("perl -e 'print(\"@INC\");'")
+        found = False
+        for path in perlinc.split():
+            exp = U.pj(path, "Digest", "MD5.pm")
+            if glob.glob(exp):
+                found = True
+                break
+        if found:
+            self.assertEq(exp, bscr.perl_which('Digest::MD5'))
+        else:
+            pytest.skip("Digest/MD5 not found in perl @INC")
 
     # -------------------------------------------------------------------------
     def test_bash_which(self):
@@ -95,5 +104,5 @@ class TestScripts(th.HelpedTestCase):
         emacs executable
         """
         self.dbgfunc()
-        self.assertEq("/usr/bin/emacs",
+        self.assertEq(pexpect.which("emacs"),
                       bscr.bash_which("emacs"))
