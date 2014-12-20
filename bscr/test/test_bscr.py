@@ -72,11 +72,20 @@ class TestScripts(th.HelpedTestCase):
         Calling python_which('sys') should get back a string containing the
         same path as sys.__file__
         """
+        def rshave(path, comp):
+            while comp in path:
+                path = U.dirname(path)
+            return path
+
         self.dbgfunc()
-        self.assertEq(U.dirname(unittest.__file__),
-                      bscr.python_which('unittest'))
-        self.assertEq(U.__file__, bscr.python_which('bscr/util'))
-        self.assertEq(U.__file__, bscr.python_which('bscr.util'))
+        act = rshave(bscr.python_which('unittest'), 'unittest')
+        exp = rshave(unittest.__file__, 'unittest')
+        self.assertEq(exp, act)
+
+        self.assertEq(rshave(U.__file__, 'util'),
+                      rshave(bscr.python_which('bscr/util'), 'util'))
+        self.assertEq(rshave(U.__file__, 'util'),
+                      rshave(bscr.python_which('bscr.util'), 'util'))
 
     # -------------------------------------------------------------------------
     def test_perl_which(self):

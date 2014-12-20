@@ -3,6 +3,7 @@ from bscr import testhelp as th
 from bscr import util as U
 import os
 import pdb
+import pytest
 import re
 import shutil
 import stat
