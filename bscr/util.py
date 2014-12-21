@@ -2,6 +2,7 @@
 import pdb
 import fcntl
 import glob
+import optparse
 import os
 import pexpect
 import re
@@ -51,6 +52,45 @@ class Chdir(object):
         starting directory.
         """
         os.chdir(self.start)
+
+
+# -----------------------------------------------------------------------------
+class cmdline(object):
+    """
+    Handle command line parsing
+    """
+    def __init__(self, optdef, usage=None):
+        """
+        The constructor expects a dictionary in *optdef* defining the arguments
+        to be parsed from the command line.
+        """
+        debug_absent = True
+        self.p = optparse.OptionParser(usage=usage)
+        for arg in optdef:
+            if '--debug' in arg['a']:
+               debug_absent = False
+            self.p.add_option(*arg['a'], **arg['k'])
+        if debug_absent:
+            self.p.add_option('-d', '--debug',
+                              action='store_true',
+                              default=False,
+                              dest='debug',
+                              help='run under the debugger')
+
+    def parse(self, arglist):
+        """
+        Parse the command line based on the dictionary passed in to the
+        constructor
+        """
+        try:
+            (o, a) = self.p.parse_args(arglist)
+        except SystemExit:
+            return
+
+        if o.debug:
+            pdb.set_trace()
+
+        return(o, a)
 
 
 # ---------------------------------------------------------------------------
