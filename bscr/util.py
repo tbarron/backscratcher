@@ -68,7 +68,7 @@ class cmdline(object):
         self.p = optparse.OptionParser(usage=usage)
         for arg in optdef:
             if '--debug' in arg['a']:
-               debug_absent = False
+                debug_absent = False
             self.p.add_option(*arg['a'], **arg['k'])
         if debug_absent:
             self.p.add_option('-d', '--debug',

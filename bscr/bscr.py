@@ -220,17 +220,14 @@ def bscr_version(args):
 
     usage: bscr version
     """
-    p = optparse.OptionParser()
-    p.add_option('-d', '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='run under the debugger')
-    p.add_option('-v', '--verbose',
-                 action='store_true', default=False, dest='verbose',
-                 help='show more info')
-    (o, a) = p.parse_args(args)
-
-    if o.debug:
-        pdb.set_trace()
+    ap = util.cmdline([{'a': ['-v', '--verbose'],
+                        'k': {'action': 'store_true',
+                              'default': False,
+                              'dest': 'verbose',
+                              'help': 'show more info'
+                              }}
+                       ])
+    (o, a) = ap.parse(args)
 
     print("Backscratcher version %s" % __version__)
 
