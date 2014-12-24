@@ -14,6 +14,19 @@ import pytest
 import unittest
 
 
+# -------------------------------------------------------------------------
+def test_bscr_version_help():
+    """
+    Test 'bscr version -h'
+    """
+    pytest.debug_func()
+    cmd = "bscr version -h"
+    result = th.rm_cov_warn(pexpect.run(cmd))
+    assert "Traceback" not in result
+    assert "Usage: bscr [options]" in result
+    assert "-d, --debug    run under the debugger" in result
+
+
 # -----------------------------------------------------------------------------
 class TestScripts(th.HelpedTestCase):
     # -------------------------------------------------------------------------
