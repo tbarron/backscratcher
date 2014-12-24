@@ -220,12 +220,12 @@ def bscr_version(args):
 
     usage: bscr version
     """
-    ap = util.cmdline([{'a': ['-v', '--verbose'],
-                        'k': {'action': 'store_true',
-                              'default': False,
-                              'dest': 'verbose',
-                              'help': 'show more info'
-                              }}
+    ap = util.cmdline([{'opts': ['-v', '--verbose'],
+                        'action': 'store_true',
+                        'default': False,
+                        'dest': 'verbose',
+                        'help': 'show more info'
+                        }
                        ])
     (o, a) = ap.parse(args)
 
