@@ -67,9 +67,10 @@ class cmdline(object):
         debug_absent = True
         self.p = optparse.OptionParser(usage=usage)
         for arg in optdef:
-            if '--debug' in arg['a']:
+            if '--debug' in arg['opts']:
                 debug_absent = False
-            self.p.add_option(*arg['a'], **arg['k'])
+            kw = dict((k, arg[k]) for k in arg if k != 'opts')
+            self.p.add_option(*arg['opts'], **kw)
         if debug_absent:
             self.p.add_option('-d', '--debug',
                               action='store_true',
@@ -82,10 +83,7 @@ class cmdline(object):
         Parse the command line based on the dictionary passed in to the
         constructor
         """
-        try:
-            (o, a) = self.p.parse_args(arglist)
-        except SystemExit:
-            return
+        (o, a) = self.p.parse_args(arglist)
 
         if o.debug:
             pdb.set_trace()
