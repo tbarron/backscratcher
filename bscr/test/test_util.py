@@ -10,6 +10,102 @@ import stat
 import time
 
 
+# -----------------------------------------------------------------------------
+def cmdline_arg_list():
+    """
+    Example argument structure for U.cmdline()
+    """
+    clargs = [{'opts': ['-t', '--test'],
+               'action': 'store_true',
+               'default': False,
+               'dest': 'fribble',
+               'help': 'help string'
+               },
+              {'opts': ['-s', '--special'],
+               'action': 'store_true',
+               'default': False,
+               'dest': 'special',
+               'help': 'help string'
+               }
+              ]
+    return clargs
+
+
+# -----------------------------------------------------------------------------
+def test_cmdline_help(capsys):
+    """
+    Test the cmdline class for command line parsing
+    """
+    pytest.debug_func()
+    c = U.cmdline(cmdline_arg_list())
+    try:
+        c.parse(['cmd', '-h'])
+    except SystemExit:
+        pass
+    o, e = capsys.readouterr()
+    assert 'Usage:' in o
+    assert '-h, --help     show this help message and exit' in o
+    assert '-t, --test     help string' in o
+    assert '-s, --special  help string' in o
+    assert '-d, --debug    run under the debugger' in o
+
+
+# ---------------------------------------------------------------------------
+class TestUtilCmdline(th.HelpedTestCase):
+    clargs = cmdline_arg_list()
+
+    # -----------------------------------------------------------------------
+    def test_cmdline_attr(self):
+        """
+        Test the cmdline class for command line parsing
+        """
+        self.dbgfunc()
+        c = U.cmdline(self.clargs)
+
+        self.assertTrue(hasattr(c, 'p'),
+                        "Expected attribute 'p' on cmdline object")
+
+    # -----------------------------------------------------------------------
+    def test_cmdline_long_opts(self):
+        """
+        Test the cmdline class for command line parsing
+        """
+        self.dbgfunc()
+        c = U.cmdline(self.clargs)
+
+        self.exp_in_got('--debug', c.p._long_opt)
+        self.exp_in_got('--test', c.p._long_opt)
+        self.exp_in_got('--special', c.p._long_opt)
+
+    # -----------------------------------------------------------------------
+    def test_cmdline_parse(self):
+        """
+        Test the cmdline class for command line parsing
+        """
+        self.dbgfunc()
+        c = U.cmdline(self.clargs)
+
+        (o, a) = c.parse(['cmd', '-t', '--special'])
+        self.expected(True, o.fribble)
+        self.expected(True, o.special)
+        self.expected(False, o.debug)
+
+        (o, a) = c.parse(['cmd', '--test'])
+        self.expected(True, o.fribble)
+        self.expected(False, o.special)
+        self.expected(False, o.debug)
+
+        (o, a) = c.parse(['cmd', '-s'])
+        self.expected(False, o.fribble)
+        self.expected(True, o.special)
+        self.expected(False, o.debug)
+
+        (o, a) = c.parse(['cmd'])
+        self.expected(False, o.fribble)
+        self.expected(False, o.special)
+        self.expected(False, o.debug)
+
+
 # ---------------------------------------------------------------------------
 class TestUtil(th.HelpedTestCase):
     tmp = "/tmp"
