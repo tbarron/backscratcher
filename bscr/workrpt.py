@@ -678,7 +678,6 @@ def week_starting_last(weekday, offset, now=time.time()):
     <offset> is a number of seconds to shift the result. Typically
     <offset> will be a number of days given as N * 24 * 3600.
     '''
-    # now = time.time()
     tm = time.localtime(now)
     delta = (tm[6] + 7 - weekday) % 7    # !@!here
     then = now - delta * 24 * 3600
@@ -697,13 +696,13 @@ def week_starting(ymd):
 
     <ymd> is one of 'yesterday', 'today', 'tomorrow', 'monday', 'tuesday', etc.
 
-    We extend the end time by 2 hours (7200 seconds) so that if the week spans
-    the beginning or end of DST, we land within the last day of the week, not
-    just shy of its early edge.
+    We set the start time four hours into the first day of the week so we don't
+    have issues from being too close to midnight (eg, due to DST changing
+    between the beginning and end of the week, etc.)
     """
     (y, m, d) = parse_ymd(ymd)
-    start_time = time.mktime([int(y), int(m), int(d), 0, 0, 0, 0, 0, 0])
-    end_time = start_time + 6 * 24 * 3600 + 7200
+    start_time = time.mktime([int(y), int(m), int(d), 4, 0, 0, 0, 0, 0])
+    end_time = start_time + 6 * 24 * 3600
     start = time.strftime('%Y.%m%d', time.localtime(start_time))
     end = time.strftime('%Y.%m%d', time.localtime(end_time))
     return(start, end)
@@ -715,10 +714,14 @@ def week_ending(ymd):
     Return start and end %Y.%m%d dates for the week ending on <ymd>.
 
     <ymd> is one of 'yesterday', 'today', 'tomorrow', 'monday', 'tuesday', etc.
+
+    We set the start time four hours into the first day of the week so we don't
+    have issues from being too close to midnight (eg, due to DST changing
+    between the beginning and end of the week, etc.)
     """
     (y, m, d) = parse_ymd(ymd)
-    end_time = time.mktime([int(y), int(m), int(d), 0, 0, 0, 0, 0, 0])
-    start_time = end_time - (6 * 24 * 3600 - 7200)
+    end_time = time.mktime([int(y), int(m), int(d), 4, 0, 0, 0, 0, 0])
+    start_time = end_time - (6 * 24 * 3600)
     start = time.strftime('%Y.%m%d', time.localtime(start_time))
     end = time.strftime('%Y.%m%d', time.localtime(end_time))
     return(start, end)
