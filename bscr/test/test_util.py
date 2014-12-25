@@ -50,6 +50,26 @@ def test_cmdline_help(capsys):
     assert '-d, --debug    run under the debugger' in o
 
 
+# -----------------------------------------------------------------------------
+def test_cmdline_usage(capsys):
+    """
+    Test the cmdline class for command line parsing
+    """
+    pytest.debug_func()
+    c = U.cmdline(cmdline_arg_list(), usage="This is a usage test message")
+    try:
+        c.parse(['cmd', '-h'])
+    except SystemExit:
+        pass
+    o, e = capsys.readouterr()
+    assert 'Usage:' in o
+    assert 'This is a usage test message' in o
+    assert '-h, --help     show this help message and exit' in o
+    assert '-t, --test     help string' in o
+    assert '-s, --special  help string' in o
+    assert '-d, --debug    run under the debugger' in o
+
+
 # ---------------------------------------------------------------------------
 class TestUtilCmdline(th.HelpedTestCase):
     clargs = cmdline_arg_list()

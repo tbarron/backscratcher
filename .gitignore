@@ -1,11 +1,14 @@
 MANIFEST
 README
 attic
+backscratcher.egg-info
 dist
+incoming
 test_*.clps*
 testhome
 TAGS
 cmsg
+.ackrc
 .bscr_version
 .coverage
 *.org
