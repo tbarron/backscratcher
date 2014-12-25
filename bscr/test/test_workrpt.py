@@ -427,6 +427,7 @@ class workrptTest(th.HelpedTestCase):
                  '2009.0401': time.mktime(time.strptime('2009.0401',
                                                         '%Y.%m%d'))}
         for t in tlist.keys():
+            print("t = %s" % t)
             (start, end) = wr.week_starting(t)
             tm = time.localtime(tlist[t])
             start_should_be = time.strftime('%Y.%m%d', tm)
