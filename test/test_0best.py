@@ -21,7 +21,7 @@ This file checks for best practice compliance.
 # -----------------------------------------------------------------------------
 class Test_BEST(th.HelpedTestCase):
     # -------------------------------------------------------------------------
-    def test_pep8(self):
+    def test_0_pep8(self):
         """
         Check the code in this package for PEP8 conformance.
         """
