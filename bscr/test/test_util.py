@@ -105,7 +105,7 @@ class TestUtilCmdline(th.HelpedTestCase):
         self.assertTrue(hasattr(c, 'p'),
                         "Expected attribute 'p' on cmdline object")
 
-    # -----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     def test_cmdline_defaults(self):
         """
         Have the cmdline class set defaults for us
@@ -116,11 +116,12 @@ class TestUtilCmdline(th.HelpedTestCase):
                 dest            name          default_dest
                 type            string        default_type
 
-        So, for example, the default action is 'store', but you can override this
-        by passing, say, default_action='store_true' to the cmdline constructor.
+        So, for example, the default action is 'store', but you can override
+        this by passing, say, default_action='store_true' to the cmdline
+        constructor.
 
-        You can also specify the action for a specific option in the dict defining
-        that option.
+        You can also specify the action for a specific option in the dict
+        defining that option.
         """
         pytest.debug_func()
         c = U.cmdline(simple_arg_list())
@@ -134,10 +135,10 @@ class TestUtilCmdline(th.HelpedTestCase):
 
         assert o.first == 'optarg'
         assert o.second == ['two']
-        assert o.third == False
-        assert o.forward == None
+        assert o.third is False
+        assert o.forward is None
 
-    # -----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     def test_cmdline_default_action(self):
         """
         Have the cmdline class set defaults for us
@@ -148,11 +149,12 @@ class TestUtilCmdline(th.HelpedTestCase):
                 dest            name          default_dest
                 type            string        default_type
 
-        So, for example, the default action is 'store', but you can override this
-        by passing, say, default_action='store_true' to the cmdline constructor.
+        So, for example, the default action is 'store', but you can override
+        this by passing, say, default_action='store_true' to the cmdline
+        constructor.
 
-        You can also specify the action for a specific option in the dict defining
-        that option.
+        You can also specify the action for a specific option in the dict
+        defining that option.
         """
         pytest.debug_func()
         c = U.cmdline(simple_arg_list(),
@@ -166,12 +168,12 @@ class TestUtilCmdline(th.HelpedTestCase):
         except SystemExit:
             pass
 
-        assert o.first == False
+        assert o.first is False
         assert o.second == ['carniverous']
-        assert o.third == True
-        assert o.forward == True
+        assert o.third is True
+        assert o.forward is True
 
-    # -----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     def test_cmdline_default_default(self):
         """
         Have the cmdline class set defaults for us
@@ -182,11 +184,12 @@ class TestUtilCmdline(th.HelpedTestCase):
                 dest            name          default_dest
                 type            string        default_type
 
-        So, for example, the default action is 'store', but you can override this
-        by passing, say, default_action='store_true' to the cmdline constructor.
+        So, for example, the default action is 'store', but you can override
+        this by passing, say, default_action='store_true' to the cmdline
+        constructor.
 
-        You can also specify the action for a specific option in the dict defining
-        that option.
+        You can also specify the action for a specific option in the dict
+        defining that option.
         """
         pytest.debug_func()
         c = U.cmdline(simple_arg_list(),
@@ -201,10 +204,10 @@ class TestUtilCmdline(th.HelpedTestCase):
 
         assert o.first == 'angular'
         assert o.second == ['carniverous']
-        assert o.third == False
+        assert o.third is False
         assert o.forward == 'yummy'
 
-    # -----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     def test_cmdline_default_type(self):
         """
         Have the cmdline class set defaults for us
@@ -215,11 +218,12 @@ class TestUtilCmdline(th.HelpedTestCase):
                 dest            name          default_dest
                 type            string        default_type
 
-        So, for example, the default action is 'store', but you can override this
-        by passing, say, default_action='store_true' to the cmdline constructor.
+        So, for example, the default action is 'store', but you can override
+        this by passing, say, default_action='store_true' to the cmdline
+        constructor.
 
-        You can also specify the action for a specific option in the dict defining
-        that option.
+        You can also specify the action for a specific option in the dict
+        defining that option.
         """
         pytest.debug_func()
         c = U.cmdline(simple_arg_list(),
@@ -234,8 +238,8 @@ class TestUtilCmdline(th.HelpedTestCase):
 
         assert o.first == 7.3
         assert o.second == [9.452]
-        assert o.third == False
-        assert o.forward == None
+        assert o.third is False
+        assert o.forward is None
 
     # -----------------------------------------------------------------------
     def test_cmdline_long_opts(self):
