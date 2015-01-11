@@ -32,6 +32,59 @@ def cmdline_arg_list():
 
 
 # -----------------------------------------------------------------------------
+def test_cmdline_defaults(capsys):
+    """
+    Have the cmdline class set defaults for us
+
+       Attribute       Default       Override Argument
+        action          'store'       default_action
+        default         None          default_default
+        dest            name          default_dest
+        type            string        default_type
+
+    So, for example, the default action is 'store', but you can override this
+    by passing, say, default_action='store_true' to the cmdline constructor.
+
+    You can also specify the action for a specific option in the dict defining
+    that option.
+    """
+    def arg_list():
+        """
+        Artument list for this test
+        """
+        clargs = [{'name': 'first',
+                   'help': 'first option'},
+                  {'name': 'second',
+                   'action': 'append',
+                   'help': 'second option'},
+                  {'name': 'third',
+                   'default': False,
+                   'help': 'third option'},
+                  {'name': 'fourth',
+                   'dest': 'forward',
+                   'help': 'fourth option'},
+                  ]
+        return clargs
+
+    pytest.debug_func()
+    c = U.cmdline(arg_list())
+    try:
+        (o, a) = c.parse(['cmd',
+                          '--first', 'one',
+                          '--second', 'two',
+                          '--third', True,
+                          '--fourth', 'fiddle',
+                          ])
+    except SystemExit:
+        pass
+
+    assert o.first == 'one'
+    assert o.second == ['two']
+    assert o.third == True
+    assert o.forward == 'fiddle'
+
+
+# -----------------------------------------------------------------------------
 def test_cmdline_help(capsys):
     """
     Test the cmdline class for command line parsing
