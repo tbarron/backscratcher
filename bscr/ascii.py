@@ -22,10 +22,9 @@ GNU General Public License for more details.
 """
 
 import getopt
-import optparse
 import pdb
 import sys
-import toolframe
+import util as U
 
 
 # ---------------------------------------------------------------------------
@@ -35,14 +34,9 @@ def main(argv=None):
     """
     if argv is None:
         argv = sys.argv
-    p = optparse.OptionParser(usage=usage())
-    p.add_option('-d', '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='run under the debugger')
-    (o, a) = p.parse_args(argv)
 
-    if o.debug:
-        pdb.set_trace()
+    c = U.cmdline([], usage=usage())
+    (o, a) = c.parse(argv)
 
     asc = ['NUL', 'SOH', 'STX', 'ETX', 'EOT', 'ENQ', 'ACK', 'BEL', 'BS',
            'TAB', 'LF', 'VT', 'FF', 'CR', 'SO', 'SI', 'DLE', 'DC1', 'DC2',

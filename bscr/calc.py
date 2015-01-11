@@ -27,12 +27,11 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 '''
 
-import getopt
-import optparse
 import pexpect
 import sys
 import toolframe
 import unittest
+import util as U
 
 
 # ---------------------------------------------------------------------------
@@ -43,13 +42,8 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    p = optparse.OptionParser()
-    # define options here
-    # p.add_option('-s', '--long',
-    #              action='', default='',
-    #              dest='', type='',
-    #              help='')
-    (o, a) = p.parse_args(argv)
+    c = U.cmdline([])
+    (o, a) = c.parse(argv)
 
     try:
         r = []

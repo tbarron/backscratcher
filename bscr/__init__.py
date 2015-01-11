@@ -1,5 +1,4 @@
 import glob
-import optparse
 import pdb
 import pexpect
 import sys
@@ -27,17 +26,10 @@ def whych():
     """
     Find stuff
     """
-    p = optparse.OptionParser()
-    p.add_option('-d', '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='run under the debugger')
-    p.add_option('-n', '--namespace',
-                 action='store', default='', dest='namespace',
-                 help='python (default), perl, or bash')
-    (o, a) = p.parse_args(sys.argv)
-
-    if o.debug:
-        pdb.set_trace()
+    c = U.cmdline([{'name': 'namespace',
+                    'default': '',
+                    'help': 'python (default), perl, or bash'}])
+    (o, a) = c.parse(sys.argv)
 
     if o.namespace in ['', 'python']:
         for item in a[1:]:

@@ -36,10 +36,10 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
-import optparse
 import pdb
 import re
 import sys
+import util as U
 
 
 # ---------------------------------------------------------------------------
@@ -49,17 +49,11 @@ def main(A=None):
     """
     if A is None:
         A = sys.argv
-    p = optparse.OptionParser(usage=usage())
-    p.add_option('-d', '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='run under the debugger')
-    (o, a) = p.parse_args(A)
+    c = U.cmdline([], usage=usage())
+    (o, a) = c.parse(A)
 
-    if o.debug:
-        pdb.set_trace()
-
-    if 1 < len(A):
-        input = open(A[1], 'r')
+    if 1 < len(a):
+        input = open(a[1], 'r')
     else:
         input = sys.stdin
     align(input)

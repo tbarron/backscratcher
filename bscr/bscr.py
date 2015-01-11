@@ -1,5 +1,4 @@
 import glob
-import optparse
 import os
 try:
     import pager
@@ -96,14 +95,8 @@ def bscr_roots(args):
 
     usage: bscr roots
     """
-    p = optparse.OptionParser()
-    p.add_option('-d', '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='run under the debugger')
-    (o, a) = p.parse_args(args)
-
-    if o.debug:
-        pdb.set_trace()
+    c = U.cmdline([])
+    (o, a) = c.parse(args)
 
     print("bscr root: %s" % util.bscr_root())
     print(" git root: %s" % util.git_root())
@@ -123,20 +116,12 @@ def bscr_test(args):
     The tests are optimized for py.test. They may not work well under green
     or nose.
     """
-    p = optparse.OptionParser()
-    p.add_option('-d', '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='run under the debugger')
-    p.add_option('-n', '--dry-run',
-                 action='store_true', default=False, dest='dryrun',
-                 help='select a tester')
-    p.add_option('-t', '--tester',
-                 action='store', default='', dest='tester',
-                 help='select a tester')
-    (o, a) = p.parse_args(args)
-
-    if o.debug:
-        pdb.set_trace()
+    c = U.cmdline([{'opts': ['--dry-run', '-n'],
+                    'action': 'store_true',
+                    'help': 'see what would happen'},
+                   {'name': 'tester',
+                    'help': 'select a test runner'}])
+    (o, a) = c.parse(args)
 
     with util.Chdir(util.dirname(__file__)):
         target = util.pj(os.path.dirname(__file__), 'test')
