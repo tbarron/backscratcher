@@ -465,7 +465,7 @@ class TestFx(th.HelpedTestCase):
                  "all arguments",
                  " -i IRANGE, --integer=IRANGE",
                  "low:high -- generate range of numbers",
-                 "-n, --dryrun          dryrun or execute",
+                 "-n, --dry-run         dryrun or execute",
                  "-q, --quiet           don't echo commands, just run them",
                  "-x, --xargs           batch input from stdin into command" +
                  " lines like xargs",
