@@ -81,7 +81,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
 import glob
-import optparse
 import os
 import pdb
 import re
@@ -100,29 +99,55 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    p = optparse.OptionParser(usage=Usage())
-    p.add_option('-c', '--command',
-                 action='store', default='', dest='cmd', type='string',
-                 help='command to apply to all arguments')
-    p.add_option('-d', '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='run under the debugger')
-    p.add_option('-e', '--edit',
-                 action='store', default='', dest='edit', type='string',
-                 help='file rename expression applied to all arguments')
-    p.add_option('-i', '--integer',
-                 action='store', default='', dest='irange', type='string',
-                 help='low:high -- generate range of numbers')
-    p.add_option('-n', '--dryrun',
-                 action='store_true', default=False, dest='dryrun',
-                 help='dryrun or execute')
-    p.add_option('-q', '--quiet',
-                 action='store_true', default=False, dest='quiet',
-                 help="don't echo commands, just run them")
-    p.add_option('-x', '--xargs',
-                 action='store_true', default=False, dest='xargs',
-                 help='batch input from stdin into command lines like xargs')
-    (o, a) = p.parse_args(argv)
+    c = util.cmdline([{'opts': ['-c', '--command'],
+                       'action': 'store',
+                       'dest': 'cmd',
+                       'default': '',
+                       'type': 'string',
+                       'help': 'command to apply to all arguments'
+                       },
+                      {'opts': ['-d', '--debug'],
+                       'action': 'store_true',
+                       'dest': 'debug',
+                       'default': False,
+                       'help': 'run under the debugger'
+                       },
+                      {'opts': ['-e', '--edit'],
+                       'action': 'store',
+                       'dest': 'edit',
+                       'default': '',
+                       'type': 'string',
+                       'help': 'file rename expression '
+                       'applied to all arguments',
+                       },
+                      {'opts': ['-i', '--integer'],
+                       'action': 'store',
+                       'dest': 'irange',
+                       'default': '',
+                       'type': 'string',
+                       'help': 'low:high -- generate range of numbers',
+                       },
+                      {'opts': ['-n', '--dry-run'],
+                       'action': 'store_true',
+                       'dest': 'dryrun',
+                       'default': False,
+                       'help': 'dryrun or execute',
+                       },
+                      {'opts': ['-q', '--quiet'],
+                       'action': 'store_true',
+                       'dest': 'quiet',
+                       'default': False,
+                       'help': "don't echo commands, just run them",
+                       },
+                      {'opts': ['-x', '--xargs'],
+                       'action': 'store_true',
+                       'dest': 'xargs',
+                       'default': False,
+                       'help': 'batch input from stdin into '
+                       'command lines like xargs',
+                       },
+                      ], usage=Usage())
+    (o, a) = c.parse(argv)
 
     if o.debug:
         pdb.set_trace()

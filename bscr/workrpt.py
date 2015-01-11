@@ -36,7 +36,6 @@ workrpt - report work times
 
 import copy
 import getopt
-import optparse
 import os
 import pdb
 import re
@@ -333,46 +332,88 @@ def makeOptionParser(argv):
     '''
     Build a parser to understand the command line options.
     '''
-    p = optparse.OptionParser()
-    p.add_option('-c', '--copy',
-                 action='store', type='string', dest='copy', default='',
-                 help='copy this code to <dir>')
-    p.add_option('-d', '--day',
-                 action='store_true', default=False, dest='dayflag',
-                 help='report each day separately')
-    p.add_option('-e', '--end',
-                 action='store', dest='end_ymd', type='string', default='',
-                 help='end date for report YYYY.MMDD')
-    p.add_option('-f', '--file',
-                 action='store', type='string', dest='filename',
-                 default=default_input_filename(),
-                 help='timelog to read')
-    p.add_option('-g', '--debug',
-                 action='store_true', dest='debug', default=False,
-                 help='run the debugger')
-    p.add_option('-l', '--last',
-                 action='store_true', default=False, dest='lastweek',
-                 help='report the last week')
-    p.add_option('-s', '--start',
-                 action='store', dest='start_ymd', type='string', default='',
-                 help='start date for report YYYY.MMDD')
-    p.add_option('-S', '--since',
-                 action='store', dest='since', type='string', default='',
-                 help='report date YYYY.MMDD through end of file')
-    p.add_option('-w', '--week',
-                 action='store', dest='weektype', type='string', default='',
-                 help='one of [fcMTWtFsS]')
-    p.add_option('-D', '--doc',
-                 action='store_true', dest='help', default=False,
-                 help='show script documentation')
-    p.add_option('-p', '--pkg',
-                 action='store', type='string', dest='tarball',
-                 default='',
-                 help='package this code to <filename>')
-    p.add_option('-v', '--verbose',
-                 action='store_true', dest='verbose', default=False,
-                 help='display debugging info')
-    (o, a) = p.parse_args(argv)
+    c = U.cmdline([{'opts': ['-c', '--copy'],
+                    'action': 'store',
+                    'type': 'string',
+                    'dest': 'copy',
+                    'default': '',
+                    'help': 'copy this code to <dir>',
+                    },
+                   {'opts': ['-d', '--day'],
+                    'action': 'store_true',
+                    'dest': 'dayflag',
+                    'default': False,
+                    'help': 'report each day separately',
+                    },
+                   {'opts': ['-e', '--end'],
+                    'action': 'store',
+                    'type': 'string',
+                    'dest': 'end_ymd',
+                    'default': '',
+                    'help': 'end date for report YYYY.MMDD',
+                    },
+                   {'opts': ['-f', '--file'],
+                    'action': 'store',
+                    'type': 'string',
+                    'dest': 'filename',
+                    'default': default_input_filename(),
+                    'help': 'timelog to read',
+                    },
+                   {'opts': ['-g', '--debug'],
+                    'action': 'store_true',
+                    'dest': 'debug',
+                    'default': False,
+                    'help': 'run the debugger',
+                    },
+                   {'opts': ['-l', '--last'],
+                    'action': 'store_true',
+                    # 'type': 'string',
+                    'dest': 'lastweek',
+                    'default': False,
+                    'help': 'report the last week',
+                    },
+                   {'opts': ['-s', '--start'],
+                    'action': 'store',
+                    'type': 'string',
+                    'dest': 'start_ymd',
+                    'default': '',
+                    'help': 'start date for report YYYY.MMDD',
+                    },
+                   {'opts': ['-S', '--since'],
+                    'action': 'store',
+                    'dest': 'since',
+                    'type': 'string',
+                    'default': '',
+                    'help': 'report date YYYY.MMDD through end of file',
+                    },
+                   {'opts': ['-w', '--week'],
+                    'action': 'store',
+                    'dest': 'weektype',
+                    'type': 'string',
+                    'default': '',
+                    'help': 'one of [fcMTWtFsS]',
+                    },
+                   {'opts': ['-D', '--doc'],
+                    'action': 'store_true',
+                    'dest': 'help',
+                    'default': False,
+                    'help': 'show script documentation',
+                    },
+                   {'opts': ['-p', '--pkg'],
+                    'action': 'store',
+                    'type': 'string',
+                    'dest': 'tarball',
+                    'default': '',
+                    'help': 'package this code to <filename>',
+                    },
+                   {'opts': ['-v', '--verbose'],
+                    'action': 'store_true',
+                    'dest': 'verbose',
+                    'default': False,
+                    'help': 'display debugging info',
+                    },
+                   ])
+    (o, a) = c.parse(argv)
     return(o, a)
 
 

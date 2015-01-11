@@ -18,57 +18,6 @@ bscr = U.package_module(__name__)
 tlogger = None
 
 
-# -----------------------------------------------------------------------------
-def main(args=None, filter=None, logfile=None):
-    """
-    This could be used as our own test runner, although I don't think it ever
-    is. We could probably get rid of this routine.
-    """
-    if args is None:
-        args = sys.argv
-    p = optparse.OptionParser()
-    p.add_option('-d', '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='debug')
-    p.add_option('-k', '--keep',
-                 action='store_true', default=False, dest='keep',
-                 help='keep test files')
-    p.add_option('-l', '--list',
-                 action='store_true', default=False, dest='list',
-                 help='list tests')
-    p.add_option('-q', '--quiet',
-                 action='store_true', default=False, dest='quiet',
-                 help='quieter')
-    p.add_option('-t', '--to',
-                 action='store', default='', dest='final',
-                 help='run all tests up to this one')
-    p.add_option('-v', '--verbose',
-                 action='store_true', default=False, dest='verbose',
-                 help='louder')
-    (o, a) = p.parse_args(args)
-
-    debug_flag(o.debug)
-
-    if o.verbose:
-        volume = 2
-    elif o.quiet:
-        volume = 0
-    else:
-        volume = 1
-
-    # print sys.modules.keys()
-    # print sys.modules['__main__']
-
-    testlist = all_tests('__main__', filter)
-    if o.list:
-        list_tests(a, o.final, testlist)
-        o.keep = True
-    else:
-        run_tests(a, o.final, testlist, volume, logfile)
-
-    return o.keep
-
-
 # ---------------------------------------------------------------------------
 def all_tests(name, filter=None):
     '''

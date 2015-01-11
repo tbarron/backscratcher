@@ -1,8 +1,8 @@
-import optparse
 import os
 import pdb
 import re
 import sys
+import util as U
 
 
 # -----------------------------------------------------------------------------
@@ -13,21 +13,24 @@ def main(args=None):
     if args is None:
         args = sys.argv
 
-    p = optparse.OptionParser(usage=usage())
-    p.add_option('-d', '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='run under the debugger')
-    p.add_option('-n', '--dry-run',
-                 action='store_true', default=False, dest='dryrun',
-                 help='just report')
-    p.add_option('-p', '--pattern',
-                 action='store', default=None, dest='pattern',
-                 help='file matching regexp')
-    p.add_option('-r', '--recursive',
-                 action='store_true', default=False, dest='recursive',
-                 help='whether to descend directories')
-    (o, a) = p.parse_args(args)
-
+    c = U.cmdline([{'opts': ['-n', '--dry-run'],
+                    'action': 'store_true',
+                    'default': False,
+                    'dest': 'dryrun',
+                    'help': 'just report'},
+                   {'opts': ['-p', '--pattern'],
+                    'action': 'store',
+                    'default': None,
+                    'dest': 'pattern',
+                    'help': 'file matching regexp'},
+                   {'opts': ['-r', '--recursive'],
+                    'action': 'store_true',
+                    'default': False,
+                    'dest': 'recursive',
+                    'help': 'whether to descend directories'}
+                   ],
+                  usage=usage())
+    (o, a) = c.parse(args)
     if 0 == len(a[1:]):
         cleanup('.', o.dryrun, o.pattern, o.recursive)
     else:

@@ -47,7 +47,6 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
-import optparse
 import os
 import pdb
 import sys
@@ -65,24 +64,38 @@ def main(argv=None):
     (say, once every five seconds) or to regenerate an output when a file
     is updated.
     """
-    p = optparse.OptionParser()
-    p.add_option('-c', '--change',
-                 action='store_true', default=False, dest='change',
-                 help='update on change')
-    p.add_option('-d', '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='run under debugger')
-    p.add_option('-i', '--interval',
-                 action='store', default=10, dest='interval', type='int',
-                 help='seconds between updates')
-    p.add_option('-p', '--prompt',
-                 action='store_true', default=False, dest='prompt',
-                 help='update on user input')
-    p.add_option('-t', '--trigger',
-                 action='store', default='', dest='pathname',
-                 help='update when mtime on pathname changes')
-    (o, a) = p.parse_args(argv)
-
+    c = U.cmdline([{'opts': ['-c', '--change'],
+                    'action': 'store_true',
+                    'default': False,
+                    'dest': 'change',
+                    'help': 'update on change',
+                    },
+                   {'opts': ['-d', '--debug'],
+                    'action': 'store_true',
+                    'default': False,
+                    'dest': 'debug',
+                    'help': 'run under debugger',
+                    },
+                   {'opts': ['-i', '--interval'],
+                    'action': 'store',
+                    'default': 10,
+                    'dest': 'interval',
+                    'help': 'seconds between updates',
+                    },
+                   {'opts': ['-p', '--prompt'],
+                    'action': 'store_true',
+                    'default': False,
+                    'dest': 'prompt',
+                    'help': 'update on user input',
+                    },
+                   {'opts': ['-t', '--trigger'],
+                    'action': 'store',
+                    'default': '',
+                    'dest': 'pathname',
+                    'help': 'update when mtime on pathname changes',
+                    },
+                   ])
+    (o, a) = c.parse(argv)
     if o.debug:
         pdb.set_trace()
 
@@ -111,7 +124,7 @@ def main(argv=None):
                     time.sleep(1.0)
             else:
                 report(start, cmd, stuff_s)
-                time.sleep(o.interval)
+                time.sleep(float(o.interval))
     except KeyboardInterrupt:
         print("")
         sys.exit()
