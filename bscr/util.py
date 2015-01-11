@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-import pdb
 import fcntl
 import glob
 import optparse
 import os
+import pdb
 import pexpect
 import re
 import shlex
@@ -59,7 +59,13 @@ class cmdline(object):
     """
     Handle command line parsing
     """
-    def __init__(self, optdef, usage=None):
+    def __init__(self,
+                 optdef,
+                 default_action='store',
+                 default_default=None,
+                 default_dest='',
+                 default_type='string',
+                 usage=None):
         """
         The constructor expects a dictionary in *optdef* defining the arguments
         to be parsed from the command line.
@@ -67,9 +73,36 @@ class cmdline(object):
         debug_absent = True
         self.p = optparse.OptionParser(usage=usage)
         for arg in optdef:
+            if 'name' in arg and 'opts' not in arg:
+                name = arg['name']
+                arg['opts'] = ['-' + name[0], '--' + name]
+
+            if 'opts' in arg and 'name' not in arg:
+                arg['name'] = self.pick_name(arg['opts'])
+
+            if 'action' not in arg:
+                arg['action'] = default_action
+
+            if 'default' not in arg:
+                if arg['action'] == 'store_true':
+                    arg['default'] = False
+                elif arg['action'] == 'store_false':
+                    arg['default'] = True
+                elif arg['action'] == 'append':
+                    arg['default'] = []
+                else:
+                    arg['default'] = default_default
+
+            if 'dest' not in arg:
+                if default_dest == '':
+                    arg['dest'] = name
+                else:
+                    arg['dest'] = default_dest
+
             if '--debug' in arg['opts']:
                 debug_absent = False
-            kw = dict((k, arg[k]) for k in arg if k != 'opts')
+
+            kw = dict((k, arg[k]) for k in arg if k != 'opts' and k != 'name')
             self.p.add_option(*arg['opts'], **kw)
         if debug_absent:
             self.p.add_option('-d', '--debug',
@@ -78,6 +111,7 @@ class cmdline(object):
                               dest='debug',
                               help='run under the debugger')
 
+    # -----------------------------------------------------------------------
     def parse(self, arglist):
         """
         Parse the command line based on the dictionary passed in to the
@@ -89,6 +123,34 @@ class cmdline(object):
             pdb.set_trace()
 
         return(o, a)
+
+    # -----------------------------------------------------------------------
+    def pick_name(self, opt_l):
+        """
+        Choose a reasonable name from the list of option expressions. Use the
+        long option if it's present. If not, use the short option. If we don't
+        find either one, generate a short random name and return that.
+        """
+        rval = ''
+        for o in opt_l:
+            if o.startswith('--'):
+                rval = o.replace('--', '')
+                break
+            elif o.startswith('-') and rval == '':
+                rval = o.replace('-', '')
+        if rval == '':
+            rval = self.random_name(4)
+        return rval
+
+    # -----------------------------------------------------------------------
+    def random_name(self, length):
+        """
+        Make up a random name of length *length*
+        """
+        rval = ''
+        for x in range(length):
+            rval += random.choice(string.lowercase)
+        return rval
 
 
 # ---------------------------------------------------------------------------
