@@ -38,7 +38,7 @@ ep_d = {
 exec(open(os.path.join("bscr", "version.py")).read())
 setup(name='backscratcher',
       version=__version__,
-      packages=['bscr', 'bscr/test'],
+      packages=['bscr', 'test'],
       entry_points = ep_d,
       author="Tom Barron",
       author_email='tom.barron@comcast.net',
