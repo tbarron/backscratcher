@@ -795,6 +795,7 @@ def write_report(filename, start, end, dayflag, testing=False):
 
     rval = ''
     last = None
+    lastline = None
     if dayflag:
         day = start
         while day <= end:
@@ -804,6 +805,10 @@ def write_report(filename, start, end, dayflag, testing=False):
                 lastc = tally(C, day, day, parse_timeline(line))
                 if lastc is not None:
                     last = lastc
+                    if line < lastline:
+                        sys.exit('Dates or times out of order')
+                    else:
+                        lastline = line
             f.close()
             if last is not None and last in C.keys():
                 timeclose(C, last, time.time(), True)
@@ -816,6 +821,10 @@ def write_report(filename, start, end, dayflag, testing=False):
             lastc = tally(C, start, end, parse_timeline(line))
             if lastc is not None:
                 last = lastc
+                if line < lastline:
+                    sys.exit('Dates or times out of order')
+                else:
+                    lastline = line
         f.close()
         if verbose():
             dump_struct(C)
