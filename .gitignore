@@ -10,7 +10,9 @@ TAGS
 cmsg
 .ackrc
 .bscr_version
+.cache
 .coverage
+pytest.ini
 *.org
 *.log
 *.pyc

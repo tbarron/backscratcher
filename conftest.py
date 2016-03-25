@@ -12,9 +12,13 @@ def pytest_addoption(parser):
     """
 #     parser.addoption("--keepfiles", action="store_true", default=False,
 #                      help="whether to keep or remove test outputs")
+    parser.addoption("--skip", action="append", default=[],
+                     help="don't run the named test(s)")
     parser.addoption("--logpath", action="store", default="",
                      help="where to write a test log")
     parser.addoption("--dbg", action="append", default=[],
+                     help="start debugger on test named or ALL")
+    parser.addoption("--all", action="store_true", default=False,
                      help="start debugger on test named or ALL")
 
 # -----------------------------------------------------------------------------
@@ -28,10 +32,23 @@ def pytest_report_header(config):
 
 
 # -----------------------------------------------------------------------------
+def pytest_configure(config):
+    """
+    If --all, turn off --exitfirst
+    """
+    # pdb.set_trace()
+    if config.getoption("--all"):
+        config.option.__dict__['exitfirst'] = False
+
+# -----------------------------------------------------------------------------
 def pytest_runtest_setup(item):
     """
     For each test, just before it runs...
     """
+    skipl = item.config.getoption("--skip")
+    if any([item.name in skipl,
+            any([_ in item.name for _ in skipl])]):
+        pytest.skip()
     if any([item.name in item.config.getoption("--dbg"),
             'all' in item.config.getoption("--dbg")]):
         pytest.debug_func = pdb.set_trace
