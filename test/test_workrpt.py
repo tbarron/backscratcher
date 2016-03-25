@@ -1,9 +1,27 @@
 import bscr
 import os
+import pytest
 from bscr import testhelp as th
 import time
 from bscr import util as U
 from bscr import workrpt as wr
+
+
+# -----------------------------------------------------------------------------
+def test_workrpt_order(tmpdir):
+    """
+    Times or dates out of order should produce SystemExit exception
+    """
+    xyz = tmpdir.join('XYZ')
+    xyz.write('\n'.join(['2015-01-07 10:00:00 first task',
+                         '2015-01-07 10:15:00 second task',
+                         '2015-01-07 10:10:00 time order',
+                         '2015-01-07 10:20:00 fourth task',
+                         ]))
+    wr.verbose(False, True)
+    with pytest.raises(SystemExit) as err:
+        r = wr.write_report(xyz.strpath, '2015.0107', '2015.0107', False, True)
+    assert 'Dates or times out of order' in str(err)
 
 
 # -----------------------------------------------------------------------------
@@ -331,15 +349,12 @@ class workrptTest(th.HelpedTestCase):
 2009-07-21 08:30:28 admin: setup
 2009-07-21 08:35:34 admin: liason
 2009-07-21 17:00:34 COB
-
 -- Wednesday
 2009-07-22 08:35:59 vacation
 2009-07-22 16:34:59 COB
-
 -- Thursday
 2009-07-23 08:35:59 vacation
 2009-07-23 16:35:59 COB
-
 -- Friday
 2009-07-24 08:35:59 vacation
 2009-07-24 16:35:59 COB
