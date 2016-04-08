@@ -32,7 +32,6 @@ import optparse
 import os
 import re
 import sys
-import toolframe
 import unittest
 
 
@@ -44,54 +43,54 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    p = optparse.OptionParser(usage=usage())
+    prs = optparse.OptionParser(usage=usage())
     # define options here
     # p.add_option('-s', '--long',
     #              action='', default='',
     #              dest='', type='',
     #              help='')
-    (o, a) = p.parse_args(argv)
+    (_, args) = prs.parse_args(argv)
 
-    if 0 < len(a[1:]):
-        for filename in a[1:]:
+    if 0 < len(args[1:]):
+        for filename in args[1:]:
             if filename == '-':
                 hexdump(sys.stdin)
             else:
-                f = open(filename, 'r')
-                hexdump(f)
-                f.close()
+                rble = open(filename, 'r')
+                hexdump(rble)
+                rble.close()
     else:
         hexdump(sys.stdin)
 
 
 # -----------------------------------------------------------------------------
-def hexdump(input, output=sys.stdout):
+def hexdump(rble, wble=sys.stdout):
     """
-    Read input, format the stream as a hexdump, and send it to output.
+    Read *rble*, format the stream as a hexdump, and send it to *wble*.
     """
-    d = input.read()
-    for b in range(0, len(d), 16):
-        for o in range(0, min(len(d)-b, 16)):
-            if 0 == o % 4:
-                output.write(" ")
-            output.write("%02x " % ord(d[b+o]))
-        for o in range(min(len(d)-b, 16), 16):
-            if 0 == o % 4:
-                output.write(" ")
-            output.write("   ")
-        output.write("  ")
-        for o in range(0, min(len(d)-b, 16)):
-            if 0 == o % 8:
-                output.write(" ")
-            if d[b+o] < ' ' or 0x7f < ord(d[b+o]):
-                output.write(".")
+    data = rble.read()
+    for idx in range(0, len(data), 16):
+        for offs in range(0, min(len(data)-idx, 16)):
+            if 0 == offs % 4:
+                wble.write(" ")
+            wble.write("%02x " % ord(data[idx+offs]))
+        for offs in range(min(len(data)-idx, 16), 16):
+            if 0 == offs % 4:
+                wble.write(" ")
+            wble.write("   ")
+        wble.write("  ")
+        for offs in range(0, min(len(data)-idx, 16)):
+            if 0 == offs % 8:
+                wble.write(" ")
+            if data[idx+offs] < ' ' or 0x7f < ord(data[idx+offs]):
+                wble.write(".")
             else:
-                output.write("%c" % d[b+o])
-        for o in range(min(len(d)-b, 16), 16):
-            if 0 == o % 8:
-                output.write(" ")
-            output.write(" ")
-        output.write("\n")
+                wble.write("%c" % data[idx+offs])
+        for offs in range(min(len(data)-idx, 16), 16):
+            if 0 == offs % 8:
+                wble.write(" ")
+            wble.write(" ")
+        wble.write("\n")
 
 
 # ---------------------------------------------------------------------------

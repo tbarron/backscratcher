@@ -33,13 +33,13 @@ EXAMPLES
    $ dt next year
    2011.0406 15:51:28
 
-   $ dt -f "%s" yesterday
+   $ dt -f '%s' yesterday
    1270500782
 
    $ dt -f %s
    1270587188
 
-   $ dt -f "%Y.%m%d" 1270587188
+   $ dt -f '%Y.%m%d' 1270587188
 
 LICENSE
 
@@ -67,10 +67,11 @@ import pdb
 import re
 import sys
 import time
-import toolframe
 import unittest
+
+import toolframe
 import util as U
-bscr = U.package_module(__name__)
+BSCR = U.package_module(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -81,18 +82,18 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    p = optparse.OptionParser(usage=usage())
-    p.add_option('-d', '--debug', dest='debug',
-                 action='store_true', default=False,
-                 help='run the debugger')
-    p.add_option('-f', '--format', type='string', dest='format',
-                 action='store', default='%Y.%m%d %H:%M:%S',
-                 help='date format (see strftime(3))')
-    (o, a) = p.parse_args(argv)
+    prs = optparse.OptionParser(usage=usage())
+    prs.add_option('-d', '--debug', dest='debug',
+                   action='store_true', default=False,
+                   help='run the debugger')
+    prs.add_option('-f', '--format', type='string', dest='format',
+                   action='store', default='%Y.%m%d %H:%M:%S',
+                   help='date format (see strftime(3))')
+    (opts, args) = prs.parse_args(argv)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
-    print report_date(o.format, a[1:])
+    print report_date(opts.format, args[1:])
 
 
 # -----------------------------------------------------------------------------
@@ -100,13 +101,13 @@ def fatal(msg):
     """
     !@!DERPRECATED -- should this be in util?
     """
-    raise bscr.Error(msg)
+    raise BSCR.Error(msg)
 
 
 # -----------------------------------------------------------------------------
-def report_date(format, args):
+def report_date(fmt, args):
     """
-    Parse *args* to get a time and return it formatted according to *format*
+    Parse *args* to get a time and return it formatted according to *fmt*
     """
     # print args
     argstr = ' '.join(args).lower()
@@ -120,7 +121,7 @@ def report_date(format, args):
     # print('edited_args = ', edited_args)
     offset = parse_whenspec(edited_args)
     when = time.time() + offset
-    return time.strftime(format, time.localtime(when))
+    return time.strftime(fmt, time.localtime(when))
 
 
 # ---------------------------------------------------------------------------
@@ -130,7 +131,7 @@ def is_numeric(strval):
     """
     try:
         float(strval)
-    except:
+    except ValueError:
         return False
     return True
 
@@ -143,7 +144,7 @@ def parse_whenspec(args):
     if is_numeric(args[0]) and (1 == len(args)):
         rval = int(args[0]) - int(time.time())
     elif args[0] == 'next':
-        rval = next(args[1:])
+        rval = successor(args[1:])
     elif args[0] == 'last':
         rval = last(args[1:])
     elif args[0] == 'today':
@@ -163,24 +164,24 @@ def parse_whenspec(args):
 
 
 # ---------------------------------------------------------------------------
-def next(args):
+def successor(args):
     """
     Apply 'next' to the unit
     """
     if len(args) < 1:
-        raise bscr.Error('next: expected unit or weekday, found nothing')
+        raise BSCR.Error('next: expected unit or weekday, found nothing')
     elif re.match(r'[+-]?\d+', args[0]):
-        raise bscr.Error('next: expected unit or weekday, got number')
+        raise BSCR.Error('next: expected unit or weekday, got number')
     elif args[0] in ['second', 'minute', 'hour', 'day',
                      'week', 'month', 'year']:
         rval = unit_size(args[0])
     elif 0 <= weekday_number(args[0]) and weekday_number(args[0]) <= 6:
-        rval = time_to(args[0], dir='next')
+        rval = time_to(args[0], direction='next')
 
     try:
         return rval
     except UnboundLocalError:
-        raise bscr.Error('next: no return value set')
+        raise BSCR.Error('next: no return value set')
 
 
 # ---------------------------------------------------------------------------
@@ -189,19 +190,19 @@ def last(args):
     Apply 'last' to the unit
     """
     if len(args) < 1:
-        raise bscr.Error('last: expected unit or weekday, found nothing')
+        raise BSCR.Error('last: expected unit or weekday, found nothing')
     elif re.match(r'[+-]?\d+', args[0]):
-        raise bscr.Error('last: expected unit or weekday, got number')
+        raise BSCR.Error('last: expected unit or weekday, got number')
     elif args[0] in ['second', 'minute', 'hour', 'day',
                      'week', 'month', 'year']:
         rval = -1 * unit_size(args[0])
     elif 0 <= weekday_number(args[0]) and weekday_number(args[0]) <= 6:
-        rval = time_to(args[0], dir='last')
+        rval = time_to(args[0], direction='last')
 
     try:
         return rval
     except UnboundLocalError:
-        raise bscr.Error('last: no return value set')
+        raise BSCR.Error('last: no return value set')
 
 
 # ---------------------------------------------------------------------------
@@ -211,27 +212,28 @@ def weekday_number(day):
     with a dict indexed by day names.
     """
     wdl = weekday_list()
-    for num in range(len(wdl)):
-        if wdl[num].startswith(day):
+    # for num in range(len(wdl)):
+    for num, wdname in enumerate(wdl):
+        if wdname.startswith(day):
             return num
     return -1
 
 
 # ---------------------------------------------------------------------------
-def time_to(day, dir):
+def time_to(day, direction):
     """
     Figure out the time to the next or previous *day*
     """
-    wdl = weekday_list()
+    # wdl = weekday_list()
     # daynum = wdl.index(day)
     daynum = weekday_number(day)
     tup = time.localtime()
-    if dir == 'last':
+    if direction == 'last':
         then = -24*60*60 * ((7 + tup[6] - daynum - 1) % 7 + 1)
-    elif dir == 'next':
+    elif direction == 'next':
         then = 24*60*60 * ((7 + daynum - tup[6] - 1) % 7 + 1)
     else:
-        raise bscr.Error('time_to: invalid direction')
+        raise BSCR.Error('time_to: invalid direction')
     return then
 
 

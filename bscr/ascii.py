@@ -35,8 +35,9 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    c = U.cmdline([], usage=usage())
-    (o, a) = c.parse(argv)
+    # pylint: disable=unused-variable
+    cmd = U.cmdline([], usage=usage())
+    (opts, args) = cmd.parse(argv)
 
     asc = ['NUL', 'SOH', 'STX', 'ETX', 'EOT', 'ENQ', 'ACK', 'BEL', 'BS',
            'TAB', 'LF', 'VT', 'FF', 'CR', 'SO', 'SI', 'DLE', 'DC1', 'DC2',

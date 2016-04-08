@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# pylint: disable=anomalous-backslash-in-string,redefined-builtin
 """
 filter.py - Distinguish interesting from ignorable strings in a list.
 
@@ -44,38 +45,57 @@ import unittest
 
 
 # -----------------------------------------------------------------------------
-class filter(object):
+class Filter(object):
+    """
+    A Filter object can be used to select items based on a set of ignorable vs
+    keepable regexes
+    """
     # -------------------------------------------------------------------------
     def __init__(self):
-        self.IGN = []
-        self.KEEP = []
+        """
+        Initialize
+        """
+        self.ign = []
+        self.keepl = []
 
     # -------------------------------------------------------------------------
     def ignore(self, rgx):
-        self.IGN.append(rgx)
+        """
+        Build a list of stuff to ignore
+        """
+        self.ign.append(rgx)
 
     # -------------------------------------------------------------------------
     def is_interesting(self, item):
+        """
+        Return True or False to indicate whether the item is interesting or
+        ignorable.
+        """
         rval = True
-        for r in self.IGN:
-            if re.search(r, item):
+        for element in self.ign:
+            if re.search(element, item):
                 rval = False
                 break
         return rval
 
     # -------------------------------------------------------------------------
     def is_keepable(self, item):
+        """
+        Return True or False to indicate whether the item is keepable
+        """
         rval = False
-        for r in self.KEEP:
-            if re.search(r, item):
+        for element in self.keepl:
+            if re.search(element, item):
                 rval = True
                 break
         return rval
 
     # -------------------------------------------------------------------------
     def keep(self, rgx):
-        self.KEEP.append(rgx)
-
+        """
+        Add a regex to the keep list
+        """
+        self.keepl.append(rgx)
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':

@@ -5,10 +5,10 @@ stopwatch or countdown timer
 chron -c/--count up
 chron -c/--count down hh:mm:ss [-a/--action command]
 
-For "-count up", print a '.' every second, divided into 10s with one
+For '-count up', print a '.' every second, divided into 10s with one
 minute per line.
 
-For "-count down", begin with the specified time and count down to 0.
+For '-count down', begin with the specified time and count down to 0.
 If command is specified, once 0 is reached, run the command.
 
 Copyright (C) 1995 - <the end of time>  Tom Barron
@@ -35,10 +35,11 @@ import optparse
 import os
 import sys
 import time
-import toolframe
 import unittest
+
+import toolframe
 import util as U
-bscr = U.package_module(__name__)
+BSCR = U.package_module(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -49,21 +50,21 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    p = optparse.OptionParser(usage=usage())
-    p.add_option('-c', '--count',
-                 action='store', default='up',
-                 dest='count', type='string',
-                 help='whether to count up or down')
-    p.add_option('-a', '--action',
-                 action='store', default='', dest='action', type='string',
-                 help='optional action at end of countdown')
-    (o, a) = p.parse_args(argv)
+    prs = optparse.OptionParser(usage=usage())
+    prs.add_option('-c', '--count',
+                   action='store', default='up',
+                   dest='count', type='string',
+                   help='whether to count up or down')
+    prs.add_option('-a', '--action',
+                   action='store', default='', dest='action', type='string',
+                   help='optional action at end of countdown')
+    (opts, args) = prs.parse_args(argv)
 
-    if o.count.lower() != 'down' and o.action != '':
-        raise bscr.Error('--action is only meaningful for --count down')
+    if opts.count.lower() != 'down' and opts.action != '':
+        raise BSCR.Error('--action is only meaningful for --count down')
 
-    if o.count.lower() == 'down':
-        count_down(a[1], o.action)
+    if opts.count.lower() == 'down':
+        count_down(args[1], opts.action)
     else:
         count_up()
 
@@ -98,24 +99,24 @@ def count_up():
     """
     Count from low to high -- stopwatch
     """
-    m = 0
-    sys.stdout.write('%02d: ' % m)
-    m = m + 1
-    x = 0
+    minute = 0
+    sys.stdout.write('%02d: ' % minute)
+    minute += 1
+    dec = 0
     while True:
-        if (0 == ((x+1) % 60)):
-            sys.stdout.write('%d\n%02d: ' % (int((x+1)/10), m))
-            m = m + 1
-            x = 0
-        elif 0 == ((x+1) % 10):
-            sys.stdout.write('%d' % int((x+1)/10))
-            x = x + 1
-        elif 0 == ((x+1) % 5):
+        if (0 == ((dec+1) % 60)):
+            sys.stdout.write('%d\n%02d: ' % (int((dec+1)/10), minute))
+            minute += 1
+            dec = 0
+        elif 0 == ((dec+1) % 10):
+            sys.stdout.write('%d' % int((dec+1)/10))
+            dec += 1
+        elif 0 == ((dec+1) % 5):
             sys.stdout.write('+')
-            x = x + 1
+            dec += 1
         else:
             sys.stdout.write('.')
-            x = x + 1
+            dec += 1
         sys.stdout.flush()
         time.sleep(1.0)
 
@@ -126,8 +127,8 @@ def hms_seconds(hms):
     Convert HH:MM:SS to seconds
     !@! should this go in util?
     """
-    h, m, s = hms.split(':')
-    return int(s) + 60 * (int(m) + 60 * int(h))
+    hour, minute, second = hms.split(':')
+    return int(second) + 60 * (int(minute) + 60 * int(hour))
 
 
 # ---------------------------------------------------------------------------

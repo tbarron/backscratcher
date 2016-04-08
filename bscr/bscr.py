@@ -1,20 +1,26 @@
+"""
+Backscratcher help and management
+"""
 import glob
 import os
-try:
-    import pager
-except ImportError:
-    pass
 import pdb
-import pexpect
 import re
-from pkg_resources import resource_string
 import shutil
 import StringIO
 import subprocess as subp
 import sys
+
+try:
+    import pager
+except ImportError:
+    pass
+import pexpect
+from pkg_resources import resource_string
+
 import util
 from version import __version__
 
+# from bscr import Error
 
 # -----------------------------------------------------------------------------
 def main(args=None):
@@ -27,43 +33,44 @@ def main(args=None):
 
 
 # -----------------------------------------------------------------------------
-def bscr_help_commands(args):
+# pylint: disable=unused-argument
+def bscr_help_commands(args=None):
     """help_commands - list the commands that are part of backscratcher
     """
 
-    cl = ["align       - use spaces to spread input lines so that " +
-          "columns line up",
-          "ascii       - display the ASCII collating sequence",
-          "bscr        - help and management for the backscratcher suite",
-          "calc        - simple python expression evaluator",
-          "chron       - stopwatch and timer",
-          "dt          - date and time manipulations",
-          "fl          - retrieve and report information about files",
-          "gtx         - git helper extensions",
-          "fx          - command line special effects",
-          "hd          - hexdump",
-          "jcal        - generate various kinds of calendars",
-          "list        - minus, union, or intersect two lists",
-          "mag         - report the magnitude of a large number",
-          "nvtool      - environment manipulation tool",
-          "odx         - display value in octal, decimal, and hex format",
-          "perrno      - report errno values",
-          "plwhich     - report location of a perl module",
-          "pstrack     - report whether current process stack contains root",
-          "pytool      - start python scripts",
-          "pywhich     - report location of python modules",
-          "replay      - run a command repetitively",
-          "rxlab       - play with regexps",
-          "tps         - look up processes by fragments of ps line",
-          "truth_table - generate a truth table",
-          "wcal        - show a wide calendar of three months",
-          "whych       - find python, perl, and bash modules",
-          "workrpt     - time reports",
-          "xclean      - remove files by pattern, optionally walking trees",
-          ]
+    cmdl = ["align       - use spaces to spread input lines so that " +
+            "columns line up",
+            "ascii       - display the ASCII collating sequence",
+            "bscr        - help and management for the backscratcher suite",
+            "calc        - simple python expression evaluator",
+            "chron       - stopwatch and timer",
+            "dt          - date and time manipulations",
+            "fl          - retrieve and report information about files",
+            "gtx         - git helper extensions",
+            "fx          - command line special effects",
+            "hd          - hexdump",
+            "jcal        - generate various kinds of calendars",
+            "list        - minus, union, or intersect two lists",
+            "mag         - report the magnitude of a large number",
+            "nvtool      - environment manipulation tool",
+            "odx         - display value in octal, decimal, and hex format",
+            "perrno      - report errno values",
+            "plwhich     - report location of a perl module",
+            "pstrack     - report whether current process stack contains root",
+            "pytool      - start python scripts",
+            "pywhich     - report location of python modules",
+            "replay      - run a command repetitively",
+            "rxlab       - play with regexps",
+            "tps         - look up processes by fragments of ps line",
+            "truth_table - generate a truth table",
+            "wcal        - show a wide calendar of three months",
+            "whych       - find python, perl, and bash modules",
+            "workrpt     - time reports",
+            "xclean      - remove files by pattern, optionally walking trees",
+           ]
 
     ldir = os.path.dirname(sys.argv[0])
-    for line in cl:
+    for line in cmdl:
         cmd = line.split()[0]
         if os.path.exists("%s/%s" % (ldir, cmd)):
             print("   %s" % line)
@@ -72,21 +79,21 @@ def bscr_help_commands(args):
 
 
 # -----------------------------------------------------------------------------
-def bscr_readme(args):
-    """readme - display the package README file
-
-    usage: bscr readme
-    """
-    try:
-        readme = resource_string(__name__, "README")
-    except:
-        raise bscr.Error("Can't find the README file")
-
-    try:
-        pager.page(StringIO.StringIO(readme))
-    except NameError:
-        print(readme)
-        print("(*** 'pip install pager' to get internal paging ***)")
+# def bscr_readme(args):
+#     """readme - display the package README file
+#
+#     usage: bscr readme
+#     """
+#     try:
+#         readme = resource_string(__name__, "README")
+#     except:
+#         raise bscr.Error("Can't find the README file")
+#
+#     try:
+#         pager.page(StringIO.StringIO(readme))
+#     except NameError:
+#         print(readme)
+#         print("(*** 'pip install pager' to get internal paging ***)")
 
 
 # -----------------------------------------------------------------------------
@@ -95,8 +102,8 @@ def bscr_roots(args):
 
     usage: bscr roots
     """
-    c = U.cmdline([])
-    (o, a) = c.parse(args)
+    cmd = util.cmdline([])
+    (_, _) = cmd.parse(args)
 
     print("bscr root: %s" % util.bscr_root())
     print(" git root: %s" % util.git_root())
@@ -116,45 +123,45 @@ def bscr_test(args):
     The tests are optimized for py.test. They may not work well under green
     or nose.
     """
-    c = U.cmdline([{'opts': ['--dry-run', '-n'],
-                    'action': 'store_true',
-                    'help': 'see what would happen'},
-                   {'name': 'tester',
-                    'help': 'select a test runner'}])
-    (o, a) = c.parse(args)
+    cmd = util.cmdline([{'opts': ['--dry-run', '-n'],
+                         'action': 'store_true',
+                         'help': 'see what would happen'},
+                        {'name': 'tester',
+                         'help': 'select a test runner'}])
+    (opts, args) = cmd.parse(args)
 
     with util.Chdir(util.dirname(__file__)):
         target = util.pj(os.path.dirname(__file__), 'test')
         print("Running tests in %s" % target)
-        if o.tester == '':
+        if opts.tester == '':
             if which('py.test'):
-                util.run('py.test %s' % target, not o.dryrun)
+                util.run('py.test %s' % target, not opts.dryrun)
             elif which('green'):
-                util.run('green -v %s' % target, not o.dryrun)
+                util.run('green -v %s' % target, not opts.dryrun)
             elif which('nosetests') and importable('nose_ignoredoc'):
-                tl = glob.glob(util.pj(target, 'test_*.py'))
-                util.run('nosetests -v -c nose.cfg %s' % " ".join(tl),
-                         not o.dryrun)
+                testl = glob.glob(util.pj(target, 'test_*.py'))
+                util.run('nosetests -v -c nose.cfg %s' % " ".join(testl),
+                         not opts.dryrun)
             else:
-                tl = glob.glob(util.pj(target, 'test_*.py'))
-                for t in tl:
-                    util.run("%s -v" % t, not o.dryrun)
+                testl = glob.glob(util.pj(target, 'test_*.py'))
+                for tst in testl:
+                    util.run("%s -v" % tst, not opts.dryrun)
                     # p = subp.Popen([t, '-v'])
                     # p.wait()
-        elif o.tester == 'py.test':
-            util.run('py.test %s' % target, not o.dryrun)
-        elif o.tester == 'green':
-            util.run('green -v %s' % target, not o.dryrun)
-        elif o.tester == 'nose':
-            tl = glob.glob(util.pj(target, 'test_*.py'))
-            util.run('nosetests -v -c nose.cfg %s' % " ".join(tl),
-                     not o.dryrun)
-        elif o.tester == 'unittest':
-            tl = glob.glob(util.pj(target, 'test_*.py'))
-            for t in tl:
-                util.run("%s -v" % t, not o.dryrun)
+        elif opts.tester == 'py.test':
+            util.run('py.test %s' % target, not opts.dryrun)
+        elif opts.tester == 'green':
+            util.run('green -v %s' % target, not opts.dryrun)
+        elif opts.tester == 'nose':
+            testl = glob.glob(util.pj(target, 'test_*.py'))
+            util.run('nosetests -v -c nose.cfg %s' % " ".join(testl),
+                     not opts.dryrun)
+        elif opts.tester == 'unittest':
+            testl = glob.glob(util.pj(target, 'test_*.py'))
+            for tst in testl:
+                util.run("%s -v" % tst, not opts.dryrun)
         else:
-            raise SystemExit("unrecognized tester: '%s'" % o.tester)
+            raise SystemExit("unrecognized tester: '%s'" % opts.tester)
 
 
 # -----------------------------------------------------------------------------
@@ -205,14 +212,14 @@ def bscr_version(args):
 
     usage: bscr version
     """
-    ap = util.cmdline([{'opts': ['-v', '--verbose'],
-                        'action': 'store_true',
-                        'default': False,
-                        'dest': 'verbose',
-                        'help': 'show more info'
+    cmd = util.cmdline([{'opts': ['-v', '--verbose'],
+                         'action': 'store_true',
+                         'default': False,
+                         'dest': 'verbose',
+                         'help': 'show more info'
                         }
                        ])
-    (o, a) = ap.parse(args)
+    (_, _) = cmd.parse(args)
 
     print("Backscratcher version %s" % __version__)
 
@@ -223,10 +230,10 @@ def importable(module_name):
     Module *module_name* is importable? True or False
     """
     try:
-        m = __import__(module_name)
+        mod = __import__(module_name)
         if sys.getrefcount(module_name) <= 3:
             del sys.modules[module_name]
-            del m
+            del mod
     except ImportError:
         return False
     return True
@@ -238,9 +245,12 @@ def which(program):
     Figure out where program is. !@!DERPRECATED in favor of pexpect.which()
     """
     def is_exe(fpath):
+        """
+        True if *fpath* is executable, else False
+        """
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
-    fpath, fname = os.path.split(program)
+    fpath, _ = os.path.split(program)
     if fpath:
         if is_exe(program):
             return program

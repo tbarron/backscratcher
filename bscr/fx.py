@@ -99,93 +99,95 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    c = util.cmdline([{'opts': ['-c', '--command'],
-                       'action': 'store',
-                       'dest': 'cmd',
-                       'default': '',
-                       'type': 'string',
-                       'help': 'command to apply to all arguments'
-                       },
-                      {'opts': ['-d', '--debug'],
-                       'action': 'store_true',
-                       'dest': 'debug',
-                       'default': False,
-                       'help': 'run under the debugger'
-                       },
-                      {'opts': ['-e', '--edit'],
-                       'action': 'store',
-                       'dest': 'edit',
-                       'default': '',
-                       'type': 'string',
-                       'help': 'file rename expression '
-                       'applied to all arguments',
-                       },
-                      {'opts': ['-i', '--integer'],
-                       'action': 'store',
-                       'dest': 'irange',
-                       'default': '',
-                       'type': 'string',
-                       'help': 'low:high -- generate range of numbers',
-                       },
-                      {'opts': ['-n', '--dry-run'],
-                       'action': 'store_true',
-                       'dest': 'dryrun',
-                       'default': False,
-                       'help': 'dryrun or execute',
-                       },
-                      {'opts': ['-q', '--quiet'],
-                       'action': 'store_true',
-                       'dest': 'quiet',
-                       'default': False,
-                       'help': "don't echo commands, just run them",
-                       },
-                      {'opts': ['-x', '--xargs'],
-                       'action': 'store_true',
-                       'dest': 'xargs',
-                       'default': False,
-                       'help': 'batch input from stdin into '
-                       'command lines like xargs',
-                       },
-                      ], usage=Usage())
-    (o, a) = c.parse(argv)
+    cmd = util.cmdline([{'opts': ['-c', '--command'],
+                         'action': 'store',
+                         'dest': 'cmd',
+                         'default': '',
+                         'type': 'string',
+                         'help': 'command to apply to all arguments'
+                        },
+                        {'opts': ['-d', '--debug'],
+                         'action': 'store_true',
+                         'dest': 'debug',
+                         'default': False,
+                         'help': 'run under the debugger'
+                        },
+                        {'opts': ['-e', '--edit'],
+                         'action': 'store',
+                         'dest': 'edit',
+                         'default': '',
+                         'type': 'string',
+                         'help': 'file rename expression applied to all'
+                                 ' arguments',
+                        },
+                        {'opts': ['-i', '--integer'],
+                         'action': 'store',
+                         'dest': 'irange',
+                         'default': '',
+                         'type': 'string',
+                         'help': 'low:high -- generate range of numbers',
+                        },
+                        {'opts': ['-n', '--dry-run'],
+                         'action': 'store_true',
+                         'dest': 'dryrun',
+                         'default': False,
+                         'help': 'dryrun or execute',
+                        },
+                        {'opts': ['-q', '--quiet'],
+                         'action': 'store_true',
+                         'dest': 'quiet',
+                         'default': False,
+                         'help': "don't echo commands, just run them",
+                        },
+                        {'opts': ['-x', '--xargs'],
+                         'action': 'store_true',
+                         'dest': 'xargs',
+                         'default': False,
+                         'help': 'batch input from stdin into command lines'
+                                 ' like xargs',
+                        },
+                       ], usage=usage())
+    (opts, args) = cmd.parse(argv)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
 
-    Home = os.getenv('HOME')
+    # home = os.getenv('HOME')
 
-    if o.edit != '':
-        SubstRename(o, a[1:])
-    elif o.irange != '':
-        IterateCommand(o, a[1:])
-    elif o.xargs:
-        BatchCommand(o, a[1:])
-    elif o.cmd != '':
-        SubstCommand(o, a[1:])
+    if opts.edit != '':
+        subst_rename(opts, args[1:])
+    elif opts.irange != '':
+        iterate_command(opts, args[1:])
+    elif opts.xargs:
+        batch_command(opts, args[1:])
+    elif opts.cmd != '':
+        subst_command(opts, args[1:])
     else:
-        print Usage()
+        print usage()
 
 
 # ---------------------------------------------------------------------------
-def BatchCommand(options, arglist, f=sys.stdin):
+def batch_command(options, arglist, rble=sys.stdin):
     """
     Bundle arguments into command lines similarly to xargs.
 
     Unlink xargs, this version allows for static values following the
     list of arguments on each command line.
     """
-    for cmd in xargs_wrap(options.cmd, f):
+    # pylint: disable=unused-argument
+    for cmd in xargs_wrap(options.cmd, rble):
         psys(cmd, options)
 
 
 # ---------------------------------------------------------------------------
-def IterateCommand(options, arglist):
+def iterate_command(options, arglist):
     """
     Run a command once for each of a sequence of numbers.
 
     Possible enhancements would be to handle low/high/step tuples, and
     to handle an arbitrary comma delimited list of values.
     """
+    # pylint: disable=unused-argument
     (low, high) = options.irange.split(':')
     for idx in range(int(low), int(high)):
         cmd = util.expand(re.sub('%', str(idx), options.cmd))
@@ -208,19 +210,19 @@ def psys(cmd, options):
         print("would do '%s'" % cmd)
     elif options.quiet:
         # os.system(cmd)
-        f = os.popen(cmd, 'r')
-        sys.stdout.write(f.read())
-        f.close()
+        pipe = os.popen(cmd, 'r')
+        sys.stdout.write(pipe.read())
+        pipe.close()
     else:
         print(cmd)
         # os.system(cmd)
-        f = os.popen(cmd, 'r')
-        sys.stdout.write(f.read())
-        f.close()
+        pipe = os.popen(cmd, 'r')
+        sys.stdout.write(pipe.read())
+        pipe.close()
 
 
 # ---------------------------------------------------------------------------
-def SubstCommand(options, arglist):
+def subst_command(options, arglist):
     """
     Run the command for each filename in arglist.
     """
@@ -230,21 +232,21 @@ def SubstCommand(options, arglist):
 
 
 # ---------------------------------------------------------------------------
-def SubstRename(options, arglist):
+def subst_rename(options, arglist):
     """
     Create and run a rename command based on a s/old/new/ expression.
     """
-    p = options.edit
-    s = p.split(p[1])
+    subst = options.edit
+    pieces = subst.split(subst[1])
     for filename in arglist:
-        newname = re.sub(s[1], s[2], filename)
+        newname = re.sub(pieces[1], pieces[2], filename)
         print("rename %s %s" % (filename, newname))
         if not options.dryrun:
             os.rename(filename, newname)
 
 
 # ---------------------------------------------------------------------------
-def Usage():
+def usage():
     """
     Report program usage.
     """
@@ -256,16 +258,16 @@ def Usage():
 
 
 # ---------------------------------------------------------------------------
-def xargs_wrap(cmd, input):
+def xargs_wrap(cmd, rble):
     """
-    Do xargs wrapping to cmd, distributing args from file input across
+    Do xargs wrapping to cmd, distributing args from file rble across
     command lines.
     """
     tcmd = cmd
     rval = []
-    for line in input:
-        l = line.strip()
-        for item in l.split(" "):
+    for line in rble:
+        bline = line.strip()
+        for item in bline.split(" "):
             tcmd = util.expand(re.sub('%', item + ' %', tcmd))
             pending = True
 

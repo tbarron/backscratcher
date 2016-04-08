@@ -27,10 +27,12 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 '''
 
-import pexpect
 import sys
-import toolframe
 import unittest
+
+import pexpect
+
+import toolframe
 import util as U
 
 
@@ -39,25 +41,26 @@ def main(argv=None):
     """
     Command line entry point
     """
+    # pylint: disable=eval-used
     if argv is None:
         argv = sys.argv
 
-    c = U.cmdline([])
-    (o, a) = c.parse(argv)
+    cmd = U.cmdline([])
+    (_, _) = cmd.parse(argv)
 
     try:
-        r = []
+        results = []
         while True:
             expr = raw_input("> ")
-            r.append(eval(expr))
-            if type(r[-1]) == int:
-                print("r[%d] = %d" % (len(r)-1, r[-1]))
-            elif type(r[-1]) == float:
-                print("r[%d] = %f" % (len(r)-1, r[-1]))
-            elif type(r[-1]) == str:
-                print("r[%d] = %s" % (len(r)-1, r[-1]))
+            results.append(eval(expr))
+            if isinstance(results[-1], int):
+                print("r[%d] = %d" % (len(results)-1, results[-1]))
+            elif isinstance(results[-1], float):
+                print("r[%d] = %f" % (len(results)-1, results[-1]))
+            elif isinstance(results[-1], str):
+                print("r[%d] = %s" % (len(results)-1, results[-1]))
             else:
-                print("r[%d] = %s" % (len(r)-1, str(r[-1])))
+                print("r[%d] = %s" % (len(results)-1, str(results[-1])))
     except EOFError:
         print ''
         sys.exit(0)

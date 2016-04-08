@@ -1,5 +1,7 @@
 #!/bin/env python
-
+"""
+Git extensions
+"""
 import fnmatch
 import glob
 import sys
@@ -7,14 +9,14 @@ sys.path.append("/ccs/home/tpb/lib/python")
 import optparse
 import os
 import pdb
-import pexpect
 import re
 import shlex
 import subprocess
 import time
-# import xtoolframe
 import traceback
 import unittest
+
+import pexpect
 import util
 
 
@@ -32,53 +34,52 @@ def main(args=None):
 def gtx_addem(args):
     """addem - add pending files to git index for commit
     """
-    p = optparse.OptionParser()
-    p.add_option('-a',  '--add',
+    prs = optparse.OptionParser()
+    prs.add_option('-a', '--add',
                  action='append', default=[], dest='add',
                  help='which statuses to add')
-    p.add_option('-d',  '--debug',
+    prs.add_option('-d', '--debug',
                  action='store_true', default=False, dest='debug',
                  help='start the debugger')
-    p.add_option('-f',  '--force',
+    prs.add_option('-f', '--force',
                  action='store_true', default=False, dest='force',
                  help='add -f to the git add command')
-    p.add_option('-i',  '--ignore',
+    prs.add_option('-i', '--ignore',
                  action='append', default=[], dest='ignore',
                  help='which statuses to ignore')
-    p.add_option('-n',  '--dryrun',
+    prs.add_option('-n', '--dryrun',
                  action='store_true', default=False, dest='dryrun',
                  help='show what would happen')
-    (o, a) = p.parse_args(args)
+    (opts, _) = prs.parse_args(args)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
 
-    fl = []
-    r = pexpect.run("git status --porcelain")
+    flist = []
+    result = pexpect.run("git status --porcelain")
     ignlist = ["??", "R"]
     addlist = ["UU", "AA", "AU", "UA", "M"]
 
-    for st in o.add:
-        if st in ignlist:
-            ignlist.remove(st)
-        if st not in addlist:
-            addlist.append(st)
-    for st in o.ignore:
-        if st in addlist:
-            addlist.remove(st)
-        if st not in ignlist:
-            ignlist.append(st)
+    # remove from ignlist anything in opts.add
+    ignlist = [_ for _ in ignlist if _ not in opts.add]
+    # add to addlist anything in opts.add
+    addlist.extend([_ for _ in opts.add if _ not in addlist])
 
-    for line in r.strip().split("\r\n"):
+    # remove from addlist anything in opts.ignore
+    addlist = [_ for _ in addlist if _ not in opts.ignore]
+    # add to ignlist anything in opts.ignore
+    ignlist.extend([_ for _ in opts.ignore if _ not in ignlist])
+
+    for line in result.strip().split("\r\n"):
         if line.strip() == '':
             continue
         (status, filename) = line.strip().split(None, 1)
         if status in ignlist:
             continue
         if status in addlist:
-            fl.append(filename)
+            flist.append(filename)
 
-    if fl == []:
+    if flist == []:
         msg = ["Nothing to add. 'git status --porcelain' to see status flags.",
                "Use 'gtx addem -a/--add ST -i/--ignore ST' to select statuses",
                "to add or ignore.",
@@ -90,84 +91,83 @@ def gtx_addem(args):
             print line
         raise SystemExit
     cmd = "git add "
-    if o.force:
+    if opts.force:
         cmd += "-f "
-    cmd += " ".join(fl)
-    if o.dryrun:
+    cmd += " ".join(flist)
+    if opts.dryrun:
         print("would do: '%s'" % cmd)
     else:
         print cmd
-        r = pexpect.run(cmd)
-        print r
+        result = pexpect.run(cmd)
+        print result
 
 
 # -----------------------------------------------------------------------------
 def gtx_cleanup(args):
     """cleanup - remove .orig files
     """
-    p = optparse.OptionParser()
-    p.add_option('-d',  '--debug',
+    prs = optparse.OptionParser()
+    prs.add_option('-d',  '--debug',
                  action='store_true', default=False, dest='debug',
                  help='start the debugger')
-    p.add_option('-n',  '--dryrun',
+    prs.add_option('-n',  '--dryrun',
                  action='store_true', default=False, dest='dryrun',
                  help='show what would happen')
-    p.add_option('-s',  '--suffix',
+    prs.add_option('-s',  '--suffix',
                  action='store', default='', dest='suffix',
                  help='suffix to remove')
-    (o, a) = p.parse_args(args)
+    (opts, _) = prs.parse_args(args)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
 
-    if o.suffix == '':
-        suffix = '.orig'
-    else:
-        suffix = o.suffix
+    suffix = opts.suffix or '.orig'
 
-    for r, d, f in os.walk("."):
-        for filename in f:
+    for root, _, files in os.walk("."):
+        for filename in files:
             if filename.endswith(suffix):
-                print("os.unlink(%s)" % os.path.join(r, filename))
-                os.unlink(os.path.join(r, filename))
+                print("os.unlink(%s)" % os.path.join(root, filename))
+                os.unlink(os.path.join(root, filename))
 
 
 # -----------------------------------------------------------------------------
 def gtx_gerrit_issues(args):
     """gerrit_issues - report commits that we expect gerrit to complain about
+
+    TODO: needs test?
     """
-    p = optparse.OptionParser()
-    p.add_option('-d',  '--debug',
+    prs = optparse.OptionParser()
+    prs.add_option('-d',  '--debug',
                  action='store_true', default=False, dest='debug',
                  help='start the debugger')
-    p.add_option('-n',  '--dryrun',
+    prs.add_option('-n',  '--dryrun',
                  action='store_true', default=False, dest='dryrun',
                  help='show what would happen')
-    (o, a) = p.parse_args(args)
+    (opts, _) = prs.parse_args(args)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
 
     depth = 0
-    r = pexpect.run("git --no-pager log")
-    for c in r.split("\r\n\x1b[33mcommit"):
+    result = pexpect.run("git --no-pager log")
+    for commit in result.split("\r\n\x1b[33mcommit"):
         issue = []
-        if "Change-Id:" not in c:
+        if "Change-Id:" not in commit:
             issue.append("Change-Id: not present")
-        z = c.split("\r\n")
-        if 65 < len(z[4].strip()):
+        lines = commit.split("\r\n")
+        if 65 < len(lines[4].strip()):
             issue.append("Summary line too long")
-        if 0 < len(z[5].strip()):
+        if 0 < len(lines[5].strip()):
             issue.append("First paragraph too long")
         if issue != []:
             # d = c.replace("\x1b[m", "")
-            d = re.sub("\x1b\[\d*m", "", c)
-            if not d.startswith("commit"):
-                d = "commit" + d
+            clean = re.sub(r"\x1b\[\d*m", "", commit)
+            if not clean.startswith("commit"):
+                clean = "commit" + clean
             print "===> Depth: %d" % depth
             for i in issue:
                 print "===> %s" % i
-            print d
+            print clean
             print("")
         depth += 1
 
@@ -179,73 +179,76 @@ def gtx_hooks(args):
     usage: gtx hooks [-d] [-n] [-C|-D] [-H dir]
 
     """
-    p = optparse.OptionParser()
-    p.add_option('-d',  '--debug',
+    prs = optparse.OptionParser()
+    prs.add_option('-d',  '--debug',
                  action='store_true', default=False, dest='debug',
                  help='start the debugger')
-    p.add_option('-C',  '--create',
+    prs.add_option('-C',  '--create',
                  action='store_true', default=False, dest='create',
                  help='create hooks')
-    p.add_option('-D',  '--delete',
+    prs.add_option('-D',  '--delete',
                  action='store_true', default=False, dest='delete',
                  help='delete hooks')
-    p.add_option('-H',  '--hookdir',
+    prs.add_option('-H',  '--hookdir',
                  action='store', default='', dest='hookdir',
                  help='where to look for hook scripts')
-    p.add_option('-l',  '--linkdir',
+    prs.add_option('-l',  '--linkdir',
                  action='store', default='', dest='linkdir',
                  help='link dir for testing')
-    p.add_option('-n',  '--dryrun',
+    prs.add_option('-n',  '--dryrun',
                  action='store_true', default=False, dest='dryrun',
                  help='show what would happen')
-    (o, a) = p.parse_args(args)
+    (opts, args) = prs.parse_args(args)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
 
-    srcdir = o.hookdir
+    srcdir = opts.hookdir
     if srcdir == '':
         srcdir = 'githooks'
 
-    lnkdir = o.linkdir
+    lnkdir = opts.linkdir
     if lnkdir == '':
         lnkdir = ".git/hooks"
 
-    if o.delete:
-        hooks_delete(a, lnkdir)
+    if opts.delete:
+        hooks_delete(args, lnkdir)
 
-    if o.create:
-        hooks_create(srcdir, lnkdir, a)
+    if opts.create:
+        hooks_create(srcdir, lnkdir, args)
 
     hooks_list(srcdir, lnkdir)
 
 
 # -----------------------------------------------------------------------------
 def hooks_list(srcdir, lnkdir):
-    D = {}
+    """
+    Report the hooks set up in a git repository
+    """
+    dat = {}
     scr_l = [x for x in glob.glob("%s/*" % srcdir)]
     for scr in scr_l:
         key = os.path.abspath(scr)
-        D[key] = {}
-        D[key]['abs'] = os.path.abspath(scr)
-        D[key]['short'] = scr
+        dat[key] = {}
+        dat[key]['abs'] = os.path.abspath(scr)
+        dat[key]['short'] = scr
 
     lnk_l = [x for x in glob.glob("%s/*" % lnkdir) if os.path.islink(x)]
     for link in lnk_l:
         target = os.readlink(link)
-        if target in D:
-            D[target]['link'] = link
+        if target in dat:
+            dat[target]['link'] = link
         else:
-            D[target] = {}
-            D[target]['link'] = link
+            dat[target] = {}
+            dat[target]['link'] = link
 
-    for key in D:
-        if 'short' in D[key] and 'link' in D[key]:
-            print("   %-25s  <-- %s" % (D[key]['short'], D[key]['link']))
-        elif 'short' in D[key] and 'link' not in D[key]:
-            print("   %-25s      NO LINK" % (D[key]['short']))
-        elif 'short' not in D[key] and 'link' in D[key]:
-            print("   %-25s <-- %s" % ('-' * 10, D[key]['link']))
+    for key in dat:
+        if 'short' in dat[key] and 'link' in dat[key]:
+            print("   %-25s  <-- %s" % (dat[key]['short'], dat[key]['link']))
+        elif 'short' in dat[key] and 'link' not in dat[key]:
+            print("   %-25s      NO LINK" % (dat[key]['short']))
+        elif 'short' not in dat[key] and 'link' in dat[key]:
+            print("   %-25s <-- %s" % ('-' * 10, dat[key]['link']))
 
 
 # -----------------------------------------------------------------------------
@@ -270,85 +273,102 @@ def hooks_delete(names, lnkdir):
 
 
 # -----------------------------------------------------------------------------
+def hook_exists(path, linkdir):
+    """
+    Return True if a link in linkdir points at path, else False.
+
+    We assume linkdir is already normalized.
+    """
+    rval = ''
+    for link in [_ for _ in glob.glob(os.path.join(linkdir, "*"))
+                 if os.path.islink(_)]:
+        targ = util.normalize_path(os.readlink(link))
+        if targ == path:
+            rval = link
+            break
+    return rval
+
+# -----------------------------------------------------------------------------
 def hooks_create(srcdir, lnkdir, names):
     """
     Offer to create hook links if they are missing
     """
-    script_l = [os.path.abspath(x) for x in glob.glob("%s/*" % srcdir)]
-    link_l = [x for x in glob.glob("%s/*" % lnkdir) if os.path.islink(x)]
-    linked = {}
-    for l in link_l:
-        target = os.path.abspath(os.readlink(l))
-        if target in script_l:
-            linked[target] = l
+    srcndir = util.normalize_path(srcdir)
+    lnkndir = util.normalize_path(lnkdir)
+
+    src_l = [_ for _ in glob.glob(os.path.join(srcndir, "*"))
+             if os.path.isfile(_)]
 
     if names == []:
-        for h in script_l:
-            if h not in linked:
-                print("%s does not appear to have a link in .git/hooks" %
-                      os.path.basename(h))
+        for hook in src_l:
+            link = hook_exists(hook, lnkndir)
+            if link:
+                print("{0} already has link {1}"
+                      ''.format(os.path.basename(hook),
+                                link))
+            else:
+
+                print("{0} does not appear to have a link in the link directory"
+                      "".format(os.path.basename(hook)))
                 answer = raw_input("Shall I add one? > ")
                 if answer.strip().lower().startswith('y'):
-                    os.symlink(h, "%s/%s" % (lnkdir, os.path.basename(h)))
-            else:
-                print("%s already has link %s" % (os.path.basename(h),
-                                                  linked[h]))
+                    os.symlink(hook,
+                               os.path.join(lnkndir, os.path.basename(hook)))
     else:
         for name in names:
-            tmp = [x for x in script_l if x.endswith(name)]
-            if tmp == []:
-                print("I don't see a hook script named %s to link" % name)
+            path = os.path.join(srcndir, name)
+            if path not in src_l:
+                print("I don't see a hook script named {0} to link"
+                      ''.format(name))
                 continue
 
-            for spath in tmp:
-                if spath in linked:
-                    print("It looks like link %s already points at %s" %
-                          (linked[spath], os.path.basename(spath)))
-                else:
-                    os.symlink(spath,
-                               "%s/%s" % (lnkdir, os.path.basename(spath)))
-
+            link = hook_exists(path, lnkndir)
+            if link:
+                print("{0} already has link {1}"
+                      ''.format(os.path.basename(path), link))
+            else:
+                os.symlink(path, os.path.join(lnkndir, os.path.basename(path)))
 
 # -----------------------------------------------------------------------------
-def gtx_depth(args):
+def gtx_depth(argl):
     """depth - report depth and age of a commit
     """
-    p = optparse.OptionParser()
-    p.add_option('-d',  '--debug',
+    prs = optparse.OptionParser()
+    prs.add_option('-d',  '--debug',
                  action='store_true', default=False, dest='debug',
                  help='start the debugger')
-    p.add_option('-n',  '--dryrun',
+    prs.add_option('-n',  '--dryrun',
                  action='store_true', default=False, dest='dryrun',
                  help='show what would happen')
-    (o, a) = p.parse_args(args)
+    (opts, args) = prs.parse_args(argl)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
 
     depth = 0
     found = False
-    r = pexpect.run("git --no-pager log")
-    for c in r.split("\r\n\x1b[33mcommit"):
-        chash_l = re.findall("(commit)?\s+([0-9a-f]+)", c)
-        chash = chash_l[0][1]
-        date_l = re.findall("Date:\s+([^\r\n]+)", c)
-        date = date_l[0]
+    result = pexpect.run("git --no-pager log")
+    for commit in result.split("\r\n\x1b[33mcommit"):
+        # chash_l = re.findall(r"(commit)?\s+([0-9a-f]+)", commit)
+        # chash = chash_l[0][1]
+        # date_l = re.findall(r"Date:\s+([^\r\n]+)", commit)
+        # date = date_l[0]
 
-        for needle in a:
-            if needle in c:
+        for needle in args:
+            if needle in commit:
                 found = True
-                print("commit %s" % c.replace("\x1b[m", ""))
+                print("commit %s" % commit.replace("\x1b[m", ""))
                 print("===> Depth: %d" % depth)
                 break
 
         depth += 1
 
     if not found:
-        print("No commit found matching '%s'" % a)
+        print("No commit found matching '%s'" % args)
 
 
 # -----------------------------------------------------------------------------
-def gtx_flix(args):
+def gtx_flix(argl):
     """flix - show '<<<<< HEAD' lines from current conflicts
 
     With the -e option, you can make flix throw you into an editor on each file
@@ -357,50 +377,51 @@ def gtx_flix(args):
     any() is True if any of the listed conditions are True. Basically, it ORs
     all the conditions in the list passed to it.
     """
-    p = optparse.OptionParser()
-    p.add_option('-d',  '--debug',
+    prs = optparse.OptionParser()
+    prs.add_option('-d',  '--debug',
                  action='store_true', default=False, dest='debug',
                  help='start the debugger')
-    p.add_option('-e',  '--edit',
+    prs.add_option('-e',  '--edit',
                  action='store_true', default=False, dest='edit',
                  help='run an editor on each file with conflicts')
-    p.add_option('-g', '--glob',
+    prs.add_option('-g', '--glob',
                  action='store', default='*', dest='globstr',
                  help='only report on files matching the glob string')
-    (o, a) = p.parse_args(args)
+    (opts, _) = prs.parse_args(argl)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
 
-    fl = []
-    r = pexpect.run("git status --porcelain")
-    for line in r.split("\n"):
+    flist = []
+    result = pexpect.run("git status --porcelain")
+    for line in result.split("\n"):
         if any([line.startswith("?? "),
                 line.startswith("D  "),
                 line.startswith("R  "),
                 line.strip() == '',
                 ]):
             continue
-        fl.append(line.strip()[3:])
-    for fn in [x for x in fl if fnmatch.fnmatch(x, o.globstr)]:
+        flist.append(line.strip()[3:])
+    for fname in [_ for _ in flist if fnmatch.fnmatch(_, opts.globstr)]:
         edit_this_one = False
         lnum = 0
-        z = open(fn, 'r')
-        for line in z:
+        rble = open(fname, 'r')
+        for line in rble:
             if '<<<<<<<' in line:
-                print("%s[%d]: %s" % (fn, lnum, line.strip()))
+                print("%s[%d]: %s" % (fname, lnum, line.strip()))
                 edit_this_one = True
             lnum += 1
-        if edit_this_one and o.edit:
-            call_editor(fn)
+        if edit_this_one and opts.edit:
+            call_editor(fname)
 
 
 # -----------------------------------------------------------------------------
-def gtx_fl(args):
+def gtx_fl(argl=None):
     """fl - list files needing attention (eg, during a rebase)
     """
-    r = pexpect.run("git status --porcelain")
-    for line in r.split("\n"):
+    # pylint: disable=unused-argument
+    result = pexpect.run("git status --porcelain")
+    for line in result.split("\n"):
         if "??" in line or line.strip() == '':
             continue
         print line.split()[1]
@@ -408,42 +429,40 @@ def gtx_fl(args):
 
 
 # -----------------------------------------------------------------------------
-def gtx_progress(args):
+def gtx_progress(argl):
     """progress - show rebase progress
 
     usage: gtx progress refdir rebasedir
 
 
     """
-    p = optparse.OptionParser()
-    p.add_option('-d',  '--debug',
+    prs = optparse.OptionParser()
+    prs.add_option('-d',  '--debug',
                  action='store_true', default=False, dest='debug',
                  help='start the debugger')
-    (o, a) = p.parse_args(args)
+    (opts, args) = prs.parse_args(argl)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
 
-    ref = a[0]
-    rebase = a[1]
+    ref = args[0]
+    rebase = args[1]
 
     os.chdir(rebase)
-    r = pexpect.run("git --no-pager log --no-color -1")
-    commit = re.findall("commit\s+(\w+)", r)
-    x = r.split("\r\n")
-    needle = x[4].strip()
-    pass
+    result = pexpect.run("git --no-pager log --no-color -1")
+    commit = re.findall(r"commit\s+(\w+)", result)
+    line = result.split("\r\n")
+    needle = line[4].strip()
 
     os.chdir(os.path.join("..", ref))
-    r = pexpect.run("gtx depth %s" % commit[0])
-    if "No commit found" in r:
-        r = pexpect.run("gtx depth -- \"%s\"" % needle)
-    print r
-    pass
+    result = pexpect.run("gtx depth %s" % commit[0])
+    if "No commit found" in result:
+        result = pexpect.run("gtx depth -- \"%s\"" % needle)
+    print result
 
 
 # -----------------------------------------------------------------------------
-def gtx_recover(args):
+def gtx_recover(argl):
     """recover - recover file content from HEAD into a missing 'added by them'
 
     This is for when we're rebasing and files git says are in conflict and need
@@ -451,13 +470,13 @@ def gtx_recover(args):
     files from the previous commit and copy the content into the right place
     where git expects them.
     """
-    p = optparse.OptionParser()
-    p.add_option('-d',  '--debug',
+    prs = optparse.OptionParser()
+    prs.add_option('-d',  '--debug',
                  action='store_true', default=False, dest='debug',
                  help='start the debugger')
-    (o, a) = p.parse_args(args)
+    (opts, args) = prs.parse_args(argl)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
 
     agenda = {}
@@ -465,10 +484,10 @@ def gtx_recover(args):
 
     # For each file to be handled, we expect a "D" record from where the file
     # was deleted and a "UA" record for where the file should be.
-    for substr in a:
-        z = [x for x in status if substr in x]
+    for substr in args:
+        hits = [_ for _ in status if substr in _]
         agenda[substr] = {}
-        for entry in z:
+        for entry in hits:
             (stat, path) = entry.split(None, 1)
             if stat == "D":
                 agenda[substr]["src"] = path
@@ -496,50 +515,51 @@ def gtx_recover(args):
 def gtx_resolve(args):
     """resolve - resolve conflicts either for or against HEAD
     """
-    p = optparse.OptionParser()
-    p.add_option('-d',  '--debug',
+    prs = optparse.OptionParser()
+    prs.add_option('-d',  '--debug',
                  action='store_true', default=False, dest='debug',
                  help='start the debugger')
-    p.add_option('-H', '--head',
+    prs.add_option('-H', '--head',
                  action='store_true', default=False, dest='head',
                  help='resolve in favor of HEAD')
-    p.add_option('-c', '--commit',
+    prs.add_option('-c', '--commit',
                  action='store_true', default=False, dest='commit',
                  help='resolve in favor of commit')
-    p.add_option('-s', '--suffix',
+    prs.add_option('-s', '--suffix',
                  action='store', default='.orig', dest='suffix',
                  help='suffix to append to original file(s)')
-    (o, a) = p.parse_args(args)
+    (opts, _) = prs.parse_args(args)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
 
-    if o.head and o.commit:
+    if opts.head and opts.commit:
         raise SystemExit("-H and -c are mutually exclusive")
-    elif o.head:
+    elif opts.head:
         resolve = 'head'
-    elif o.commit:
+    elif opts.commit:
         resolve = 'commit'
     else:
         raise SystemExit("One of -H or -c are required")
 
-    r = pexpect.run("git status --porcelain")
-    for line in r.rstrip().split("\r\n"):
+    result = pexpect.run("git status --porcelain")
+    for line in result.rstrip().split("\r\n"):
         (status, filename) = line.split(None, 1)
         if status in ["AA", "UU"]:
-            resolve_file(resolve, filename, o.suffix)
+            resolve_file(resolve, filename, opts.suffix)
 
 
 # -----------------------------------------------------------------------------
 def resolve_file(which, filename, suffix):
     """
     Resolve one file
+    @TEST
     """
     nname = filename + ".new"
-    o = open(nname, 'w')
+    wble = open(nname, 'w')
     write = True
-    with open(filename, 'r') as i:
-        for line in i.readlines():
+    with open(filename, 'r') as rble:
+        for line in rble.readlines():
             if line.startswith("<<<<<<< HEAD"):
                 write = (which == 'head')
                 continue
@@ -550,8 +570,8 @@ def resolve_file(which, filename, suffix):
                 write = True
                 continue
             elif write:
-                o.write(line)
-    o.close()
+                wble.write(line)
+    wble.close()
 
     if suffix != '':
         os.rename(filename, filename + suffix)
@@ -562,13 +582,13 @@ def resolve_file(which, filename, suffix):
 def gtx_nochid(args):
     """nochid - report log entries that don't have a Change-Id
     """
-    p = optparse.OptionParser()
-    p.add_option('-d',  '--debug',
+    prs = optparse.OptionParser()
+    prs.add_option('-d',  '--debug',
                  action='store_true', default=False, dest='debug',
                  help='start the debugger')
-    (o, a) = p.parse_args(args)
+    (opts, _) = prs.parse_args(args)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
 
     try:
@@ -576,7 +596,7 @@ def gtx_nochid(args):
         current = ''
         for line in result.split("\n"):
             if line.startswith("\x1b[33mcommit "):
-                line = re.sub("\x1b\[3*m", "", line)
+                line = re.sub(r"\x1b\[3*m", "", line)
                 if current and "Change-Id:" not in current:
                     print("-----")
                     print current
@@ -586,68 +606,76 @@ def gtx_nochid(args):
                 current += "\n" + line
         if "Change-Id:" not in current:
             print current
-    except IOError as e:
-        if "Broken pipe" not in str(e):
+    except IOError as err:
+        if "Broken pipe" not in str(err):
             raise
 
 
 # -----------------------------------------------------------------------------
 def gtx_nodoc(args):
     """nodoc - report functions in the current tree with no doc string
+
+    @DEPRECATE in favor of pylint
     """
-    p = optparse.OptionParser()
-    p.add_option('-d',  '--debug',
+    prs = optparse.OptionParser()
+    prs.add_option('-d',  '--debug',
                  action='store_true', default=False, dest='debug',
                  help='start the debugger')
-    (o, a) = p.parse_args(args)
+    (opts, _) = prs.parse_args(args)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
 
-    for r, d, f in os.walk("."):
-        for path in [os.path.join(r, fname) for fname in f
+    for root, _, files in os.walk("."):
+        for path in [os.path.join(root, fname) for fname in files
                      if fname.endswith(".py")]:
-            s = contents(path)
-            for idx in range(len(s)):
-                if re.findall("^\s*def\s+", s[idx]):
-                    if all([x not in s[idx+1] for x in ['"""', "'''"]]):
-                        print("%s: %s" % (path, s[idx].rstrip()))
+            data = contents(path)
+            for idx in enumerate(data):
+                if re.findall(r"^\s*def\s+", data[idx]):
+                    if all([x not in data[idx+1] for x in ['"""', "'''"]]):
+                        print("%s: %s" % (path, data[idx].rstrip()))
 
 
 # -----------------------------------------------------------------------------
 def gtx_rm_untrack(args):
     """rm_untrack - remove untracked files
+
+    @TEST
     """
-    p = optparse.OptionParser()
-    p.add_option('-d',  '--debug',
+    prs = optparse.OptionParser()
+    prs.add_option('-d',  '--debug',
                  action='store_true', default=False, dest='debug',
                  help='start the debugger')
-    p.add_option('-n',  '--dry-run',
-                 action='store_true', default=False, dest='dryrun',
+    prs.add_option('-n',  '--dry-run',
+                 action='store_true', default=True, dest='dryrun',
                  help='show what would happen')
-    (o, a) = p.parse_args(args)
+    (opts, _) = prs.parse_args(args)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
 
-    r = [z.split()
-         for z in pexpect.run("git status --porcelain").strip().split("\r\n")]
-    for x in r:
-        if x[0] == '??':
-            print("os.unlink(%s)" % x[1])
-            if not o.dryrun:
-                os.unlink(x[1])
-
+    for line in pexpect.run("git status --porcelain").strip().split("\r\n"):
+        words = line.split()
+        if words[0] == '??':
+            print("os.unlink({0})".format(words[1]))
+            if not opts.dryrun:
+                os.unlink(words[1])
 
 # -----------------------------------------------------------------------------
 def contents(path):
-    with open(path, 'r') as f:
-        rval = f.readlines()
+    """
+    Read a file and return its contents as an array of lines
+    """
+    with open(path, 'r') as rble:
+        rval = rble.readlines()
     return rval
 
 
 # -----------------------------------------------------------------------------
 def call_editor(filename):
+    """
+    Run an editor on a file
+    """
     editor = os.getenv("EDITOR")
     if editor is None:
         editor = pexpect.which("vim")

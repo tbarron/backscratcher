@@ -43,46 +43,46 @@ import util as U
 
 
 # ---------------------------------------------------------------------------
-def main(A=None):
+def main(argl=None):
     """
     Program entry point
     """
-    if A is None:
-        A = sys.argv
-    c = U.cmdline([], usage=usage())
-    (o, a) = c.parse(A)
+    if argl is None:
+        argl = sys.argv
+    cmd = U.cmdline([], usage=usage())
+    (_, args) = cmd.parse(argl)
 
-    if 1 < len(a):
-        input = open(a[1], 'r')
+    if 1 < len(args):
+        src = open(args[1], 'r')
     else:
-        input = sys.stdin
-    align(input)
+        src = sys.stdin
+    align(src)
 
 
 # ---------------------------------------------------------------------------
-def align(input):
+def align(src):
     """
     Payload routine
     """
-    lines = [l.strip() for l in input.readlines()]
-    width = []
-    for l in lines:
-        f = l.split()
-        w = [len(f) for f in l.split()]
-        for idx in range(0, min(len(w), len(width))):
-            width[idx] = max(w[idx], width[idx])
-        if len(width) < len(w):
-            width.extend(w[len(width):])
+    lines = [l.strip() for l in src.readlines()]
+    max_width = []
+    for line in lines:
+        # flds = line.split()
+        cur_width = [len(_) for _ in line.split()]
+        for idx in range(0, min(len(cur_width), len(max_width))):
+            max_width[idx] = max(cur_width[idx], max_width[idx])
+        if len(max_width) < len(cur_width):
+            max_width.extend(cur_width[len(max_width):])
 
-    for l in lines:
-        f = l.split()
+    for line in lines:
+        flds = line.split()
         oline = ''
-        for i in range(0, len(f)):
-            if re.search(r'\d+', f[i]):
-                fmt = '%%%ds  ' % width[i]
+        for idx in range(0, len(flds)):
+            if re.search(r'\d+', flds[idx]):
+                fmt = '%%%ds  ' % max_width[idx]
             else:
-                fmt = '%%-%ds  ' % width[i]
-            oline = oline + fmt % f[i]
+                fmt = '%%-%ds  ' % max_width[idx]
+            oline = oline + fmt % flds[idx]
         print oline
 
 

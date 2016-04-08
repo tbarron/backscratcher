@@ -111,10 +111,11 @@ import stat
 import string
 import sys
 import time
-import toolframe
 import unittest
+
+import toolframe
 import util
-bscr = util.package_module(__name__)
+BSCR = util.package_module(__name__)
 
 
 # -----------------------------------------------------------------------------
@@ -134,13 +135,13 @@ def fl_diff(args):
     usage: fl diff file1 file2 file3 ...
 
     """
-    p = optparse.OptionParser()
-    p.add_option('-n', '--noexec',
-                 default=True, action='store_false', dest='xable',
-                 help='just do a dry run')
-    (o, a) = p.parse_args(args)
+    prs = optparse.OptionParser()
+    prs.add_option('-n', '--noexec',
+                   default=True, action='store_false', dest='xable',
+                   help='just do a dry run')
+    (opts, args) = prs.parse_args(args)
 
-    for filename in a:
+    for filename in args:
         dirname = os.path.dirname(filename)
         if dirname == '':
             dirname = '.'
@@ -151,89 +152,89 @@ def fl_diff(args):
         cmd = 'diff %s %s' % (counterpath, filename)
         print cmd
         sys.stdout.flush()
-        util.run(cmd, o.xable)
+        util.run(cmd, opts.xable)
 
 
 # ---------------------------------------------------------------------------
-def fl_edit(args):
+def fl_edit(argl):
     """edit - edit files in place
 
     usage: fl edit [-i <suffix>] -e <edit-cmd> file1 file2 file3 ...
 
     """
-    p = optparse.OptionParser()
-    p.add_option('-d', '--debug',
-                 default=False, action='store_true', dest='debug',
-                 help='run the debugger')
-    p.add_option('-e', '--edit',
-                 default='', action='store', dest='edit_cmd',
-                 help='edit command')
-    p.add_option('-i', '--init',
-                 default='', action='store', dest='suffix',
-                 help='suffix for original files')
-    (o, a) = p.parse_args(args)
+    prs = optparse.OptionParser()
+    prs.add_option('-d', '--debug',
+                   default=False, action='store_true', dest='debug',
+                   help='run the debugger')
+    prs.add_option('-e', '--edit',
+                   default='', action='store', dest='edit_cmd',
+                   help='edit command')
+    prs.add_option('-i', '--init',
+                   default='', action='store', dest='suffix',
+                   help='suffix for original files')
+    (opts, args) = prs.parse_args(argl)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
 
-    if o.suffix == '':
+    if opts.suffix == '':
         suffix = 'original'
     else:
-        suffix = o.suffix
+        suffix = opts.suffix
 
-    if o.edit_cmd == '':
+    if opts.edit_cmd == '':
         util.fatal("usage: fl edit [-i <suffix>] -e <cmd> f1 f2 ...")
 
-    ec = o.edit_cmd.split(o.edit_cmd[1])
-    if all([ec[0] != 's', ec[0] != 'y']):
-        raise bscr.Error("Only 's' and 'y' supported for -e right now")
+    ecmd = opts.edit_cmd.split(opts.edit_cmd[1])
+    if all([ecmd[0] != 's', ecmd[0] != 'y']):
+        raise BSCR.Error("Only 's' and 'y' supported for -e right now")
 
-    if 4 != len(ec):
-        raise bscr.Error("usage: ... -e '[sy]/before/after/' ...")
+    if 4 != len(ecmd):
+        raise BSCR.Error("usage: ... -e '[sy]/before/after/' ...")
 
-    (op, prev, post) = ec[0:3]
+    (opn, prev, post) = ecmd[0:3]
 
-    if 0 == len(a):
+    if 0 == len(args):
         util.fatal("no files on command line to edit")
     else:
-        for filename in a:
-            editfile(filename, op, prev, post, suffix)
+        for filename in args:
+            editfile(filename, opn, prev, post, suffix)
 
 
 # ---------------------------------------------------------------------------
-def editfile(filename, op, prev, post, suffix=None):
+def editfile(filename, opn, prev, post, suffix=None):
     """
     Edit *filename*, replacing *prev* with *post* and renaming the original
     file by appending *suffix* to its name
     """
-    if op != 's' and op != 'y':
-        raise bscr.Error("Invalid operation: '%s'" % op)
+    if opn != 's' and opn != 'y':
+        raise BSCR.Error("Invalid operation: '%s'" % opn)
     if suffix is None or suffix == '':
         suffix = 'original'
 
     fn_orig = "%s.%s" % (filename, suffix)
     fn_new = "%s.%s" % (filename, "new")
-    n = open(filename, 'r')
-    o = open(fn_new, 'w')
+    inc = open(filename, 'r')
+    out = open(fn_new, 'w')
 
-    if op == 's':
-        for line in n.readlines():
+    if opn == 's':
+        for line in inc.readlines():
             nline = re.sub(prev, post, line)
-            o.write(nline)
-    elif op == 'y':
+            out.write(nline)
+    elif opn == 'y':
         prev = prev.decode('string_escape')
         if post == '':
-            for line in n.readlines():
+            for line in inc.readlines():
                 nline = line.translate(None, prev)
-                o.write(nline)
+                out.write(nline)
         else:
             tbl = string.maketrans(prev, post)
-            for line in n.readlines():
+            for line in inc.readlines():
                 nline = line.translate(tbl)
-                o.write(nline)
+                out.write(nline)
 
-    o.close()
-    n.close()
+    out.close()
+    inc.close()
 
     os.rename(filename, fn_orig)
     os.rename(fn_new, filename)
@@ -248,21 +249,22 @@ def fl_revert(args):
     For each file listed in the command line, look for 'save'd version
     and bring it back. The current file is renamed <file>.new.
     """
-    p = optparse.OptionParser()
-    p.add_option('-n', '--noexec',
-                 default=True, action='store_false', dest='xable',
-                 help='just do a dry run')
-    (o, a) = p.parse_args(args)
+    prs = optparse.OptionParser()
+    prs.add_option('-n', '--noexec',
+                   default=True, action='store_false', dest='xable',
+                   help='just do a dry run')
+    (opts, args) = prs.parse_args(args)
 
-    for f in a:
-        dir = os.path.dirname(f)
-        if dir == '':
-            dir = '.'
+    for filename in args:
+        dirn = os.path.dirname(filename)
+        if dirn == '':
+            dirn = '.'
 
-        counterpath = most_recent_prefix_match(dir, os.path.basename(f))
+        counterpath = most_recent_prefix_match(dirn,
+                                               os.path.basename(filename))
 
-        util.run('mv %s %s.new' % (f, f), o.xable)
-        util.run('mv %s %s' % (counterpath, f), o.xable)
+        util.run('mv %s %s.new' % (filename, filename), opts.xable)
+        util.run('mv %s %s' % (counterpath, filename), opts.xable)
 
 
 # ---------------------------------------------------------------------------
@@ -274,16 +276,16 @@ def fl_rm_cr(args):
     Filter out CR charaters from a file.
     """
     for filename in args:
-        f = open(filename, 'r')
-        d = f.readlines()
-        f.close()
+        rble = open(filename, 'r')
+        data = rble.readlines()
+        rble.close()
 
-        r = [x.replace('\r', '') for x in d]
+        edited = [x.replace('\r', '') for x in data]
 
         wname = "%s.%d" % (filename, os.getpid())
-        f = open(wname, 'w')
-        f.writelines(r)
-        f.close()
+        wble = open(wname, 'w')
+        wble.writelines(edited)
+        wble.close()
 
         os.rename(filename, "%s~" % filename)
         os.rename(wname, filename)
@@ -297,6 +299,7 @@ def fl_save(args):
 
     For each file, create file.YYYY.mmdd.
     """
+    # pylint: disable=unused-argument
     print("under construction")
 
 
@@ -310,8 +313,8 @@ def fl_set_atime_to_mtime(args):
     mtime value.
     """
     for filename in args:
-        s = os.stat(filename)
-        os.utime(filename, (s[stat.ST_MTIME], s[stat.ST_MTIME]))
+        mdat = os.stat(filename)
+        os.utime(filename, (mdat.st_mtime, mdat.st_mtime))
 
 
 # ---------------------------------------------------------------------------
@@ -324,8 +327,8 @@ def fl_set_mtime_to_atime(args):
     atime value.
     """
     for filename in args:
-        s = os.stat(filename)
-        os.utime(filename, (s[stat.ST_ATIME], s[stat.ST_ATIME]))
+        mdat = os.stat(filename)
+        os.utime(filename, (mdat.st_atime, mdat.st_atime))
 
 
 # ---------------------------------------------------------------------------
@@ -336,6 +339,7 @@ def fl_times(args):
 
     For each file, report the access, mod, and create times.
     """
+    # pylint: disable=unused-argument
     print("under construction")
 
 
@@ -347,32 +351,33 @@ def fl_unreadable(args):
 
     Descend the directory at <root> and report unreadable files.
     """
+    # pylint: disable=unused-argument
     print("under construction")
 
 
 # ---------------------------------------------------------------------------
-def most_recent_prefix_match(dir, filename):
+def most_recent_prefix_match(dirn, filename):
     """
     Return the path of the newest file in dir that prefix-matches filename
     but does not match exactly (filename is not a path, only a filename).
     """
-    list = os.listdir(dir)
-    if os.path.exists('%s/old' % dir):
-        list.extend(['old/%s' % x for x in os.listdir('%s/old' % dir)])
+    dirl = os.listdir(dirn)
+    if os.path.exists('%s/old' % dirn):
+        dirl.extend(['old/%s' % x for x in os.listdir('%s/old' % dirn)])
     # print list
 
     recent_time = 0
     recent_file = ''
-    for file in list:
-        s = os.stat('%s/%s' % (dir, file))
-        bfile = os.path.basename(file)
-        if all([file != filename,
+    for candidate in dirl:
+        mdat = os.stat('%s/%s' % (dirn, candidate))
+        bfile = os.path.basename(candidate)
+        if all([candidate != filename,
                 bfile.startswith(filename),
-                recent_time < s[stat.ST_MTIME]]):
-            recent_time = s[stat.ST_MTIME]
-            recent_file = file
+                recent_time < mdat.st_mtime]):
+            recent_time = mdat.st_mtime
+            recent_file = candidate
 
     # print 'recent_file = %s' % recent_file
     if recent_file != '':
         # print 'mrpm returning %s/%s' % (dir, recent_file)
-        return '%s/%s' % (dir, recent_file)
+        return '%s/%s' % (dirn, recent_file)
