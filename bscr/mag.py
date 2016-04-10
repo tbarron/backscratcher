@@ -39,9 +39,9 @@ GNU General Public License for more details.
 """
 import optparse
 import sys
-import toolframe
 import unittest
 
+import toolframe
 
 # ---------------------------------------------------------------------------
 def main(argv=None, testing=False):
@@ -51,14 +51,14 @@ def main(argv=None, testing=False):
     if argv is None:
         argv = sys.argv
 
-    p = optparse.OptionParser(usage=usage())
+    prs = optparse.OptionParser(usage=usage())
     # define options here
-    p.add_option('-b', '--binary',
-                 action='store_true', default=False, dest='binary',
-                 help='div=1024 rather than 1000')
-    (o, a) = p.parse_args(argv)
+    prs.add_option('-b', '--binary',
+                   action='store_true', default=False, dest='binary',
+                   help='div=1024 rather than 1000')
+    (opts, args) = prs.parse_args(argv)
 
-    if o.binary:
+    if opts.binary:
         divisor = 1024
         units = ['b', 'Kib', 'Mib', 'Gib', 'Tib', 'Pib', 'Eib', 'Zib', 'Yib']
     else:
@@ -67,16 +67,16 @@ def main(argv=None, testing=False):
 
     units.reverse()
 
-    if len(a) < 2:
+    if len(args) < 2:
         rval = usage()
     else:
-        val = float(a[1])
-        u = units.pop()
+        val = float(args[1])
+        unit = units.pop()
         while divisor <= val:
             val /= divisor
-            u = units.pop()
+            unit = units.pop()
 
-        rval = "%s = %3.2f %s" % (a[1], val, u)
+        rval = "%s = %3.2f %s" % (args[1], val, unit)
 
     if testing:
         return(rval)
