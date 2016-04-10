@@ -56,9 +56,9 @@ import os
 import pprint
 import re
 import sys
-import toolframe
 import unittest
 
+import toolframe
 
 # ---------------------------------------------------------------------------
 def main(args=None):
@@ -69,22 +69,20 @@ def main(args=None):
         args = sys.argv
     try:
         operation = args[1]
-        Acmd = args[2]
-        Bcmd = args[3]
+        a_cmd = args[2]
+        b_cmd = args[3]
     except IndexError:
         usage()
 
-    if (operation == "") or (Acmd == "") or (Bcmd == ""):
+    if (operation == "") or (a_cmd == "") or (b_cmd == ""):
         usage()
 
-    A = generate_list(Acmd)
-    B = generate_list(Bcmd)
+    a_list = generate_list(a_cmd)
+    b_list = generate_list(b_cmd)
 
-    # eval("result = list_%s(A, B)" % operation)
     lfunc = getattr(sys.modules[__name__], "list_" + operation)
-    result = lfunc(A, B)
-    p = pprint.PrettyPrinter()
-    p.pprint(result)
+    result = lfunc(a_list, b_list)
+    pprint.pprint(result)
 
 
 # ---------------------------------------------------------------------------
@@ -103,45 +101,38 @@ def generate_list(cmd):
     """
     Run a command and turn its output into a list
     """
-    f = os.popen(cmd, 'r')
-    rval = [x.strip() for x in f.readlines()]
-    f.close()
+    rbl = os.popen(cmd, 'r')
+    rval = [_.strip() for _ in rbl.readlines()]
+    rbl.close()
     return rval
 
 
 # ---------------------------------------------------------------------------
-def list_minus(listA, listB):
+def list_minus(a_l, b_l):
     """
     compute the difference of two lists
     """
-    rval = listA
-    for item in listB:
-        if item in rval:
-            rval.remove(item)
+    rval = [_ for _ in a_l if _ not in b_l]
     return rval
 
 
 # ---------------------------------------------------------------------------
-def list_union(listA, listB):
+def list_union(a_l, b_l):
     """
     compute the union of two lists
+
+    @test: what if there are repeated values in a_l or b_l? should they be
+    repeated in the result or uniquified?
     """
-    m = {}
-    for x in listA:
-        m[x] = 1
-    for x in listB:
-        m[x] = 1
-    rval = m.keys()
+    rval = list(set(a_l).union(set(b_l)))
     return rval
 
 
 # ---------------------------------------------------------------------------
-def list_intersect(listA, listB):
+def list_intersect(a_l, b_l):
     """
     compute the intersection of two lists
     """
     rval = []
-    for x in listA:
-        if x in listB:
-            rval.append(x)
+    rval = [_ for _ in a_l if _ in b_l]
     return rval
