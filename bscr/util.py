@@ -431,6 +431,24 @@ def mtime(pathname):
 
 
 # -----------------------------------------------------------------------------
+def normalize_path(path):
+    """
+    Fully normalize a path -- apply python's abspath and normpath, but then
+    also resolve any symlink components and return the result.
+    """
+    apath = os.path.abspath(path)
+    comps = apath.split(os.sep)
+    ppath = ''
+    for comp in comps:
+        if comp == '':
+            continue
+        ppath += os.sep + comp
+        if os.path.islink(ppath):
+            ppath = os.readlink(ppath)
+    rval = os.path.normpath(ppath)
+    return rval
+
+# -----------------------------------------------------------------------------
 def script_location(script):
     """
     Compute where we expect to find the named script.

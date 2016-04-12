@@ -15,7 +15,9 @@ def assertLink(hook, link):
     """
     assert(os.path.exists(hook))
     assert(os.path.exists(link))
-    assert(os.readlink(link) == hook)
+    nhook = U.normalize_path(hook)
+    nlink = U.normalize_path(os.readlink(link))
+    assert(nlink == nhook)
 
 
 # -----------------------------------------------------------------------------

@@ -12,6 +12,30 @@ import StringIO
 import sys
 import unittest
 
+import pytest
+
+# ---------------------------------------------------------------------------
+def test_psys_quiet(tmpdir, capsys, data):
+    """
+    Test routine psys with dryrun False and quiet True.
+    """
+    with U.Chdir(tmpdir.strpath):
+        exp = "a.xyzzy\nb.xyzzy\nc.xyzzy\ntmpfile\n"
+        v = optparse.Values({'dryrun': False, 'quiet': True})
+        fx.psys('ls', v)
+        actual, _ = capsys.readouterr()
+        assert exp == actual
+
+# ---------------------------------------------------------------------------
+@pytest.fixture
+def data(tmpdir, request):
+    """
+    set up some data
+    """
+    if request.function.func_name == "test_psys_quiet":
+        for stem in ['a.xyzzy', 'b.xyzzy', 'c.xyzzy', 'tmpfile']:
+            path = tmpdir.join(stem)
+            path.ensure()
 
 # ---------------------------------------------------------------------------
 class TestFx(th.HelpedTestCase):
@@ -40,9 +64,9 @@ class TestFx(th.HelpedTestCase):
             shutil.rmtree(TestFx.testdir)
 
     # -----------------------------------------------------------------------
-    def test_BatchCommand_both(self):
+    def test_batch_command_both(self):
         """
-        Test BatchCommand with dryrun True and quiet True.
+        Test batch_command with dryrun True and quiet True.
         """
         with U.Chdir(self.testdir):
             U.writefile('tmpfile',
@@ -57,15 +81,15 @@ class TestFx(th.HelpedTestCase):
                 exp += re.sub('^echo ', "would do 'echo ", chunk) + "'\n"
             with th.StdoutExcursion() as getval:
                 with open('tmpfile', 'r') as f:
-                    fx.BatchCommand(v, [], f)
+                    fx.batch_command(v, [], f)
                 actual = getval()
 
             self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
-    def test_BatchCommand_dryrun(self):
+    def test_batch_command_dryrun(self):
         """
-        Test BatchCommand with dryrun True and quiet False.
+        Test batch_command with dryrun True and quiet False.
         """
         with U.Chdir(self.testdir):
             U.writefile('tmpfile',
@@ -80,15 +104,15 @@ class TestFx(th.HelpedTestCase):
 
             with th.StdoutExcursion() as getval:
                 with open('tmpfile', 'r') as f:
-                    fx.BatchCommand(v, [], f)
+                    fx.batch_command(v, [], f)
                 actual = getval()
 
             self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
-    def test_BatchCommand_neither(self):
+    def test_batch_command_neither(self):
         """
-        Test BatchCommand with dryrun and quiet both False.
+        Test batch_command with dryrun and quiet both False.
         """
         with U.Chdir(self.testdir):
             U.writefile('tmpfile',
@@ -104,15 +128,15 @@ class TestFx(th.HelpedTestCase):
 
             with th.StdoutExcursion() as getval:
                 with open('tmpfile', 'r') as f:
-                    fx.BatchCommand(v, [], f)
+                    fx.batch_command(v, [], f)
                 actual = getval()
 
             self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
-    def test_BatchCommand_quiet(self):
+    def test_batch_command_quiet(self):
         """
-        Test BatchCommand with dryrun False and quiet True.
+        Test batch_command with dryrun False and quiet True.
         """
         with U.Chdir(self.testdir):
             U.writefile('tmpfile',
@@ -129,15 +153,15 @@ class TestFx(th.HelpedTestCase):
 
             with th.StdoutExcursion() as getval:
                 with open('tmpfile', 'r') as f:
-                    fx.BatchCommand(v, [], f)
+                    fx.batch_command(v, [], f)
                 actual = getval()
 
             self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
-    def test_IterateCommand_both(self):
+    def test_iterate_command_both(self):
         """
-        Test IterateCommand() with dryrun True and quiet True.
+        Test iterate_command() with dryrun True and quiet True.
         """
         with U.Chdir(self.testdir):
             v = optparse.Values({'dryrun': True, 'quiet': True,
@@ -146,15 +170,15 @@ class TestFx(th.HelpedTestCase):
             exp = "".join(["would do 'echo %d'\n" % i for i in range(5, 10)])
 
             with th.StdoutExcursion() as getval:
-                fx.IterateCommand(v, [])
+                fx.iterate_command(v, [])
                 actual = getval()
 
             self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
-    def test_IterateCommand_dryrun(self):
+    def test_iterate_command_dryrun(self):
         """
-        Test IterateCommand() with dryrun True and quiet False.
+        Test iterate_command() with dryrun True and quiet False.
         """
         with U.Chdir(self.testdir):
             v = optparse.Values({'dryrun': True, 'quiet': False,
@@ -163,15 +187,15 @@ class TestFx(th.HelpedTestCase):
             exp = "".join(["would do 'echo %d'\n" % i for i in range(5, 10)])
 
             with th.StdoutExcursion() as getval:
-                fx.IterateCommand(v, [])
+                fx.iterate_command(v, [])
                 actual = getval()
 
             self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
-    def test_IterateCommand_neither(self):
+    def test_iterate_command_neither(self):
         """
-        Test IterateCommand() with dryrun False and quiet False.
+        Test iterate_command() with dryrun False and quiet False.
         """
         with U.Chdir(self.testdir):
             v = optparse.Values({'dryrun': False, 'quiet': False,
@@ -180,14 +204,14 @@ class TestFx(th.HelpedTestCase):
             exp = "".join(["echo %d\n%d\n" % (i, i) for i in range(5, 10)])
 
             with th.StdoutExcursion() as getval:
-                fx.IterateCommand(v, [])
+                fx.iterate_command(v, [])
                 actual = getval()
             self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
-    def test_IterateCommand_quiet(self):
+    def test_iterate_command_quiet(self):
         """
-        Test IterateCommand() with dryrun False and quiet True.
+        Test iterate_command() with dryrun False and quiet True.
         """
         # pdb.set_trace()
         with U.Chdir(self.testdir):
@@ -197,14 +221,14 @@ class TestFx(th.HelpedTestCase):
             exp = "".join(["%d\n" % i for i in range(5, 10)])
 
             with th.StdoutExcursion() as getval:
-                fx.IterateCommand(v, [])
+                fx.iterate_command(v, [])
                 actual = getval()
             self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
-    def test_SubstCommand_both(self):
+    def test_subst_command_both(self):
         """
-        Test SubstCommand() with dryrun True and quiet True.
+        Test subst_command() with dryrun True and quiet True.
         """
         with U.Chdir(self.testdir):
             v = optparse.Values({'dryrun': True, 'quiet': True, 'cmd': 'ls %'})
@@ -213,15 +237,15 @@ class TestFx(th.HelpedTestCase):
             U.safe_unlink(a)
 
             with th.StdoutExcursion() as getval:
-                fx.SubstCommand(v, a)
+                fx.subst_command(v, a)
                 actual = getval()
 
             self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
-    def test_SubstCommand_dryrun(self):
+    def test_subst_command_dryrun(self):
         """
-        Test SubstCommand() with dryrun True and quiet False.
+        Test subst_command() with dryrun True and quiet False.
         """
         with U.Chdir(self.testdir):
             v = optparse.Values({'dryrun': True, 'quiet': False,
@@ -231,15 +255,15 @@ class TestFx(th.HelpedTestCase):
             U.safe_unlink(a)
 
             with th.StdoutExcursion() as getval:
-                fx.SubstCommand(v, a)
+                fx.subst_command(v, a)
                 actual = getval()
 
             self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
-    def test_SubstCommand_neither(self):
+    def test_subst_command_neither(self):
         """
-        Test SubstCommand() with dryrun False and quiet False.
+        Test subst_command() with dryrun False and quiet False.
         """
         with U.Chdir(self.testdir):
             v = optparse.Values({'dryrun': False, 'quiet': False,
@@ -249,15 +273,15 @@ class TestFx(th.HelpedTestCase):
             U.touch(a)
 
             with th.StdoutExcursion() as getval:
-                fx.SubstCommand(v, a)
+                fx.subst_command(v, a)
                 actual = getval()
 
             self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
-    def test_SubstCommand_quiet(self):
+    def test_subst_command_quiet(self):
         """
-        Test SubstCommand() with dryrun False and quiet True.
+        Test subst_command() with dryrun False and quiet True.
         """
         with U.Chdir(self.testdir):
             v = optparse.Values({'dryrun': False, 'quiet': True,
@@ -267,15 +291,15 @@ class TestFx(th.HelpedTestCase):
             U.touch(a)
 
             with th.StdoutExcursion() as getval:
-                fx.SubstCommand(v, a)
+                fx.subst_command(v, a)
                 actual = getval()
 
             self.assertEq(exp, actual)
 
     # -----------------------------------------------------------------------
-    def test_SubstRename_both(self):
+    def test_subst_rename_both(self):
         """
-        Test SubstRename() with dryrun True and quiet True.
+        Test subst_rename() with dryrun True and quiet True.
         """
         with U.Chdir(self.testdir):
             arglist = ['a.pl', 'b.pl', 'c.pl']
@@ -288,7 +312,7 @@ class TestFx(th.HelpedTestCase):
                                  'edit': 's/.pl/.xyzzy'})
 
             with th.StdoutExcursion() as getval:
-                fx.SubstRename(v, arglist)
+                fx.subst_rename(v, arglist)
                 actual = getval()
 
             self.assertEq(expected, actual)
@@ -298,9 +322,9 @@ class TestFx(th.HelpedTestCase):
             self.assertEq(q, arglist)
 
     # -----------------------------------------------------------------------
-    def test_SubstRename_dryrun(self):
+    def test_subst_rename_dryrun(self):
         """
-        Test SubstRename() with dryrun True and quiet False.
+        Test subst_rename() with dryrun True and quiet False.
         """
         with U.Chdir(self.testdir):
             arglist = ['a.pl', 'b.pl', 'c.pl']
@@ -313,7 +337,7 @@ class TestFx(th.HelpedTestCase):
                                  'edit': 's/.pl/.xyzzy'})
 
             with th.StdoutExcursion() as getval:
-                fx.SubstRename(v, arglist)
+                fx.subst_rename(v, arglist)
                 actual = getval()
 
             self.assertEq(expected, actual)
@@ -323,9 +347,9 @@ class TestFx(th.HelpedTestCase):
             self.assertEq(q, arglist)
 
     # -----------------------------------------------------------------------
-    def test_SubstRename_neither(self):
+    def test_subst_rename_neither(self):
         """
-        Test SubstRename() with dryrun False and quiet False.
+        Test subst_rename() with dryrun False and quiet False.
         """
         with U.Chdir(self.testdir):
             arglist = ['a.pl', 'b.pl', 'c.pl']
@@ -338,7 +362,7 @@ class TestFx(th.HelpedTestCase):
                                  'edit': 's/.pl/.xyzzy'})
 
             with th.StdoutExcursion() as getval:
-                fx.SubstRename(v, arglist)
+                fx.subst_rename(v, arglist)
                 actual = getval()
 
             self.assertEq(expected, actual)
@@ -348,9 +372,9 @@ class TestFx(th.HelpedTestCase):
             self.assertEq(exp, q)
 
     # -----------------------------------------------------------------------
-    def test_SubstRename_quiet(self):
+    def test_subst_rename_quiet(self):
         """
-        Test SubstRename() with dryrun False and quiet True.
+        Test subst_rename() with dryrun False and quiet True.
         """
         with U.Chdir(self.testdir):
             arglist = ['a.pl', 'b.pl', 'c.pl']
@@ -363,7 +387,7 @@ class TestFx(th.HelpedTestCase):
                                  'edit': 's/.pl/.xyzzy'})
 
             with th.StdoutExcursion() as getval:
-                fx.SubstRename(v, arglist)
+                fx.subst_rename(v, arglist)
                 actual = getval()
 
             self.assertEq(expected, actual)
@@ -402,21 +426,6 @@ class TestFx(th.HelpedTestCase):
         self.assertEq(expected, actual)
 
     # -----------------------------------------------------------------------
-    def test_psys_quiet(self):
-        """
-        Test routine psys with dryrun False and quiet True.
-        """
-        with U.Chdir(self.testdir):
-            with th.StdoutExcursion() as getval:
-                v = optparse.Values({'dryrun': False, 'quiet': True})
-                fx.psys('ls', v)
-                actual = getval()
-        expected = "a.xyzzy\nb.xyzzy\nc.xyzzy\ntmpfile\n"
-        self.assertEqual(expected, actual,
-                         "%s\n   !=\n%s" %
-                         (U.lquote(expected), U.lquote(actual)))
-
-    # -----------------------------------------------------------------------
     def test_psys_both(self):
         """
         Test routine psys with dryrun True and quiet True.
@@ -440,7 +449,7 @@ class TestFx(th.HelpedTestCase):
         exp += ' name)\n'
         exp += '            -i low:high -c <command> (% ranges from low to'
         exp += ' high-1)\n            '
-        actual = fx.Usage()
+        actual = fx.usage()
         self.assertEqual(actual, exp,
                          "%s != %s" %
                          (U.lquote(repr(actual)), U.lquote(repr(exp))))

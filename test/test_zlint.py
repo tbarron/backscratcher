@@ -23,5 +23,5 @@ def test_pylint():
     """
     Run pylint to check the quality of the code
     """
-    result = pexpect.run("pylint bscr")
+    result = pexpect.run("pylint -rn bscr")
     assert result == ''

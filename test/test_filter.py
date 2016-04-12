@@ -9,9 +9,9 @@ class TestFilter(th.HelpedTestCase):
         """
         Constructing a filter object
         """
-        xyz = filter.filter()
+        xyz = filter.Filter()
         for attr in ['ignore', 'is_interesting', 'is_keepable',
-                     'keep', 'IGN', 'KEEP', '__new__']:
+                     'keep', 'ign', 'keepl', '__new__']:
             assert(attr in dir(xyz))
 
     # -------------------------------------------------------------------------
@@ -19,18 +19,18 @@ class TestFilter(th.HelpedTestCase):
         """
         Defining what is to be ignored
         """
-        x = filter.filter()
+        x = filter.Filter()
         x.ignore('12345')
-        assert('12345' in x.IGN)
-        assert(len(x.IGN) == 1)
-        assert('foobar' not in x.IGN)
+        assert('12345' in x.ign)
+        assert(len(x.ign) == 1)
+        assert('foobar' not in x.ign)
 
     # -------------------------------------------------------------------------
     def test_is_interesting(self):
         """
         Checking what is interesting
         """
-        x = filter.filter()
+        x = filter.Filter()
         x.ignore('abccd')
         assert(not x.is_interesting('one two abccd three four'))
         assert(x.is_interesting('foo bar wokka wokka'))
@@ -40,11 +40,11 @@ class TestFilter(th.HelpedTestCase):
         """
         Defining what is keepable
         """
-        x = filter.filter()
+        x = filter.Filter()
         x.keep('precious')
-        assert('precious' in x.KEEP)
-        assert(len(x.KEEP) == 1)
-        assert('frippery' not in x.KEEP)
+        assert('precious' in x.keepl)
+        assert(len(x.keepl) == 1)
+        assert('frippery' not in x.keepl)
 
     # -------------------------------------------------------------------------
     def test_is_keepable(self):
@@ -52,7 +52,7 @@ class TestFilter(th.HelpedTestCase):
         After x.keep('foo'), strings containing 'foo' will be keepable while
         other strings will not be
         """
-        x = filter.filter()
+        x = filter.Filter()
         x.keep('precious')
         assert(x.is_keepable('woo hoo! precious little got done today!'))
         assert(not x.is_keepable('not worth nuthin'))
