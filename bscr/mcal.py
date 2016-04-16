@@ -7,7 +7,7 @@ Options:
     -d          Run the debugger
     -y <year>   Year of calendar
     -m <month>  Month of calendar
-    -w          Print a wide calendar showing three months
+    -w          Print a wide calendar showing two months
 """
 import pdb
 import sys
@@ -20,13 +20,11 @@ def main(args=None):
     """
     This is the entry point
     """
-    args = args or sys.argv
-    opts = docopt.docopt(__doc__, args[1:])
+    opts = docopt.docopt(__doc__, args)
     if opts['-d']:
         pdb.set_trace()
 
     today = time.localtime()
-    # print opts
     year = int(opts['-y'] or today.tm_year)
     month = int(opts['-m'] or today.tm_mon)
 
@@ -36,8 +34,7 @@ def main(args=None):
         nlist = gen_month(year, month)
         mlist = [a+'   '+b for a,b in zip(mlist, nlist)]
 
-    for line in mlist:
-        print line
+    return '\n'.join(mlist)
 
 # -----------------------------------------------------------------------------
 def gen_month(year, month):
@@ -130,5 +127,4 @@ def next_month(year, month):
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
-    main(sys.argv)
-
+    print main(sys.argv[1:])
