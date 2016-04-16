@@ -14,9 +14,9 @@ try:
     import pager
 except ImportError:
     pass
-import pexpect
 from pkg_resources import resource_string
 
+import pexpect
 import util
 from version import __version__
 
