@@ -29,36 +29,38 @@ import os
 import pdb
 import re
 import sys
-import toolframe
 import unittest
 
 try:
-    subproc_available = True
     import subprocess
-except:
-    subproc_available = False
+except ImportError:
+    pass
 
+import toolframe
 
 # ---------------------------------------------------------------------------
 def main(args):
-    p = optparse.OptionParser()
-    p.add_option('-d', '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='start the debugger')
-#     p.add_option('-v', '--verbose',
-#                  action='store_true', default=False, dest='verbose',
-#                  help='report more of what is going on')
-    (o, a) = p.parse_args(args)
+    """
+    Entry point
+    """
+    prs = optparse.OptionParser()
+    prs.add_option('-d', '--debug',
+                   action='store_true', default=False, dest='debug',
+                   help='start the debugger')
+    prs.add_option('-v', '--verbose',
+                   action='store_true', default=False, dest='verbose',
+                   help='report more of what is going on')
+    (opts, _) = prs.parse_args(args)
 
-    if (o.debug):
+    if (opts.debug):
         pdb.set_trace()
 
-    pt = get_process_list()
+    procd = get_process_list()
 
     pid = str(os.getpid())
-    while pid in pt.keys():
-        print("%s %s" % (pid, pt[pid]['cmd']))
-        pid = pt[pid]['ppid']
+    while pid in procd.keys():
+        print("%s %s" % (pid, procd[pid]['cmd']))
+        pid = procd[pid]['ppid']
 
 
 # ---------------------------------------------------------------------------
@@ -70,62 +72,71 @@ def get_process_list():
              pid2: {'pid': pid2, 'ppid': parent-pid, 'cmd': command},
              ...}
     """
-    pd = {}
+    proctree = {}
     if os.path.exists("/proc/%d" % os.getpid()):
         # We have a /proc directory -- get the tree from there
         procs = glob.glob("/proc/[0-9]*")
         for pdir in procs:
-            d = {}
-            d['pid'] = pdir.replace("/proc/", "")
-            d['ppid'] = get_ppid(pdir)
-            d['cmd'] = get_cmd(pdir)
-            pd[d['pid']] = d
+            pdat = {}
+            pdat['pid'] = pdir.replace("/proc/", "")
+            pdat['ppid'] = get_ppid(pdir)
+            pdat['cmd'] = get_cmd(pdir)
+            proctree[pdat['pid']] = pdat
     else:
-        if subproc_available:
-            p = subprocess.Popen("ps -ef".split(),
-                                 stdin=None,
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.STDOUT)
-            (out, err) = p.communicate()
+        if 'subprocess' in sys.modules:
+            xbl = subprocess.Popen("ps -ef".split(),
+                                   stdin=None,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT)
+            (out, _) = xbl.communicate()
             ptxt = out.split('\n')
         else:
-            p = os.popen("ps -ef", "r")
-            ptxt = [x.strip('\n') for x in p.readlines()]
+            pipe = os.popen("ps -ef", "r")
+            ptxt = [x.strip('\n') for x in pipe.readlines()]
 
-        rgx = r'\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)' \
-              + '\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)'
+        rgx = ''.join([r'\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)',
+                       r'\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)'])
         for pline in ptxt:
-            q = re.search(rgx, pline)
-            d = {}
-            if q:
-                d['pid'] = q.groups()[1]
-                d['ppid'] = q.groups()[2]
-                d['cmd'] = q.groups()[7]
-                pd[d['pid']] = d
+            result = re.search(rgx, pline)
+            pdat = {}
+            if result:
+                pdat['pid'] = result.groups()[1]
+                pdat['ppid'] = result.groups()[2]
+                pdat['cmd'] = result.groups()[7]
+                proctree[pdat['pid']] = pdat
 
-    return pd
+    return proctree
 
 
 # ---------------------------------------------------------------------------
 def get_cmd(pdir):
-    f = open("%s/cmdline" % pdir)
-    line = f.readline()
-    f.close()
+    """
+    Read the command associated with a process id
+    """
+    rbl = open("%s/cmdline" % pdir)
+    line = rbl.readline()
+    rbl.close()
     rval = line.replace("\000", " ").strip()
     return rval
 
 
 # ---------------------------------------------------------------------------
 def get_ppid(pdir):
-    f = open("%s/stat" % pdir)
-    line = f.readline()
-    f.close()
+    """
+    Retrieve a process' parent process id
+    """
+    rbl = open("%s/stat" % pdir)
+    line = rbl.readline()
+    rbl.close()
     rval = line.split()[3]
     return rval
 
 
 # ---------------------------------------------------------------------------
 def usage():
+    """
+    Show the usage for this program
+    """
     print("usage: pstrack")
     sys.exit(1)
 

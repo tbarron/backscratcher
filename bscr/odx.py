@@ -36,6 +36,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
 import optparse
+import pdb
 import sys
 
 
@@ -46,32 +47,32 @@ def main(args=None):
     """
     if args is None:
         args = sys.argv
-    p = optparse.OptionParser(usage=usage())
-    p.add_option('-d', '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='run under debugger')
-    (o, a) = p.parse_args(args)
+    prs = optparse.OptionParser(usage=usage())
+    prs.add_option('-d', '--debug',
+                   action='store_true', default=False, dest='debug',
+                   help='run under debugger')
+    (opts, argl) = prs.parse_args(args)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
-    print a
-    for str in a[1:]:
-        result = odx(str)
+    print argl
+    for aval in argl[1:]:
+        result = odx(aval)
         print(result)
 
 
 # -----------------------------------------------------------------------------
-def odx(str):
+def odx(org):
     """
     Figure out the format of the input and compute the value
     """
-    if str.startswith("0x"):
-        val = int(str, 16)
-    elif str.startswith("0"):
-        val = int(str, 8)
+    if org.startswith("0x"):
+        val = int(org, 16)
+    elif org.startswith("0"):
+        val = int(org, 8)
     else:
-        val = int(str)
-    return "%s -> 0%o / %d / 0x%x" % (str, val, val, val)
+        val = int(org)
+    return "%s -> 0%o / %d / 0x%x" % (org, val, val, val)
 
 
 # -----------------------------------------------------------------------------

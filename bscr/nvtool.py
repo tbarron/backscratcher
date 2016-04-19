@@ -3,15 +3,13 @@
 nvtool - environment manipulations
 """
 
+import optparse
 import os
 import pdb
 import re
 import sys
 import tempfile
 import util
-
-from optparse import *
-
 
 # ---------------------------------------------------------------------------
 def main(args=None):
@@ -22,14 +20,12 @@ def main(args=None):
         args = sys.argv
     util.dispatch("bscr.nvtool", "nv", args)
 
-
 # ---------------------------------------------------------------------------
 def nv_decap(argv):
     """decap - remove the head of a PATH type variable
     """
-    x = argv[0].split(':')
-    print(':'.join(x[1:]))
-
+    pieces = argv[0].split(':')
+    print(':'.join(pieces[1:]))
 
 # ---------------------------------------------------------------------------
 def nv_dedup(argv):
@@ -38,21 +34,21 @@ def nv_dedup(argv):
     The earliest occurrence of each path is preserved and subsequent
     occurrences are removed.
     """
-    p = OptionParser()
-    p.add_option('-j', '--join',
-                 action='store_true', default=True, dest='join',
-                 help='colon separated format (default)')
-    p.add_option('-s', '--show',
-                 action='store_true', default=False, dest='show',
-                 help='newline separated format')
-    (o, a) = p.parse_args(argv)
+    prs = optparse.OptionParser()
+    prs.add_option('-j', '--join',
+                   action='store_true', default=True, dest='join',
+                   help='colon separated format (default)')
+    prs.add_option('-s', '--show',
+                   action='store_true', default=False, dest='show',
+                   help='newline separated format')
+    (opts, args) = prs.parse_args(argv)
 
     dup = []
-    for item in a[0].split(':'):
+    for item in args[0].split(':'):
         if item not in dup:
             dup.append(item)
 
-    if o.show:
+    if opts.show:
         for item in dup:
             print "   " + item
     else:
@@ -63,8 +59,8 @@ def nv_dedup(argv):
 def nv_deped(argv):
     """deped - remove the foot (last entry) of a PATH type variable
     """
-    x = argv[0].split(':')
-    print(':'.join(x[:-1]))
+    pieces = argv[0].split(':')
+    print(':'.join(pieces[:-1]))
 
 
 # ---------------------------------------------------------------------------
@@ -80,22 +76,22 @@ def nv_stash(argv):
         $ vi mypath
         $ export PATH=`nvtool load mypath`
     """
-    p = OptionParser()
-    p.add_option('-d', '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='start the debugger')
-    (o, a) = p.parse_args(argv)
+    prs = optparse.OptionParser()
+    prs.add_option('-d', '--debug',
+                   action='store_true', default=False, dest='debug',
+                   help='start the debugger')
+    (opts, args) = prs.parse_args(argv)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
 
-    varname = a[0]
+    varname = args[0]
     val = os.getenv(varname)
     if val is None:
         print "No value for $%s" % varname
     else:
-        for v in val.split(":"):
-            print v
+        for piece in val.split(":"):
+            print piece
 
 
 # ---------------------------------------------------------------------------
@@ -111,19 +107,19 @@ def nv_load(argv):
         $ vi mypath
         $ export PATH=`nvtool load mypath`
     """
-    p = OptionParser()
-    p.add_option('-d', '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='start the debugger')
-    (o, a) = p.parse_args(argv)
+    prs = optparse.OptionParser()
+    prs.add_option('-d', '--debug',
+                   action='store_true', default=False, dest='debug',
+                   help='start the debugger')
+    (opts, args) = prs.parse_args(argv)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
 
-    fname = a[0]
-    f = open(fname, 'r')
-    result = ":".join([x.strip() for x in f.readlines()])
-    f.close()
+    fname = args[0]
+    rbl = open(fname, 'r')
+    result = ":".join([_.strip() for _ in rbl.readlines()])
+    rbl.close()
     print result
 
 
@@ -139,26 +135,26 @@ def nv_show(argv):
 def nv_remove(argv):
     """remove - remove entries that match the argument
     """
-    p = OptionParser()
-    p.add_option('-d', '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='start the debugger')
-    p.add_option('-j', '--join',
-                 action='store_true', default=True, dest='join',
-                 help='colon separated format (default)')
-    p.add_option('-s', '--show',
-                 action='store_true', default=False, dest='show',
-                 help='newline separated format')
-    (o, a) = p.parse_args(argv)
+    prs = optparse.OptionParser()
+    prs.add_option('-d', '--debug',
+                   action='store_true', default=False, dest='debug',
+                   help='start the debugger')
+    prs.add_option('-j', '--join',
+                   action='store_true', default=True, dest='join',
+                   help='colon separated format (default)')
+    prs.add_option('-s', '--show',
+                   action='store_true', default=False, dest='show',
+                   help='newline separated format')
+    (opts, _) = prs.parse_args(argv)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
 
-    A = argv[1].split(':')
-    result = [x for x in A if argv[0] not in x]
-    if o.join:
+    pieces = argv[1].split(':')
+    result = [_ for _ in pieces if argv[0] not in _]
+    if opts.join:
         print(":".join(result))
-    elif o.show:
+    elif opts.show:
         for item in result:
             print "   " + item
 

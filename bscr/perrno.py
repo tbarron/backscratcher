@@ -1,3 +1,6 @@
+"""
+Error descriptions
+"""
 import errno
 import optparse
 import os
@@ -13,22 +16,22 @@ def main(args=None):
     if args is None:
         args = sys.argv
 
-    p = optparse.OptionParser(usage=usage())
-    p.add_option('-a', '--all', dest='all',
-                 action='store_true', default=False,
-                 help='list all errno values')
-    p.add_option('-d', '--debug', dest='debug',
-                 action='store_true', default=False,
-                 help='run the debugger')
-    (o, a) = p.parse_args(args)
+    prs = optparse.OptionParser(usage=usage())
+    prs.add_option('-a', '--all', dest='all',
+                   action='store_true', default=False,
+                   help='list all errno values')
+    prs.add_option('-d', '--debug', dest='debug',
+                   action='store_true', default=False,
+                   help='run the debugger')
+    (opts, argl) = prs.parse_args(args)
 
-    if o.debug:
+    if opts.debug:
         pdb.set_trace()
 
-    if o.all:
+    if opts.all:
         for errn in errno.errorcode.keys():
             print etranslate(errn)
-    for errval in a[1:]:
+    for errval in argl[1:]:
         print etranslate(errval)
 
 
@@ -39,7 +42,7 @@ def etranslate(errval):
     """
     rval = ''
     fmt = "%5d  %-15s  %s"
-    if type(errval) == int:
+    if isinstance(errval, int):
         nval = errval
         sval = errno.errorcode[nval]
     elif errval.isdigit():
