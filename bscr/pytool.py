@@ -27,19 +27,24 @@ GNU General Public License for more details.
 import optparse
 import os
 import pdb
-import pexpect
 import re
 import sys
-import testhelp
 import time
+import unittest
+
+import pexpect
+import testhelp
 import toolframe
 import util as U
-import unittest
-bscr = U.package_module(__name__)
+
+BSCR = U.package_module(__name__)
 
 
 # ---------------------------------------------------------------------------
 def main(args=None):
+    """
+    Where the action starts
+    """
     if args is None:
         args = sys.argv
     U.dispatch(__name__, 'pt', args)
@@ -47,62 +52,62 @@ def main(args=None):
 
 # ---------------------------------------------------------------------------
 def pt_newpy(args):
-    '''newpy - Create a new python program
+    """newpy - Create a new python program
 
     usage: pytool newpy <program-name>
 
     Creates executable file <program-name>.py with skeletal
     contents. Run "<program-name>.py -L" to create link <program-name>.
-    '''
+    """
+    prs = optparse.OptionParser()
+    (_, argl) = prs.parse_args(args)
 
-    p = optparse.OptionParser()
-    (o, a) = p.parse_args(args)
-
-    if a == []:
-        raise bscr.Error('usage: pytool newpy <program-name>')
+    if argl == []:
+        raise BSCR.Error('usage: pytool newpy <program-name>')
     else:
-        lname = a[0]
+        lname = argl[0]
         pname = lname + '.py'
         are_we_overwriting([lname, '%s.py' % pname])
 
-        f = open(pname, 'w')
-        f.writelines(['#!/usr/bin/env python\n',
-                      '"""\n',
-                      '%s - program description\n' % lname,
-                      '"""\n',
-                      '\n',
-                      'import optparse\n',
-                      'import pdb\n',
-                      'import sys\n',
-                      'from bscr import toolframe\n',
-                      'import unittest\n',
-                      '\n',
-                      'def main(argv = None):\n',
-                      '    if argv == None:\n',
-                      '        argv = sys.argv\n',
-                      '\n',
-                      '    p = optparse.OptionParser()\n',
-                      "    p.add_option('-d', '--debug',\n",
-                      "                 action='store_true', default=False,\n",
-                      "                 dest='debug',\n",
-                      "                 help='run the debugger')\n",
-                      '    (o, a) = p.parse_args(argv)\n',
-                      '\n',
-                      '    if o.debug:\n',
-                      '        pdb.set_trace()',
-                      '\n',
-                      '\n',
-                      '    # process arguments\n',
-                      '    for a in args:\n',
-                      '        process(a)\n',
-                      '\n',
-                      'class %sTest(unittest.TestCase):\n' %
-                      lname.capitalize(),
-                      '    def test_example(self):\n',
-                      '        pass\n',
-                      '\n',
-                      'toolframe.ez_launch(__name__, main)\n'])
-        f.close()
+        wbl = open(pname, 'w')
+        wbl.writelines(['#!/usr/bin/env python\n',
+                        '"""\n',
+                        '%s - program description\n' % lname,
+                        '"""\n',
+                        '\n',
+                        'import optparse\n',
+                        'import pdb\n',
+                        'import sys\n',
+                        'from bscr import toolframe\n',
+                        'import unittest\n',
+                        '\n',
+                        'def main(argv = None):\n',
+                        '    if argv == None:\n',
+                        '        argv = sys.argv\n',
+                        '\n',
+                        '    prs = optparse.OptionParser()\n',
+                        "    prs.add_option('-d', '--debug',\n",
+                        "                   action='store_true', "
+                        "default=False,\n",
+                        "                   dest='debug',\n",
+                        "                   help='run the debugger')\n",
+                        '    (opts, args) = prs.parse_args(argv)\n',
+                        '\n',
+                        '    if opts.debug:\n',
+                        '        pdb.set_trace()',
+                        '\n',
+                        '\n',
+                        '    # process arguments\n',
+                        '    for arg in args:\n',
+                        '        process(arg)\n',
+                        '\n',
+                        'class %sTest(unittest.TestCase):\n' %
+                        lname.capitalize(),
+                        '    def test_example(self):\n',
+                        '        pass\n',
+                        '\n',
+                        'toolframe.ez_launch(__name__, main)\n'])
+        wbl.close()
 
         os.chmod(pname, 0755)
         os.symlink(os.path.abspath(pname), lname)
@@ -110,49 +115,48 @@ def pt_newpy(args):
 
 # ---------------------------------------------------------------------------
 def pt_newtool(args):
-    '''newtool - Create a new tool-style program
+    """newtool - Create a new tool-style program
 
     usage: pytool newtool <program-name> <prefix>
 
     Creates executable file <program-name>.py with skeletal
     contents. The structure of the program is such that it is easy
     to add and describe new subfunctions.
-    '''
+    """
+    prs = optparse.OptionParser()
+    (opts, argl) = prs.parse_args(args)
 
-    p = optparse.OptionParser()
-    (o, a) = p.parse_args(args)
-
-    if a == [] or len(a) != 2:
+    if argl == [] or len(opts) != 2:
         U.fatal('usage: pytool newtool <program-name> <prefix>')
     else:
-        lname = a[0]
+        lname = argl[0]
         pname = lname + '.py'
-        prefix = a[1]
+        prefix = argl[1]
         are_we_overwriting([lname, pname])
 
-        f = open(pname, 'w')
-        f.writelines(['#!/usr/bin/env python\n',
-                      '"""\n',
-                      '%s - program description\n' % lname,
-                      '"""\n',
-                      '\n',
-                      'from bscr import util as U\n',
-                      'import optparse\n',
-                      'import os\n',
-                      'import re\n',
-                      'import sys\n',
-                      '\n',
-                      '# ----------------------------------------------------'
-                      + '-----------------------\n',
-                      'def %s_example(argv):\n' % prefix,
-                      '    print("this is an example")\n',
-                      "\n",
-                      '# ----------------------------------------------------'
-                      + '-----------------------\n',
-                      "if __name__ == '__main__':\n",
-                      "    U.dispatch('__main__', '%s', sys.argv)\n" % prefix,
-                      ])
-        f.close()
+        wbl = open(pname, 'w')
+        wbl.writelines(['#!/usr/bin/env python\n',
+                        '"""\n',
+                        '%s - program description\n' % lname,
+                        '"""\n',
+                        '\n',
+                        'from bscr import util as U\n',
+                        'import optparse\n',
+                        'import os\n',
+                        'import re\n',
+                        'import sys\n',
+                        '\n',
+                        '# ----------------------------------------------------'
+                        + '-----------------------\n',
+                        'def %s_example(argv):\n' % prefix,
+                        '    print("this is an example")\n',
+                        "\n",
+                        '# ----------------------------------------------------'
+                        + '-----------------------\n',
+                        "if __name__ == '__main__':\n",
+                        "    U.dispatch('__main__', '%s', sys.argv)\n" % prefix,
+                        ])
+        wbl.close()
 
         os.chmod(pname, 0755)
         os.symlink(os.path.abspath(pname), lname)
@@ -160,10 +164,13 @@ def pt_newtool(args):
 
 # ---------------------------------------------------------------------------
 def are_we_overwriting(flist):
+    """
+    Check for whether we are overwriting the program or creating it new
+    """
     already = []
-    for f in flist:
-        if os.path.exists(f):
-            already.append(f)
+    for filename in flist:
+        if os.path.exists(filename):
+            already.append(filename)
 
     if len(already) < 1:
         return
@@ -175,8 +182,8 @@ def are_we_overwriting(flist):
         report = ', '.join(already)
 
         sep = ', and '
-        for a in already:
-            report = sep + a + report
+        for item in already:
+            report = sep + item + report
             sep = ', '
         report = report[2:]
 

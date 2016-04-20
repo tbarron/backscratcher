@@ -43,7 +43,7 @@ import sys
 # -----------------------------------------------------------------------------
 def main(args=None):
     """
-    CLEP
+    Where the action starts
     """
     if args is None:
         args = sys.argv
