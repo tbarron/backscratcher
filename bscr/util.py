@@ -1,12 +1,18 @@
 #!/usr/bin/env python
+"""
+Utility stuff
+"""
+import contextlib
 import fcntl
 import glob
+import inspect
 import optparse
 import os
 import pdb
-import pexpect
+import random
 import re
 import shlex
+import string
 import struct
 import subprocess as subp
 import sys
@@ -14,9 +20,12 @@ import termios
 import time
 import unittest
 
+import pexpect
 
 # -----------------------------------------------------------------------------
-class Chdir(object):
+# pylint: disable=invalid-name
+@contextlib.contextmanager
+def Chdir(path):
     """
     This class allows for doing the following:
 
@@ -28,42 +37,28 @@ class Chdir(object):
     No matter what happens in do_stuff(), we're guaranteed that at the assert,
     we'll be back in the directory we started from.
     """
-    # ------------------------------------------------------------------------
-    def __init__(self, target):
-        """
-        This is called at instantiattion. Here we just initialize.
-        """
-        self.start = os.getcwd()
-        self.target = target
-
-    # ------------------------------------------------------------------------
-    def __enter__(self):
-        """
-        This is called as control enters the with block. We jump to the target
-        directory.
-        """
-        os.chdir(self.target)
-        return self.target
-
-    # ------------------------------------------------------------------------
-    def __exit__(self, type, value, traceback):
-        """
-        This is called as control leaves the with block. We jump back to our
-        starting directory.
-        """
-        os.chdir(self.start)
-
+    origin = os.getcwd()
+    try:
+        os.chdir(path)
+        yield path
+    finally:
+        os.chdir(origin)
 
 # -----------------------------------------------------------------------------
 class cmdline(object):
     """
     Handle command line parsing
     """
+    # pylint: disable=unnecessary-lambda,no-self-use
+    arg_default = {
+        'store_true': lambda : False,
+        'store_false': lambda : True,
+        'append': lambda : list()
+        }
+    # pylint: enable=unnecessary-lambda
     def __init__(self,
                  optdef,
                  default_action='store',
-                 default_default=None,
-                 default_dest='',
                  default_type='string',
                  usage=None):
         """
@@ -76,34 +71,29 @@ class cmdline(object):
             if 'name' in arg and 'opts' not in arg:
                 name = arg['name']
                 arg['opts'] = ['-' + name[0], '--' + name]
-
-            if 'opts' in arg and 'name' not in arg:
+            elif 'opts' in arg and 'name' not in arg:
                 arg['name'] = self.pick_name(arg['opts'])
 
             if 'action' not in arg:
                 arg['action'] = default_action
 
             if 'default' not in arg:
-                if arg['action'] == 'store_true':
-                    arg['default'] = False
-                elif arg['action'] == 'store_false':
-                    arg['default'] = True
-                elif arg['action'] == 'append':
-                    arg['default'] = []
-                else:
-                    arg['default'] = default_default
+                func = self.arg_default.get(arg['action'], lambda : None)
+                arg['default'] = func()
+
+            if 'type' not in arg:
+                if arg['action'] == 'store':
+                    arg['type'] = default_type
 
             if 'dest' not in arg:
-                if default_dest == '':
-                    arg['dest'] = name
-                else:
-                    arg['dest'] = default_dest
+                arg['dest'] = name
 
             if '--debug' in arg['opts']:
                 debug_absent = False
 
             kw = dict((k, arg[k]) for k in arg if k != 'opts' and k != 'name')
             self.p.add_option(*arg['opts'], **kw)
+
         if debug_absent:
             self.p.add_option('-d', '--debug',
                               action='store_true',
@@ -139,34 +129,29 @@ class cmdline(object):
             elif o.startswith('-') and rval == '':
                 rval = o.replace('-', '')
         if rval == '':
-            rval = self.random_name(4)
+            rval = random_word(4)
         return rval
 
-    # -----------------------------------------------------------------------
-    def random_name(self, length):
-        """
-        Make up a random name of length *length*
-        """
-        rval = ''
-        for x in range(length):
-            rval += random.choice(string.lowercase)
-        return rval
-
-
+# pylint: enable=invalid-name
 # ---------------------------------------------------------------------------
 def abspath(rpath, start=None):
     """
     Convenience wrapper for os.path.abspath(), plus the ability to compute the
     absolute path from a starting path other than cwd.
+    !@!: needs test
     """
     if start is None:
         path = os.path.abspath(rpath)
+        rval = os.path.normpath(path)
     elif not os.path.isabs(rpath):
         if isinstance(rpath, unicode):
-            start = unicode(start)
-        path = os.path.join(start, rpath)
-
-    return os.path.normpath(path)
+            ustart = unicode(start)
+            upath = os.path.join(ustart, rpath)
+            rval = os.path.normpath(upath)
+        else:
+            path = os.path.join(start, rpath)
+            rval = os.path.normpath(path)
+    return rval
 
 
 # ---------------------------------------------------------------------------
@@ -181,28 +166,34 @@ def basename(rpath):
 def terminal_size():
     """
     Best effort to determine and return the width and height of the terminal
+    !@! test?
     """
     if not sys.stdout.isatty():
         return -1, -1
     # import fcntl, termios, struct
-    h, w, hp, wp = struct.unpack('HHHH',
-                                 fcntl.ioctl(sys.stdout.fileno(),
-                                             termios.TIOCGWINSZ,
-                                             struct.pack('HHHH', 0, 0, 0, 0)))
-    return w, h
+    tiocwinsz = fcntl.ioctl(sys.stdout.fileno(),
+                            termios.TIOCGWINSZ,
+                            struct.pack('HHHH', 0, 0, 0, 0))
+    (height, width, _, _) = struct.unpack('HHHH', tiocwinsz)
+    return width, height
 
 
 # ---------------------------------------------------------------------------
 def contents(filename, string=False):
-    '''
+    """
     Contents of filename in a list, one line per element. If filename does
     not exist or is not readable, an IOError is thrown.
-    '''
-    with open(filename, 'r') as f:
+
+    !@! make the second argument be *ctype* = 'string'|'list' rather than
+    *string* = True | False; This is will make pylint happier since we won't be
+    reusing a name that python defines
+    """
+    # pylint: disable=redefined-outer-name
+    with open(filename, 'r') as rbl:
         if string:
-            rval = "".join(f.readlines())
+            rval = "".join(rbl.readlines())
         else:
-            rval = [l.rstrip() for l in f.readlines()]
+            rval = [_.rstrip() for _ in rbl.readlines()]
     return rval
 
 
@@ -218,9 +209,8 @@ def dirname(rpath):
 def dispatch(mname, prefix, args):
     """
     Call a subfunction from module *mname* based on *prefix* and *args*
+    !@! test?
     """
-    # pdb.set_trace()
-    called_as = args[0]
     try:
         func_name = args[1]
     except IndexError:
@@ -242,6 +232,7 @@ def dispatch(mname, prefix, args):
 def dispatch_help(mname, prefix, args):
     """
     Standard help function for dispatch-based tool programs
+    !@! test?
     """
     mod = sys.modules[mname]
     if 3 <= len(args) and args[1] == 'help' and args[2] == "help":
@@ -274,9 +265,10 @@ def dispatch_help(mname, prefix, args):
 def epoch(ymd):
     """
     Convert a YYYY.mmdd date into an epoch (seconds since 1970.0101)
+    !@! test?
     """
-    tm = time.strptime(ymd, "%Y.%m%d")
-    return time.mktime(tm)
+    tms = time.strptime(ymd, "%Y.%m%d")
+    return time.mktime(tms)
 
 
 # ---------------------------------------------------------------------------
@@ -299,6 +291,7 @@ def expand(path):
 def fatal(msg):
     """
     Print an error message and exit.
+    !@! test?
     """
     print ' '
     print '   %s' % msg
@@ -307,11 +300,15 @@ def fatal(msg):
 
 
 # ---------------------------------------------------------------------------
-def function_name():
+def function_name(level=1):
     """
     Return the name of the caller.
+    !@! test?
     """
-    return sys._getframe(1).f_code.co_name
+    stk = inspect.stack()
+    rval = stk[level][3]
+    return rval
+    # return sys._getframe(1).f_code.co_name
 
 
 # -----------------------------------------------------------------------------
@@ -327,6 +324,7 @@ def git_describe():
 def git_root(path=None):
     """
     If we're in a git repository, return its root. Otherwise return None.
+    !@! test?
     """
     if path is None:
         path = os.getcwd()
@@ -346,6 +344,7 @@ def git_root(path=None):
 def in_bscr_repo(path=None):
     """
     We are in a backscratcher repo -- true or false?
+    !@! test?
     """
     if path is None:
         here = os.getcwd()
@@ -357,10 +356,10 @@ def in_bscr_repo(path=None):
 
     if exists(pj(here, ".git")):
         try:
-            c = contents(pj(here, ".git", "description"))
+            content = contents(pj(here, ".git", "description"))
         except IOError:
             return False
-        if "backscratcher" not in "".join(c):
+        if "backscratcher" not in "".join(content):
             return False
     else:
         return False
@@ -381,6 +380,7 @@ def bscr_root(filename=None):
 
 # -----------------------------------------------------------------------------
 def pj(*args):
+    # pylint: disable=invalid-name
     """
     pathjoin -- convenience wrapper for os.path.join()
     """
@@ -391,13 +391,14 @@ def pj(*args):
 def run(cmd, xable, verbose=False):
     """
     Run *cmd* if *xable*, otherwise just report what would happen
+    !@! test?
     """
     # print "run: cmd='%s', %s" % (cmd, xable)
     if xable:
         if verbose:
             print cmd
-        p = subp.Popen(shlex.split(cmd))
-        p.wait()
+        pipe = subp.Popen(shlex.split(cmd))
+        pipe.wait()
         # os.system(cmd)
     else:
         print "would do '%s'" % cmd
@@ -408,26 +409,28 @@ def safe_unlink(path):
     """
     As long as *path* is a string or a list, this will not throw an exception.
     Unlink all the file(s) named if they exist.
+    !@! test?
     """
 
-    if type(path) == str:
+    if isinstance(path, str):
         if os.path.exists(path):
             os.unlink(path)
-    elif type(path) == list:
+    elif isinstance(path, list):
         for item in path:
             if os.path.exists(item):
                 os.unlink(item)
     else:
-        raise bscr.Error('safe_unlink: argument must be str or list')
+        raise BSCR.Error('safe_unlink: argument must be str or list')
 
 
 # -----------------------------------------------------------------------------
 def mtime(pathname):
     """
     Return the mtime of pathname
+    !@! deprecate -- use os.path.getmtime or py.path.local
     """
-    s = os.stat(pathname)
-    return s.st_mtime
+    sinfo = os.stat(pathname)
+    return sinfo.st_mtime
 
 
 # -----------------------------------------------------------------------------
@@ -464,7 +467,7 @@ def script_location(script):
             if groot not in sys.path:
                 sys.path.append(groot)
         else:
-            raise bscr.Error("Can't find script %s" % script)
+            raise BSCR.Error("Can't find script %s" % script)
     return rval
 
 
@@ -476,15 +479,15 @@ def touch(touchables, times=None):
     if times is None:
         now = int(time.time())
         times = (now, now)
-    if type(touchables) == list:
-        for f in touchables:
-            open(f, 'a').close()
-            os.utime(f, times)
-    elif type(touchables) == str:
+    if isinstance(touchables, list):
+        for fname in touchables:
+            open(fname, 'a').close()
+            os.utime(fname, times)
+    elif isinstance(touchables, str):
         open(touchables, 'a').close()
         os.utime(touchables, times)
     else:
-        raise bscr.Error('argument must be list or string')
+        raise BSCR.Error('argument must be list or string')
 
 
 # ---------------------------------------------------------------------------
@@ -492,17 +495,17 @@ def writefile(filepath, lines, newlines=False):
     """
     Write the contents of *lines* to *filepath*
     """
-    f = open(filepath, 'w')
+    wbl = open(filepath, 'w')
     if newlines:
-        if type(lines) == str:
-            f.writelines(lines + '\n')
-        elif type(lines) == list:
-            f.writelines([z.rstrip() + '\n' for z in lines])
+        if isinstance(lines, str):
+            wbl.writelines(lines + '\n')
+        elif isinstance(lines, list):
+            wbl.writelines([z.rstrip() + '\n' for z in lines])
         else:
-            f.writelines(str(lines))
+            wbl.writelines(str(lines))
     else:
-        f.writelines(lines)
-    f.close()
+        wbl.writelines(lines)
+    wbl.close()
 
 
 # ---------------------------------------------------------------------------
@@ -532,8 +535,15 @@ def findroot():
     Best effort to find the install root of this file
     """
     afile = os.path.abspath(__file__)
-    bscr = os.path.dirname(afile)
-    return bscr
+    rval = os.path.dirname(afile)
+    return rval
 
+# ---------------------------------------------------------------------------
+def random_word(length):
+    """
+    Make up a random name of length *length*
+    """
+    rval = ''.join([random.choice(string.lowercase) for _ in range(length)])
+    return rval
 
-bscr = package_module(__name__)
+BSCR = package_module(__name__)

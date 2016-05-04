@@ -1,11 +1,13 @@
 import os
 import pdb
-import pexpect
 import shutil
 import sys
+
+import pexpect
+import pytest
+
 from bscr import testhelp as th
 from bscr import util as U
-
 
 class TestPytool(th.HelpedTestCase):
     testdir = "/tmp/test_pytool"
@@ -167,6 +169,7 @@ class TestPytool(th.HelpedTestCase):
         that we are prompted about overwriting. Answer "no" and verify that the
         original file is not overwritten.
         """
+        pytest.debug_func()
         tlink = "testtool"
         tname = tlink + ".py"
         with U.Chdir(self.testdir):
@@ -375,19 +378,19 @@ class TestPytool(th.HelpedTestCase):
                     '    if argv == None:',
                     '        argv = sys.argv',
                     '',
-                    '    p = optparse.OptionParser()',
-                    "    p.add_option('-d', '--debug',",
-                    "                 action='store_true', default=False,",
-                    "                 dest='debug',",
-                    "                 help='run the debugger')",
-                    '    (o, a) = p.parse_args(argv)',
+                    '    prs = optparse.OptionParser()',
+                    "    prs.add_option('-d', '--debug',",
+                    "                   action='store_true', default=False,",
+                    "                   dest='debug',",
+                    "                   help='run the debugger')",
+                    '    (opts, args) = prs.parse_args(argv)',
                     "",
-                    "    if o.debug:",
+                    "    if opts.debug:",
                     "        pdb.set_trace()",
                     '',
                     '    # process arguments',
-                    '    for a in args:',
-                    '        process(a)',
+                    '    for arg in args:',
+                    '        process(arg)',
                     '',
                     'class XyzzyTest(unittest.TestCase):',
                     '    def test_example(self):',

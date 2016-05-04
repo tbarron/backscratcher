@@ -1,3 +1,6 @@
+"""
+Clean stuff up
+"""
 import os
 import pdb
 import re
@@ -13,37 +16,37 @@ def main(args=None):
     if args is None:
         args = sys.argv
 
-    c = U.cmdline([{'opts': ['-n', '--dry-run'],
-                    'action': 'store_true',
-                    'default': False,
-                    'dest': 'dryrun',
-                    'help': 'just report'},
-                   {'opts': ['-p', '--pattern'],
-                    'action': 'store',
-                    'default': None,
-                    'dest': 'pattern',
-                    'help': 'file matching regexp'},
-                   {'opts': ['-r', '--recursive'],
-                    'action': 'store_true',
-                    'default': False,
-                    'dest': 'recursive',
-                    'help': 'whether to descend directories'}
-                   ],
-                  usage=usage())
-    (o, a) = c.parse(args)
-    if 0 == len(a[1:]):
-        cleanup('.', o.dryrun, o.pattern, o.recursive)
+    cmdl = U.cmdline([{'opts': ['-n', '--dry-run'],
+                       'action': 'store_true',
+                       'default': False,
+                       'dest': 'dryrun',
+                       'help': 'just report'},
+                      {'opts': ['-p', '--pattern'],
+                       'action': 'store',
+                       'default': None,
+                       'dest': 'pattern',
+                       'help': 'file matching regexp'},
+                      {'opts': ['-r', '--recursive'],
+                       'action': 'store_true',
+                       'default': False,
+                       'dest': 'recursive',
+                       'help': 'whether to descend directories'}
+                      ],
+                     usage=usage())
+    (opts, args) = cmdl.parse(args)
+    if 0 == len(args[1:]):
+        cleanup('.', opts.dryrun, opts.pattern, opts.recursive)
     else:
-        for dir in a[1:]:
-            cleanup(dir, o.dryrun, o.pattern, o.recursive)
+        for directory in args[1:]:
+            cleanup(directory, opts.dryrun, opts.pattern, opts.recursive)
 
 
 # -----------------------------------------------------------------------------
-def cleanup(dir, dryrun=False, pattern=None, recursive=False):
+def cleanup(directory, dryrun=False, pattern=None, recursive=False):
     """
     Payload routine
     """
-    flist = find_files(dir, pattern, recursive)
+    flist = find_files(directory, pattern, recursive)
     if dryrun:
         print("Without --dryrun, would remove:")
         for fname in flist:
@@ -55,7 +58,7 @@ def cleanup(dir, dryrun=False, pattern=None, recursive=False):
 
 
 # -----------------------------------------------------------------------------
-def find_files(dir, pattern=None, recursive=False):
+def find_files(directory, pattern=None, recursive=False):
     """
     Helper for finding files
     """
@@ -63,12 +66,12 @@ def find_files(dir, pattern=None, recursive=False):
         pattern = '.*~'
     rval = []
     if recursive:
-        for root, dlist, flist in os.walk(dir):
-            fl = [os.path.join(root, f) for f in flist if re.match(pattern, f)]
-            rval.extend(fl)
+        for root, _, flist in os.walk(directory):
+            fpath = [os.path.join(root, f) for f in flist if re.match(pattern, f)]
+            rval.extend(fpath)
     else:
-        rval = [os.path.join(dir, f) for f in os.listdir(dir)
-                if re.match(pattern, f)]
+        rval = [os.path.join(directory, _) for _ in os.listdir(directory)
+                if re.match(pattern, _)]
 
     return rval
 

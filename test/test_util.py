@@ -192,8 +192,7 @@ class TestUtilCmdline(th.HelpedTestCase):
         defining that option.
         """
         pytest.debug_func()
-        c = U.cmdline(simple_arg_list(),
-                      default_default='yummy')
+        c = U.cmdline(simple_arg_list())
         try:
             (o, a) = c.parse(['cmd',
                               '--first', 'angular',
@@ -205,7 +204,7 @@ class TestUtilCmdline(th.HelpedTestCase):
         assert o.first == 'angular'
         assert o.second == ['carniverous']
         assert o.third is False
-        assert o.forward == 'yummy'
+        assert o.forward is None
 
     # -------------------------------------------------------------------------
     def test_cmdline_default_type(self):

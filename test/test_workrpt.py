@@ -1,5 +1,6 @@
 import bscr
 import os
+import pdb
 import pytest
 from bscr import testhelp as th
 import time
@@ -89,7 +90,7 @@ class workrptTest(th.HelpedTestCase):
         """
         Check default start and end times.
         """
-        (o, a) = wr.makeOptionParser([])
+        (o, a) = wr.make_option_parser([])
         (start, end) = wr.interpret_options(o)
         assert(not o.dayflag)
         (start_should_be, x) = wr.week_starting_last(wr.day_offset('M'), 0)
@@ -103,7 +104,7 @@ class workrptTest(th.HelpedTestCase):
         Verify that setting the day flag does not disrupt the default start/end
         time.
         """
-        (o, a) = wr.makeOptionParser(['-d'])
+        (o, a) = wr.make_option_parser(['-d'])
         (start, end) = wr.interpret_options(o)
         assert(o.dayflag)
         (start_should_be, x) = wr.week_starting_last(wr.day_offset('M'), 0)
@@ -117,7 +118,7 @@ class workrptTest(th.HelpedTestCase):
         If the user provides option -e <date>, wr.interpret_options should
         return a start date one week before and an end date of <date>.
         """
-        (o, a) = wr.makeOptionParser(['-e', '2009.0401'])
+        (o, a) = wr.make_option_parser(['-e', '2009.0401'])
         (start, end) = wr.interpret_options(o)
         start_should_be = '2009.0326'
         end_should_be = '2009.0401'
@@ -133,7 +134,7 @@ class workrptTest(th.HelpedTestCase):
         """
         Verify mutual exclusion of -l and -s
         """
-        (o, a) = wr.makeOptionParser(['-l', '-s', '2009.0501'])
+        (o, a) = wr.make_option_parser(['-l', '-s', '2009.0501'])
         self.assertRaisesMsg(bscr.Error,
                              '--last and --start or --end are not compatible',
                              wr.interpret_options,
@@ -144,7 +145,7 @@ class workrptTest(th.HelpedTestCase):
         """
         Verify mutual exclusion of -l and -e
         """
-        (o, a) = wr.makeOptionParser(['-l', '-e', '2009.0501'])
+        (o, a) = wr.make_option_parser(['-l', '-e', '2009.0501'])
         self.assertRaisesMsg(bscr.Error,
                              '--last and --start or --end are not compatible',
                              wr.interpret_options,
@@ -155,12 +156,12 @@ class workrptTest(th.HelpedTestCase):
         """
         Verify that option --since works as expected
         """
-        (o, a) = wr.makeOptionParser(['--since', '2009.0501'])
+        (o, a) = wr.make_option_parser(['--since', '2009.0501'])
         (start, end) = wr.interpret_options(o)
         self.assertEqual(start, '2009.0501')
         self.assertEqual(end, time.strftime('%Y.%m%d'))
 
-        (o, a) = wr.makeOptionParser(['-s', '2010.0101', '-S', '2010.1231'])
+        (o, a) = wr.make_option_parser(['-s', '2010.0101', '-S', '2010.1231'])
         self.assertRaisesMsg(bscr.Error,
                              '--since and --start are not compatible',
                              wr.interpret_options,
@@ -171,7 +172,7 @@ class workrptTest(th.HelpedTestCase):
         """
         Verify mutual exclusion of -w and -s
         """
-        (o, a) = wr.makeOptionParser(['-w', 'M', '-s', '2009.0501'])
+        (o, a) = wr.make_option_parser(['-w', 'M', '-s', '2009.0501'])
         self.assertRaisesMsg(bscr.Error,
                              '--week and --start or --end are not compatible',
                              wr.interpret_options,
@@ -182,7 +183,7 @@ class workrptTest(th.HelpedTestCase):
         """
         Verify mutual exclusion of -w and -e
         """
-        (o, a) = wr.makeOptionParser(['-w', 'T', '-e', '2009.0501'])
+        (o, a) = wr.make_option_parser(['-w', 'T', '-e', '2009.0501'])
         self.assertRaisesMsg(bscr.Error,
                              '--week and --start or --end are not compatible',
                              wr.interpret_options,
@@ -278,6 +279,7 @@ class workrptTest(th.HelpedTestCase):
         """
         test parse_ymd() for each weekday, yesterday, and tomorrow
         """
+        pytest.debug_func()
         s = wr.stringify(time.localtime(wr.day_plus(-1)))
         assert(wr.parse_ymd('yesterday') == s[0:3])
         s = wr.stringify(time.localtime(wr.day_plus(1)))
@@ -345,6 +347,7 @@ class workrptTest(th.HelpedTestCase):
         this needs work -- !@!)
         """
         # pdb.set_trace()
+        pytest.debug_func()
         lines = '''-- Tuesday
 2009-07-21 08:30:28 admin: setup
 2009-07-21 08:35:34 admin: liason

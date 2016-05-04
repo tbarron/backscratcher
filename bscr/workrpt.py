@@ -1,5 +1,5 @@
 #!/usr/bin/python
-'''
+"""
 workrpt - report work times
 
  usage: workrpt   [-D/--doc]
@@ -32,20 +32,21 @@ workrpt - report work times
     -e/--end       report for week ending <YYYY-MM-DD> or from start date
     -p/--pkg       tarball this code to <filename>
     -c/--copy      copy this code to <dir>
-'''
-
+"""
 import copy
 import getopt
 import os
 import pdb
 import re
+import shutil
 import sys
 import time
-import toolframe
 import unittest
-from bscr import util as U
-bscr = U.package_module(__name__)
 
+import toolframe
+from bscr import util as U
+
+BSCR = U.package_module(__name__)
 
 # ---------------------------------------------------------------------------
 def main(argv=None):
@@ -55,31 +56,30 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    (o, a) = makeOptionParser(argv)
-    if o.debug:
+    (opts, _) = make_option_parser(argv)
+    if opts.debug:
         pdb.set_trace()
 
-    if o.help:
-        help()
+    if opts.help:
+        wr_help()
 
-    verbose(o.verbose, True)
+    verbose(opts.verbose, True)
     if verbose():
-        dump_options(o)
+        dump_options(opts)
 
-    if o.tarball != '' and o.copy != '':
-        raise bscr.Error('--pkg and --copy are not compatible')
-    elif o.tarball != '' and o.copy == '':
-        package(sys.argv[0], o.tarball)
-    elif o.tarball == '' and o.copy != '':
-        copy_me(sys.argv[0], o.copy)
+    if opts.tarball != '' and opts.copy != '':
+        raise BSCR.Error('--pkg and --copy are not compatible')
+    elif opts.tarball != '' and opts.copy == '':
+        package(sys.argv[0], opts.tarball)
+    elif opts.tarball == '' and opts.copy != '':
+        copy_me(sys.argv[0], opts.copy)
 
     try:
-        (start, end) = interpret_options(o)
-    except Exception, e:
-        print str(e)
-        sys.exit(1)
+        (start, end) = interpret_options(opts)
+    except BSCR.Error as err:
+        sys.exit(str(err))
 
-    write_report(o.filename, start, end, o.dayflag)
+    write_report(opts.filename, start, end, opts.dayflag)
 
 
 # ---------------------------------------------------------------------------
@@ -87,21 +87,21 @@ def copy_me(source, dest):
     """
     Copy a file. This should probably be replaced with something from shutil.
     !@!DEPRECATE
+    !@!untested
     """
-    dir = os.path.dirname(source)
-    flist = ['%s/workrpt' % dir, '%s/workrpt.py' % dir]
-    for f in flist:
-        cmd = "cp %s %s" % (f, dest)
-        print cmd
-        os.system(cmd)
+    if not os.path.isdir(dest):
+        dest = os.path.dirname(dest)
+    stem = re.sub(r'\.pyc*', '', source)
+    for src in [stem, stem + '.py']:
+        print("{0} -> {1}".format(src, dest))
+        shutil.copy(src, dest)
     sys.exit(0)
-
 
 # ---------------------------------------------------------------------------
 def day_offset(weektype):
-    '''
+    """
     Return the appropriate day number based on <weektype>.
-    '''
+    """
     offset = {'f': 3, 'c': 4, 'M': 0, 'T': 1, 'W': 2,
               't': 3, 'F': 4, 's': 5, 'S': 6, '': 3}
     return offset[weektype]
@@ -112,10 +112,6 @@ def default_input_filename():
     """
     Defines the default input file
     """
-    # rval = "%s/diary/journal/work/%s/WORKLOG" \
-    #        % (os.getenv('HOME'), time.strftime('%Y', time.localtime()))
-    # rval = time.strftime('/Volumes/ZAPHOD/journal/%Y/WORKLOG',
-    #                      time.localtime())
     rval = U.pj(os.getenv('HOME'),
                 "Dropbox",
                 "journal",
@@ -123,21 +119,16 @@ def default_input_filename():
                 "WORKLOG")
     return rval
 
-
 # ---------------------------------------------------------------------------
 def dst(mark=0):
     """
     Daylight Saving Time? True or False. With no *mark* (i.e., mark of 0),
     return current status. Otherwise return status of epoch time *mark*.
+    !@! untested
     """
-    if time == 0:
-        when = time.time()
-    else:
-        when = mark
-
-    tm = time.localtime(when)
-    return tm[8]
-
+    when = mark or time.time()
+    tml = time.localtime(when)
+    return tml[8]
 
 # ---------------------------------------------------------------------------
 def dst_adjusted_time():
@@ -150,46 +141,46 @@ def dst_adjusted_time():
         rval = rval - 3600
     return rval
 
-
 # ---------------------------------------------------------------------------
-def dump_struct(C):
+def dump_struct(coll):
     """
-    Dump the structure (duh!). Where/why is this used?
+    This routine is called when the verbose flag is used, to help with
+    debugging
     """
-    klist = C.keys()
+    klist = coll.keys()
     klist.sort()
     for k in klist:
-        jlist = C[k].keys()
+        jlist = coll[k].keys()
         jlist.sort()
         for j in jlist:
-            print('%s/%s     %f' % (k, j, C[k][j]))
+            print('%s/%s     %f' % (k, j, coll[k][j]))
 
 
 # ---------------------------------------------------------------------------
-def dump_options(o):
+def dump_options(opts):
     """
-    Where/why is this used?
+    Called to help with debugging when the verbose options is True
     """
     ignore_list = ['ensure_value', 'read_file', 'read_module']
-    for item in dir(o):
+    for item in dir(opts):
         if item not in ignore_list and not item.startswith('_'):
-            print('dump_options: %s = %s' % (item, getattr(o, item)))
+            print('dump_options: %s = %s' % (item, getattr(opts, item)))
 
 
 # ---------------------------------------------------------------------------
-def format_report(start, end, C, testing=False):
+def format_report(start, end, coll, testing=False):
     """
     Put the report together
     """
     if verbose():
-        dump_struct(C)
+        dump_struct(coll)
     rval = '%s - %s ' % (start, end) + '-' * 44 + '\n'
     gtotal = 0
     try:
-        del C['COB']
-    except:
+        del coll['COB']
+    except KeyError:
         pass
-    klist = C.keys()
+    klist = coll.keys()
     klist.sort()
     skip = ''
     try:
@@ -201,24 +192,24 @@ def format_report(start, end, C, testing=False):
                     dkey = key.strip()
                 rval = rval + '%s%-47s %8s\n' % ('   ',
                                                  dkey,
-                                                 hms(C[key]['length']))
+                                                 hms(coll[key]['length']))
             else:
                 if verbose():
                     print "key = '%s'" % key
-                    print "total = %d" % C[key]['total']
+                    print "total = %d" % coll[key]['total']
                 rval = rval + '%s%-30s %35s (%s)\n' % (skip,
                                                        key,
-                                                       hms(C[key]['total']),
-                                                       fph(C[key]['total']))
+                                                       hms(coll[key]['total']),
+                                                       fph(coll[key]['total']))
                 skip = '\n'
                 try:
-                    gtotal = gtotal + C[key]['total']
-                except KeyError, e:
-                    timeclose(C, key, time.time())
-                    gtotal = gtotal + C[key]['total']
+                    gtotal = gtotal + coll[key]['total']
+                except KeyError as err:
+                    timeclose(coll, key, time.time())
+                    gtotal = gtotal + coll[key]['total']
 
-    except KeyError, e:
-        rval = rval + "%s on top level key '%s'\n" % (str(e), key)
+    except KeyError as err:
+        rval = rval + "%s on top level key '%s'\n" % (str(err), key)
 
     rval = rval + '\n%-30s %35s (%s)\n' % ('Total:', hms(gtotal), fph(gtotal))
     if not testing:
@@ -228,7 +219,7 @@ def format_report(start, end, C, testing=False):
 
 
 # ---------------------------------------------------------------------------
-def help():
+def wr_help():
     """
     Display a usage message based on the module docstring
     """
@@ -259,181 +250,141 @@ def fph(seconds):
 
     return '%3.1f' % (hours)
 
-
 # ---------------------------------------------------------------------------
-def intify(list):
+def intify(arg):
     """
     Turn everything in the list into an int
     """
-    rval = [int(item) for item in list]
+    if isinstance(arg, list):
+        rval = [int(item) for item in arg]
+    else:
+        rval = int(arg)
     return rval
 
-
 # ---------------------------------------------------------------------------
-def interpret_options(o):
-    '''
+def interpret_options(opts):
+    """
     Parse the program options and set things up for the rest of the program.
-    '''
-    if o.lastweek and ((o.start_ymd != '') or (o.end_ymd != '')):
-        raise bscr.Error('--last and --start or --end are not compatible')
-    elif (o.weektype != '') and ((o.start_ymd != '') or (o.end_ymd != '')):
-        raise bscr.Error('--week and --start or --end are not compatible')
-    elif (o.since != '') and (o.start_ymd != ''):
-        raise bscr.Error('--since and --start are not compatible')
-    elif (re.search('^[fcMTWtFsS]$', o.weektype)
-          and (o.start_ymd == '')
-          and (o.end_ymd == '')):
-        if o.lastweek:
-            (start, end) = week_starting_last(day_offset(o.weektype),
+    """
+    if opts.lastweek and ((opts.start_ymd != '') or (opts.end_ymd != '')):
+        raise BSCR.Error('--last and --start or --end are not compatible')
+    elif (opts.weektype != '') and ((opts.start_ymd != '') or (opts.end_ymd != '')):
+        raise BSCR.Error('--week and --start or --end are not compatible')
+    elif (opts.since != '') and (opts.start_ymd != ''):
+        raise BSCR.Error('--since and --start are not compatible')
+    elif (re.search('^[fcMTWtFsS]$', opts.weektype)
+          and (opts.start_ymd == '')
+          and (opts.end_ymd == '')):
+        if opts.lastweek:
+            (start, end) = week_starting_last(day_offset(opts.weektype),
                                               -7 * 24 * 3600)
         else:
-            (start, end) = week_starting_last(day_offset(o.weektype), 0)
+            (start, end) = week_starting_last(day_offset(opts.weektype), 0)
 
-    elif (o.start_ymd == '') and (o.end_ymd != ''):
-        (start, end) = week_ending(o.end_ymd)
-    elif (o.start_ymd != '') and (o.end_ymd == ''):
-        (start, end) = week_starting(o.start_ymd)
-    elif (o.start_ymd != '') and (o.end_ymd != ''):
-        start = o.start_ymd
-        end = o.end_ymd
-        # start = ymd(parse_ymd(o.start_ymd))
-        # end = ymd(parse_ymd(o.end_ymd))
-    elif (o.since != ''):
-        start = o.since
+    elif (opts.start_ymd == '') and (opts.end_ymd != ''):
+        (start, end) = week_ending(opts.end_ymd)
+    elif (opts.start_ymd != '') and (opts.end_ymd == ''):
+        (start, end) = week_starting(opts.start_ymd)
+    elif (opts.start_ymd != '') and (opts.end_ymd != ''):
+        start = opts.start_ymd
+        end = opts.end_ymd
+    elif (opts.since != ''):
+        start = opts.since
         end = time.strftime("%Y.%m%d", time.localtime())
     else:
-        (start, x) = week_starting_last(day_offset('M'), 0)
+        (start, _) = week_starting_last(day_offset('M'), 0)
         end = time.strftime("%Y.%m%d", time.localtime())
 
     return (start, end)
 
-
 # ---------------------------------------------------------------------------
-# def last_monday():
-#     # print 'last_monday:'
-#     now = time.time()
-#     tm = time.localtime(now)
-#     delta = (tm[6] + 7 - 0) % 7     # !@!here
-#     # delta = week_diff(tm[6], day_offset('M'))
-#     then = now - delta * 24 * 3600
-#     return then
-
-# # ---------------------------------------------------------------------------
-# def last_wednesday():
-#     now = time.time()
-#     tm = time.localtime(now)
-#     delta = (tm[6] + 7 - 2) % 7   # !@!here
-#     then = now - delta * 24 * 3600
-#     return then
-
-
-# ---------------------------------------------------------------------------
-def makeOptionParser(argv):
-    '''
+def make_option_parser(argv):
+    """
     Build a parser to understand the command line options.
-    '''
-    c = U.cmdline([{'opts': ['-c', '--copy'],
-                    'action': 'store',
-                    'type': 'string',
-                    'dest': 'copy',
-                    'default': '',
-                    'help': 'copy this code to <dir>',
-                    },
-                   {'opts': ['-d', '--day'],
-                    'action': 'store_true',
-                    'dest': 'dayflag',
-                    'default': False,
-                    'help': 'report each day separately',
-                    },
-                   {'opts': ['-e', '--end'],
-                    'action': 'store',
-                    'type': 'string',
-                    'dest': 'end_ymd',
-                    'default': '',
-                    'help': 'end date for report YYYY.MMDD',
-                    },
-                   {'opts': ['-f', '--file'],
-                    'action': 'store',
-                    'type': 'string',
-                    'dest': 'filename',
-                    'default': default_input_filename(),
-                    'help': 'timelog to read',
-                    },
-                   {'opts': ['-g', '--debug'],
-                    'action': 'store_true',
-                    'dest': 'debug',
-                    'default': False,
-                    'help': 'run the debugger',
-                    },
-                   {'opts': ['-l', '--last'],
-                    'action': 'store_true',
-                    # 'type': 'string',
-                    'dest': 'lastweek',
-                    'default': False,
-                    'help': 'report the last week',
-                    },
-                   {'opts': ['-s', '--start'],
-                    'action': 'store',
-                    'type': 'string',
-                    'dest': 'start_ymd',
-                    'default': '',
-                    'help': 'start date for report YYYY.MMDD',
-                    },
-                   {'opts': ['-S', '--since'],
-                    'action': 'store',
-                    'dest': 'since',
-                    'type': 'string',
-                    'default': '',
-                    'help': 'report date YYYY.MMDD through end of file',
-                    },
-                   {'opts': ['-w', '--week'],
-                    'action': 'store',
-                    'dest': 'weektype',
-                    'type': 'string',
-                    'default': '',
-                    'help': 'one of [fcMTWtFsS]',
-                    },
-                   {'opts': ['-D', '--doc'],
-                    'action': 'store_true',
-                    'dest': 'help',
-                    'default': False,
-                    'help': 'show script documentation',
-                    },
-                   {'opts': ['-p', '--pkg'],
-                    'action': 'store',
-                    'type': 'string',
-                    'dest': 'tarball',
-                    'default': '',
-                    'help': 'package this code to <filename>',
-                    },
-                   {'opts': ['-v', '--verbose'],
-                    'action': 'store_true',
-                    'dest': 'verbose',
-                    'default': False,
-                    'help': 'display debugging info',
-                    },
-                   ])
-    (o, a) = c.parse(argv)
-    return(o, a)
-
-
-# ---------------------------------------------------------------------------
-# def maketime(tm=[]):
-#     """
-#     With no *tm* (i.e., == []), return the current epoch time (time.time()).
-#     With *mark*, use it as an arg to time.mktime() in a way that gives an
-#     accurate dst result.
-#     """
-#     if tm:
-#         x = list(tm)
-#         x[3] = 12
-#         x[4] = 0
-#         x[5] = 0
-#         x[8] = 0
-#         z = time.mktime(x)
-#         y = time.localtime(z)
-#         x[8] = y.tm_isdst
-#     return time.mktime(tm)
+    """
+    cmd = U.cmdline([{'opts': ['-c', '--copy'],
+                      'action': 'store',
+                      'type': 'string',
+                      'dest': 'copy',
+                      'default': '',
+                      'help': 'copy this code to <dir>',
+                      },
+                     {'opts': ['-d', '--day'],
+                      'action': 'store_true',
+                      'dest': 'dayflag',
+                      'default': False,
+                      'help': 'report each day separately',
+                      },
+                     {'opts': ['-e', '--end'],
+                      'action': 'store',
+                      'type': 'string',
+                      'dest': 'end_ymd',
+                      'default': '',
+                      'help': 'end date for report YYYY.MMDD',
+                      },
+                     {'opts': ['-f', '--file'],
+                      'action': 'store',
+                      'type': 'string',
+                      'dest': 'filename',
+                      'default': default_input_filename(),
+                      'help': 'timelog to read',
+                      },
+                     {'opts': ['-g', '--debug'],
+                      'action': 'store_true',
+                      'dest': 'debug',
+                      'default': False,
+                      'help': 'run the debugger',
+                      },
+                     {'opts': ['-l', '--last'],
+                      'action': 'store_true',
+                      # 'type': 'string',
+                      'dest': 'lastweek',
+                      'default': False,
+                      'help': 'report the last week',
+                      },
+                     {'opts': ['-s', '--start'],
+                      'action': 'store',
+                      'type': 'string',
+                      'dest': 'start_ymd',
+                      'default': '',
+                      'help': 'start date for report YYYY.MMDD',
+                      },
+                     {'opts': ['-S', '--since'],
+                      'action': 'store',
+                      'dest': 'since',
+                      'type': 'string',
+                      'default': '',
+                      'help': 'report date YYYY.MMDD through end of file',
+                      },
+                     {'opts': ['-w', '--week'],
+                      'action': 'store',
+                      'dest': 'weektype',
+                      'type': 'string',
+                      'default': '',
+                      'help': 'one of [fcMTWtFsS]',
+                      },
+                     {'opts': ['-D', '--doc'],
+                      'action': 'store_true',
+                      'dest': 'help',
+                      'default': False,
+                      'help': 'show script documentation',
+                      },
+                     {'opts': ['-p', '--pkg'],
+                      'action': 'store',
+                      'type': 'string',
+                      'dest': 'tarball',
+                      'default': '',
+                      'help': 'package this code to <filename>',
+                      },
+                     {'opts': ['-v', '--verbose'],
+                      'action': 'store_true',
+                      'dest': 'verbose',
+                      'default': False,
+                      'help': 'display debugging info',
+                      },
+                     ])
+    (opts, args) = cmd.parse(argv)
+    return(opts, args)
 
 
 # ---------------------------------------------------------------------------
@@ -442,22 +393,22 @@ def next_tuesday():
     Relative weekday
     """
     now = time.time()
-    tm = time.localtime(now)
-    delta = (1 + 7 - tm[6]) % 7    # !@!here
+    tml = time.localtime(now)
+    delta = (1 + 7 - tml[6]) % 7    # !@!here
     then = now + delta * 24 * 3600
     return time.strftime("%Y.%m%d", time.localtime(then))
 
 
 # ---------------------------------------------------------------------------
-def next_day(ymd, format=None):
+def next_day(ymd, fmt=None):
     """
     Day offset
     """
-    if format is None:
-        format = '%Y.%m%d'
-    now = time.mktime(time.strptime(ymd, format))
+    if fmt is None:
+        fmt = '%Y.%m%d'
+    now = time.mktime(time.strptime(ymd, fmt))
     then = now + 24*3600
-    return time.strftime(format, time.localtime(then))
+    return time.strftime(fmt, time.localtime(then))
 
 
 # ---------------------------------------------------------------------------
@@ -477,9 +428,9 @@ def package(source, filename):
     """
     print 'source = ', source
     print 'filename = ', filename
-    dir = os.path.dirname(source)
-    flist = ['%s/workrpt' % dir,
-             '%s/workrpt.py' % dir,
+    tdir = os.path.dirname(source)
+    flist = ['%s/workrpt' % tdir,
+             '%s/workrpt.py' % tdir,
              default_input_filename()]
     cmd = 'tar zcvf %s %s' % (filename, ' '.join(flist))
     print cmd
@@ -497,13 +448,13 @@ def parse_timeline(line):
     lfmt = (r'(\d{4})(-(\d{2})-(\d{2})|.(\d{2})(\d{2})) ' +
             r'(\d{2}):(\d{2}):(\d{2}) (.*)')
     line = re.sub('#.*', '', line)
-    m = re.search(lfmt, line)
-    if m:
-        x = m.groups()
-        if '-' in x[1]:
-            rval = [x[0], x[2], x[3], x[6], x[7], x[8], x[9]]
-        elif '.' in x[1]:
-            rval = [x[0], x[4], x[5], x[6], x[7], x[8], x[9]]
+    mat = re.search(lfmt, line)
+    if mat:
+        grp = mat.groups()
+        if '-' in grp[1]:
+            rval = [grp[0], grp[2], grp[3], grp[6], grp[7], grp[8], grp[9]]
+        elif '.' in grp[1]:
+            rval = [grp[0], grp[4], grp[5], grp[6], grp[7], grp[8], grp[9]]
 
     return rval
 
@@ -521,155 +472,139 @@ def parse_ymd(dayname):
     elif dayname == 'tomorrow':
         ymd = time.strftime("%Y.%m%d", time.localtime(time.time() + 24*3600))
     elif re.search(r'(mon|tues|wednes|thurs|fri|satur|sun)day', dayname):
-        dt = time.localtime(time.time())
-        wd = dt[6]
-        t = weekday_num(dayname)
-        delta = ((-6 - wd + t) % - 7) - 1   # !@!here
+        tml = time.localtime(time.time())
+        wday = tml[6]
+        wdn = weekday_num(dayname)
+        delta = ((-6 - wday + wdn) % - 7) - 1   # !@!here
         # t = time.time() + (24 * 3600 * delta)
-        t = day_plus(delta)
-        ymd = time.strftime("%Y.%m%d", time.localtime(t))
+        tmark = day_plus(delta)
+        ymd = time.strftime("%Y.%m%d", time.localtime(tmark))
     else:
         ymd = dayname
 
     [rval] = re.findall(r'(\d{2,4})[-.](\d{2})[-.]?(\d{2})', ymd)
-    xrval = []
-    for q in rval:
-        xrval.append(q)
-    # print 'parse_ymd: returning', xrval
-    return xrval
-
+    return list(rval)
 
 # ---------------------------------------------------------------------------
-def stringify(list):
+def stringify(seq):
     """
     !@!DEPRECATED -- apparently unused
     """
     rval = []
-    for item in list:
+    for item in seq:
         rval.append('%02d' % item)
     return rval
 
 
 # ---------------------------------------------------------------------------
-def tally(C, start, end, Q):
+def tally(coll, start, end, t_tup):
     """
     Set the start time for an interval.
     """
-    global last
+    try:
+        _ = tally.last
+    except AttributeError:
+        tally.last = ''
 
-    # print "tally: ----------------------------------------"
-    # print "tally: ", Q
-
-    if Q is None or 7 != len(Q):
-        last = ''
+    if t_tup is None or 7 != len(t_tup):
+        tally.last = ''
         return
 
-    [y, m, d, H, M, S, T] = Q
-    date = '%s.%s%s' % (y, m, d)
+    [year, mon, mday, hour, mint, sec, t_item] = t_tup
+    date = '%s.%s%s' % (year, mon, mday)
     if (date < start) or (end < date):
         return
 
-    # print 'tally: %s <?> %s <?> %s' % (start, date, end)
-    # when = time.mktime(S, M, H, d, m-1, y-1900, 0, 0, dst())
-    when = time.mktime(intify([y, m, d, H, M, S, 0, 0, dst()]))
-    # print 'tally: when = %d' % when
+    when = time.mktime(intify([year, mon, mday, hour, mint, sec, 0, 0, dst()]))
     try:
-        C[T]['start'] = when
+        coll[t_item]['start'] = when
     except KeyError:
-        C[T] = {}
-        C[T]['start'] = when
+        coll[t_item] = {}
+        coll[t_item]['start'] = when
 
-    try:
-        if last != '':
-            timeclose(C, last, when)
-    except NameError:
-        pass
+    if tally.last != '':
+        timeclose(coll, tally.last, when)
 
-    last = T
-    return last
+    tally.last = t_item
+    return tally.last
 
 
 # ---------------------------------------------------------------------------
-def timeclose(C, last, when, all=False):
+def timeclose(coll, last, when, every=False):
     """
     Close a time interval, adding end - start to length. Delete
     'start' and 'end' members of the interval. If 'all' is True, scan
     the whole structure for time intervals needing closeout.
     """
-    if all:
-        klist = C.keys()
+    if every:
+        klist = coll.keys()
         for key in klist:
             cat = category(key)
             if cat != key or ':' not in key:
-                reset_category_total(C, cat)
+                reset_category_total(coll, cat)
 
         if last != 'COB' and last is not None:
-            C[last]['end'] = when
-            lapse = when - C[last]['start']
+            coll[last]['end'] = when
+            lapse = when - coll[last]['start']
             try:
-                C[last]['length'] = C[last]['length'] + lapse
+                coll[last]['length'] = coll[last]['length'] + lapse
             except KeyError:
-                C[last]['length'] = lapse
+                coll[last]['length'] = lapse
 
         for key in klist:
             cat = category(key)
             if (cat != key or ':' not in key) and key != 'COB':
                 try:
-                    increment_category_total(C, cat, C[key]['length'])
-                except KeyError, e:
-                    print("timeclose: No %s member for key %s" % (str(e), key))
+                    increment_category_total(coll, cat, coll[key]['length'])
+                except KeyError, err:
+                    print("timeclose: No %s member for key %s" %
+                          (str(err), key))
                     raise
 
     else:
-        C[last]['end'] = when
-        lapse = when - C[last]['start']
+        coll[last]['end'] = when
+        lapse = when - coll[last]['start']
         try:
-            C[last]['length'] = C[last]['length'] + lapse
+            coll[last]['length'] = coll[last]['length'] + lapse
         except KeyError:
-            C[last]['length'] = lapse
-        del C[last]['start']
-        del C[last]['end']
-
-        # cat = category(last)
-        # increment_category_total(C, cat, lapse)
-
-    # return lapse
-
+            coll[last]['length'] = lapse
+        del coll[last]['start']
+        del coll[last]['end']
 
 # ---------------------------------------------------------------------------
-def reset_category_total(C, cat):
+def reset_category_total(coll, cat):
     """
     Start over
     """
     if cat != '':
         try:
-            C[cat]['total'] = 0
+            coll[cat]['total'] = 0
         except KeyError:
             pass
 
 
 # ---------------------------------------------------------------------------
-def increment_category_total(C, cat, lapse):
+def increment_category_total(coll, cat, lapse):
     """
     Accumulate some time
     """
     if cat != '':
         try:
-            C[cat]['total'] = C[cat]['total'] + lapse
+            coll[cat]['total'] = coll[cat]['total'] + lapse
         except KeyError:
-            C[cat] = {}
-            C[cat]['total'] = lapse
+            coll[cat] = {}
+            coll[cat]['total'] = lapse
 
 
 # ---------------------------------------------------------------------------
 def category(task):
-    '''
+    """
     Parse the task category from the task description.
 
     A task description looks like 'admin: liason'. The category for this
     task would be 'admin'. If the task description does not contain a colon,
     the category is the whole description. Eg., 'vacation' -> 'vacation'.
-    '''
+    """
     cat = ''
     try:
         [cat] = re.findall(r'([^:]+):?.*', task)
@@ -677,40 +612,42 @@ def category(task):
         cat = task
 
     if verbose():
-        # print 'category: catgory(%s) -> %s' % (task, cat)
         pass
 
     return cat
 
 
 # ---------------------------------------------------------------------------
-def verbose(value=None, set=False):
-    '''
+def verbose(value=None, update=False):
+    """
     Control program verbosity.
 
     Set the global flag to <value> if <set> is true. Return the
     current flag value. Both arguments are optional so the current
     flag can be checked by calling verbose() with no arguments.
-    '''
-    global verbosity
-    if set:
-        verbosity = value
-    return verbosity
+    """
+    try:
+        rval = verbose.verbosity
+    except AttributeError:
+        rval = verbose.verbosity = False
+    if update:
+        rval = verbose.verbosity = value
+    return rval
 
 
 # ---------------------------------------------------------------------------
-def week_diff(a, b):
+def week_diff(start, fin):
     """
-    !@!DERPRECATED -- apparently unused
+    Compute the number of days required to get from weekday *start* to weekday
+    *fin*
     """
-    # rval = (a + 7 - b) % 7
-    rval = -1 * (((a + 6 - b) % 7) + 1)
+    rval = -1 * (((start + 6 - fin) % 7) + 1)
     return rval
 
 
 # ---------------------------------------------------------------------------
 def week_starting_last(weekday, offset, now=time.time()):
-    '''
+    """
     Return start and end dates for week beginning on most recent <weekday>.
 
     Return values are in %Y.%m%d format.
@@ -718,9 +655,9 @@ def week_starting_last(weekday, offset, now=time.time()):
     <weekday> is in range(0:6), indicating Monday through Sunday.
     <offset> is a number of seconds to shift the result. Typically
     <offset> will be a number of days given as N * 24 * 3600.
-    '''
-    tm = time.localtime(now)
-    delta = (tm[6] + 7 - weekday) % 7    # !@!here
+    """
+    tml = time.localtime(now)
+    delta = (tml.tm_wday + 7 - weekday) % 7    # !@!here
     then = now - delta * 24 * 3600
     then = then + offset
 
@@ -741,8 +678,9 @@ def week_starting(ymd):
     have issues from being too close to midnight (eg, due to DST changing
     between the beginning and end of the week, etc.)
     """
-    (y, m, d) = parse_ymd(ymd)
-    start_time = time.mktime([int(y), int(m), int(d), 4, 0, 0, 0, 0, 0])
+    (year, mon, mday) = parse_ymd(ymd)
+    start_time = time.mktime([int(year), int(mon), int(mday),
+                              4, 0, 0, 0, 0, 0])
     end_time = start_time + 6 * 24 * 3600
     start = time.strftime('%Y.%m%d', time.localtime(start_time))
     end = time.strftime('%Y.%m%d', time.localtime(end_time))
@@ -760,8 +698,9 @@ def week_ending(ymd):
     have issues from being too close to midnight (eg, due to DST changing
     between the beginning and end of the week, etc.)
     """
-    (y, m, d) = parse_ymd(ymd)
-    end_time = time.mktime([int(y), int(m), int(d), 4, 0, 0, 0, 0, 0])
+    (year, mon, mday) = parse_ymd(ymd)
+    end_time = time.mktime([int(year), int(mon), int(mday),
+                            4, 0, 0, 0, 0, 0])
     start_time = end_time - (6 * 24 * 3600)
     start = time.strftime('%Y.%m%d', time.localtime(start_time))
     end = time.strftime('%Y.%m%d', time.localtime(end_time))
@@ -770,23 +709,39 @@ def week_ending(ymd):
 
 # ---------------------------------------------------------------------------
 def weekday_num(name):
-    '''
+    """
     Return the number of weekday <name>.
-    '''
-    x = {'monday': 0, 'tuesday': 1, 'wednesday': 2, 'thursday': 3,
-         'friday': 4, 'saturday': 5, 'sunday': 6}
-    return x[name]
+    """
+    wday_d = {'monday': 0, 'tuesday': 1, 'wednesday': 2, 'thursday': 3,
+              'friday': 4, 'saturday': 5, 'sunday': 6}
+    return wday_d[name]
 
 
 # ---------------------------------------------------------------------------
+def process_line(coll, low, high, line):
+    """
+    Handle one line
+    """
+    last = tally(coll, low, high, parse_timeline(line))
+    if last:
+        try:
+            if line < process_line.lastline:
+                sys.exit('Dates or times out of order')
+            else:
+                process_line.lastline = line
+        except AttributeError:
+            process_line.lastline = line
+    return last
+
+# ---------------------------------------------------------------------------
 def write_report(filename, start, end, dayflag, testing=False):
-    '''
+    """
     Generate a time report from <filename> based on <start> and <end> dates.
 
     <dayflag> is a boolean indicating whether to write a single report
     for the entire time period between <start> and <end> or whether to
     write a mini-report for each day in the time period.
-    '''
+    """
     if verbose():
         print "write_report: filename = '%s'" % filename
         print "write_report: start = '%s'" % start
@@ -795,41 +750,29 @@ def write_report(filename, start, end, dayflag, testing=False):
 
     rval = ''
     last = None
-    lastline = None
+    process_line.lastline = None
     if dayflag:
         day = start
         while day <= end:
-            C = {}
-            f = open(filename, 'r')
-            for line in f:
-                lastc = tally(C, day, day, parse_timeline(line))
-                if lastc is not None:
-                    last = lastc
-                    if line < lastline:
-                        sys.exit('Dates or times out of order')
-                    else:
-                        lastline = line
-            f.close()
-            if last is not None and last in C.keys():
-                timeclose(C, last, time.time(), True)
-            rval = rval + format_report(day, day, C, testing)
+            coll = {}
+            rbl = open(filename, 'r')
+            for line in rbl:
+                last = process_line(coll, day, day, line)
+            rbl.close()
+            if last is not None and last in coll.keys():
+                timeclose(coll, last, time.time(), True)
+            rval = rval + format_report(day, day, coll, testing)
             day = next_day(day)
     else:
-        C = {}
-        f = open(filename, 'r')
-        for line in f:
-            lastc = tally(C, start, end, parse_timeline(line))
-            if lastc is not None:
-                last = lastc
-                if line < lastline:
-                    sys.exit('Dates or times out of order')
-                else:
-                    lastline = line
-        f.close()
+        coll = {}
+        rbl = open(filename, 'r')
+        for line in rbl:
+            last = process_line(coll, start, end, line)
+        rbl.close()
         if verbose():
-            dump_struct(C)
-        timeclose(C, last, time.time(), True)
-        rval = format_report(start, end, C, testing)
+            dump_struct(coll)
+        timeclose(coll, last, time.time(), True)
+        rval = format_report(start, end, coll, testing)
     return rval
 
 

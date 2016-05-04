@@ -64,15 +64,16 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
+import inspect
 import os
 import pdb
 import re
 import shlex
 import sys
-import testhelp
 import traceback as tb
 import unittest
 
+import testhelp
 
 # ---------------------------------------------------------------------------
 def tf_main(args, prefix=None, noarg='help'):
@@ -109,7 +110,13 @@ def tf_dispatch(prefix, args):
         tf_help(args[1:], prefix=prefix)
     else:
         try:
-            eval("sys.modules['__main__'].%s_%s(args[1:])" % (prefix, args[0]))
+            funcname = '{0}_{1}'.format(prefix, args[0])
+            module = sys.modules['__main__']
+            try:
+                func = getattr(module, funcname)
+            except AttributeError:
+                sys.exit("unrecognized subfunction: {0}".format(funcname))
+            func(args[1:])
         except IndexError:
             tb.print_exc()
             tf_help([], prefix=prefix)
@@ -121,9 +128,9 @@ def tf_dispatch(prefix, args):
             tb.print_exc()
             print("unrecognized subfunction: %s" % args[0])
             tf_help([], prefix=prefix)
-        except SystemExit as e:
+        except SystemExit as err:
             tb.print_exc()
-            print(e)
+            print(err)
 
 
 # ---------------------------------------------------------------------------
@@ -131,12 +138,16 @@ def tf_dispatch_epilog(prefix, args):
     """
     What to do after each dispatched function returns
     """
+    # eval("sys.modules['__main__'].%s_epilog(args)" % prefix)
+    func = None
+    epiname = '{0}_epilog'.format(prefix)
     try:
-        eval("sys.modules['__main__'].%s_epilog(args)" % prefix)
-    except:
-        # no epilog defined -- carry on
+        func = getattr(sys.modules['__main__'], epiname)
+    except AttributeError:
+        # if epilog doesn't exist, don't whine
         pass
-
+    if func:
+        func(args)
 
 # ---------------------------------------------------------------------------
 def tf_dispatch_prolog(prefix, args):
@@ -144,18 +155,19 @@ def tf_dispatch_prolog(prefix, args):
     What to do before calling each dispatched function
     """
     rval = args
+    func = None
+    plname = '{0}_prolog'.format(prefix)
     try:
-        rval = eval("sys.modules['__main__'].%s_prolog(args)" % prefix)
-    except SystemExit:
-        sys.exit(0)
-    except:
-        # no prolog defined -- carry on
+        func = getattr(sys.modules['__main__'], plname)
+    except AttributeError:
+        # if prolog does not exist, just carry on without whining
         pass
+    if func:
+        rval = func(args)
     return rval
 
-
 # ---------------------------------------------------------------------------
-def tf_help(A, prefix=None):
+def tf_help(argl, prefix=None):
     """help - show this list
 
     usage: <program> help [function-name]
@@ -164,34 +176,39 @@ def tf_help(A, prefix=None):
     Otherwise, show a list of functions based on the first line of
     each __doc__ member.
     """
-    d = dir(sys.modules['__main__'])
     if prefix is None:
         prefix = sys.modules['__main__'].prefix()
-    if 0 < len(A):
-        if '%s_%s' % (prefix, A[0]) in d:
-            dname = "sys.modules['__main__'].%s_%s.__doc__" % (prefix, A[0])
-            x = eval(dname)
-            print x
-        elif A[0] == 'help':
-            x = tf_help.__doc__
-            print x
+    if 0 < len(argl):
+        head = argl.pop(0)
+        if head == 'help':
+            text = tf_help.__doc__
+            print text
+        else:
+            try:
+                func = getattr(sys.modules['__main__'],
+                               '{0}_{1}'.format(prefix, head))
+                text = func()
+                print text
+            except AttributeError:
+                pass
         return
 
-    d.append('tf_help')
-    for o in d:
-        if o.startswith(prefix + '_'):
-            x = getattr(sys.modules['__main__'], o)
-            ds = x.__doc__
-            f = o.replace(prefix + '_', '')
-            if ds is not None:
-                docsum = ds.split('\n')[0]
+    mattrl = dict(inspect.getmembers(sys.modules['__main__'],
+                                     inspect.isfunction))
+    mattrl['tf_help'] = tf_help
+    for name in mattrl:
+        if name.startswith(prefix + '_'):
+            dstr = mattrl[name].__doc__
+            fname = name.replace(prefix + '_', '')
+            if dstr:
+                summary = dstr.split('\n')[0]
             else:
-                docsum = "%s - no docstring provided" % f
-            print "   %s" % (docsum)
-        elif o == 'tf_help':
-            f = 'help'
-            docsum = tf_help.__doc__.split('\n')[0]
-            print "   %s" % (docsum)
+                summary = '{0} - no docstring provided'.format(fname)
+            print "   %s" % (summary)
+        elif name == 'tf_help':
+            fname = 'help'
+            summary = tf_help.__doc__.split('\n')[0]
+            print "   %s" % (summary)
 
 
 # -----------------------------------------------------------------------------
@@ -200,6 +217,7 @@ def tf_launch(prefix, noarg='help', cleanup_tests=None, testclass='',
     """
     Launch a toolframe'd program
     """
+    # pylint: disable=protected-access,no-member
     if len(sys.argv) == 1 and sys.argv[0] == '':
         return
     sname = sys.argv[0]
@@ -221,11 +239,12 @@ def tf_shell(prefix, args):
     """
     Provide a shell in which subfunctions can be run
     """
+    # pylint: disable=unused-argument
     prompt = "%s> " % prefix
     req = raw_input(prompt)
     while req != 'quit':
-        r = shlex.split(req)
-        tf_dispatch(prefix, r)
+        result = shlex.split(req)
+        tf_dispatch(prefix, result)
 
         req = raw_input(prompt)
 
@@ -241,6 +260,7 @@ def ez_launch(modname,
     For a simple (non-tool-style) program, figure out what needs to happen and
     call the invoker's 'main' callback.
     """
+    # pylint: disable=protected-access, no-member, too-many-arguments
     if len(sys.argv) == 1 and sys.argv[0] == '':
         return
     if modname != '__main__':

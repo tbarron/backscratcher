@@ -35,7 +35,6 @@ import optparse
 import os
 import sys
 import time
-import unittest
 
 import toolframe
 import util as U

@@ -124,9 +124,9 @@ def pt_newtool(args):
     to add and describe new subfunctions.
     """
     prs = optparse.OptionParser()
-    (opts, argl) = prs.parse_args(args)
+    (_, argl) = prs.parse_args(args)
 
-    if argl == [] or len(opts) != 2:
+    if argl == [] or len(argl) != 2:
         U.fatal('usage: pytool newtool <program-name> <prefix>')
     else:
         lname = argl[0]

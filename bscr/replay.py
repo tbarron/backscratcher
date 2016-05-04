@@ -64,67 +64,67 @@ def main(argv=None):
     (say, once every five seconds) or to regenerate an output when a file
     is updated.
     """
-    c = U.cmdline([{'opts': ['-c', '--change'],
-                    'action': 'store_true',
-                    'default': False,
-                    'dest': 'change',
-                    'help': 'update on change',
-                    },
-                   {'opts': ['-d', '--debug'],
-                    'action': 'store_true',
-                    'default': False,
-                    'dest': 'debug',
-                    'help': 'run under debugger',
-                    },
-                   {'opts': ['-i', '--interval'],
-                    'action': 'store',
-                    'default': 10,
-                    'dest': 'interval',
-                    'help': 'seconds between updates',
-                    },
-                   {'opts': ['-p', '--prompt'],
-                    'action': 'store_true',
-                    'default': False,
-                    'dest': 'prompt',
-                    'help': 'update on user input',
-                    },
-                   {'opts': ['-t', '--trigger'],
-                    'action': 'store',
-                    'default': '',
-                    'dest': 'pathname',
-                    'help': 'update when mtime on pathname changes',
-                    },
-                   ])
-    (o, a) = c.parse(argv)
-    if o.debug:
+    cmdline = U.cmdline([{'opts': ['-c', '--change'],
+                          'action': 'store_true',
+                          'default': False,
+                          'dest': 'change',
+                          'help': 'update on change',
+                         },
+                         {'opts': ['-d', '--debug'],
+                          'action': 'store_true',
+                          'default': False,
+                          'dest': 'debug',
+                          'help': 'run under debugger',
+                         },
+                         {'opts': ['-i', '--interval'],
+                          'action': 'store',
+                          'default': 10,
+                          'dest': 'interval',
+                          'help': 'seconds between updates',
+                         },
+                         {'opts': ['-p', '--prompt'],
+                          'action': 'store_true',
+                          'default': False,
+                          'dest': 'prompt',
+                          'help': 'update on user input',
+                         },
+                         {'opts': ['-t', '--trigger'],
+                          'action': 'store',
+                          'default': '',
+                          'dest': 'pathname',
+                          'help': 'update when mtime on pathname changes',
+                         },
+                        ])
+    (opts, args) = cmdline.parse(argv)
+    if opts.debug:
         pdb.set_trace()
 
     try:
         start = time.time()
-        cmd = " ".join(a)
+        cmd = " ".join(args)
         old_stuff_s = ""
         while True:
-            f = os.popen(cmd, "r")
-            stuff = f.readlines()
-            f.close()
+            rbl = os.popen(cmd, "r")
+            stuff = rbl.readlines()
+            rbl.close()
             stuff_s = " ".join(stuff)
 
-            if o.prompt:
+            if opts.prompt:
                 report(start, cmd, stuff_s)
-                x = raw_input('Press ENTER to continue...')
-            elif o.change:
+                _ = raw_input('Press ENTER to continue...')
+            elif opts.change:
                 if stuff_s != old_stuff_s:
                     report(start, cmd, stuff_s)
                     old_stuff_s = stuff_s
                 time.sleep(1.0)
-            elif o.pathname != '':
-                when = U.mtime(o.pathname)
+            elif opts.pathname != '':
+                when = U.mtime(opts.pathname)
                 report(start, cmd, stuff_s)
-                while when == U.mtime(o.pathname):
+                while when == U.mtime(opts.pathname):
                     time.sleep(1.0)
             else:
                 report(start, cmd, stuff_s)
-                time.sleep(float(o.interval))
+                time.sleep(float(opts.interval))
     except KeyboardInterrupt:
         print("")
         sys.exit()
@@ -150,19 +150,19 @@ def ymdhms(seconds):
     Convert a number of seconds to day-HH:MM:SS. This might be replaceable
     with something from util.
     """
-    S = seconds % 60
-    minutes = (seconds - S)/60
-    rval = "%02d" % S
+    rem_s = seconds % 60
+    minutes = (seconds - rem_s)/60
+    rval = "%02d" % rem_s
 
-    M = minutes % 60
-    hours = (minutes - M)/60
+    rem_m = minutes % 60
+    hours = (minutes - rem_m)/60
     if 0 < minutes:
-        rval = "%02d:%s" % (M, rval)
+        rval = "%02d:%s" % (rem_m, rval)
 
-    H = hours % 24
-    days = (hours - H)/24
+    rem_h = hours % 24
+    days = (hours - rem_h)/24
     if 0 < hours:
-        rval = "%02d:%s" % (H, rval)
+        rval = "%02d:%s" % (rem_h, rval)
 
     if 0 < days:
         rval = "%d %s" % (days, rval)

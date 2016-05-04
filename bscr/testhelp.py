@@ -1,52 +1,55 @@
 #!/usr/bin/python
-
+"""
+Stuff to help with testing
+"""
+# pylint: disable=invalid-name
+# pylint: disable=no-self-use
+# pylint: disable=unused-argument
 import logging
 import logging.handlers
 import optparse
 import os
 import pdb
-import pexpect
 import pprint as pp
 import re
 import socket
 import sys
-import pytest
 import unittest
 import StringIO
-import util as U
-bscr = U.package_module(__name__)
-tlogger = None
 
+import pytest
+
+import pexpect
+import util as U
+
+BSCR = U.package_module(__name__)
 
 # ---------------------------------------------------------------------------
-def all_tests(name, filter=None):
-    '''
-    Return a list of tests in the module <name>.
-    Limit the list to those which contain the string <filter>.
-    '''
-    # print("all_tests(%s, %s)" % (name, filter))
+def all_tests(name, fltr=None):
+    """
+    Return a list of tests in the module *name*.
+    Limit the list to those which contain the string *fltr*.
+    """
     testclasses = []
     cases = []
-    if filter is None:
-        filter = 'Test'
-    # print("all_tests(%s, %s)" % (name, filter))
-    # print dir(sys.modules[name])
+    if fltr is None:
+        fltr = 'Test'
     for item in dir(sys.modules[name]):
         iobj = getattr(sys.modules[name], item)
         for iobjmember in dir(iobj):
-            if iobjmember.startswith('test_') and filter in item:
+            if iobjmember.startswith('test_') and fltr in item:
                 testclasses.append(item)
                 break
 
-    for c in testclasses:
-        cobj = getattr(sys.modules[name], c)
+    for cls in testclasses:
+        cobj = getattr(sys.modules[name], cls)
         for case in unittest.TestLoader().getTestCaseNames(cobj):
             skip = case.replace('test_', 'skip_', 1)
             sfunc = getattr(sys.modules[name], skip, None)
             if sfunc is None:
-                cases.append(['%s.%s' % (c, case), None])
+                cases.append(['%s.%s' % (cls, case), None])
             else:
-                cases.append(['%s.%s' % (c, case), skip])
+                cases.append(['%s.%s' % (cls, case), skip])
 
     return cases
 
@@ -57,28 +60,15 @@ def debug_flag(value=None):
     Used in main() to decide whether --debug occurred on command line. This
     could go away with main().
     """
-    global dval
+    try:
+        rval = debug_flag.dval
+    except AttributeError:
+        rval = debug_flag.dval = False
 
     if value is not None:
-        dval = value
-
-    try:
-        rval = dval
-    except NameError:
-        dval = False
-        rval = dval
+        rval = debug_flag.dval = value
 
     return rval
-
-
-# ---------------------------------------------------------------------------
-def get_logger():
-    """
-    Get the singleton test logger
-    """
-    global tlogger
-    return tlogger
-
 
 # ---------------------------------------------------------------------------
 def into_test_dir():
@@ -93,46 +83,42 @@ def into_test_dir():
         os.chdir(tdname)
     return tdname
 
-
 # ---------------------------------------------------------------------------
 def keepfiles(value=None):
     """
     Return value of global value kf_flag. Optionally set it if value
     is specified. If it is not set, the default return value is False.
     """
-    global kf_flag
     try:
-        rval = kf_flag
-    except:
-        kf_flag = False
-        rval = kf_flag
+        rval = keepfiles.kf_flag
+    except AttributeError:
+        keepfiles.kf_flag = False
+        rval = keepfiles.kf_flag
 
     if value is not None:
-        kf_flag = value
+        keepfiles.kf_flag = value
 
     return rval
 
-
 # ---------------------------------------------------------------------------
-def list_tests(a, final, testlist):
+def list_tests(argl, final, testlist):
     """
     This goes away with main(). If called through the main() test runner, this
     will list the tests available without running them.
     """
     # pdb.set_trace()
-    if len(a) <= 1:
-        for c in testlist:
-            print c[0]
-            if final != '' and final in c[0]:
+    if len(argl) <= 1:
+        for candy in testlist:
+            print candy[0]
+            if final != '' and final in candy[0]:
                 break
     else:
-        for arg in a[1:]:
-            for c in testlist:
-                if arg in c[0]:
-                    print c[0]
-                if final != '' and final in c[0]:
+        for arg in argl[1:]:
+            for candy in testlist:
+                if arg in candy[0]:
+                    print candy[0]
+                if final != '' and final in candy[0]:
                     break
-
 
 # ---------------------------------------------------------------------------
 def name_of(obj=None):
@@ -141,7 +127,6 @@ def name_of(obj=None):
     Is this used anywhere? Can we get rid of it?
     """
     return str(obj).split()[0]
-
 
 # ---------------------------------------------------------------------------
 def rm_cov_warn(string):
@@ -155,39 +140,41 @@ def rm_cov_warn(string):
         rval = re.sub(covwarn, "", string)
     return rval
 
-
 # ---------------------------------------------------------------------------
-def run_tests(a, final, testlist, volume, logfile=None):
+def run_tests(argl, final, testlist, volume, logfile=None):
     """
     This goes with the main() test runner. Probably not needed.
     """
     mainmod = sys.modules['__main__']
-    if len(a) <= 1:
+    if len(argl) <= 1:
         suite = LoggingTestSuite(logfile=logfile)
         for (case, skip) in testlist:
             if skip_check(skip):
                 continue
-            s = unittest.TestLoader().loadTestsFromName(case, mainmod)
-            suite.addTests(s)
+            slst = unittest.TestLoader().loadTestsFromName(case, mainmod)
+            suite.addTests(slst)
             if final != '' and final in case:
                 break
     else:
         suite = LoggingTestSuite(logfile=logfile)
-        for arg in a[1:]:
+        for arg in argl[1:]:
             for (case, skip) in testlist:
                 if skip_check(skip):
                     continue
                 if arg in case:
-                    s = unittest.TestLoader().loadTestsFromName(case, mainmod)
-                    suite.addTests(s)
+                    slst = unittest.TestLoader().loadTestsFromName(case, mainmod)
+                    suite.addTests(slst)
                 if final != '' and final in case:
                     break
 
-    result = unittest.TextTestRunner(verbosity=volume).run(suite)
-
+    _ = unittest.TextTestRunner(verbosity=volume).run(suite)
 
 # -----------------------------------------------------------------------------
 class HelpedTestCase(unittest.TestCase):
+    """
+    This class inherits from unittest.TestCase so we can hang extra attributes
+    on it
+    """
     # -------------------------------------------------------------------------
     def expgot(self, exp, actual):
         """
@@ -222,7 +209,7 @@ class HelpedTestCase(unittest.TestCase):
 
         If it fails, we report expected and actual. Otherwise, just return.
         """
-        if type(actual) == str:
+        if isinstance(actual, str):
             covmsg = "Coverage.py.warning:.No.data.was collected.\r?\n?"
             if re.findall(covmsg, actual):
                 actual = re.sub(covmsg, "", actual)
@@ -235,7 +222,7 @@ class HelpedTestCase(unittest.TestCase):
         Generate a message to report how *exp* and *act* differ
         """
         rval = "\n"
-        if type(exp) == list:
+        if isinstance(exp, list):
             if 5 < len(exp):
                 for i in range(0, len(exp)):
                     try:
@@ -248,7 +235,7 @@ class HelpedTestCase(unittest.TestCase):
             else:
                 rval += "EXPECTED '%s'\n" % exp
                 rval += "     GOT '%s'\n" % act
-        elif type(exp) == str:
+        elif isinstance(exp, str):
             rval += "EXPECTED: '%s'\n" % exp.replace(' ', '.')
             rval += "     GOT: '%s'\n" % act.replace(' ', '.')
         else:
@@ -268,7 +255,7 @@ class HelpedTestCase(unittest.TestCase):
             self.fail(msg or fmsg)
 
     # -------------------------------------------------------------------------
-    def assertModule(self, module_name, filename):
+    def assertModule(self, module_name, filename=None):
         """
         The root directory for the module and the associated test file should
         be the same. If not, report an assertion failure.
@@ -295,11 +282,11 @@ class HelpedTestCase(unittest.TestCase):
         """
         cmd = U.script_location(script)
         result = pexpect.run("%s --help" % cmd)
-        if type(explist) == str:
+        if isinstance(explist, str):
             self.assertTrue(explist in result,
                             "Expected '%s' in %s" %
                             (explist, U.lquote(result)))
-        elif type(explist) == list:
+        elif isinstance(explist, list):
             for exp in explist:
                 self.assertTrue(exp in result,
                                 "Expected '%s' in %s" %
@@ -314,6 +301,7 @@ class HelpedTestCase(unittest.TestCase):
         *exctype* containing the message *excstr*. If not, we report the
         assertion failure.
         """
+        # pylint: disable=broad-except
         try:
             func(*args, **kwargs)
         except exctype, e:
@@ -328,7 +316,9 @@ class HelpedTestCase(unittest.TestCase):
     # -------------------------------------------------------------------------
     def setUp(self):
         """
+        What it sounds like -- prepare for a test
         """
+        # pylint: disable=no-member
         dbgopt = pytest.config.getoption("dbg")
         if any(["all" in x.lower() for x in dbgopt] +
                [self._testMethodName in dbgopt]):
@@ -339,6 +329,9 @@ class HelpedTestCase(unittest.TestCase):
 
 # -----------------------------------------------------------------------------
 class LoggingTestSuite(unittest.TestSuite):
+    """
+    Inherit from unittest.TestSuite so we can add attributes useful for logging
+    """
     def __init__(self, tests=(), logfile=None):
         """
         This initializes my version of the TestSuite class that does test
@@ -371,6 +364,7 @@ class LoggingTestSuite(unittest.TestSuite):
         """
         Run the tests in the suite.
         """
+        # pylint: disable=arguments-differ, undefined-variable
         errs = 0
         fails = 0
         for test in self._tests:
@@ -393,6 +387,7 @@ class LoggingTestSuite(unittest.TestSuite):
 
 # -----------------------------------------------------------------------------
 class StdoutExcursion(object):
+    # pylint: disable=too-few-public-methods
     """
     This class allows us to run something that writes to stdout and capture the
     output in a StringIO.
@@ -406,6 +401,8 @@ class StdoutExcursion(object):
         result = pexpect.run(something that writes stdout)
     since pexpect.run() expects a command line but in a StdoutExcursion, we can
     call a python function.
+
+    DEPRECATED in favor of py.test's capsys facility
     """
     def __init__(self):
         self.stdout = sys.stdout
@@ -414,7 +411,7 @@ class StdoutExcursion(object):
         sys.stdout = StringIO.StringIO()
         return sys.stdout.getvalue
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, tb_type, value, traceback):
         sys.stdout.close()
         sys.stdout = self.stdout
 
@@ -425,15 +422,14 @@ def show_stdout(value=None):
     Return value of global value show_stdout. Optionally set it if
     value is specified. If it is not set, the default return value is False.
     """
-    global show_output
     try:
-        rval = show_output
-    except:
-        show_output = False
-        rval = show_output
+        rval = show_stdout.flag
+    except AttributeError:
+        show_stdout.flag = False
+        rval = show_stdout.flag
 
     if value is not None:
-        show_output = value
+        show_stdout.flag = value
 
     return rval
 
@@ -478,12 +474,12 @@ def write_file(filename, mode=0644, content=None):
     to be the same as util.writefile().
     """
     f = open(filename, 'w')
-    if type(content) == str:
+    if isinstance(content, str):
         f.write(content)
-    elif type(content) == list:
+    elif isinstance(content, list):
         f.writelines([x.rstrip() + '\n' for x in content])
     else:
-        raise bscr.Error("content is not of a suitable type (%s)"
+        raise BSCR.Error("content is not of a suitable type (%s)"
                          % type(content))
     f.close()
     os.chmod(filename, mode)
@@ -491,6 +487,10 @@ def write_file(filename, mode=0644, content=None):
 
 # -----------------------------------------------------------------------------
 class UnderConstructionError(Exception):
+    """
+    Deprecated in favor of 'pytest.fail('construction')'
+    """
+    # pylint: disable=super-init-not-called
     # -------------------------------------------------------------------------
     def __init__(self, value=""):
         """
@@ -507,9 +507,3 @@ class UnderConstructionError(Exception):
         Deprecated in favor of 'self.fail('construction')'
         """
         return repr(self.value)
-
-# -----------------------------------------------------------------------------
-global d
-d = dir()
-if __name__ == '__main__':
-    main(sys.argv)
