@@ -12,7 +12,7 @@ import tempfile
 import util
 
 # ---------------------------------------------------------------------------
-def main(args=None):
+def main(args=None):                                    # pragma: no coverage
     """
     Command line entry point
     """
@@ -82,7 +82,7 @@ def nv_stash(argv):
                    help='start the debugger')
     (opts, args) = prs.parse_args(argv)
 
-    if opts.debug:
+    if opts.debug:               # pragma: no coverage
         pdb.set_trace()
 
     varname = args[0]
@@ -113,12 +113,13 @@ def nv_load(argv):
                    help='start the debugger')
     (opts, args) = prs.parse_args(argv)
 
-    if opts.debug:
+    if opts.debug:          # pragma: no coverage
         pdb.set_trace()
 
     fname = args[0]
     rbl = open(fname, 'r')
-    result = ":".join([_.strip() for _ in rbl.readlines()])
+    lines = rbl.readlines()
+    result = ":".join([_.strip() for _ in lines])
     rbl.close()
     print result
 
@@ -134,29 +135,31 @@ def nv_show(argv):
 # ---------------------------------------------------------------------------
 def nv_remove(argv):
     """remove - remove entries that match the argument
+
+    !@! needs test
     """
     prs = optparse.OptionParser()
     prs.add_option('-d', '--debug',
                    action='store_true', default=False, dest='debug',
                    help='start the debugger')
-    prs.add_option('-j', '--join',
-                   action='store_true', default=True, dest='join',
-                   help='colon separated format (default)')
+#     prs.add_option('-j', '--join',
+#                    action='store_true', default=True, dest='join',
+#                    help='colon separated format (default)')
     prs.add_option('-s', '--show',
                    action='store_true', default=False, dest='show',
                    help='newline separated format')
-    (opts, _) = prs.parse_args(argv)
+    (opts, args) = prs.parse_args(argv)
 
-    if opts.debug:
+    if opts.debug:                 # pragma: no coverage
         pdb.set_trace()
 
-    pieces = argv[1].split(':')
-    result = [_ for _ in pieces if argv[0] not in _]
-    if opts.join:
-        print(":".join(result))
-    elif opts.show:
+    pieces = args[1].split(':')
+    result = [_ for _ in pieces if args[0] not in _]
+    if opts.show:
         for item in result:
             print "   " + item
-
+    else:
+        print(":".join(result))
+        
 # ---------------------------------------------------------------------------
 # xtoolframe.tf_launch("nv")
