@@ -10,6 +10,7 @@ import sys
 
 import docopt
 
+# -----------------------------------------------------------------------------
 def main(args):
     """
     pfind: walk a directory tree and find files
@@ -42,15 +43,35 @@ def main(args):
     else:
         excl = []
 
+    hitlist = []
     paths = opts['<dir>'] or ['.']
     for path in paths:
-        for root, dirs, files in os.walk(path):
-            hits = [_ for _ in dirs + files if fnmatch.fnmatch(_, match_str)]
-            for hit in hits:
-                hitpath = os.path.join(root, hit)
-                if all([_ not in hitpath for _ in excl]):
-                    print(hitpath)
+        hitlist.extend(get_hitlist(path, opts))
+    for hit in hitlist:
+        print hit
 
+# -----------------------------------------------------------------------------
+def get_hitlist(path=None, opts=None):
+    """
+    Walk *path* looking for filepaths that match *match* while excluding those
+    that contain an *exclude* expression
+    """
+    path = path or '.'
+    match = opts['--name'] or '*'
+    if opts['--exclude']:
+        exclude = opts['--exclude'].split(',')
+    else:
+        exclude = []
 
+    rval = []
+    for root, dirs, files in os.walk(path):
+        hits = [_ for _ in dirs + files if fnmatch.fnmatch(_, match)]
+        for hit in hits:
+            hitpath = os.path.join(root, hit)
+            if all([_ not in hitpath for _ in exclude]):
+                rval.append(hitpath)
+    return rval
+
+# -----------------------------------------------------------------------------
 if __name__ == '__main__':
     main(sys.argv[1:])
