@@ -6,7 +6,7 @@ import fnmatch
 import os
 import pdb
 import sys
-
+import time
 
 import docopt
 
@@ -64,6 +64,32 @@ def get_hitlist(path=None, opts=None):
             hitpath = os.path.join(root, hit)
             if all([_ not in hitpath for _ in exclude]):
                 rval.append(hitpath)
+    return rval
+
+# -----------------------------------------------------------------------------
+def parse_time(dtstr):
+    """
+    Parse a date/time into an epoch time
+    """
+    try:
+        _ = parse_time.fmt_l
+    except AttributeError:
+        parse_time.fmt_l = ['%Y.%m%d',
+                            '%Y.%m%d %H:%M:%S',
+                            '%Y.%m%d.%H%M%S',
+                            'failure']
+
+    for fmt in parse_time.fmt_l:
+        try:
+            tup = time.strptime(dtstr, fmt)
+            break
+        except ValueError as err:
+            if fmt == 'failure':
+                msg = "time data {0} does not match any of the formats"
+                raise ValueError(msg.format(dtstr))
+            else:
+                pass
+    rval = time.mktime(tup)
     return rval
 
 # -----------------------------------------------------------------------------
