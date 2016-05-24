@@ -11,7 +11,7 @@ import sys
 import docopt
 
 # -----------------------------------------------------------------------------
-def main(args):
+def main(args=None):
     """
     pfind: walk a directory tree and find files
 
@@ -36,12 +36,6 @@ def main(args):
 
     if opts['--verbose']:
         print(opts)
-
-    match_str = opts['--name'] or '*'
-    if opts['--exclude']:
-        excl = opts['--exclude'].split(',')
-    else:
-        excl = []
 
     hitlist = []
     paths = opts['<dir>'] or ['.']

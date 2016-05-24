@@ -160,6 +160,6 @@ def nv_remove(argv):
             print "   " + item
     else:
         print(":".join(result))
-        
+
 # ---------------------------------------------------------------------------
 # xtoolframe.tf_launch("nv")
