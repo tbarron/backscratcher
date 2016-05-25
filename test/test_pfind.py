@@ -160,13 +160,13 @@ def test_age(tmpdir, pfind_fx):
     """
     find files based on age
     """
-    pytest.fail('construction')
+    exp = list_minus(pfind_fx.data.keys(), ['ancient*'])
     opts = {'--name': 'aardvark',
             '--exclude': 'something',
             '--older': '2016.0101',
             '<dir>': tmpdir.strpath}
     result = pfind.get_hitlist(path=tmpdir.strpath, opts=opts)
-    validate_result(pfind_fx, result, [])
+    validate_result(pfind_fx, result, exp)
 
 # -----------------------------------------------------------------------------
 def test_newer_ymd(tmpdir, pfind_fx):
