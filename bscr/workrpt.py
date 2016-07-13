@@ -1,10 +1,11 @@
 #!/usr/bin/python
-'''
+"""
 workrpt - report work times
 
  usage: workrpt   [-D/--doc]
                   [-v/--verbose]
                   [-f/--file input-file-name]
+                  [-m/--match regexp]
                   [-w/--week f|c|M|T|W|t|F|S|s]
                   [-d/--day]
                   [-l/--last]
@@ -17,6 +18,7 @@ workrpt - report work times
     -v/--verbose   output debugging info
     -f/--file      <input-file-name> is the name of the file to read
                      time information from
+    -m/--match     report entries that match regexp
     -w/--week      reports a week beginning on
            f         last Thursday - HPSS rotation
            c         last Friday - CCS rotation
@@ -32,13 +34,14 @@ workrpt - report work times
     -e/--end       report for week ending <YYYY-MM-DD> or from start date
     -p/--pkg       tarball this code to <filename>
     -c/--copy      copy this code to <dir>
-'''
+"""
 
 import copy
 import getopt
 import os
 import pdb
 import re
+import StringIO
 import sys
 import time
 import toolframe
@@ -74,12 +77,15 @@ def main(argv=None):
         copy_me(sys.argv[0], o.copy)
 
     try:
-        (start, end) = interpret_options(o)
+        (o.start, o.end) = interpret_options(o)
     except Exception, e:
         print str(e)
         sys.exit(1)
 
-    write_report(o.filename, start, end, o.dayflag)
+    if o.match_regexp:
+        write_report_regexp(o)
+    else:
+        write_report(o)
 
 
 # ---------------------------------------------------------------------------
@@ -371,6 +377,13 @@ def makeOptionParser(argv):
                     'dest': 'lastweek',
                     'default': False,
                     'help': 'report the last week',
+                    },
+                   {'opts': ['-m', '--match'],
+                    'action': 'store',
+                    'type': 'string',
+                    'dest': 'match_regexp',
+                    'default': '',
+                    'help': 'regexp to match',
                     },
                    {'opts': ['-s', '--start'],
                     'action': 'store',
@@ -777,9 +790,69 @@ def weekday_num(name):
          'friday': 4, 'saturday': 5, 'sunday': 6}
     return x[name]
 
+# ---------------------------------------------------------------------------
+def write_report_regexp(opts, testing=False):
+    """
+    Generate a time report from <filename> based on <o.match_regexp>
+    """
+    filename = opts.filename
+    start = opts.start
+    end = opts.end
+    dayflag = opts.dayflag
+    if verbose():
+        print "write_report: filename = '%s'" % filename
+        print "write_report: start = '%s'" % start
+        print "write_report: end = '%s'" % end
+        print "write_report: dayflag = %s" % dayflag
+
+    dat = {}
+    rval = StringIO.StringIO()
+    last = None
+    with open(opts.filename, 'r') as rbl:
+        for line in rbl:
+            if not line[0:4].isdigit():
+                continue
+
+            (year, mon, day, hour, mnt, sec, payld) = parse_timeline(line)
+            when = int(time.mktime(intify([year, mon, day,
+                                           hour, mnt, sec,
+                                           0, 0, dst()])))
+
+            if last:
+                dat[last]['sum'] += when - dat[last]['start']
+                dat[last]['start'] = 0
+                last = None
+
+            if re.findall(opts.match_regexp, payld):
+                try:
+                    dat[payld]['start'] = when
+                except KeyError:
+                    dat[payld] = {}
+                    dat[payld]['start'] = when
+                    dat[payld]['sum'] = 0
+                last = payld
+
+    for key in dat:
+        if dat[key]['start'] != 0:
+            dat[key]['sum'] += int(time.time()) - dat[key]['start']
+
+    total = 0
+    rval.write("----- matching '{0}' -----\n".format(opts.match_regexp))
+    for key in dat:
+        duration = dat[key]['sum']
+        total += duration
+        rval.write("{0:48}   {1} ({2})\n".format(key,
+                                                 hms(duration),
+                                                 fph(duration)))
+    rval.write("\n")
+    rval.write("{0:56}  {1} ({2})\n".format("Total:",
+                                            hms(total),
+                                            fph(total)))
+
+    print rval.getvalue()
 
 # ---------------------------------------------------------------------------
-def write_report(filename, start, end, dayflag, testing=False):
+def write_report(opts, testing=False):
     '''
     Generate a time report from <filename> based on <start> and <end> dates.
 
@@ -787,6 +860,10 @@ def write_report(filename, start, end, dayflag, testing=False):
     for the entire time period between <start> and <end> or whether to
     write a mini-report for each day in the time period.
     '''
+    filename = opts.filename
+    start = opts.start
+    end = opts.end
+    dayflag = opts.dayflag
     if verbose():
         print "write_report: filename = '%s'" % filename
         print "write_report: start = '%s'" % start
@@ -822,7 +899,6 @@ def write_report(filename, start, end, dayflag, testing=False):
         timeclose(C, last, time.time(), True)
         rval = format_report(start, end, C, testing)
     return rval
-
 
 # ---------------------------------------------------------------------------
 toolframe.ez_launch(__name__, main)
