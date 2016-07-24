@@ -69,27 +69,33 @@ def get_hitlist(path=None, opts=None):
 # -----------------------------------------------------------------------------
 def parse_time(dtstr):
     """
-    Parse a date/time into an epoch time
+    Return an epoch time. If *dtstr* matches a path, return the mtime of the
+    file or directory. Otherwise, treat *dtstr* as a date/time specification
+    and apply time.strptime().
     """
-    try:
-        _ = parse_time.fmt_l
-    except AttributeError:
-        parse_time.fmt_l = ['%Y.%m%d',
-                            '%Y.%m%d %H:%M:%S',
-                            '%Y.%m%d.%H%M%S',
-                            'failure']
-
-    for fmt in parse_time.fmt_l:
+    if os.path.exists(dtstr):
+        pinfo = os.stat(dtstr)
+        rval = pinfo.st_mtime
+    else:
         try:
-            tup = time.strptime(dtstr, fmt)
-            break
-        except ValueError as err:
-            if fmt == 'failure':
-                msg = "time data {0} does not match any of the formats"
-                raise ValueError(msg.format(dtstr))
-            else:
-                pass
-    rval = time.mktime(tup)
+            _ = parse_time.fmt_l
+        except AttributeError:
+            parse_time.fmt_l = ['%Y.%m%d',
+                                '%Y.%m%d %H:%M:%S',
+                                '%Y.%m%d.%H%M%S',
+                                'failure']
+
+        for fmt in parse_time.fmt_l:
+            try:
+                tup = time.strptime(dtstr, fmt)
+                break
+            except ValueError as err:
+                if fmt == 'failure':
+                    msg = "time data {0} does not match any of the formats"
+                    raise ValueError(msg.format(dtstr))
+                else:
+                    pass
+        rval = time.mktime(tup)
     return rval
 
 # -----------------------------------------------------------------------------
