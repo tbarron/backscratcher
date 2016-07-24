@@ -44,6 +44,47 @@ def main(args=None):
     for hit in hitlist:
         print hit
 
+# ----------------------------------------------------------------------------
+def digest_opts(opts):
+    """
+    Map options from the command line into a configuration structure for the
+    rest of the program
+    """
+    def safe_del(dct, key):
+        if key in dct:
+            del dct[key]
+
+    rval = {}
+
+    rval['paths'] = opts.get('<dir>', ['.']) or ['.']
+    safe_del(opts, '<dir>')
+
+    excl = opts.get('--exclude', None)
+    rval['exclude'] = [] if excl is None else [_.strip()
+                                               for _ in excl.split(',')]
+    safe_del(opts, '--exclude')
+
+    if opts.get('--older', None):
+        rval['older'] = parse_time(opts['--older'])
+    else:
+        rval['older'] = False
+    safe_del(opts, '--older')
+
+    if opts.get('--newer', None):
+        rval['newer'] = parse_time(opts['--newer'])
+    else:
+        rval['newer'] = False
+    safe_del(opts, '--newer')
+
+    rval['verbose'] = opts.get('--verbose', False)
+    safe_del(opts, '--verbose')
+
+    for key in opts:
+        nkey = key.replace('-', '')
+        rval[nkey] = opts[key]
+
+    return rval
+
 # -----------------------------------------------------------------------------
 def get_hitlist(path=None, opts=None):
     """
