@@ -14,6 +14,37 @@ import tbx
 from bscr import pfind
 
 # -----------------------------------------------------------------------------
+def test_digest_keys():
+    """
+    Make sure all the expected keys are present
+    """
+    pytest.debug_func()
+    opts = {'--debug': False,
+            '--namme': '*',
+            '--exclude': None,
+            '<dir>': ['frooble']}
+    dgst = pfind.digest_opts(opts)
+    for key in ['paths', 'exclude', 'older', 'newer', 'verbose']:
+        assert key in dgst
+
+    assert isinstance(dgst['paths'], list)
+
+# -----------------------------------------------------------------------------
+def test_digest_xspace():
+    """
+    Make sure spaces get squeezed out of exclude specs
+    """
+    pytest.debug_func()
+    opts = {'--debug': False,
+            '--namme': '*',
+            '--exclude': 'foobar, excelsior , frumpish',
+            '<dir>': ['frooble']}
+    dgst = pfind.digest_opts(opts)
+
+    for item in dgst['exclude']:
+        assert item == item.strip()
+
+# -----------------------------------------------------------------------------
 def test_everything(tmpdir, pfind_fx):
     """
     a test that finds everything
