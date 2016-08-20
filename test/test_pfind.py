@@ -2,8 +2,10 @@
 Tests for pfind
 """
 import copy
+import grp
 import os
 import pdb
+import pwd
 import re
 import time
 
@@ -50,8 +52,8 @@ def test_everything(tmpdir, pfind_fx):
     a test that finds everything
     """
     pytest.debug_func()
-    opts = {'--name': '*', '--exclude': None, '<dir>': tmpdir.strpath}
-    result = pfind.get_hitlist(path=tmpdir.strpath, opts=opts)
+    opts = {'--name': '*', '--exclude': None, '<dir>': [tmpdir.strpath]}
+    result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, pfind_fx.data.keys())
 
 # -----------------------------------------------------------------------------
@@ -65,8 +67,8 @@ def test_some_noex(tmpdir, pfind_fx):
                                             'young$',
                                             'young/six',
                                             ])
-    opts = {'--name': '*e*', '--exclude': None, '<dir>': tmpdir.strpath}
-    result = pfind.get_hitlist(path=tmpdir.strpath, opts=opts)
+    opts = {'--name': '*e*', '--exclude': None, '<dir>': [tmpdir.strpath]}
+    result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, exp)
 
 # -----------------------------------------------------------------------------
@@ -75,8 +77,8 @@ def test_nothing_noex(tmpdir, pfind_fx):
     a test that finds nothing without exclusion
     """
     pytest.debug_func()
-    opts = {'--name': '*z*', '--exclude': None, '<dir>': tmpdir.strpath}
-    result = pfind.get_hitlist(path=tmpdir.strpath, opts=opts)
+    opts = {'--name': '*z*', '--exclude': None, '<dir>': [tmpdir.strpath]}
+    result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, [])
 
 # -----------------------------------------------------------------------------
@@ -88,8 +90,8 @@ def test_everything_exdir(tmpdir, pfind_fx):
     exp = list_minus(pfind_fx.data.keys(), ['mature',
                                             'mature/three',
                                             'mature/four'])
-    opts = {'--name': '*', '--exclude': 'mature', '<dir>': tmpdir.strpath}
-    result = pfind.get_hitlist(path=tmpdir.strpath, opts=opts)
+    opts = {'--name': '*', '--exclude': 'mature', '<dir>': [tmpdir.strpath]}
+    result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, exp)
 
 # -----------------------------------------------------------------------------
@@ -99,8 +101,8 @@ def test_everything_exleaf(tmpdir, pfind_fx):
     """
     pytest.debug_func()
     exp = list_minus(pfind_fx.data.keys(), ['mature/four'])
-    opts = {'--name': '*', '--exclude': 'four', '<dir>': tmpdir.strpath}
-    result = pfind.get_hitlist(path=tmpdir.strpath, opts=opts)
+    opts = {'--name': '*', '--exclude': 'four', '<dir>': [tmpdir.strpath]}
+    result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, exp)
 
 # -----------------------------------------------------------------------------
@@ -110,8 +112,8 @@ def test_everything_exall(tmpdir, pfind_fx):
     """
     pytest.debug_func()
     opts = {'--name': '*', '--exclude': 'ancient,mature,young,ref',
-            '<dir>': tmpdir.strpath}
-    result = pfind.get_hitlist(path=tmpdir.strpath, opts=opts)
+            '<dir>': [tmpdir.strpath]}
+    result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, [])
 
 # -----------------------------------------------------------------------------
@@ -125,8 +127,8 @@ def test_some_exdir(tmpdir, pfind_fx):
                                             'mature/three',
                                             'reference',
                                             'young.*'])
-    opts = {'--name': '*o*', '--exclude': 'young', '<dir>': tmpdir.strpath}
-    result = pfind.get_hitlist(path=tmpdir.strpath, opts=opts)
+    opts = {'--name': '*o*', '--exclude': 'young', '<dir>': [tmpdir.strpath]}
+    result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, exp)
 
 # -----------------------------------------------------------------------------
@@ -139,8 +141,8 @@ def test_some_exleaf(tmpdir, pfind_fx):
                                             'mature.*',
                                             'reference',
                                             'young/.*'])
-    opts = {'--name': '*o*', '--exclude': 'ture', '<dir>': tmpdir.strpath}
-    result = pfind.get_hitlist(path=tmpdir.strpath, opts=opts)
+    opts = {'--name': '*o*', '--exclude': 'ture', '<dir>': [tmpdir.strpath]}
+    result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, exp)
 
 # -----------------------------------------------------------------------------
@@ -150,8 +152,8 @@ def test_some_exall(tmpdir, pfind_fx):
     """
     pytest.debug_func()
     opts = {'--name': '*o*', '--exclude': 'ref,anc,mature,young',
-            '<dir>': tmpdir.strpath}
-    result = pfind.get_hitlist(path=tmpdir.strpath, opts=opts)
+            '<dir>': [tmpdir.strpath]}
+    result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, [])
 
 # -----------------------------------------------------------------------------
@@ -161,8 +163,8 @@ def test_nothing_exall(tmpdir, pfind_fx):
     """
     pytest.debug_func()
     opts = {'--name': 'aardvark', '--exclude': 'something',
-            '<dir>': tmpdir.strpath}
-    result = pfind.get_hitlist(path=tmpdir.strpath, opts=opts)
+            '<dir>': [tmpdir.strpath]}
+    result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, [])
 
 # -----------------------------------------------------------------------------
@@ -191,66 +193,78 @@ def test_age(tmpdir, pfind_fx):
     """
     find files based on age
     """
-    exp = list_minus(pfind_fx.data.keys(), ['ancient*'])
-    opts = {'--name': 'aardvark',
+    pytest.debug_func()
+    exp = list_minus(pfind_fx.data.keys(), ['mature', 'young', 'ref'])
+    opts = {'--name': '*',
             '--exclude': 'something',
-            '--older': '2016.0101',
-            '<dir>': tmpdir.strpath}
-    result = pfind.get_hitlist(path=tmpdir.strpath, opts=opts)
+            '--older': '2010.0101',
+            '<dir>': [tmpdir.strpath]}
+    result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, exp)
 
 # -----------------------------------------------------------------------------
 def test_newer_ymd(tmpdir, pfind_fx):
-    pytest.fail('construction')
-    opts = {'--older': '2016.0101',
-            '<dir>': tmpdir.strpath}
-    result = pfind.get_hitlist(path=tmpdir.strpath, opts=opts)
-    validate_result(pfind_fx, result, [])
+    """
+    Find files that are newer than a date
+    """
+    pytest.debug_func()
+    exp = list_minus(pfind_fx.data.keys(), ['ancient'])
+    opts = {'--newer': '2010.0101',
+            '<dir>': [tmpdir.strpath]}
+    result = pfind.get_hitlist(opts=opts)
+    validate_result(pfind_fx, result, exp)
 
 # -----------------------------------------------------------------------------
 def test_newer_path(tmpdir, pfind_fx):
-    pytest.fail('construction')
-    opts = {'--older': tmpdir.join('reference').strpath,
-            '<dir>': tmpdir.strpath}
-    result = pfind.get_hitlist(path=tmpdir.strpath, opts=opts)
-    validate_result(pfind_fx, result, [])
+    """
+    Find files newer than a reference file
+    """
+    pytest.debug_func()
+    exp = list_minus(pfind_fx.data.keys(), ['mature', 'ancient'])
+    opts = {'--newer': tmpdir.join('reference').strpath,
+            '<dir>': [tmpdir.strpath]}
+    result = pfind.get_hitlist(opts=opts)
+    validate_result(pfind_fx, result, exp)
 
 # -----------------------------------------------------------------------------
 def test_older_ymd(tmpdir, pfind_fx):
-    pytest.fail('construction')
-    opts = {'--older': '2016.0101',
-            '<dir>': tmpdir.strpath}
-    result = pfind.get_hitlist(path=tmpdir.strpath, opts=opts)
-    validate_result(pfind_fx, result, [])
+    """
+    Find files older than a specified date
+    """
+    pytest.debug_func()
+    exp = list_minus(pfind_fx.data.keys(), ['mature', 'young', 'ref'])
+    opts = {'--older': '2010.0101',
+            '<dir>': [tmpdir.strpath]}
+    result = pfind.get_hitlist(opts=opts)
+    validate_result(pfind_fx, result, exp)
 
 # -----------------------------------------------------------------------------
 def test_older_path(tmpdir, pfind_fx):
-    pytest.fail('construction')
+    """
+    Find files older than a reference file
+    """
+    pytest.debug_func()
+    exp = list_minus(pfind_fx.data.keys(), ['young'])
     opts = {'--older': tmpdir.join('reference').strpath,
-            '<dir>': tmpdir.strpath}
-    result = pfind.get_hitlist(path=tmpdir.strpath, opts=opts)
-    validate_result(pfind_fx, result, [])
+            '<dir>': [tmpdir.strpath]}
+    result = pfind.get_hitlist(opts=opts)
+    validate_result(pfind_fx, result, exp)
 
 # -----------------------------------------------------------------------------
 def test_ownership(tmpdir, pfind_fx):
     """
+    I don't see a simple and portable way to test this, so it's a skip
+
     find files based on ownership
     """
-    pytest.fail('construction')
-
-# -----------------------------------------------------------------------------
-def test_age_ref(tmpdir, pfind_fx):
-    """
-    find files based on age relative to a reference file
-    """
-    pytest.fail('construction')
-
-# -----------------------------------------------------------------------------
-def test_pfindNeedsTests():
-    """
-    Need tests for pfind
-    """
-    pytest.fail('pfind needs tests')
+    pytest.skip()
+    exp = list_minus(pfind_fx.data.keys(), ['ancient/two',
+                                            'mature/three',
+                                            'young/five'])
+    gname = alt_group()
+    opts = {'--group': gname, '<dir>': [tmpdir.strpath]}
+    result = pfind.get_hitlist(opts=opts)
+    validate_result(pfind_fx, result, exp)
 
 # -----------------------------------------------------------------------------
 @pytest.fixture
@@ -282,6 +296,7 @@ def pfind_fx(tmpdir):
                                'dir': True},
                      'ancient/one': {'mtime': tbx.randomize(anc, -1, day),
                                      'atime': tbx.randomize(anc, -1, day),
+                                     'group': True,
                                      'dir': False},
                      'ancient/two': {'mtime': tbx.randomize(anc, -1, day),
                                      'atime': tbx.randomize(anc, -1, day),
@@ -292,6 +307,7 @@ def pfind_fx(tmpdir):
                                     },
                      'mature/four': {'mtime': tbx.randomize(mat-1, -1, day),
                                      'atime': tbx.randomize(mat-1, -1, day),
+                                     'group': True,
                                      'dir': False
                                     },
                      'young/five': {'mtime': tbx.randomize(mat+1, 1, day),
@@ -299,9 +315,10 @@ def pfind_fx(tmpdir):
                                      'dir': False
                                     },
                      'young/six': {'mtime': tbx.randomize(mat+1, 1, day),
-                                     'atime': tbx.randomize(mat+1, 1, day),
-                                     'dir': False
-                                    },
+                                   'atime': tbx.randomize(mat+1, 1, day),
+                                   'group': True,
+                                   'dir': False
+                                   },
                      'reference': {'mtime': mat,
                                    'atime': mat,
                                    'dir': False
@@ -311,10 +328,37 @@ def pfind_fx(tmpdir):
     for pstr in pfind_fx.data:
         path = tmpdir.join(pstr)
         path.ensure(dir=pfind_fx.data[pstr]['dir'])
+        pfind_fx.data[pstr]['path'] = path
+        if 'group' in pfind_fx.data[pstr]:
+            alt_group(path)
+
+    for pstr in pfind_fx.data:
+        path = pfind_fx.data[pstr]['path']
         os.utime(path.strpath, (pfind_fx.data[pstr]['atime'],
                                 pfind_fx.data[pstr]['mtime']))
-        pfind_fx.data[pstr]['path'] = path
+
     return pfind_fx
+
+# -----------------------------------------------------------------------------
+def alt_group(path=None):
+    """
+    Change the group ownership of a path.local object
+    """
+    try:
+        newgrp = alt_group.gid
+        rval = alt_group.gname
+    except AttributeError:
+        usr = pwd.getpwnam(os.getenv('LOGNAME'))
+        grpl = [_ for _ in grp.getgrall() if usr.pw_name in _.gr_mem]
+        grpnl = [_ for _ in grpl if not _.gr_name.startswith('_')]
+        grpalt = [_ for _ in grpnl if _.gr_gid != usr.pw_gid]
+        newgrp = alt_group.gid = grpalt[0].gr_gid
+        rval = alt_group.gname = grpalt[0].gr_name
+
+    if path:
+        # path.chgrp(alt_group.gid)
+        pass
+    return rval
 
 # -----------------------------------------------------------------------------
 def list_minus(keep, drop):
