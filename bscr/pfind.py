@@ -21,10 +21,12 @@ def main(args=None):
     Options:
         -d, --debug                  use the debugger
         -x <strs>, --exclude <strs>  skip paths containing any of <strs>
-        -n, <name>, --name <name>    report files matching <name>
+        -N <name>, --name <name>     report files matching <name>
+        -o <date>, --older <date>    report files older than <date>
+        -n <date>, --newer <date>    report files newer than <date>
         -v, --verbose                noisy output
 
-    If no path is given, '.' is assumed.
+    If no <dir> path is given, '.' is assumed.
 
     The argument for the -x/--exclude option can be a comma separated list of
     string expressions. If any one of them matches a hit, it will be
