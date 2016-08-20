@@ -108,6 +108,21 @@ def get_hitlist(path=None, opts=None):
     return rval
 
 # -----------------------------------------------------------------------------
+def keep(path, opts):
+    """
+    Decide whether to keep path based on opts
+    """
+    exclude = opts.get('exclude', [])
+    if any([_ in path for _ in exclude]):
+        return False
+    stinfo = os.stat(path)
+    if opts.get('older', False) and opts['older'] < stinfo.st_mtime:
+        return False
+    if opts.get('newer', False) and stinfo.st_mtime < opts['newer']:
+        return False
+    return True
+
+# -----------------------------------------------------------------------------
 def parse_time(dtstr):
     """
     Return an epoch time. If *dtstr* matches a path, return the mtime of the
