@@ -34,13 +34,7 @@ def main(args=None):
     if opts['--debug']:
         pdb.set_trace()
 
-    if opts['--verbose']:
-        print(opts)
-
-    hitlist = []
-    paths = opts['<dir>'] or ['.']
-    for path in paths:
-        hitlist.extend(get_hitlist(path, opts))
+    hitlist = get_hitlist(opts)
     for hit in hitlist:
         print hit
 
