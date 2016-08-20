@@ -86,25 +86,24 @@ def digest_opts(opts):
     return rval
 
 # -----------------------------------------------------------------------------
-def get_hitlist(path=None, opts=None):
+def get_hitlist(opts=None):
     """
     Walk *path* looking for filepaths that match *match* while excluding those
     that contain an *exclude* expression
     """
-    path = path or '.'
-    match = opts['--name'] or '*'
-    if opts['--exclude']:
-        exclude = opts['--exclude'].split(',')
-    else:
-        exclude = []
+    dgst = digest_opts(opts)
+    if not isinstance(dgst['paths'], list):
+        sys.exit('programming error: paths must be a list')
+    match = dgst.get('name', '*')
 
     rval = []
-    for root, dirs, files in os.walk(path):
-        hits = [_ for _ in dirs + files if fnmatch.fnmatch(_, match)]
-        for hit in hits:
-            hitpath = os.path.join(root, hit)
-            if all([_ not in hitpath for _ in exclude]):
-                rval.append(hitpath)
+    for path in dgst['paths']:
+        for root, dirs, files in os.walk(path):
+            hits = [_ for _ in dirs + files if fnmatch.fnmatch(_, match)]
+            for hit in hits:
+                hitpath = os.path.join(root, hit)
+                if keep(hitpath, dgst):
+                    rval.append(hitpath)
     return rval
 
 # -----------------------------------------------------------------------------
