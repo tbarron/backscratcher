@@ -50,7 +50,8 @@ def pytest_runtest_setup(item):
             any([_ in item.name for _ in skipl])]):
         pytest.skip()
     if any([item.name in item.config.getoption("--dbg"),
-            'all' in item.config.getoption("--dbg")]):
+            'all' in item.config.getoption("--dbg")] +
+           [_ in item.name for _ in item.config.getoption('--dbg')]):
         pytest.debug_func = pdb.set_trace
     else:
         pytest.debug_func = lambda: None
