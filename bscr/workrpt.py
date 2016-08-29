@@ -5,6 +5,7 @@ workrpt - report work times
  usage: workrpt   [-D/--doc]
                   [-v/--verbose]
                   [-f/--file input-file-name]
+                  [-m/--match regexp]
                   [-w/--week f|c|M|T|W|t|F|S|s]
                   [-d/--day]
                   [-l/--last]
@@ -17,6 +18,7 @@ workrpt - report work times
     -v/--verbose   output debugging info
     -f/--file      <input-file-name> is the name of the file to read
                      time information from
+    -m/--match     report entries that match regexp
     -w/--week      reports a week beginning on
            f         last Thursday - HPSS rotation
            c         last Friday - CCS rotation
@@ -38,7 +40,7 @@ import getopt
 import os
 import pdb
 import re
-import shutil
+import StringIO
 import sys
 import time
 import unittest
@@ -75,11 +77,15 @@ def main(argv=None):
         copy_me(sys.argv[0], opts.copy)
 
     try:
-        (start, end) = interpret_options(opts)
-    except BSCR.Error as err:
-        sys.exit(str(err))
+        (opts.start, opts.end) = interpret_options(opts)
+    except Exception, e:
+        print str(e)
+        sys.exit(1)
 
-    write_report(opts.filename, start, end, opts.dayflag)
+    if opts.match_regexp:
+        write_report_regexp(opts)
+    else:
+        write_report(opts)
 
 
 # ---------------------------------------------------------------------------
@@ -302,89 +308,115 @@ def make_option_parser(argv):
     """
     Build a parser to understand the command line options.
     """
-    cmd = U.cmdline([{'opts': ['-c', '--copy'],
-                      'action': 'store',
-                      'type': 'string',
-                      'dest': 'copy',
-                      'default': '',
-                      'help': 'copy this code to <dir>',
-                      },
-                     {'opts': ['-d', '--day'],
-                      'action': 'store_true',
-                      'dest': 'dayflag',
-                      'default': False,
-                      'help': 'report each day separately',
-                      },
-                     {'opts': ['-e', '--end'],
-                      'action': 'store',
-                      'type': 'string',
-                      'dest': 'end_ymd',
-                      'default': '',
-                      'help': 'end date for report YYYY.MMDD',
-                      },
-                     {'opts': ['-f', '--file'],
-                      'action': 'store',
-                      'type': 'string',
-                      'dest': 'filename',
-                      'default': default_input_filename(),
-                      'help': 'timelog to read',
-                      },
-                     {'opts': ['-g', '--debug'],
-                      'action': 'store_true',
-                      'dest': 'debug',
-                      'default': False,
-                      'help': 'run the debugger',
-                      },
-                     {'opts': ['-l', '--last'],
-                      'action': 'store_true',
-                      # 'type': 'string',
-                      'dest': 'lastweek',
-                      'default': False,
-                      'help': 'report the last week',
-                      },
-                     {'opts': ['-s', '--start'],
-                      'action': 'store',
-                      'type': 'string',
-                      'dest': 'start_ymd',
-                      'default': '',
-                      'help': 'start date for report YYYY.MMDD',
-                      },
-                     {'opts': ['-S', '--since'],
-                      'action': 'store',
-                      'dest': 'since',
-                      'type': 'string',
-                      'default': '',
-                      'help': 'report date YYYY.MMDD through end of file',
-                      },
-                     {'opts': ['-w', '--week'],
-                      'action': 'store',
-                      'dest': 'weektype',
-                      'type': 'string',
-                      'default': '',
-                      'help': 'one of [fcMTWtFsS]',
-                      },
-                     {'opts': ['-D', '--doc'],
-                      'action': 'store_true',
-                      'dest': 'help',
-                      'default': False,
-                      'help': 'show script documentation',
-                      },
-                     {'opts': ['-p', '--pkg'],
-                      'action': 'store',
-                      'type': 'string',
-                      'dest': 'tarball',
-                      'default': '',
-                      'help': 'package this code to <filename>',
-                      },
-                     {'opts': ['-v', '--verbose'],
-                      'action': 'store_true',
-                      'dest': 'verbose',
-                      'default': False,
-                      'help': 'display debugging info',
-                      },
-                     ])
-    (opts, args) = cmd.parse(argv)
-    return(opts, args)
+    c = U.cmdline([{'opts': ['-c', '--copy'],
+                    'action': 'store',
+                    'type': 'string',
+                    'dest': 'copy',
+                    'default': '',
+                    'help': 'copy this code to <dir>',
+                    },
+                   {'opts': ['-d', '--day'],
+                    'action': 'store_true',
+                    'dest': 'dayflag',
+                    'default': False,
+                    'help': 'report each day separately',
+                    },
+                   {'opts': ['-e', '--end'],
+                    'action': 'store',
+                    'type': 'string',
+                    'dest': 'end_ymd',
+                    'default': '',
+                    'help': 'end date for report YYYY.MMDD',
+                    },
+                   {'opts': ['-f', '--file'],
+                    'action': 'store',
+                    'type': 'string',
+                    'dest': 'filename',
+                    'default': default_input_filename(),
+                    'help': 'timelog to read',
+                    },
+                   {'opts': ['-g', '--debug'],
+                    'action': 'store_true',
+                    'dest': 'debug',
+                    'default': False,
+                    'help': 'run the debugger',
+                    },
+                   {'opts': ['-l', '--last'],
+                    'action': 'store_true',
+                    # 'type': 'string',
+                    'dest': 'lastweek',
+                    'default': False,
+                    'help': 'report the last week',
+                    },
+                   {'opts': ['-m', '--match'],
+                    'action': 'store',
+                    'type': 'string',
+                    'dest': 'match_regexp',
+                    'default': '',
+                    'help': 'regexp to match',
+                    },
+                   {'opts': ['-s', '--start'],
+                    'action': 'store',
+                    'type': 'string',
+                    'dest': 'start_ymd',
+                    'default': '',
+                    'help': 'start date for report YYYY.MMDD',
+                    },
+                   {'opts': ['-S', '--since'],
+                    'action': 'store',
+                    'dest': 'since',
+                    'type': 'string',
+                    'default': '',
+                    'help': 'report date YYYY.MMDD through end of file',
+                    },
+                   {'opts': ['-w', '--week'],
+                    'action': 'store',
+                    'dest': 'weektype',
+                    'type': 'string',
+                    'default': '',
+                    'help': 'one of [fcMTWtFsS]',
+                    },
+                   {'opts': ['-D', '--doc'],
+                    'action': 'store_true',
+                    'dest': 'help',
+                    'default': False,
+                    'help': 'show script documentation',
+                    },
+                   {'opts': ['-p', '--pkg'],
+                    'action': 'store',
+                    'type': 'string',
+                    'dest': 'tarball',
+                    'default': '',
+                    'help': 'package this code to <filename>',
+                    },
+                   {'opts': ['-v', '--verbose'],
+                    'action': 'store_true',
+                    'dest': 'verbose',
+                    'default': False,
+                    'help': 'display debugging info',
+                    },
+                   ])
+    (o, a) = c.parse(argv)
+    return(o, a)
+
+
+# ---------------------------------------------------------------------------
+# def maketime(tm=[]):
+#     """
+#     With no *tm* (i.e., == []), return the current epoch time (time.time()).
+#     With *mark*, use it as an arg to time.mktime() in a way that gives an
+#     accurate dst result.
+#     """
+#     if tm:
+#         x = list(tm)
+#         x[3] = 12
+#         x[4] = 0
+#         x[5] = 0
+#         x[8] = 0
+#         z = time.mktime(x)
+#         y = time.localtime(z)
+#         x[8] = y.tm_isdst
+#     return time.mktime(tm)
 
 
 # ---------------------------------------------------------------------------
@@ -716,25 +748,87 @@ def weekday_num(name):
               'friday': 4, 'saturday': 5, 'sunday': 6}
     return wday_d[name]
 
+# ---------------------------------------------------------------------------
+# def process_line(coll, low, high, line):
+#     """
+#     Handle one line
+#     """
+#     last = tally(coll, low, high, parse_timeline(line))
+#     if last:
+#         try:
+#             if line < process_line.lastline:
+#                 sys.exit('Dates or times out of order')
+#             else:
+#                 process_line.lastline = line
+#         except AttributeError:
+#             process_line.lastline = line
+#     return last
 
 # ---------------------------------------------------------------------------
-def process_line(coll, low, high, line):
+# def write_report(filename, start, end, dayflag, testing=False):
+#     """
+def write_report_regexp(opts, testing=False):
     """
-    Handle one line
+    Generate a time report from <filename> based on <o.match_regexp>
     """
-    last = tally(coll, low, high, parse_timeline(line))
-    if last:
-        try:
-            if line < process_line.lastline:
-                sys.exit('Dates or times out of order')
-            else:
-                process_line.lastline = line
-        except AttributeError:
-            process_line.lastline = line
-    return last
+    filename = opts.filename
+    start = opts.start
+    end = opts.end
+    dayflag = opts.dayflag
+    if verbose():
+        print "write_report: filename = '%s'" % filename
+        print "write_report: start = '%s'" % start
+        print "write_report: end = '%s'" % end
+        print "write_report: dayflag = %s" % dayflag
+
+    dat = {}
+    rval = StringIO.StringIO()
+    last = None
+    with open(opts.filename, 'r') as rbl:
+        for line in rbl:
+            if not line[0:4].isdigit():
+                continue
+
+            (year, mon, day, hour, mnt, sec, payld) = parse_timeline(line)
+            when = int(time.mktime(intify([year, mon, day,
+                                           hour, mnt, sec,
+                                           0, 0, dst()])))
+
+            if last:
+                dat[last]['sum'] += when - dat[last]['start']
+                dat[last]['start'] = 0
+                last = None
+
+            if re.findall(opts.match_regexp, payld):
+                try:
+                    dat[payld]['start'] = when
+                except KeyError:
+                    dat[payld] = {}
+                    dat[payld]['start'] = when
+                    dat[payld]['sum'] = 0
+                last = payld
+
+    for key in dat:
+        if dat[key]['start'] != 0:
+            dat[key]['sum'] += int(time.time()) - dat[key]['start']
+
+    total = 0
+    rval.write("----- matching '{0}' -----\n".format(opts.match_regexp))
+    for key in dat:
+        duration = dat[key]['sum']
+        total += duration
+        rval.write("{0:48}   {1} ({2})\n".format(key,
+                                                 hms(duration),
+                                                 fph(duration)))
+    rval.write("\n")
+    rval.write("{0:56}  {1} ({2})\n".format("Total:",
+                                            hms(total),
+                                            fph(total)))
+
+    print rval.getvalue()
 
 # ---------------------------------------------------------------------------
-def write_report(filename, start, end, dayflag, testing=False):
+def write_report(opts, testing=False):
     """
     Generate a time report from <filename> based on <start> and <end> dates.
 
@@ -742,6 +836,10 @@ def write_report(filename, start, end, dayflag, testing=False):
     for the entire time period between <start> and <end> or whether to
     write a mini-report for each day in the time period.
     """
+    filename = opts.filename
+    start = opts.start
+    end = opts.end
+    dayflag = opts.dayflag
     if verbose():
         print "write_report: filename = '%s'" % filename
         print "write_report: start = '%s'" % start
@@ -750,14 +848,17 @@ def write_report(filename, start, end, dayflag, testing=False):
 
     rval = ''
     last = None
-    process_line.lastline = None
+    # process_line.lastline = None
     if dayflag:
         day = start
         while day <= end:
             coll = {}
             rbl = open(filename, 'r')
             for line in rbl:
-                last = process_line(coll, day, day, line)
+                # last = process_line(coll, day, day, line)
+                lastc = tally(coll, day, day, parse_timeline(line))
+                if lastc is not None:
+                    last = lastc
             rbl.close()
             if last is not None and last in coll.keys():
                 timeclose(coll, last, time.time(), True)
@@ -767,14 +868,17 @@ def write_report(filename, start, end, dayflag, testing=False):
         coll = {}
         rbl = open(filename, 'r')
         for line in rbl:
-            last = process_line(coll, start, end, line)
+            # last = process_line(coll, start, end, line)
+            lastc = tally(coll, start, end, parse_timeline(line))
+            # last = lastc or last
+            if lastc is not None:
+                last = lastc
         rbl.close()
         if verbose():
             dump_struct(coll)
         timeclose(coll, last, time.time(), True)
         rval = format_report(start, end, coll, testing)
     return rval
-
 
 # ---------------------------------------------------------------------------
 toolframe.ez_launch(__name__, main)
