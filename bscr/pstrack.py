@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 """
 show lineage of the current process
 
@@ -36,7 +36,7 @@ try:
 except ImportError:
     pass
 
-import toolframe
+# import toolframe
 
 # ---------------------------------------------------------------------------
 def main(args):
@@ -141,4 +141,7 @@ def usage():
     sys.exit(1)
 
 # ---------------------------------------------------------------------------
-toolframe.ez_launch(__name__, main)
+# toolframe.ez_launch(__name__, main)
+if __name__ == '__main__':
+    # pdb.set_trace()
+    main(sys.argv)
