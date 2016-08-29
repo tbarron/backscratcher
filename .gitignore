@@ -9,6 +9,7 @@ test_*.clps*
 testhome
 TAGS
 cmsg
+venv
 .ackrc
 .bscr_version
 .cache
