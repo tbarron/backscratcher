@@ -1,4 +1,5 @@
 import bscr
+import optparse
 import os
 import pdb
 import pytest
@@ -21,7 +22,11 @@ def test_workrpt_order(tmpdir):
                          ]))
     wr.verbose(False, True)
     with pytest.raises(SystemExit) as err:
-        r = wr.write_report(xyz.strpath, '2015.0107', '2015.0107', False, True)
+        opts = optparse.Values({'filename': xyz.strpath,
+                                'start': '2015.0107',
+                                'end': '2015.0107',
+                                'dayflag': False})
+        r = wr.write_report(opts, True)
     assert 'Dates or times out of order' in str(err)
 
 

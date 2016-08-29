@@ -749,24 +749,22 @@ def weekday_num(name):
     return wday_d[name]
 
 # ---------------------------------------------------------------------------
-# def process_line(coll, low, high, line):
-#     """
-#     Handle one line
-#     """
-#     last = tally(coll, low, high, parse_timeline(line))
-#     if last:
-#         try:
-#             if line < process_line.lastline:
-#                 sys.exit('Dates or times out of order')
-#             else:
-#                 process_line.lastline = line
-#         except AttributeError:
-#             process_line.lastline = line
-#     return last
+def process_line(coll, low, high, line):
+    """
+    Handle one line
+    """
+    last = tally(coll, low, high, parse_timeline(line))
+    if last:
+        try:
+            if line < process_line.lastline:
+                sys.exit('Dates or times out of order')
+            else:
+                process_line.lastline = line
+        except AttributeError:
+            process_line.lastline = line
+    return last
 
 # ---------------------------------------------------------------------------
-# def write_report(filename, start, end, dayflag, testing=False):
-#     """
 def write_report_regexp(opts, testing=False):
     """
     Generate a time report from <filename> based on <o.match_regexp>
@@ -848,17 +846,13 @@ def write_report(opts, testing=False):
 
     rval = ''
     last = None
-    # process_line.lastline = None
     if dayflag:
         day = start
         while day <= end:
             coll = {}
             rbl = open(filename, 'r')
             for line in rbl:
-                # last = process_line(coll, day, day, line)
-                lastc = tally(coll, day, day, parse_timeline(line))
-                if lastc is not None:
-                    last = lastc
+                last = process_line(coll, day, day, line)
             rbl.close()
             if last is not None and last in coll.keys():
                 timeclose(coll, last, time.time(), True)
@@ -868,11 +862,7 @@ def write_report(opts, testing=False):
         coll = {}
         rbl = open(filename, 'r')
         for line in rbl:
-            # last = process_line(coll, start, end, line)
-            lastc = tally(coll, start, end, parse_timeline(line))
-            # last = lastc or last
-            if lastc is not None:
-                last = lastc
+            last = process_line(coll, start, end, line)
         rbl.close()
         if verbose():
             dump_struct(coll)
