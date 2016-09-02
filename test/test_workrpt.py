@@ -66,6 +66,45 @@ def test_rounding(tmpdir):
     assert '24.0' in r, "'24.0' expected in '{}'".format(r)
 
 
+# -------------------------------------------------------------------------
+def test_standalone_category(tmpdir):
+    """
+    test standalone categories like 'vacation' and 'holiday'
+    """
+    pytest.debug_func()
+    lines = ['Tuesday',
+             '2009-07-21 08:30:28 admin: setup',
+             '2009-07-21 08:35:34 admin: liason',
+             '2009-07-21 17:00:34 COB',
+             '',
+             '-- Wednesday',
+             '2009-07-22 08:35:59 vacation',
+             '2009-07-22 16:35:59 COB',
+             '',
+             '-- Thursday',
+             '2009-07-23 08:35:59 vacation',
+             '2009-07-23 16:35:59 COB',
+             '',
+             '-- Friday',
+             '2009-07-24 08:35:59 vacation',
+             '2009-07-24 16:35:59 COB',]
+
+    wr.verbose(False, True)
+    xyz = tmpdir.join('XYZ')
+    with open(xyz.strpath, 'w') as wbl:
+        wbl.write('\n'.join(lines))
+
+    del wr.process_line.lastline
+    opts = optparse.Values({'filename': xyz.strpath,
+                            'start': '2009.0721',
+                            'end': '2009.0724',
+                            'dayflag': False})
+    r = wr.write_report(opts, True)
+    try:
+        assert('32:30:06' in r)
+    except AssertionError:
+        print r
+
 # -----------------------------------------------------------------------------
 class workrptTest(th.HelpedTestCase):
     """
@@ -345,41 +384,6 @@ class workrptTest(th.HelpedTestCase):
         # print 's = ', s
         # print 'p = ', wr.parse_ymd(target)
         assert(wr.parse_ymd(target) == s[0:3])
-
-    # -------------------------------------------------------------------------
-    def test_standalone_category(self):
-        """
-        test standalone categories like 'vacation' and 'holiday'
-        """
-        # pdb.set_trace()
-        lines = '''-- Tuesday
-2009-07-21 08:30:28 admin: setup
-2009-07-21 08:35:34 admin: liason
-2009-07-21 17:00:34 COB
-
--- Wednesday
-2009-07-22 08:35:59 vacation
-2009-07-22 16:35:59 COB
-
--- Thursday
-2009-07-23 08:35:59 vacation
-2009-07-23 16:35:59 COB
-
--- Friday
-2009-07-24 08:35:59 vacation
-2009-07-24 16:35:59 COB
-'''
-        wr.verbose(False, True)
-        f = open('XYZ', 'w')
-        f.write(lines)
-        f.close()
-
-        r = wr.write_report('XYZ', '2009.0721', '2009.0724', False, True)
-        os.unlink('XYZ')
-        try:
-            assert('32:30:06' in r)
-        except AssertionError:
-            print r
 
     # -------------------------------------------------------------------------
     def test_start_date_missing(self):
