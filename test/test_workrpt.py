@@ -30,6 +30,42 @@ def test_workrpt_order(tmpdir):
     assert 'Dates or times out of order' in str(err)
 
 
+# -------------------------------------------------------------------------
+def test_rounding(tmpdir):
+    """
+    Test that calculations round properly (except that they don't always --
+    this needs work -- !@!)
+    """
+    pytest.debug_func()
+    lines = ['-- Tuesday',
+             '2009-07-21 08:30:28 admin: setup',
+             '2009-07-21 08:35:34 admin: liason',
+             '2009-07-21 17:00:34 COB',
+             '-- Wednesday',
+             '2009-07-22 08:35:59 vacation',
+             '2009-07-22 16:34:59 COB',
+             '-- Thursday',
+             '2009-07-23 08:35:59 vacation',
+             '2009-07-23 16:35:59 COB',
+             '-- Friday',
+             '2009-07-24 08:35:59 vacation',
+             '2009-07-24 16:35:59 COB']
+    wr.verbose(False, True)
+    xyz = tmpdir.join('XYZ')
+    f = open(xyz.strpath, 'w')
+    f.write('\n'.join(lines))
+    f.close()
+
+    opts = optparse.Values({'filename': xyz.strpath,
+                            'start': '2009.0721',
+                            'end': '2009.0724',
+                            'dayflag': False})
+    del wr.process_line.lastline
+    r = wr.write_report(opts, True)
+    assert '23.10' not in r, "'23.10' not expected in '{}'".format(r)
+    assert '24.0' in r, "'24.0' expected in '{}'".format(r)
+
+
 # -----------------------------------------------------------------------------
 class workrptTest(th.HelpedTestCase):
     """
@@ -344,40 +380,6 @@ class workrptTest(th.HelpedTestCase):
             assert('32:30:06' in r)
         except AssertionError:
             print r
-
-    # -------------------------------------------------------------------------
-    def test_rounding(self):
-        """
-        Test that calculations round properly (except that they don't always --
-        this needs work -- !@!)
-        """
-        # pdb.set_trace()
-        pytest.debug_func()
-        lines = '''-- Tuesday
-2009-07-21 08:30:28 admin: setup
-2009-07-21 08:35:34 admin: liason
-2009-07-21 17:00:34 COB
--- Wednesday
-2009-07-22 08:35:59 vacation
-2009-07-22 16:34:59 COB
--- Thursday
-2009-07-23 08:35:59 vacation
-2009-07-23 16:35:59 COB
--- Friday
-2009-07-24 08:35:59 vacation
-2009-07-24 16:35:59 COB
-'''
-        wr.verbose(False, True)
-        f = open('XYZ', 'w')
-        f.write(lines)
-        f.close()
-
-        r = wr.write_report('XYZ', '2009.0721', '2009.0724', False, True)
-        os.unlink('XYZ')
-        self.assertFalse('23.10' in r,
-                         "'23.10' not expected in '%s'" % r)
-        self.assertTrue('24.0' in r,
-                        "'24.0' expected in '%s'" % r)
 
     # -------------------------------------------------------------------------
     def test_start_date_missing(self):
