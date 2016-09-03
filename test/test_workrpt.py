@@ -106,6 +106,32 @@ def test_standalone_category(tmpdir):
         print r
 
 # -----------------------------------------------------------------------------
+def test_start_date_missing(tmpdir):
+    """
+    Calculate a week when the first few dates are missing
+    """
+    lines = ['-- Friday',
+             '2012-04-13 08:30:48 3op3arst: trouble-shooting production logc',
+             '2012-04-13 14:16:34 3op3sysp: e-mail',
+             '2012-04-13 15:45:03 3op3arst: bug 1476',
+             '2012-04-13 17:55:00 COB',]
+    xyz = tmpdir.join('XYZ')
+    with open(xyz.strpath, 'w') as wbl:
+        wbl.write('\n'.join(lines))
+
+    wr.verbose(False, True)
+    opts = optparse.Values({'filename': xyz.strpath,
+                            'start': '2012.0407',
+                            'end': '2012.0413',
+                            'dayflag': False})
+    del wr.process_line.lastline
+    r = wr.write_report(opts, True)
+    nexp = '23.10'
+    assert nexp not in r, "'{}' not expected in '{}'".format(nexp, r)
+    exp = '09:24:12 (9.4)'
+    assert exp in r, "'{}' expected in '{}'".format(exp, r)
+
+# -----------------------------------------------------------------------------
 class workrptTest(th.HelpedTestCase):
     """
     things to test
@@ -384,31 +410,6 @@ class workrptTest(th.HelpedTestCase):
         # print 's = ', s
         # print 'p = ', wr.parse_ymd(target)
         assert(wr.parse_ymd(target) == s[0:3])
-
-    # -------------------------------------------------------------------------
-    def test_start_date_missing(self):
-        """
-        Calculate a week when the first few dates are missing
-        """
-        lines = '''-- Friday
-2012-04-13 08:30:48 3op3arst: trouble-shooting production logc
-2012-04-13 14:16:34 3op3sysp: e-mail
-2012-04-13 15:45:03 3op3arst: bug 1476
-2012-04-13 17:55:00 COB
-'''
-        wr.verbose(False, True)
-        f = open('XYZ', 'w')
-        f.write(lines)
-        f.close()
-
-        r = wr.write_report('XYZ', '2012.0407', '2012.0413', True, True)
-        os.unlink('XYZ')
-        nexp = '23.10'
-        self.assertFalse(nexp in r,
-                         "'%s' not expected in '%s'" % (nexp, r))
-        exp = '09:24:12 (9.4)'
-        self.assertTrue(exp in r,
-                        "'%s' expected in '%s'" % (exp, r))
 
     # -------------------------------------------------------------------------
     def daystart(self, mark):
