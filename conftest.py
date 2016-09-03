@@ -68,21 +68,26 @@ def pytest_unconfigure(config):
 
 
 # -----------------------------------------------------------------------------
-@pytest.mark.tryfirst
-def pytest_runtest_makereport(item, call, __multicall__):
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
     """
     Write a line to the log file for this test
     """
-    rep = __multicall__.execute()
+    ctx = yield
+    rep = ctx.result
     if rep.when != 'call':
-        return rep
+        return
 
     if rep.outcome == 'failed':
         status = ">>>>FAIL"
         bscr_writelog._failcount += 1
-    else:
+    elif rep.outcome == 'passed':
         status = "--pass"
         bscr_writelog._passcount += 1
+    elif rep.outcome == 'skipped':
+        status = '**skip'
+    else:
+        status = 'other '
 
     parent = item.parent
     msg = "%-8s %s:%s.%s" % (status,
@@ -90,8 +95,6 @@ def pytest_runtest_makereport(item, call, __multicall__):
                              parent.name,
                              item.name)
     bscr_writelog(item.config, msg)
-    return rep
-
 
 # -----------------------------------------------------------------------------
 def bscr_writelog(config, loggable):
