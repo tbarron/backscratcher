@@ -82,9 +82,9 @@ def main(argv=None):
         sys.exit(1)
 
     if opts.match_regexp:
-        write_report_regexp(opts)
+        print write_report_regexp(opts)
     else:
-        write_report(opts)
+        print write_report(opts)
 
 
 # ---------------------------------------------------------------------------
@@ -831,7 +831,7 @@ def write_report_regexp(opts, testing=False):
                                             hms(total),
                                             fph(total)))
 
-    print rval.getvalue()
+    return rval.getvalue()
 
 
 # ---------------------------------------------------------------------------
