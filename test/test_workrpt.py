@@ -9,26 +9,39 @@ from bscr import util as U
 from bscr import workrpt as wr
 
 
-# -----------------------------------------------------------------------------
-def test_workrpt_order(tmpdir):
+# -------------------------------------------------------------------------
+def test_match(tmpdir):
     """
-    Times or dates out of order should produce SystemExit exception
+    Test that option --match/-m matches specific lines from input file
     """
-    xyz = tmpdir.join('XYZ')
-    xyz.write('\n'.join(['2015-01-07 10:00:00 first task',
-                         '2015-01-07 10:15:00 second task',
-                         '2015-01-07 10:10:00 time order',
-                         '2015-01-07 10:20:00 fourth task',
-                         ]))
+    pytest.debug_func()
+    lines = ['-- Tuesday',
+             '2009-07-21 08:30:28 admin: setup',
+             '2009-07-21 08:35:34 admin: liason',
+             '2009-07-21 17:00:34 COB',
+             '-- Wednesday',
+             '2009-07-22 08:35:59 vacation',
+             '2009-07-22 16:34:59 COB',
+             '-- Thursday',
+             '2009-07-23 08:35:59 vacation',
+             '2009-07-23 16:35:59 COB',
+             '-- Friday',
+             '2009-07-24 08:35:59 vacation',
+             '2009-07-24 16:35:59 COB']
     wr.verbose(False, True)
-    with pytest.raises(SystemExit) as err:
-        opts = optparse.Values({'filename': xyz.strpath,
-                                'start': '2015.0107',
-                                'end': '2015.0107',
-                                'dayflag': False})
-        r = wr.write_report(opts, True)
-    assert 'Dates or times out of order' in str(err)
+    xyz = tmpdir.join('XYZ')
+    f = open(xyz.strpath, 'w')
+    f.write('\n'.join(lines))
+    f.close()
 
+    opts = optparse.Values({'filename': xyz.strpath,
+                            'start': '2009.0721',
+                            'end': '2009.0724',
+                            'dayflag': False})
+    del wr.process_line.lastline
+    r = wr.write_report(opts, True)
+    assert '23.10' not in r, "'23.10' not expected in '{}'".format(r)
+    assert '24.0' in r, "'24.0' expected in '{}'".format(r)
 
 # -------------------------------------------------------------------------
 def test_rounding(tmpdir):
@@ -130,6 +143,28 @@ def test_start_date_missing(tmpdir):
     assert nexp not in r, "'{}' not expected in '{}'".format(nexp, r)
     exp = '09:24:12 (9.4)'
     assert exp in r, "'{}' expected in '{}'".format(exp, r)
+
+
+# -----------------------------------------------------------------------------
+def test_workrpt_order(tmpdir):
+    """
+    Times or dates out of order should produce SystemExit exception
+    """
+    xyz = tmpdir.join('XYZ')
+    xyz.write('\n'.join(['2015-01-07 10:00:00 first task',
+                         '2015-01-07 10:15:00 second task',
+                         '2015-01-07 10:10:00 time order',
+                         '2015-01-07 10:20:00 fourth task',
+                         ]))
+    wr.verbose(False, True)
+    with pytest.raises(SystemExit) as err:
+        opts = optparse.Values({'filename': xyz.strpath,
+                                'start': '2015.0107',
+                                'end': '2015.0107',
+                                'dayflag': False})
+        r = wr.write_report(opts, True)
+    assert 'Dates or times out of order' in str(err)
+
 
 # -----------------------------------------------------------------------------
 class workrptTest(th.HelpedTestCase):
