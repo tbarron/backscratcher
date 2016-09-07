@@ -541,11 +541,10 @@ def tally(coll, start, end, t_tup):
     """
     Set the start time for an interval.
     """
+    if t_tup is None or 7 != len(t_tup):
+        return
     if not hasattr(tally, 'last'):
         tally.last = ''
-    elif t_tup is None or 7 != len(t_tup):
-        tally.last = ''
-        return
 
     [year, mon, mday, hour, mint, sec, t_item] = t_tup
     date = '%s.%s%s' % (year, mon, mday)
