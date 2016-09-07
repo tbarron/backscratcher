@@ -33,32 +33,15 @@ def test_match(tmpdir, fx_stddata):
 
 
 # -------------------------------------------------------------------------
-def test_rounding(tmpdir):
+def test_rounding(tmpdir, fx_stddata):
     """
     Test that calculations round properly (except that they don't always --
     this needs work -- !@!)
     """
     pytest.debug_func()
-    lines = ['-- Tuesday',
-             '2009-07-21 08:30:28 admin: setup',
-             '2009-07-21 08:35:34 admin: liason',
-             '2009-07-21 17:00:34 COB',
-             '-- Wednesday',
-             '2009-07-22 08:35:59 vacation',
-             '2009-07-22 16:34:59 COB',
-             '-- Thursday',
-             '2009-07-23 08:35:59 vacation',
-             '2009-07-23 16:35:59 COB',
-             '-- Friday',
-             '2009-07-24 08:35:59 vacation',
-             '2009-07-24 16:35:59 COB']
     wr.verbose(False, True)
-    xyz = tmpdir.join('XYZ')
-    f = open(xyz.strpath, 'w')
-    f.write('\n'.join(lines))
-    f.close()
 
-    opts = optparse.Values({'filename': xyz.strpath,
+    opts = optparse.Values({'filename': fx_stddata.file.strpath,
                             'start': '2009.0721',
                             'end': '2009.0724',
                             'dayflag': False})
@@ -70,36 +53,16 @@ def test_rounding(tmpdir):
 
 
 # -------------------------------------------------------------------------
-def test_standalone_category(tmpdir):
+def test_standalone_category(tmpdir, fx_stddata):
     """
     test standalone categories like 'vacation' and 'holiday'
     """
     pytest.debug_func()
-    lines = ['Tuesday',
-             '2009-07-21 08:30:28 admin: setup',
-             '2009-07-21 08:35:34 admin: liason',
-             '2009-07-21 17:00:34 COB',
-             '',
-             '-- Wednesday',
-             '2009-07-22 08:35:59 vacation',
-             '2009-07-22 16:35:59 COB',
-             '',
-             '-- Thursday',
-             '2009-07-23 08:35:59 vacation',
-             '2009-07-23 16:35:59 COB',
-             '',
-             '-- Friday',
-             '2009-07-24 08:35:59 vacation',
-             '2009-07-24 16:35:59 COB',]
-
     wr.verbose(False, True)
-    xyz = tmpdir.join('XYZ')
-    with open(xyz.strpath, 'w') as wbl:
-        wbl.write('\n'.join(lines))
 
     if hasattr(wr.process_line, 'lastline'):
         del wr.process_line.lastline
-    opts = optparse.Values({'filename': xyz.strpath,
+    opts = optparse.Values({'filename': fx_stddata.file.strpath,
                             'start': '2009.0721',
                             'end': '2009.0724',
                             'dayflag': False})
