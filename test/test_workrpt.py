@@ -12,33 +12,6 @@ from bscr import workrpt as wr
 
 
 # -------------------------------------------------------------------------
-@pytest.fixture
-def fx_stddata(tmpdir):
-    """
-    Generate standard test data
-    """
-    lines = ['-- Tuesday',
-             '2009-07-21 08:30:28 admin: setup',
-             '2009-07-21 08:35:34 admin: liason',
-             '2009-07-21 17:00:34 COB',
-             '-- Wednesday',
-             '2009-07-22 08:35:59 vacation',
-             '2009-07-22 16:34:59 COB',
-             '-- Thursday',
-             '2009-07-23 08:35:59 vacation',
-             '2009-07-23 16:35:59 COB',
-             '-- Friday',
-             '2009-07-24 08:35:59 vacation',
-             '2009-07-24 16:35:59 COB']
-    xyz = tmpdir.join('XYZ')
-    f = open(xyz.strpath, 'w')
-    f.write('\n'.join(lines))
-    f.close()
-    fx_stddata.file = xyz
-    return fx_stddata
-
-
-# -------------------------------------------------------------------------
 def test_match(tmpdir, fx_stddata):
     """
     Test that option --match/-m matches specific lines from input file
@@ -619,3 +592,30 @@ class workrptTest(th.HelpedTestCase):
                              "notaday",
                              wr.weekday_num,
                              'notaday')
+
+
+# -------------------------------------------------------------------------
+@pytest.fixture
+def fx_stddata(tmpdir):
+    """
+    Generate standard test data
+    """
+    lines = ['-- Tuesday',
+             '2009-07-21 08:30:28 admin: setup',
+             '2009-07-21 08:35:34 admin: liason',
+             '2009-07-21 17:00:34 COB',
+             '-- Wednesday',
+             '2009-07-22 08:35:59 vacation',
+             '2009-07-22 16:34:59 COB',
+             '-- Thursday',
+             '2009-07-23 08:35:59 vacation',
+             '2009-07-23 16:35:59 COB',
+             '-- Friday',
+             '2009-07-24 08:35:59 vacation',
+             '2009-07-24 16:35:59 COB']
+    xyz = tmpdir.join('XYZ')
+    f = open(xyz.strpath, 'w')
+    f.write('\n'.join(lines))
+    f.close()
+    fx_stddata.file = xyz
+    return fx_stddata
