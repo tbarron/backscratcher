@@ -1,20 +1,22 @@
-import bscr
 import optparse
 import os
 import pdb
-import pytest
-from bscr import testhelp as th
 import time
+
+import pytest
+
+import bscr
+from bscr import testhelp as th
 from bscr import util as U
 from bscr import workrpt as wr
 
 
 # -------------------------------------------------------------------------
-def test_match(tmpdir):
+@pytest.fixture
+def fx_stddata(tmpdir):
     """
-    Test that option --match/-m matches specific lines from input file
+    Generate standard test data
     """
-    pytest.debug_func()
     lines = ['-- Tuesday',
              '2009-07-21 08:30:28 admin: setup',
              '2009-07-21 08:35:34 admin: liason',
@@ -28,20 +30,34 @@ def test_match(tmpdir):
              '-- Friday',
              '2009-07-24 08:35:59 vacation',
              '2009-07-24 16:35:59 COB']
-    wr.verbose(False, True)
     xyz = tmpdir.join('XYZ')
     f = open(xyz.strpath, 'w')
     f.write('\n'.join(lines))
     f.close()
+    fx_stddata.file = xyz
+    return fx_stddata
 
-    opts = optparse.Values({'filename': xyz.strpath,
+
+# -------------------------------------------------------------------------
+def test_match(tmpdir, fx_stddata):
+    """
+    Test that option --match/-m matches specific lines from input file
+    """
+    pytest.debug_func()
+    wr.verbose(False, True)
+
+    opts = optparse.Values({'filename': fx_stddata.file.strpath,
+                            'match_regexp': 'admin',
                             'start': '2009.0721',
                             'end': '2009.0724',
                             'dayflag': False})
-    del wr.process_line.lastline
-    r = wr.write_report(opts, True)
-    assert '23.10' not in r, "'23.10' not expected in '{}'".format(r)
-    assert '24.0' in r, "'24.0' expected in '{}'".format(r)
+    if hasattr(wr.process_line, 'lastline'):
+        del wr.process_line.lastline
+    r = wr.write_report_regexp(opts, True)
+    assert '08:30:06' in r
+    assert '(8.5)' in r
+    assert 'vacation' not in r
+
 
 # -------------------------------------------------------------------------
 def test_rounding(tmpdir):
