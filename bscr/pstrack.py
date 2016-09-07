@@ -37,10 +37,11 @@ except ImportError:
 
 
 # ---------------------------------------------------------------------------
-def main(args):
+def main(args=None):
     """
     Entry point
     """
+    args = args or sys.argv
     prs = optparse.OptionParser()
     prs.add_option('-d', '--debug',
                    action='store_true', default=False, dest='debug',
