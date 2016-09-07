@@ -10,6 +10,7 @@ import time
 
 import docopt
 
+
 # -----------------------------------------------------------------------------
 def main(args=None):
     """
@@ -39,6 +40,7 @@ def main(args=None):
     hitlist = get_hitlist(opts)
     for hit in hitlist:
         print hit
+
 
 # ----------------------------------------------------------------------------
 def digest_opts(opts):
@@ -81,6 +83,7 @@ def digest_opts(opts):
 
     return rval
 
+
 # -----------------------------------------------------------------------------
 def get_hitlist(opts=None):
     """
@@ -102,6 +105,7 @@ def get_hitlist(opts=None):
                     rval.append(hitpath)
     return rval
 
+
 # -----------------------------------------------------------------------------
 def keep(path, opts):
     """
@@ -117,6 +121,7 @@ def keep(path, opts):
         return False
     return True
 
+
 # -----------------------------------------------------------------------------
 def parse_time(dtstr):
     """
@@ -128,9 +133,7 @@ def parse_time(dtstr):
         pinfo = os.stat(dtstr)
         rval = pinfo.st_mtime
     else:
-        try:
-            _ = parse_time.fmt_l
-        except AttributeError:
+        if not hasattr(parse_time, 'fmt_l'):
             parse_time.fmt_l = ['%Y.%m%d',
                                 '%Y.%m%d %H:%M:%S',
                                 '%Y.%m%d.%H%M%S',
@@ -140,7 +143,7 @@ def parse_time(dtstr):
             try:
                 tup = time.strptime(dtstr, fmt)
                 break
-            except ValueError as err:
+            except ValueError:
                 if fmt == 'failure':
                     msg = "time data {0} does not match any of the formats"
                     raise ValueError(msg.format(dtstr))

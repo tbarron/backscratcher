@@ -1,9 +1,6 @@
 """
 Backscratcher
 """
-# pylint: disable=import-self
-import glob
-import pdb
 import sys
 
 import pexpect

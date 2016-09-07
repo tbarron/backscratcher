@@ -105,15 +105,10 @@ GNU General Public License for more details.
 import optparse
 import os
 import pdb
-import random
 import re
-import stat
 import string
 import sys
-import time
-import unittest
 
-import toolframe
 import util
 BSCR = util.package_module(__name__)
 
@@ -299,7 +294,6 @@ def fl_save(args):
 
     For each file, create file.YYYY.mmdd.
     """
-    # pylint: disable=unused-argument
     print("under construction")
 
 
@@ -339,7 +333,6 @@ def fl_times(args):
 
     For each file, report the access, mod, and create times.
     """
-    # pylint: disable=unused-argument
     print("under construction")
 
 
@@ -351,7 +344,6 @@ def fl_unreadable(args):
 
     Descend the directory at <root> and report unreadable files.
     """
-    # pylint: disable=unused-argument
     print("under construction")
 
 

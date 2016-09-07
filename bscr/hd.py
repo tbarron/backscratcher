@@ -29,10 +29,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
 import optparse
-import os
-import re
 import sys
-import unittest
 
 
 # -----------------------------------------------------------------------------
@@ -44,11 +41,6 @@ def main(argv=None):
         argv = sys.argv
 
     prs = optparse.OptionParser(usage=usage())
-    # define options here
-    # p.add_option('-s', '--long',
-    #              action='', default='',
-    #              dest='', type='',
-    #              help='')
     (_, args) = prs.parse_args(argv)
 
     if 0 < len(args[1:]):

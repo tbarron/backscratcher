@@ -2,7 +2,6 @@
 Clean stuff up
 """
 import os
-import pdb
 import re
 import sys
 import util as U
@@ -67,7 +66,9 @@ def find_files(directory, pattern=None, recursive=False):
     rval = []
     if recursive:
         for root, _, flist in os.walk(directory):
-            fpath = [os.path.join(root, f) for f in flist if re.match(pattern, f)]
+            fpath = [os.path.join(root, f)
+                     for f in flist
+                     if re.match(pattern, f)]
             rval.extend(fpath)
     else:
         rval = [os.path.join(directory, _) for _ in os.listdir(directory)

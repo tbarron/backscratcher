@@ -15,6 +15,7 @@ import time
 
 import docopt
 
+
 # -----------------------------------------------------------------------------
 def main(args=None):
     """
@@ -32,9 +33,10 @@ def main(args=None):
     if opts['-w']:
         year, month = next_month(year, month)
         nlist = gen_month(year, month)
-        mlist = [a+'   '+b for a,b in zip(mlist, nlist)]
+        mlist = [a+'   '+b for a, b in zip(mlist, nlist)]
 
     return '\n'.join(mlist)
+
 
 # -----------------------------------------------------------------------------
 def gen_month(year, month):
@@ -72,6 +74,7 @@ def gen_month(year, month):
         rval.append(' ' * 21)
     return rval
 
+
 # -----------------------------------------------------------------------------
 def title(year, month):
     """
@@ -80,6 +83,7 @@ def title(year, month):
     rval = "{0}.{1:02}".format(year, month)
     return rval.center(21)
 
+
 # -----------------------------------------------------------------------------
 def week_header():
     """
@@ -87,6 +91,7 @@ def week_header():
     """
     wdnames = " Mo Tu We Th Fr Sa Su"
     return wdnames
+
 
 # -----------------------------------------------------------------------------
 def first_day(year=None, month=None):
@@ -104,6 +109,7 @@ def first_day(year=None, month=None):
     rval = time.localtime(epoch)
     return rval
 
+
 # -----------------------------------------------------------------------------
 def next_day(date):
     """
@@ -113,6 +119,7 @@ def next_day(date):
                          0, 0, 0, 0, 0, 0))
     rval = time.localtime(epoch)
     return rval
+
 
 # -----------------------------------------------------------------------------
 def next_month(year, month):

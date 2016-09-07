@@ -3,24 +3,13 @@ Backscratcher help and management
 """
 import glob
 import os
-import pdb
 import re
 import shutil
-import StringIO
-import subprocess as subp
 import sys
 
-try:
-    import pager
-except ImportError:
-    pass
-from pkg_resources import resource_string
-
-import pexpect
 import util
 from version import __version__
 
-# from bscr import Error
 
 # -----------------------------------------------------------------------------
 def main(args=None):
@@ -33,7 +22,6 @@ def main(args=None):
 
 
 # -----------------------------------------------------------------------------
-# pylint: disable=unused-argument
 def bscr_help_commands(args=None):
     """help_commands - list the commands that are part of backscratcher
     """
@@ -68,8 +56,7 @@ def bscr_help_commands(args=None):
             "wcal        - show a wide calendar of three months",
             "whych       - find python, perl, and bash modules",
             "workrpt     - time reports",
-            "xclean      - remove files by pattern, optionally walking trees",
-           ]
+            "xclean      - remove files by pattern, optionally walking trees"]
 
     ldir = os.path.dirname(sys.argv[0])
     for line in cmdl:
@@ -219,8 +206,7 @@ def bscr_version(args):
                          'default': False,
                          'dest': 'verbose',
                          'help': 'show more info'
-                        }
-                       ])
+                         }])
     (_, _) = cmd.parse(args)
 
     print("Backscratcher version %s" % __version__)
@@ -232,7 +218,7 @@ def importable(module_name):
     Module *module_name* is importable? True or False
     """
     try:
-        mod = __import__(module_name)
+        __import__(module_name)
         if sys.getrefcount(module_name) <= 3:
             del sys.modules[module_name]
             del mod

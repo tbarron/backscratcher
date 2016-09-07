@@ -5,16 +5,10 @@ Git extensions
 import fnmatch
 import glob
 import sys
-sys.path.append("/ccs/home/tpb/lib/python")
 import optparse
 import os
 import pdb
 import re
-import shlex
-import subprocess
-import time
-import traceback
-import unittest
 
 import pexpect
 import util
@@ -36,20 +30,20 @@ def gtx_addem(args):
     """
     prs = optparse.OptionParser()
     prs.add_option('-a', '--add',
-                 action='append', default=[], dest='add',
-                 help='which statuses to add')
+                   action='append', default=[], dest='add',
+                   help='which statuses to add')
     prs.add_option('-d', '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='start the debugger')
+                   action='store_true', default=False, dest='debug',
+                   help='start the debugger')
     prs.add_option('-f', '--force',
-                 action='store_true', default=False, dest='force',
-                 help='add -f to the git add command')
+                   action='store_true', default=False, dest='force',
+                   help='add -f to the git add command')
     prs.add_option('-i', '--ignore',
-                 action='append', default=[], dest='ignore',
-                 help='which statuses to ignore')
+                   action='append', default=[], dest='ignore',
+                   help='which statuses to ignore')
     prs.add_option('-n', '--dryrun',
-                 action='store_true', default=False, dest='dryrun',
-                 help='show what would happen')
+                   action='store_true', default=False, dest='dryrun',
+                   help='show what would happen')
     (opts, _) = prs.parse_args(args)
 
     if opts.debug:
@@ -61,7 +55,7 @@ def gtx_addem(args):
     addlist = ["UU", "AA", "AU", "UA", "M"]
 
     # remove from ignlist anything in opts.add
-    ignlist = [_ for _ in ignlist if _ not in opts.add]
+    ignlist = [_ for _ in ignlist if _ not in opts.add]  # noqa: ignore=F812
     # add to addlist anything in opts.add
     addlist.extend([_ for _ in opts.add if _ not in addlist])
 
@@ -108,14 +102,14 @@ def gtx_cleanup(args):
     """
     prs = optparse.OptionParser()
     prs.add_option('-d',  '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='start the debugger')
+                   action='store_true', default=False, dest='debug',
+                   help='start the debugger')
     prs.add_option('-n',  '--dryrun',
-                 action='store_true', default=False, dest='dryrun',
-                 help='show what would happen')
+                   action='store_true', default=False, dest='dryrun',
+                   help='show what would happen')
     prs.add_option('-s',  '--suffix',
-                 action='store', default='', dest='suffix',
-                 help='suffix to remove')
+                   action='store', default='', dest='suffix',
+                   help='suffix to remove')
     (opts, _) = prs.parse_args(args)
 
     if opts.debug:
@@ -138,11 +132,11 @@ def gtx_gerrit_issues(args):
     """
     prs = optparse.OptionParser()
     prs.add_option('-d',  '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='start the debugger')
+                   action='store_true', default=False, dest='debug',
+                   help='start the debugger')
     prs.add_option('-n',  '--dryrun',
-                 action='store_true', default=False, dest='dryrun',
-                 help='show what would happen')
+                   action='store_true', default=False, dest='dryrun',
+                   help='show what would happen')
     (opts, _) = prs.parse_args(args)
 
     if opts.debug:
@@ -181,23 +175,23 @@ def gtx_hooks(args):
     """
     prs = optparse.OptionParser()
     prs.add_option('-d',  '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='start the debugger')
+                   action='store_true', default=False, dest='debug',
+                   help='start the debugger')
     prs.add_option('-C',  '--create',
-                 action='store_true', default=False, dest='create',
-                 help='create hooks')
+                   action='store_true', default=False, dest='create',
+                   help='create hooks')
     prs.add_option('-D',  '--delete',
-                 action='store_true', default=False, dest='delete',
-                 help='delete hooks')
+                   action='store_true', default=False, dest='delete',
+                   help='delete hooks')
     prs.add_option('-H',  '--hookdir',
-                 action='store', default='', dest='hookdir',
-                 help='where to look for hook scripts')
+                   action='store', default='', dest='hookdir',
+                   help='where to look for hook scripts')
     prs.add_option('-l',  '--linkdir',
-                 action='store', default='', dest='linkdir',
-                 help='link dir for testing')
+                   action='store', default='', dest='linkdir',
+                   help='link dir for testing')
     prs.add_option('-n',  '--dryrun',
-                 action='store_true', default=False, dest='dryrun',
-                 help='show what would happen')
+                   action='store_true', default=False, dest='dryrun',
+                   help='show what would happen')
     (opts, args) = prs.parse_args(args)
 
     if opts.debug:
@@ -288,6 +282,7 @@ def hook_exists(path, linkdir):
             break
     return rval
 
+
 # -----------------------------------------------------------------------------
 def hooks_create(srcdir, lnkdir, names):
     """
@@ -307,8 +302,8 @@ def hooks_create(srcdir, lnkdir, names):
                       ''.format(os.path.basename(hook),
                                 link))
             else:
-
-                print("{0} does not appear to have a link in the link directory"
+                print("{0} does not appear to have a link "
+                      "in the link directory"
                       "".format(os.path.basename(hook)))
                 answer = raw_input("Shall I add one? > ")
                 if answer.strip().lower().startswith('y'):
@@ -329,17 +324,18 @@ def hooks_create(srcdir, lnkdir, names):
             else:
                 os.symlink(path, os.path.join(lnkndir, os.path.basename(path)))
 
+
 # -----------------------------------------------------------------------------
 def gtx_depth(argl):
     """depth - report depth and age of a commit
     """
     prs = optparse.OptionParser()
     prs.add_option('-d',  '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='start the debugger')
+                   action='store_true', default=False, dest='debug',
+                   help='start the debugger')
     prs.add_option('-n',  '--dryrun',
-                 action='store_true', default=False, dest='dryrun',
-                 help='show what would happen')
+                   action='store_true', default=False, dest='dryrun',
+                   help='show what would happen')
     (opts, args) = prs.parse_args(argl)
 
     if opts.debug:
@@ -379,14 +375,14 @@ def gtx_flix(argl):
     """
     prs = optparse.OptionParser()
     prs.add_option('-d',  '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='start the debugger')
+                   action='store_true', default=False, dest='debug',
+                   help='start the debugger')
     prs.add_option('-e',  '--edit',
-                 action='store_true', default=False, dest='edit',
-                 help='run an editor on each file with conflicts')
+                   action='store_true', default=False, dest='edit',
+                   help='run an editor on each file with conflicts')
     prs.add_option('-g', '--glob',
-                 action='store', default='*', dest='globstr',
-                 help='only report on files matching the glob string')
+                   action='store', default='*', dest='globstr',
+                   help='only report on files matching the glob string')
     (opts, _) = prs.parse_args(argl)
 
     if opts.debug:
@@ -402,7 +398,9 @@ def gtx_flix(argl):
                 ]):
             continue
         flist.append(line.strip()[3:])
-    for fname in [_ for _ in flist if fnmatch.fnmatch(_, opts.globstr)]:
+    for fname in [_ for _ in flist               # noqa: ignore=F812
+                  if fnmatch.fnmatch(_, opts.globstr)]:
+
         edit_this_one = False
         lnum = 0
         rble = open(fname, 'r')
@@ -419,7 +417,6 @@ def gtx_flix(argl):
 def gtx_fl(argl=None):
     """fl - list files needing attention (eg, during a rebase)
     """
-    # pylint: disable=unused-argument
     result = pexpect.run("git status --porcelain")
     for line in result.split("\n"):
         if "??" in line or line.strip() == '':
@@ -438,8 +435,8 @@ def gtx_progress(argl):
     """
     prs = optparse.OptionParser()
     prs.add_option('-d',  '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='start the debugger')
+                   action='store_true', default=False, dest='debug',
+                   help='start the debugger')
     (opts, args) = prs.parse_args(argl)
 
     if opts.debug:
@@ -472,8 +469,8 @@ def gtx_recover(argl):
     """
     prs = optparse.OptionParser()
     prs.add_option('-d',  '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='start the debugger')
+                   action='store_true', default=False, dest='debug',
+                   help='start the debugger')
     (opts, args) = prs.parse_args(argl)
 
     if opts.debug:
@@ -517,17 +514,17 @@ def gtx_resolve(args):
     """
     prs = optparse.OptionParser()
     prs.add_option('-d',  '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='start the debugger')
+                   action='store_true', default=False, dest='debug',
+                   help='start the debugger')
     prs.add_option('-H', '--head',
-                 action='store_true', default=False, dest='head',
-                 help='resolve in favor of HEAD')
+                   action='store_true', default=False, dest='head',
+                   help='resolve in favor of HEAD')
     prs.add_option('-c', '--commit',
-                 action='store_true', default=False, dest='commit',
-                 help='resolve in favor of commit')
+                   action='store_true', default=False, dest='commit',
+                   help='resolve in favor of commit')
     prs.add_option('-s', '--suffix',
-                 action='store', default='.orig', dest='suffix',
-                 help='suffix to append to original file(s)')
+                   action='store', default='.orig', dest='suffix',
+                   help='suffix to append to original file(s)')
     (opts, _) = prs.parse_args(args)
 
     if opts.debug:
@@ -584,8 +581,8 @@ def gtx_nochid(args):
     """
     prs = optparse.OptionParser()
     prs.add_option('-d',  '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='start the debugger')
+                   action='store_true', default=False, dest='debug',
+                   help='start the debugger')
     (opts, _) = prs.parse_args(args)
 
     if opts.debug:
@@ -612,31 +609,6 @@ def gtx_nochid(args):
 
 
 # -----------------------------------------------------------------------------
-def gtx_nodoc(args):
-    """nodoc - report functions in the current tree with no doc string
-
-    @DEPRECATE in favor of pylint
-    """
-    prs = optparse.OptionParser()
-    prs.add_option('-d',  '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='start the debugger')
-    (opts, _) = prs.parse_args(args)
-
-    if opts.debug:
-        pdb.set_trace()
-
-    for root, _, files in os.walk("."):
-        for path in [os.path.join(root, fname) for fname in files
-                     if fname.endswith(".py")]:
-            data = contents(path)
-            for idx in enumerate(data):
-                if re.findall(r"^\s*def\s+", data[idx]):
-                    if all([x not in data[idx+1] for x in ['"""', "'''"]]):
-                        print("%s: %s" % (path, data[idx].rstrip()))
-
-
-# -----------------------------------------------------------------------------
 def gtx_rm_untrack(args):
     """rm_untrack - remove untracked files
 
@@ -644,11 +616,11 @@ def gtx_rm_untrack(args):
     """
     prs = optparse.OptionParser()
     prs.add_option('-d',  '--debug',
-                 action='store_true', default=False, dest='debug',
-                 help='start the debugger')
+                   action='store_true', default=False, dest='debug',
+                   help='start the debugger')
     prs.add_option('-n',  '--dry-run',
-                 action='store_true', default=True, dest='dryrun',
-                 help='show what would happen')
+                   action='store_true', default=True, dest='dryrun',
+                   help='show what would happen')
     (opts, _) = prs.parse_args(args)
 
     if opts.debug:
@@ -660,6 +632,7 @@ def gtx_rm_untrack(args):
             print("os.unlink({0})".format(words[1]))
             if not opts.dryrun:
                 os.unlink(words[1])
+
 
 # -----------------------------------------------------------------------------
 def contents(path):

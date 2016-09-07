@@ -35,20 +35,19 @@ workrpt - report work times
     -p/--pkg       tarball this code to <filename>
     -c/--copy      copy this code to <dir>
 """
-import copy
-import getopt
 import os
 import pdb
 import re
+import shutil
 import StringIO
 import sys
 import time
-import unittest
 
 import toolframe
 from bscr import util as U
 
 BSCR = U.package_module(__name__)
+
 
 # ---------------------------------------------------------------------------
 def main(argv=None):
@@ -103,6 +102,7 @@ def copy_me(source, dest):
         shutil.copy(src, dest)
     sys.exit(0)
 
+
 # ---------------------------------------------------------------------------
 def day_offset(weektype):
     """
@@ -125,6 +125,7 @@ def default_input_filename():
                 "WORKLOG")
     return rval
 
+
 # ---------------------------------------------------------------------------
 def dst(mark=0):
     """
@@ -136,6 +137,7 @@ def dst(mark=0):
     tml = time.localtime(when)
     return tml[8]
 
+
 # ---------------------------------------------------------------------------
 def dst_adjusted_time():
     """
@@ -146,6 +148,7 @@ def dst_adjusted_time():
     if now[8] == 0:
         rval = rval - 3600
     return rval
+
 
 # ---------------------------------------------------------------------------
 def dump_struct(coll):
@@ -256,6 +259,7 @@ def fph(seconds):
 
     return '%3.1f' % (hours)
 
+
 # ---------------------------------------------------------------------------
 def intify(arg):
     """
@@ -267,6 +271,7 @@ def intify(arg):
         rval = int(arg)
     return rval
 
+
 # ---------------------------------------------------------------------------
 def interpret_options(opts):
     """
@@ -274,7 +279,8 @@ def interpret_options(opts):
     """
     if opts.lastweek and ((opts.start_ymd != '') or (opts.end_ymd != '')):
         raise BSCR.Error('--last and --start or --end are not compatible')
-    elif (opts.weektype != '') and ((opts.start_ymd != '') or (opts.end_ymd != '')):
+    elif (opts.weektype != '') and ((opts.start_ymd != '')
+                                    or (opts.end_ymd != '')):
         raise BSCR.Error('--week and --start or --end are not compatible')
     elif (opts.since != '') and (opts.start_ymd != ''):
         raise BSCR.Error('--since and --start are not compatible')
@@ -302,6 +308,7 @@ def interpret_options(opts):
         end = time.strftime("%Y.%m%d", time.localtime())
 
     return (start, end)
+
 
 # ---------------------------------------------------------------------------
 def make_option_parser(argv):
@@ -517,6 +524,7 @@ def parse_ymd(dayname):
     [rval] = re.findall(r'(\d{2,4})[-.](\d{2})[-.]?(\d{2})', ymd)
     return list(rval)
 
+
 # ---------------------------------------------------------------------------
 def stringify(seq):
     """
@@ -533,12 +541,9 @@ def tally(coll, start, end, t_tup):
     """
     Set the start time for an interval.
     """
-    try:
-        _ = tally.last
-    except AttributeError:
+    if not hasattr(tally, 'last'):
         tally.last = ''
-
-    if t_tup is None or 7 != len(t_tup):
+    elif t_tup is None or 7 != len(t_tup):
         tally.last = ''
         return
 
@@ -602,6 +607,7 @@ def timeclose(coll, last, when, every=False):
             coll[last]['length'] = lapse
         del coll[last]['start']
         del coll[last]['end']
+
 
 # ---------------------------------------------------------------------------
 def reset_category_total(coll, cat):
@@ -748,6 +754,7 @@ def weekday_num(name):
               'friday': 4, 'saturday': 5, 'sunday': 6}
     return wday_d[name]
 
+
 # ---------------------------------------------------------------------------
 def process_line(coll, low, high, line):
     """
@@ -763,6 +770,7 @@ def process_line(coll, low, high, line):
         except AttributeError:
             process_line.lastline = line
     return last
+
 
 # ---------------------------------------------------------------------------
 def write_report_regexp(opts, testing=False):
@@ -824,6 +832,7 @@ def write_report_regexp(opts, testing=False):
                                             fph(total)))
 
     print rval.getvalue()
+
 
 # ---------------------------------------------------------------------------
 def write_report(opts, testing=False):

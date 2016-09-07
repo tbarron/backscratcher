@@ -20,9 +20,6 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
-
-import getopt
-import pdb
 import sys
 import util as U
 
@@ -35,7 +32,6 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    # pylint: disable=unused-variable
     cmd = U.cmdline([], usage=usage())
     (opts, args) = cmd.parse(argv)
 

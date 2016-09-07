@@ -39,9 +39,7 @@ GNU General Public License for more details.
 """
 import optparse
 import sys
-import unittest
 
-import toolframe
 
 # ---------------------------------------------------------------------------
 def main(argv=None, testing=False):

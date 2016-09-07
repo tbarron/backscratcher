@@ -26,15 +26,9 @@ GNU General Public License for more details.
 """
 import optparse
 import os
-import pdb
 import re
 import sys
-import time
-import unittest
 
-import pexpect
-import testhelp
-import toolframe
 import util as U
 
 BSCR = U.package_module(__name__)
@@ -146,16 +140,16 @@ def pt_newtool(args):
                         'import re\n',
                         'import sys\n',
                         '\n',
-                        '# ----------------------------------------------------'
-                        + '-----------------------\n',
+                        '# ---------------------------------------'
+                        '------------------------------------\n',
                         'def %s_example(argv):\n' % prefix,
                         '    print("this is an example")\n',
                         "\n",
-                        '# ----------------------------------------------------'
-                        + '-----------------------\n',
+                        '# ---------------------------------------'
+                        '------------------------------------\n',
                         "if __name__ == '__main__':\n",
-                        "    U.dispatch('__main__', '%s', sys.argv)\n" % prefix,
-                        ])
+                        "    U.dispatch('__main__', '%s', sys.argv)\n"
+                        % prefix, ])
         wbl.close()
 
         os.chmod(pname, 0755)

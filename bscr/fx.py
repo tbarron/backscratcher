@@ -80,14 +80,10 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
-import glob
 import os
 import pdb
 import re
 import sys
-import StringIO
-import textwrap
-import unittest
 import util
 
 
@@ -104,49 +100,42 @@ def main(argv=None):
                          'dest': 'cmd',
                          'default': '',
                          'type': 'string',
-                         'help': 'command to apply to all arguments'
-                        },
+                         'help': 'command to apply to all arguments'},
                         {'opts': ['-d', '--debug'],
                          'action': 'store_true',
                          'dest': 'debug',
                          'default': False,
-                         'help': 'run under the debugger'
-                        },
+                         'help': 'run under the debugger'},
                         {'opts': ['-e', '--edit'],
                          'action': 'store',
                          'dest': 'edit',
                          'default': '',
                          'type': 'string',
                          'help': 'file rename expression applied to all'
-                                 ' arguments',
-                        },
+                                 ' arguments'},
                         {'opts': ['-i', '--integer'],
                          'action': 'store',
                          'dest': 'irange',
                          'default': '',
                          'type': 'string',
-                         'help': 'low:high -- generate range of numbers',
-                        },
+                         'help': 'low:high -- generate range of numbers'},
                         {'opts': ['-n', '--dry-run'],
                          'action': 'store_true',
                          'dest': 'dryrun',
                          'default': False,
-                         'help': 'dryrun or execute',
-                        },
+                         'help': 'dryrun or execute'},
                         {'opts': ['-q', '--quiet'],
                          'action': 'store_true',
                          'dest': 'quiet',
                          'default': False,
-                         'help': "don't echo commands, just run them",
-                        },
+                         'help': "don't echo commands, just run them"},
                         {'opts': ['-x', '--xargs'],
                          'action': 'store_true',
                          'dest': 'xargs',
                          'default': False,
                          'help': 'batch input from stdin into command lines'
-                                 ' like xargs',
-                        },
-                       ], usage=usage())
+                                 ' like xargs'}],
+                       usage=usage())
     (opts, args) = cmd.parse(argv)
 
     if opts.debug:
@@ -174,7 +163,6 @@ def batch_command(options, arglist, rble=sys.stdin):
     Unlink xargs, this version allows for static values following the
     list of arguments on each command line.
     """
-    # pylint: disable=unused-argument
     for cmd in xargs_wrap(options.cmd, rble):
         psys(cmd, options)
 
@@ -187,7 +175,6 @@ def iterate_command(options, arglist):
     Possible enhancements would be to handle low/high/step tuples, and
     to handle an arbitrary comma delimited list of values.
     """
-    # pylint: disable=unused-argument
     (low, high) = options.irange.split(':')
     for idx in range(int(low), int(high)):
         cmd = util.expand(re.sub('%', str(idx), options.cmd))

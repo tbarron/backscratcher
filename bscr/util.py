@@ -4,13 +4,11 @@ Utility stuff
 """
 import contextlib
 import fcntl
-import glob
 import inspect
 import optparse
 import os
 import pdb
 import random
-import re
 import shlex
 import string
 import struct
@@ -18,12 +16,11 @@ import subprocess as subp
 import sys
 import termios
 import time
-import unittest
 
 import pexpect
 
+
 # -----------------------------------------------------------------------------
-# pylint: disable=invalid-name
 @contextlib.contextmanager
 def Chdir(path):
     """
@@ -44,18 +41,18 @@ def Chdir(path):
     finally:
         os.chdir(origin)
 
+
 # -----------------------------------------------------------------------------
 class cmdline(object):
     """
     Handle command line parsing
     """
-    # pylint: disable=unnecessary-lambda,no-self-use
     arg_default = {
-        'store_true': lambda : False,
-        'store_false': lambda : True,
-        'append': lambda : list()
+        'store_true': lambda: False,
+        'store_false': lambda: True,
+        'append': lambda: list()
         }
-    # pylint: enable=unnecessary-lambda
+
     def __init__(self,
                  optdef,
                  default_action='store',
@@ -78,7 +75,7 @@ class cmdline(object):
                 arg['action'] = default_action
 
             if 'default' not in arg:
-                func = self.arg_default.get(arg['action'], lambda : None)
+                func = self.arg_default.get(arg['action'], lambda: None)
                 arg['default'] = func()
 
             if 'type' not in arg:
@@ -132,7 +129,7 @@ class cmdline(object):
             rval = random_word(4)
         return rval
 
-# pylint: enable=invalid-name
+
 # ---------------------------------------------------------------------------
 def abspath(rpath, start=None):
     """
@@ -183,12 +180,7 @@ def contents(filename, string=False):
     """
     Contents of filename in a list, one line per element. If filename does
     not exist or is not readable, an IOError is thrown.
-
-    !@! make the second argument be *ctype* = 'string'|'list' rather than
-    *string* = True | False; This is will make pylint happier since we won't be
-    reusing a name that python defines
     """
-    # pylint: disable=redefined-outer-name
     with open(filename, 'r') as rbl:
         if string:
             rval = "".join(rbl.readlines())
@@ -380,7 +372,6 @@ def bscr_root(filename=None):
 
 # -----------------------------------------------------------------------------
 def pj(*args):
-    # pylint: disable=invalid-name
     """
     pathjoin -- convenience wrapper for os.path.join()
     """
@@ -393,13 +384,11 @@ def run(cmd, xable, verbose=False):
     Run *cmd* if *xable*, otherwise just report what would happen
     !@! test?
     """
-    # print "run: cmd='%s', %s" % (cmd, xable)
     if xable:
         if verbose:
             print cmd
         pipe = subp.Popen(shlex.split(cmd))
         pipe.wait()
-        # os.system(cmd)
     else:
         print "would do '%s'" % cmd
 
@@ -450,6 +439,7 @@ def normalize_path(path):
             ppath = os.readlink(ppath)
     rval = os.path.normpath(ppath)
     return rval
+
 
 # -----------------------------------------------------------------------------
 def script_location(script):
@@ -537,6 +527,7 @@ def findroot():
     afile = os.path.abspath(__file__)
     rval = os.path.dirname(afile)
     return rval
+
 
 # ---------------------------------------------------------------------------
 def random_word(length):

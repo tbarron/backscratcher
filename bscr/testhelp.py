@@ -2,12 +2,8 @@
 """
 Stuff to help with testing
 """
-# pylint: disable=invalid-name
-# pylint: disable=no-self-use
-# pylint: disable=unused-argument
 import logging
 import logging.handlers
-import optparse
 import os
 import pdb
 import pprint as pp
@@ -23,6 +19,7 @@ import pexpect
 import util as U
 
 BSCR = U.package_module(__name__)
+
 
 # ---------------------------------------------------------------------------
 def all_tests(name, fltr=None):
@@ -70,6 +67,7 @@ def debug_flag(value=None):
 
     return rval
 
+
 # ---------------------------------------------------------------------------
 def into_test_dir():
     """
@@ -82,6 +80,7 @@ def into_test_dir():
         os.mkdir(tdname)
         os.chdir(tdname)
     return tdname
+
 
 # ---------------------------------------------------------------------------
 def keepfiles(value=None):
@@ -99,6 +98,7 @@ def keepfiles(value=None):
         keepfiles.kf_flag = value
 
     return rval
+
 
 # ---------------------------------------------------------------------------
 def list_tests(argl, final, testlist):
@@ -120,6 +120,7 @@ def list_tests(argl, final, testlist):
                 if final != '' and final in candy[0]:
                     break
 
+
 # ---------------------------------------------------------------------------
 def name_of(obj=None):
     """
@@ -127,6 +128,7 @@ def name_of(obj=None):
     Is this used anywhere? Can we get rid of it?
     """
     return str(obj).split()[0]
+
 
 # ---------------------------------------------------------------------------
 def rm_cov_warn(string):
@@ -139,6 +141,7 @@ def rm_cov_warn(string):
     if re.findall(covwarn, string):
         rval = re.sub(covwarn, "", string)
     return rval
+
 
 # ---------------------------------------------------------------------------
 def run_tests(argl, final, testlist, volume, logfile=None):
@@ -162,12 +165,14 @@ def run_tests(argl, final, testlist, volume, logfile=None):
                 if skip_check(skip):
                     continue
                 if arg in case:
-                    slst = unittest.TestLoader().loadTestsFromName(case, mainmod)
+                    slst = unittest.TestLoader().loadTestsFromName(case,
+                                                                   mainmod)
                     suite.addTests(slst)
                 if final != '' and final in case:
                     break
 
-    _ = unittest.TextTestRunner(verbosity=volume).run(suite)
+    unittest.TextTestRunner(verbosity=volume).run(suite)
+
 
 # -----------------------------------------------------------------------------
 class HelpedTestCase(unittest.TestCase):
@@ -301,7 +306,6 @@ class HelpedTestCase(unittest.TestCase):
         *exctype* containing the message *excstr*. If not, we report the
         assertion failure.
         """
-        # pylint: disable=broad-except
         try:
             func(*args, **kwargs)
         except exctype, e:
@@ -318,7 +322,6 @@ class HelpedTestCase(unittest.TestCase):
         """
         What it sounds like -- prepare for a test
         """
-        # pylint: disable=no-member
         dbgopt = pytest.config.getoption("dbg")
         if any(["all" in x.lower() for x in dbgopt] +
                [self._testMethodName in dbgopt]):
@@ -340,7 +343,7 @@ class LoggingTestSuite(unittest.TestSuite):
         """
         super(LoggingTestSuite, self).__init__(tests)
         self._logger = None
-        if None != logfile:
+        if logfile is not None:
             self.setup_logging(logfile)
 
     def setup_logging(self, logfile):
@@ -364,13 +367,12 @@ class LoggingTestSuite(unittest.TestSuite):
         """
         Run the tests in the suite.
         """
-        # pylint: disable=arguments-differ, undefined-variable
         errs = 0
         fails = 0
         for test in self._tests:
             if result.shouldStop:
                 break
-            if None != self._logger:
+            if self._logger is not None:
                 test(result)
                 if fails < len(result.failures):
                     self._logger.info('%-30s >>> FAILED' % name_of(test))
@@ -387,7 +389,6 @@ class LoggingTestSuite(unittest.TestSuite):
 
 # -----------------------------------------------------------------------------
 class StdoutExcursion(object):
-    # pylint: disable=too-few-public-methods
     """
     This class allows us to run something that writes to stdout and capture the
     output in a StringIO.
@@ -490,7 +491,6 @@ class UnderConstructionError(Exception):
     """
     Deprecated in favor of 'pytest.fail('construction')'
     """
-    # pylint: disable=super-init-not-called
     # -------------------------------------------------------------------------
     def __init__(self, value=""):
         """

@@ -28,9 +28,6 @@ GNU General Public License for more details.
 '''
 
 import sys
-import unittest
-
-import pexpect
 
 import toolframe
 import util as U
@@ -41,7 +38,6 @@ def main(argv=None):
     """
     Command line entry point
     """
-    # pylint: disable=eval-used
     if argv is None:
         argv = sys.argv
 

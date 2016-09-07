@@ -6,10 +6,9 @@ nvtool - environment manipulations
 import optparse
 import os
 import pdb
-import re
 import sys
-import tempfile
 import util
+
 
 # ---------------------------------------------------------------------------
 def main(args=None):                                    # pragma: no coverage
@@ -20,12 +19,14 @@ def main(args=None):                                    # pragma: no coverage
         args = sys.argv
     util.dispatch("bscr.nvtool", "nv", args)
 
+
 # ---------------------------------------------------------------------------
 def nv_decap(argv):
     """decap - remove the head of a PATH type variable
     """
     pieces = argv[0].split(':')
     print(':'.join(pieces[1:]))
+
 
 # ---------------------------------------------------------------------------
 def nv_dedup(argv):

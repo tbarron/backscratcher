@@ -29,14 +29,12 @@ import os
 import pdb
 import re
 import sys
-import unittest
 
 try:
     import subprocess
 except ImportError:
     pass
 
-# import toolframe
 
 # ---------------------------------------------------------------------------
 def main(args):

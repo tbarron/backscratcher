@@ -54,11 +54,8 @@ LICENSE
 """
 import os
 import pprint
-import re
 import sys
-import unittest
 
-import toolframe
 
 # ---------------------------------------------------------------------------
 def main(args=None):

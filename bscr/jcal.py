@@ -9,10 +9,10 @@ Formats to be supported:
 
 import sys
 import time
-import unittest
 
 import toolframe
 import util as U
+
 
 # -----------------------------------------------------------------------------
 def main(argv=None):
@@ -23,20 +23,20 @@ def main(argv=None):
         argv = sys.argv
     U.dispatch('bscr.jcal', 'jcal', argv)
 
+
 # -----------------------------------------------------------------------------
 def generate_day(outf, fmt, cdata, date):
     """
     Generate a day's worth of output based on fmt, cdata, and date
     """
-    # pylint: disable=unused-argument
     pass
+
 
 # -----------------------------------------------------------------------------
 def load_cal_info(filename):
     """
     Read filename and load the information into a dict and return it
     """
-    # pylint: disable=unused-argument
     pass
 
 
@@ -45,7 +45,6 @@ def month_ceiling(date=time.time()):
     """
     Compute the epoch time of the last day of the month in which date falls
     """
-    # pylint: disable=unused-argument
     pass
 
 
@@ -54,7 +53,6 @@ def month_floor(date=time.time()):
     """
     Compute the epoch time of the first day of the month in which date falls
     """
-    # pylint: disable=unused-argument
     pass
 
 

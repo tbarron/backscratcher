@@ -71,6 +71,7 @@ import time
 import util as U
 BSCR = U.package_module(__name__)
 
+
 # ---------------------------------------------------------------------------
 def main(argv=None):
     """
@@ -92,12 +93,14 @@ def main(argv=None):
         pdb.set_trace()
     print report_date(opts.format, args[1:])
 
+
 # -----------------------------------------------------------------------------
 def fatal(msg):
     """
     !@!DERPRECATED -- should this be in util?
     """
     raise BSCR.Error(msg)
+
 
 # -----------------------------------------------------------------------------
 def report_date(fmt, args):
@@ -157,6 +160,7 @@ def parse_whenspec(args):
 
     return rval
 
+
 # ---------------------------------------------------------------------------
 def successor(args):
     """
@@ -176,6 +180,7 @@ def successor(args):
         return rval
     except UnboundLocalError:
         raise BSCR.Error('next: no return value set')
+
 
 # ---------------------------------------------------------------------------
 def last(args):

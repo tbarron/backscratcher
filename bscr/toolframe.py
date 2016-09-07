@@ -75,6 +75,7 @@ import unittest
 
 import testhelp
 
+
 # ---------------------------------------------------------------------------
 def tf_main(args, prefix=None, noarg='help'):
     """
@@ -149,6 +150,7 @@ def tf_dispatch_epilog(prefix, args):
     if func:
         func(args)
 
+
 # ---------------------------------------------------------------------------
 def tf_dispatch_prolog(prefix, args):
     """
@@ -165,6 +167,7 @@ def tf_dispatch_prolog(prefix, args):
     if func:
         rval = func(args)
     return rval
+
 
 # ---------------------------------------------------------------------------
 def tf_help(argl, prefix=None):
@@ -217,7 +220,6 @@ def tf_launch(prefix, noarg='help', cleanup_tests=None, testclass='',
     """
     Launch a toolframe'd program
     """
-    # pylint: disable=protected-access,no-member
     if len(sys.argv) == 1 and sys.argv[0] == '':
         return
     sname = sys.argv[0]
@@ -228,7 +230,7 @@ def tf_launch(prefix, noarg='help', cleanup_tests=None, testclass='',
     elif sys._getframe(1).f_code.co_name in ['?', '<module>']:
         if sname.endswith('.py'):
             keep = testhelp.main(sys.argv, testclass, logfile=logfile)
-            if not keep and None != cleanup_tests:
+            if not keep and cleanup_tests is not None:
                 cleanup_tests()
         else:
             tf_main(sys.argv, prefix=prefix, noarg=noarg)
@@ -239,7 +241,6 @@ def tf_shell(prefix, args):
     """
     Provide a shell in which subfunctions can be run
     """
-    # pylint: disable=unused-argument
     prompt = "%s> " % prefix
     req = raw_input(prompt)
     while req != 'quit':
@@ -260,7 +261,6 @@ def ez_launch(modname,
     For a simple (non-tool-style) program, figure out what needs to happen and
     call the invoker's 'main' callback.
     """
-    # pylint: disable=protected-access, no-member, too-many-arguments
     if len(sys.argv) == 1 and sys.argv[0] == '':
         return
     if modname != '__main__':
