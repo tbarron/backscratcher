@@ -568,9 +568,9 @@ def tally(coll, start, end, t_tup):
 # ---------------------------------------------------------------------------
 def timeclose(coll, last, when, every=False):
     """
-    Close a time interval, adding end - start to length. Delete
-    'start' and 'end' members of the interval. If 'all' is True, scan
-    the whole structure for time intervals needing closeout.
+    Close a time interval, adding end - start to length. Delete 'start' and
+    'end' members of the interval. If 'every' is True, scan the whole structure
+    for time intervals needing closeout.
     """
     if every:
         klist = coll.keys()
@@ -597,7 +597,7 @@ def timeclose(coll, last, when, every=False):
                           (str(err), key))
                     raise
 
-    else:
+    elif last and last != 'COB':
         coll[last]['end'] = when
         lapse = when - coll[last]['start']
         try:
