@@ -1,5 +1,5 @@
 """
 Version and last update
 """
-__version__ = '0.1.0.6'
-__updated__ = "2016-08-29 04:50:59"
+__version__ = '0.1.1.1'
+__updated__ = "2016-09-07 06:06:39"
