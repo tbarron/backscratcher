@@ -73,31 +73,22 @@ def test_standalone_category(tmpdir, fx_stddata):
         print r
 
 # -----------------------------------------------------------------------------
-def test_start_date_missing(tmpdir):
+def test_start_date_missing(tmpdir, fx_stddata):
     """
     Calculate a week when the first few dates are missing
     """
-    lines = ['-- Friday',
-             '2012-04-13 08:30:48 3op3arst: trouble-shooting production logc',
-             '2012-04-13 14:16:34 3op3sysp: e-mail',
-             '2012-04-13 15:45:03 3op3arst: bug 1476',
-             '2012-04-13 17:55:00 COB',]
-    xyz = tmpdir.join('XYZ')
-    with open(xyz.strpath, 'w') as wbl:
-        wbl.write('\n'.join(lines))
-
     wr.verbose(False, True)
-    opts = optparse.Values({'filename': xyz.strpath,
-                            'start': '2012.0407',
-                            'end': '2012.0413',
+    opts = optparse.Values({'filename': fx_stddata.file.strpath,
+                            'start': '2009.0718',
+                            'end': '2009.0722',
                             'dayflag': False})
     if hasattr(wr.process_line, 'lastline'):
         del wr.process_line.lastline
     r = wr.write_report(opts, True)
-    nexp = '23.10'
-    assert nexp not in r, "'{}' not expected in '{}'".format(nexp, r)
-    exp = '09:24:12 (9.4)'
-    assert exp in r, "'{}' expected in '{}'".format(exp, r)
+    nexp = '24.0'
+    assert nexp not in r
+    exp = '16:29:06 (16.5)'
+    assert exp in r
 
 
 # -----------------------------------------------------------------------------
