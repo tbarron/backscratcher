@@ -89,7 +89,8 @@ def test_rounding(tmpdir):
                             'start': '2009.0721',
                             'end': '2009.0724',
                             'dayflag': False})
-    del wr.process_line.lastline
+    if hasattr(wr.process_line, 'lastline'):
+        del wr.process_line.lastline
     r = wr.write_report(opts, True)
     assert '23.10' not in r, "'23.10' not expected in '{}'".format(r)
     assert '24.0' in r, "'24.0' expected in '{}'".format(r)
@@ -123,7 +124,8 @@ def test_standalone_category(tmpdir):
     with open(xyz.strpath, 'w') as wbl:
         wbl.write('\n'.join(lines))
 
-    del wr.process_line.lastline
+    if hasattr(wr.process_line, 'lastline'):
+        del wr.process_line.lastline
     opts = optparse.Values({'filename': xyz.strpath,
                             'start': '2009.0721',
                             'end': '2009.0724',
@@ -153,7 +155,8 @@ def test_start_date_missing(tmpdir):
                             'start': '2012.0407',
                             'end': '2012.0413',
                             'dayflag': False})
-    del wr.process_line.lastline
+    if hasattr(wr.process_line, 'lastline'):
+        del wr.process_line.lastline
     r = wr.write_report(opts, True)
     nexp = '23.10'
     assert nexp not in r, "'{}' not expected in '{}'".format(nexp, r)
@@ -178,6 +181,8 @@ def test_workrpt_order(tmpdir):
                                 'start': '2015.0107',
                                 'end': '2015.0107',
                                 'dayflag': False})
+        if hasattr(wr.process_line, 'lastline'):
+            del wr.process_line.lastline
         r = wr.write_report(opts, True)
     assert 'Dates or times out of order' in str(err)
 
