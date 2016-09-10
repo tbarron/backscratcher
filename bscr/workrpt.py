@@ -184,7 +184,7 @@ def format_report(start, end, coll, testing=False):
     if verbose():
         dump_struct(coll)
     rval = '%s - %s ' % (start, end) + '-' * 44 + '\n'
-    gtotal = 0
+    gtotal = gtotal_fph = 0
     try:
         del coll['COB']
     except KeyError:
@@ -213,14 +213,16 @@ def format_report(start, end, coll, testing=False):
                 skip = '\n'
                 try:
                     gtotal = gtotal + coll[key]['total']
+                    gtotal_fph += float(fph(coll[key]['total']))
                 except KeyError as err:
                     timeclose(coll, key, time.time())
                     gtotal = gtotal + coll[key]['total']
+                    gtotal_fph += float(fph(coll[key]['total']))
 
     except KeyError as err:
         rval = rval + "%s on top level key '%s'\n" % (str(err), key)
 
-    rval = rval + '\n%-30s %35s (%s)\n' % ('Total:', hms(gtotal), fph(gtotal))
+    rval = rval + '\n%-30s %35s (%s)\n' % ('Total:', hms(gtotal), str(gtotal_fph))
     if not testing:
         print rval
 
@@ -816,18 +818,19 @@ def write_report_regexp(opts, testing=False):
         if dat[key]['start'] != 0:
             dat[key]['sum'] += int(time.time()) - dat[key]['start']
 
-    total = 0
+    total = total_fph = 0
     rval.write("----- matching '{0}' -----\n".format(opts.match_regexp))
     for key in dat:
         duration = dat[key]['sum']
         total += duration
+        total_fph += float(fph(duration))
         rval.write("{0:48}   {1} ({2})\n".format(key,
                                                  hms(duration),
                                                  fph(duration)))
     rval.write("\n")
     rval.write("{0:56}  {1} ({2})\n".format("Total:",
                                             hms(total),
-                                            fph(total)))
+                                            total_fph))
 
     return rval.getvalue()
 
