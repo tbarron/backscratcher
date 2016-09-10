@@ -222,7 +222,8 @@ def format_report(start, end, coll, testing=False):
     except KeyError as err:
         rval = rval + "%s on top level key '%s'\n" % (str(err), key)
 
-    rval = rval + '\n%-30s %35s (%s)\n' % ('Total:', hms(gtotal), str(gtotal_fph))
+    rval = rval + '\n%-30s %35s (%s)\n' % ('Total:', hms(gtotal),
+                                           str(gtotal_fph))
     if not testing:
         print rval
 
