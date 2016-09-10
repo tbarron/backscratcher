@@ -48,8 +48,9 @@ def test_rounding(tmpdir, fx_stddata):
     if hasattr(wr.process_line, 'lastline'):
         del wr.process_line.lastline
     r = wr.write_report(opts, True)
-    assert '23.10' not in r, "'23.10' not expected in '{}'".format(r)
-    assert '24.0' in r, "'24.0' expected in '{}'".format(r)
+    assert '23.10' not in r
+    assert '24.0' not in r
+    assert '32.4' in r, "Total should be 32.4 for {}".format(r)
 
 
 # -------------------------------------------------------------------------
@@ -87,8 +88,8 @@ def test_start_date_missing(tmpdir, fx_stddata):
     r = wr.write_report(opts, True)
     nexp = '24.0'
     assert nexp not in r
-    exp = '16:29:06 (16.5)'
-    assert exp in r
+    exp = '16:29:06 (16.4)'
+    assert exp in r, 'expected {} in {}'.format(exp, r)
 
 
 # -----------------------------------------------------------------------------
@@ -559,7 +560,11 @@ def fx_stddata(tmpdir):
              '2009-07-21 08:35:34 admin: liason',
              '2009-07-21 17:00:34 COB',
              '-- Wednesday',
-             '2009-07-22 08:35:59 vacation',
+             '2009-07-22 08:35:59 e-mail: forty-nine',
+             '2009-07-22 11:17:24 stella: frump',
+             '2009-07-22 12:48:54 stella: alump',
+             '2009-07-22 13:32:19 hpss',
+             '2009-07-22 14:26:00 e-mail: fiddle',
              '2009-07-22 16:34:59 COB',
              '-- Thursday',
              '2009-07-23 08:35:59 vacation',
