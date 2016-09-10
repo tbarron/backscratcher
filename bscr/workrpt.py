@@ -553,13 +553,12 @@ def tally(coll, start, end, t_tup):
 
     when = time.mktime(intify([year, mon, mday, hour, mint, sec, 0, 0, dst()]))
     try:
+        if tally.last != '':
+            timeclose(coll, tally.last, when)
         coll[t_item]['start'] = when
     except KeyError:
         coll[t_item] = {}
         coll[t_item]['start'] = when
-
-    if tally.last != '':
-        timeclose(coll, tally.last, when)
 
     tally.last = t_item
     return tally.last
