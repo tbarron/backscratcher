@@ -1,6 +1,7 @@
 import optparse
 import os
 import pdb
+import re
 import time
 
 import pytest
@@ -35,8 +36,18 @@ def test_match(tmpdir, fx_stddata):
 # -------------------------------------------------------------------------
 def test_rounding(tmpdir, fx_stddata):
     """
-    Test that calculations round properly (except that they don't always --
-    this needs work -- !@!)
+    Test that calculations round properly. There are five types of duration
+    number in this report:
+
+        line item hms - HH:MM:SS for a specific task
+        subtotal hms - HH:MM:SS for a category of tasks
+        subtotal fp - floating point hour.tenth version of subtotal hms
+        total hms - HH:MM:SS total duration at the bottom
+        total fp - floating point hour.tenth version of total hms
+
+    The issue is that sometimes when we add up the subtotal hms values, the
+    result is larger than the sum of all the subtotal fp values. I want the
+    total fp to represent the sum of the subtotal fp's, as PALS does.
     """
     pytest.debug_func()
     wr.verbose(False, True)
@@ -48,9 +59,35 @@ def test_rounding(tmpdir, fx_stddata):
     if hasattr(wr.process_line, 'lastline'):
         del wr.process_line.lastline
     r = wr.write_report(opts, True)
-    assert '23.10' not in r
-    assert '24.0' not in r
-    assert '32.4' in r, "Total should be 32.4 for {}".format(r)
+    htot = stot = fpsum = 0
+    for line in r.split('\n'):
+        # zap: result of parsing the string
+        # hms: what HH:MM:SS matched
+        # fp: what [\d.]+ matched
+        # stot: total of lines
+        # htot: total in header
+        zap = re.findall('(\d\d:\d\d:\d\d)( \(([\d.]+)\))?', line)
+        if 0 < len(zap):
+            (hms, _, fp) = zap[0]
+            if 'Total:' in line:
+                # here we verify that the total fp matchs the sum of the
+                # subtotal fp values even though the sum of the hms values
+                # would be larger
+                htot = float(fp)
+                assert fp_close(htot, fpsum, 0.001)
+                assert not fp_close(htot, phms(hms), 0.05)
+            elif fp != '':
+                # here we handle a subtotal header line
+                if 0 < stot:
+                    assert fp_close(stot, htot, 0.05)
+                    stot = 0
+                htot = float(fp)
+                assert fp_close(htot, phms(hms), 0.05)
+                fpsum += htot
+            else:
+                # here we handle a detail line
+                stot += phms(hms)
+        pass
 
 
 # -------------------------------------------------------------------------
@@ -547,6 +584,26 @@ class workrptTest(th.HelpedTestCase):
                              "notaday",
                              wr.weekday_num,
                              'notaday')
+
+
+# -------------------------------------------------------------------------
+def phms(hms):
+    """
+    Parse an HH:MM:SS string and return the corresponding %3.1f hours
+    """
+    (hours, minutes, seconds) = hms.split(':')
+    seconds = int(seconds) + 60*(int(minutes) + 60*int(hours))
+    hours = float(seconds)/3600.0
+    return hours
+
+
+# -------------------------------------------------------------------------
+def fp_close(a, b, tolerance):
+    """
+    Return True or False indicating whether values *a* and *b* are within
+    *tolerance* of each other
+    """
+    return abs(a - b) < tolerance
 
 
 # -------------------------------------------------------------------------
