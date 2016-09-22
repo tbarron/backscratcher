@@ -24,9 +24,9 @@ def test_match(tmpdir, fx_stddata, fx_wrprep):
                             'end': '2009.0724',
                             'dayflag': False})
     r = wr.write_report_regexp(opts, True)
-    assert '08:30:06' in r
-    assert '(8.5)' in r
-    assert 'vacation' not in r
+    assert_includes(r, '08:30:06')
+    assert_includes(r, '(8.5)')
+    assert_excludes(r, 'vacation')
 
 
 # -------------------------------------------------------------------------
@@ -93,10 +93,8 @@ def test_standalone_category(tmpdir, fx_stddata, fx_wrprep):
                             'end': '2009.0724',
                             'dayflag': False})
     r = wr.write_report(opts, True)
-    try:
-        assert('32:30:06' in r)
-    except AssertionError:
-        print r
+    assert_includes(r, '27:58:49')
+
 
 # -----------------------------------------------------------------------------
 def test_start_date_missing(tmpdir, fx_stddata, fx_wrprep):
@@ -108,10 +106,8 @@ def test_start_date_missing(tmpdir, fx_stddata, fx_wrprep):
                             'end': '2009.0722',
                             'dayflag': False})
     r = wr.write_report(opts, True)
-    nexp = '24.0'
-    assert nexp not in r
-    exp = '16:29:06 (16.4)'
-    assert exp in r, 'expected {} in {}'.format(exp, r)
+    assert_excludes(r, '24.0')
+    assert_includes(r, '16:29:06 (16.4)')
 
 
 # -----------------------------------------------------------------------------
@@ -131,7 +127,7 @@ def test_workrpt_order(tmpdir, fx_wrprep):
                                 'end': '2015.0107',
                                 'dayflag': False})
         r = wr.write_report(opts, True)
-    assert 'Dates or times out of order' in str(err)
+    assert_includes(str(err), 'Dates or times out of order')
 
 
 # -----------------------------------------------------------------------------
