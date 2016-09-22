@@ -13,20 +13,16 @@ from bscr import workrpt as wr
 
 
 # -------------------------------------------------------------------------
-def test_match(tmpdir, fx_stddata):
+def test_match(tmpdir, fx_stddata, fx_wrprep):
     """
     Test that option --match/-m matches specific lines from input file
     """
     pytest.debug_func()
-    wr.verbose(False, True)
-
     opts = optparse.Values({'filename': fx_stddata.file.strpath,
                             'match_regexp': 'admin',
                             'start': '2009.0721',
                             'end': '2009.0724',
                             'dayflag': False})
-    if hasattr(wr.process_line, 'lastline'):
-        del wr.process_line.lastline
     r = wr.write_report_regexp(opts, True)
     assert '08:30:06' in r
     assert '(8.5)' in r
@@ -34,7 +30,7 @@ def test_match(tmpdir, fx_stddata):
 
 
 # -------------------------------------------------------------------------
-def test_rounding(tmpdir, fx_stddata):
+def test_rounding(tmpdir, fx_stddata, fx_wrprep):
     """
     Test that calculations round properly. There are five types of duration
     number in this report:
@@ -50,14 +46,10 @@ def test_rounding(tmpdir, fx_stddata):
     total fp to represent the sum of the subtotal fp's, as PALS does.
     """
     pytest.debug_func()
-    wr.verbose(False, True)
-
     opts = optparse.Values({'filename': fx_stddata.file.strpath,
                             'start': '2009.0721',
                             'end': '2009.0724',
                             'dayflag': False})
-    if hasattr(wr.process_line, 'lastline'):
-        del wr.process_line.lastline
     r = wr.write_report(opts, True)
     htot = stot = fpsum = 0
     for line in r.split('\n'):
@@ -91,15 +83,11 @@ def test_rounding(tmpdir, fx_stddata):
 
 
 # -------------------------------------------------------------------------
-def test_standalone_category(tmpdir, fx_stddata):
+def test_standalone_category(tmpdir, fx_stddata, fx_wrprep):
     """
     test standalone categories like 'vacation' and 'holiday'
     """
     pytest.debug_func()
-    wr.verbose(False, True)
-
-    if hasattr(wr.process_line, 'lastline'):
-        del wr.process_line.lastline
     opts = optparse.Values({'filename': fx_stddata.file.strpath,
                             'start': '2009.0721',
                             'end': '2009.0724',
@@ -111,17 +99,14 @@ def test_standalone_category(tmpdir, fx_stddata):
         print r
 
 # -----------------------------------------------------------------------------
-def test_start_date_missing(tmpdir, fx_stddata):
+def test_start_date_missing(tmpdir, fx_stddata, fx_wrprep):
     """
     Calculate a week when the first few dates are missing
     """
-    wr.verbose(False, True)
     opts = optparse.Values({'filename': fx_stddata.file.strpath,
                             'start': '2009.0718',
                             'end': '2009.0722',
                             'dayflag': False})
-    if hasattr(wr.process_line, 'lastline'):
-        del wr.process_line.lastline
     r = wr.write_report(opts, True)
     nexp = '24.0'
     assert nexp not in r
@@ -130,7 +115,7 @@ def test_start_date_missing(tmpdir, fx_stddata):
 
 
 # -----------------------------------------------------------------------------
-def test_workrpt_order(tmpdir):
+def test_workrpt_order(tmpdir, fx_wrprep):
     """
     Times or dates out of order should produce SystemExit exception
     """
@@ -140,14 +125,11 @@ def test_workrpt_order(tmpdir):
                          '2015-01-07 10:10:00 time order',
                          '2015-01-07 10:20:00 fourth task',
                          ]))
-    wr.verbose(False, True)
     with pytest.raises(SystemExit) as err:
         opts = optparse.Values({'filename': xyz.strpath,
                                 'start': '2015.0107',
                                 'end': '2015.0107',
                                 'dayflag': False})
-        if hasattr(wr.process_line, 'lastline'):
-            del wr.process_line.lastline
         r = wr.write_report(opts, True)
     assert 'Dates or times out of order' in str(err)
 
