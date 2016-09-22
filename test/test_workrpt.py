@@ -569,6 +569,26 @@ class workrptTest(th.HelpedTestCase):
 
 
 # -------------------------------------------------------------------------
+def assert_includes(container, content):
+    """
+    Report when something expected is not present
+    """
+    assert content in container, 'expectd {} in {}'.format(content,
+                                                           container)
+
+
+# -------------------------------------------------------------------------
+def assert_excludes(container, content):
+    """
+    Report when something unexpected IS present
+    """
+    assert content not in container, '{} {} {} {}'.format('unexpected',
+                                                          content,
+                                                          'found in',
+                                                          container)
+
+
+# -------------------------------------------------------------------------
 def phms(hms):
     """
     Parse an HH:MM:SS string and return the corresponding %3.1f hours
