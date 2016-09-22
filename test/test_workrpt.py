@@ -633,14 +633,16 @@ def fx_stddata(tmpdir):
              '2009-07-22 08:35:59 e-mail: forty-nine',
              '2009-07-22 11:17:24 stella: frump',
              '2009-07-22 12:48:54 stella: alump',
-             '2009-07-22 13:32:19 hpss',
+             '2009-07-22 13:32:19 admin: hpss',
              '2009-07-22 14:26:00 e-mail: fiddle',
              '2009-07-22 16:34:59 COB',
              '-- Thursday',
-             '2009-07-23 08:35:59 vacation',
+             '2009-07-23 11:22:17 admin: read mail',
+             '2009-07-23 13:17:43 vacation',
              '2009-07-23 16:35:59 COB',
              '-- Friday',
-             '2009-07-24 08:35:59 vacation',
+             '2009-07-24 10:19:58 admin: other stuff',
+             '2009-07-24 12:35:59 vacation',
              '2009-07-24 16:35:59 COB']
     xyz = tmpdir.join('XYZ')
     f = open(xyz.strpath, 'w')
