@@ -13,6 +13,63 @@ from bscr import workrpt as wr
 
 
 # -------------------------------------------------------------------------
+def test_rgx_end(fx_stddata, fx_wrprep):
+    """
+    Verify that -m and -e work properly together
+    """
+    pytest.debug_func()
+    opts = optparse.Values({'filename': fx_stddata.file.strpath,
+                            'match_regexp': 'admin',
+                            'start': '2009.0701',
+                            'end': '2009.0723',
+                            'dayflag': False})
+    r = wr.write_report_regexp(opts, True)
+    assert_includes(r, 'admin: read mail')
+    assert_includes(r, 'admin: hpss')
+    assert_includes(r, 'admin: liason')
+    assert_includes(r, 'admin: setup')
+    assert_excludes(r, 'admin: other stuff')
+
+
+# -------------------------------------------------------------------------
+def test_rgx_start(fx_stddata, fx_wrprep):
+    """
+    Verify that -m and -s work properly together
+    """
+    pytest.debug_func()
+    opts = optparse.Values({'filename': fx_stddata.file.strpath,
+                            'match_regexp': 'admin',
+                            'start': '2009.0722',
+                            'end': '2009.0731',
+                            'dayflag': False})
+    r = wr.write_report_regexp(opts, True)
+    assert_includes(r, 'admin: read mail')
+    assert_includes(r, 'admin: hpss')
+    assert_excludes(r, 'admin: liason')
+    assert_excludes(r, 'admin: setup')
+    assert_includes(r, 'admin: other stuff')
+
+
+# -------------------------------------------------------------------------
+def test_rgx_start_end(fx_stddata, fx_wrprep):
+    """
+    Verify that -m, -s, and -e all work properly together
+    """
+    pytest.debug_func()
+    opts = optparse.Values({'filename': fx_stddata.file.strpath,
+                            'match_regexp': 'admin',
+                            'start': '2009.0722',
+                            'end': '2009.0723',
+                            'dayflag': False})
+    r = wr.write_report_regexp(opts, True)
+    assert_includes(r, 'admin: read mail')
+    assert_includes(r, 'admin: hpss')
+    assert_excludes(r, 'admin: liason')
+    assert_excludes(r, 'admin: setup')
+    assert_excludes(r, 'admin: other stuff')
+
+
+# -------------------------------------------------------------------------
 def test_match(tmpdir, fx_stddata, fx_wrprep):
     """
     Test that option --match/-m matches specific lines from input file
