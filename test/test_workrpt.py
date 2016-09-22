@@ -24,8 +24,8 @@ def test_match(tmpdir, fx_stddata, fx_wrprep):
                             'end': '2009.0724',
                             'dayflag': False})
     r = wr.write_report_regexp(opts, True)
-    assert_includes(r, '08:30:06')
-    assert_includes(r, '(8.5)')
+    assert_includes(r, '13:35:14')
+    assert_includes(r, '(13.6)')
     assert_excludes(r, 'vacation')
 
 
@@ -107,6 +107,7 @@ def test_start_date_missing(tmpdir, fx_stddata, fx_wrprep):
                             'dayflag': False})
     r = wr.write_report(opts, True)
     assert_excludes(r, '24.0')
+    assert_excludes(r, '2009.0719')
     assert_includes(r, '16:29:06 (16.4)')
 
 
