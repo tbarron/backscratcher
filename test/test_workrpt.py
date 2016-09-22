@@ -608,6 +608,17 @@ def fp_close(a, b, tolerance):
 
 # -------------------------------------------------------------------------
 @pytest.fixture
+def fx_wrprep():
+    """
+    Set wr verbosity and remove wr.process_line.lastline if it exists
+    """
+    wr.verbose(False, True)
+    if hasattr(wr.process_line, 'lastline'):
+        del wr.process_line.lastline
+
+
+# -------------------------------------------------------------------------
+@pytest.fixture
 def fx_stddata(tmpdir):
     """
     Generate standard test data
