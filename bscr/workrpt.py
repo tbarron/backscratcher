@@ -224,7 +224,7 @@ def format_report(start, end, coll, testing=False):
 
     rval = rval + '\n%-30s %35s (%s)\n' % ('Total:', hms(gtotal),
                                            str(gtotal_fph))
-    if not testing:
+    if testing:
         print rval
 
     return rval
