@@ -820,11 +820,18 @@ def complete(data, prev, now):
 
 
 # -----------------------------------------------------------------------------
-def ymd_epoch(ymd):
+def ymd_epoch(ymd, end=False):
     """
-    Given a date in %Y.%m%d format, return the corresponding epoch time
+    Given a date in %Y.%m%d format, return the corresponding epoch time.
+
+    If *end* is False, return the beginning of the day. Otherwise, return the
+    end of the day.
     """
-    return time.mktime(time.strptime(ymd, '%Y.%m%d'))
+    if end:
+        when = '{0} 23:59:59'.format(ymd)
+    else:
+        when = '{0} 00:00:00'.format(ymd)
+    return time.mktime(time.strptime(when, '%Y.%m%d %H:%M:%S'))
 
 
 # -----------------------------------------------------------------------------
