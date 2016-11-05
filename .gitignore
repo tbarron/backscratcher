@@ -1,3 +1,9 @@
+.\#*
+.ackrc
+.bscr_version
+.cache
+.coverage
+.env
 MANIFEST
 README
 DODO
@@ -10,14 +16,9 @@ testhome
 TAGS
 cmsg
 venv
-.ackrc
-.bscr_version
-.cache
-.coverage
 pytest.ini
 *.org
 *.log
 *.pyc
 *~
 \#*\#
-.\#*
