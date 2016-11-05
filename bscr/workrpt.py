@@ -194,6 +194,8 @@ def format_report(start, end, coll, testing=False):
     skip = ''
     try:
         for key in klist:
+            if 'total' not in coll[key]:
+                coll[key]['total'] = 0
             if ':' in key:
                 if 47 < len(key.strip()):
                     dkey = key.strip()[0:44] + '...'
@@ -202,6 +204,7 @@ def format_report(start, end, coll, testing=False):
                 rval = rval + '%s%-47s %8s\n' % ('   ',
                                                  dkey,
                                                  hms(coll[key]['length']))
+                coll[key]['total'] += coll[key]['length']
             else:
                 if verbose():
                     print "key = '%s'" % key
