@@ -643,6 +643,25 @@ def assert_excludes(container, content):
 
 
 # -------------------------------------------------------------------------
+def epoch_strptime(timespec, format):
+    """
+    """
+    tup = time.strptime(timespec, format)
+    epoch = time.mktime(tup)
+    return epoch
+
+
+# -------------------------------------------------------------------------
+def shms(hms):
+    """
+    Parse an HH:MM:SS string and return the corresponding seconds
+    """
+    (hours, minutes, seconds) = hms.split(':')
+    seconds = int(seconds) + 60*(int(minutes) + 60*int(hours))
+    return seconds
+
+
+# -------------------------------------------------------------------------
 def phms(hms):
     """
     Parse an HH:MM:SS string and return the corresponding %3.1f hours
@@ -704,3 +723,21 @@ def fx_stddata(tmpdir):
     f.close()
     fx_stddata.file = xyz
     return fx_stddata
+
+
+# -----------------------------------------------------------------------------
+def parse_report_line(line):
+    """
+    Break up a line like one of the following into text and duration
+
+    '   e-mail: forty-nine                              02:41:25'
+    'Total:                                                    00:00:00 (0)'
+
+    For lines that don't match the pattern, return text = '', duration = 0
+    """
+    result = re.findall('\s*(.*[\w:])\s+(\d{2}:\d{2}:\d{2}).*', line)
+    if result == []:
+        rval = ('', 0)
+    else:
+        rval = (result[0][0], shms(result[0][1]))
+    return rval
