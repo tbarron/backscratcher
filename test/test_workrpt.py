@@ -36,6 +36,23 @@ def test_daily_subtotal(tmpdir, fx_stddata, fx_wrprep):
 
 
 # -------------------------------------------------------------------------
+def test_match(tmpdir, fx_stddata, fx_wrprep):
+    """
+    Test that option --match/-m matches specific lines from input file
+    """
+    pytest.debug_func()
+    opts = optparse.Values({'filename': fx_stddata.file.strpath,
+                            'match_regexp': 'admin',
+                            'start': '2009.0721',
+                            'end': '2009.0724',
+                            'dayflag': False})
+    r = wr.write_report_regexp(opts, True)
+    assert_includes(r, '13:35:14')
+    assert_includes(r, '(13.6)')
+    assert_excludes(r, 'vacation')
+
+
+# -------------------------------------------------------------------------
 def test_rgx_end(fx_stddata, fx_wrprep):
     """
     Verify that -m and -e work properly together
@@ -90,23 +107,6 @@ def test_rgx_start_end(fx_stddata, fx_wrprep):
     assert_excludes(r, 'admin: liason')
     assert_excludes(r, 'admin: setup')
     assert_excludes(r, 'admin: other stuff')
-
-
-# -------------------------------------------------------------------------
-def test_match(tmpdir, fx_stddata, fx_wrprep):
-    """
-    Test that option --match/-m matches specific lines from input file
-    """
-    pytest.debug_func()
-    opts = optparse.Values({'filename': fx_stddata.file.strpath,
-                            'match_regexp': 'admin',
-                            'start': '2009.0721',
-                            'end': '2009.0724',
-                            'dayflag': False})
-    r = wr.write_report_regexp(opts, True)
-    assert_includes(r, '13:35:14')
-    assert_includes(r, '(13.6)')
-    assert_excludes(r, 'vacation')
 
 
 # -------------------------------------------------------------------------
