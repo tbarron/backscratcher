@@ -211,13 +211,13 @@ def format_report(start, end, coll, testing=False):
                                                        hms(coll[key]['total']),
                                                        fph(coll[key]['total']))
                 skip = '\n'
-                try:
-                    gtotal = gtotal + coll[key]['total']
-                    gtotal_fph += float(fph(coll[key]['total']))
-                except KeyError as err:
-                    timeclose(coll, key, time.time())
-                    gtotal = gtotal + coll[key]['total']
-                    gtotal_fph += float(fph(coll[key]['total']))
+            try:
+                gtotal = gtotal + coll[key]['total']
+                gtotal_fph += float(fph(coll[key]['total']))
+            except KeyError as err:
+                timeclose(coll, key, time.time())
+                gtotal = gtotal + coll[key]['total']
+                gtotal_fph += float(fph(coll[key]['total']))
 
     except KeyError as err:
         rval = rval + "%s on top level key '%s'\n" % (str(err), key)
