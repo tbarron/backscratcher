@@ -773,7 +773,132 @@ def process_line(coll, low, high, line):
     return last
 
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+def parse_epoch_task(line):
+    """
+    Parse a line into epoch time and task. Routine parse_timeline() returns
+    None for a comment line or other line that doesn't match the timestamp,
+    task format. Otherwise, it returns (year, month, day, hour, minute,
+    second).
+    """
+    tup = parse_timeline()
+    if tup is not None:
+        #         (year, mon, day, hour, mnt, sec, payld) = tup
+        #         when = int(time.mktime(intify([year, mon, day,
+        #                                        hour, mnt, sec,
+        #                                        0, 0, dst()])))
+        when = int(time.mktime(intify(tup[0:-1] + (0, 0, dst()))))
+        tup = (when, payld)
+    return tup
+
+
+# -----------------------------------------------------------------------------
+def begin(data, task, when):
+    """
+
+    """
+    if task != 'COB':
+        try:
+            data[task]['start'] = when
+        except KeyError:
+            data[task] = {'start': when, 'length': 0}
+
+
+# -----------------------------------------------------------------------------
+def complete(data, prev, now):
+    """
+    In dict *data*, complete the time segment represented by *prev* at time
+    index *now*
+    """
+    task = prev['task']
+    if task != 'COB':
+        data[task]['length'] += now - data[task]['start']
+        data[task]['start'] = None
+
+
+# -----------------------------------------------------------------------------
+def ymd_epoch(ymd):
+    """
+    Given a date in %Y.%m%d format, return the corresponding epoch time
+    """
+    return time.mktime(time.strptime(ymd, '%Y.%m%d'))
+
+
+# -----------------------------------------------------------------------------
+def filter_data_temporal(opts):
+    """
+    Select the data to be formatted from *opts*.filename based on *opts*.start,
+    *opts*.end, and *opts*.match_regexp
+    """
+    cstart = ymd_epoch(opts.start)
+    cend = ymd_epoch(next_day(opts.end))
+    rval = []
+    lastwhen = 0
+    with open(opts.filename, 'r') as rbl:
+        for line in rbl:
+            tup = parse_epoch_task(line)
+            if tup is None:
+                continue
+            (lwhen, ltask) = tup
+            if lwhen < cstart:
+                continue
+            if cend < lwhen:
+                continue
+            rval.append(line)
+
+            if lwhen < lastwhen:
+                sys.exit("'{}' precedes '{}'")
+
+            lastwhen = lwhen
+
+    complete(rval, lline, time.time())
+
+
+# -----------------------------------------------------------------------------
+def filter_data_regexp(opts, data):
+    """
+    Select the data to be formatted from *opts*.filename based on *opts*.start,
+    *opts*.end, and *opts*.match_regexp
+    """
+    rval = {}
+    lline = {}
+    for idx, line in enumerate(data):
+        tup = parse_epoch_task(line)
+        if tup is None:
+            continue
+        (lwhen, ltask) = tup
+        if [] == re.findall(opts.match_regexp, ltask):
+            data[idx] = "{} {}".format(ymdhms(lwhen), "COB")
+        else:
+            complete(rval, lline, when)
+            begin(rval, ltask, when)
+
+        lline['when'] = lwhen
+        lline['task'] = ltask
+        lline['text'] = line
+
+    complete(rval, lline, time.time())
+
+
+# -----------------------------------------------------------------------------
+def format_report_x(data):
+    """
+    Format *data* into a report
+    """
+
+# -----------------------------------------------------------------------------
+def generate_report(opts):
+    """
+    Generate a time report from *opts*.filename base on *opts*.match_regexp,
+    *opts*.start, and *opts*.end
+    """
+    datl = filter_data_temporal(opts)
+    datl = filter_data_regexp(opts, datl)
+    datd = sum_data(datl)
+    rval = format_report_x(dat)
+    return rval
+
+# -----------------------------------------------------------------------------
 def write_report_regexp(opts, testing=False):
     """
     Generate a time report from <filename> based on <o.match_regexp>
