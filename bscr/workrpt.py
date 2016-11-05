@@ -914,8 +914,8 @@ def write_report_regexp(opts, testing=False):
     Generate a time report from <filename> based on <o.match_regexp>
     """
     filename = opts.filename
-    start = opts.start
-    end = opts.end
+    start = ymd_epoch(opts.start)
+    end = ymd_epoch(opts.end, end=True)
     dayflag = opts.dayflag
     if verbose():
         print "write_report: filename = '%s'" % filename
@@ -935,6 +935,8 @@ def write_report_regexp(opts, testing=False):
             when = int(time.mktime(intify([year, mon, day,
                                            hour, mnt, sec,
                                            0, 0, dst()])))
+            if when < start or end < when:
+                continue
 
             if last:
                 dat[last]['sum'] += when - dat[last]['start']
