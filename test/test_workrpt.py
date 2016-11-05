@@ -13,6 +13,29 @@ from bscr import workrpt as wr
 
 
 # -------------------------------------------------------------------------
+def test_daily_subtotal(tmpdir, fx_stddata, fx_wrprep):
+    """
+    Test that generating a report with dayflag=True produces non-zero daily
+    subtotals when appropriate
+    """
+    pytest.debug_func()
+    opts = optparse.Values({'filename': fx_stddata.file.strpath,
+                            'match_regexp': 'admin',
+                            'start': '2009.0721',
+                            'end': '2009.0724',
+                            'dayflag': True})
+    r = wr.write_report(opts, True)
+    subtotal = 0
+    for line in r.split('\n'):
+        (text, duration) = parse_report_line(line)
+        if 'Total:' in text:
+            assert duration == subtotal
+            subtotal = 0
+        else:
+            subtotal += duration
+
+
+# -------------------------------------------------------------------------
 def test_rgx_end(fx_stddata, fx_wrprep):
     """
     Verify that -m and -e work properly together
