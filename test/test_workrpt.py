@@ -742,7 +742,7 @@ def fx_stddata(tmpdir):
              '2009-07-24 16:35:59 COB']
     xyz = tmpdir.join('XYZ')
     f = open(xyz.strpath, 'w')
-    f.write('\n'.join(lines))
+    f.write('\n'.join(lines) + "\n")
     f.close()
     fx_stddata.file = xyz
     return fx_stddata
