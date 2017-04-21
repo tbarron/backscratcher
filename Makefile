@@ -4,6 +4,7 @@ TEST_OPTIONS=-x
 clean:
 	rm -f MANIFEST README TAGS
 	find . -name "*~" | xargs rm
+	find . -name "__pycache__" | xargs rm -rf
 	rm -rf bscr/test/__pycache__
 	xclean -r -p ".*.pyc"
 
