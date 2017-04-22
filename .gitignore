@@ -4,6 +4,7 @@
 .cache
 .coverage
 .env
+BRANCHES
 MANIFEST
 README
 DODO
@@ -17,6 +18,7 @@ TAGS
 cmsg
 venv
 pytest.ini
+.python-version
 *.org
 *.log
 *.pyc
