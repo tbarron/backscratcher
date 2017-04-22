@@ -18,6 +18,7 @@ def test_daily_subtotal(tmpdir, fx_stddata, fx_wrprep):
     Test that generating a report with dayflag=True produces non-zero daily
     subtotals when appropriate
     """
+    pytest.skip()
     pytest.debug_func()
     opts = optparse.Values({'filename': fx_stddata.file.strpath,
                             'match_regexp': 'admin',
