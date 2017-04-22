@@ -132,6 +132,7 @@ def next_month(year, month):
     month = succ.tm_mon
     return year, month
 
+
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
     print main(sys.argv[1:])

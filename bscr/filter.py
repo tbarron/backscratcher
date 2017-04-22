@@ -97,6 +97,7 @@ class Filter(object):
         """
         self.keepl.append(rgx)
 
+
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
     unittest.main()

@@ -537,4 +537,5 @@ def random_word(length):
     rval = ''.join([random.choice(string.lowercase) for _ in range(length)])
     return rval
 
+
 BSCR = package_module(__name__)

@@ -792,7 +792,7 @@ def parse_epoch_task(line):
         #                                        hour, mnt, sec,
         #                                        0, 0, dst()])))
         when = int(time.mktime(intify(tup[0:-1] + (0, 0, dst()))))
-        tup = (when, payld)
+        tup = (when, tup[-1])
     return tup
 
 
@@ -861,6 +861,7 @@ def filter_data_temporal(opts):
                 sys.exit("'{}' precedes '{}'")
 
             lastwhen = lwhen
+            lline = line
 
     complete(rval, lline, time.time())
 
@@ -881,8 +882,8 @@ def filter_data_regexp(opts, data):
         if [] == re.findall(opts.match_regexp, ltask):
             data[idx] = "{} {}".format(ymdhms(lwhen), "COB")
         else:
-            complete(rval, lline, when)
-            begin(rval, ltask, when)
+            complete(rval, lline, lwhen)
+            begin(rval, ltask, lwhen)
 
         lline['when'] = lwhen
         lline['task'] = ltask
@@ -896,6 +897,16 @@ def format_report_x(data):
     """
     Format *data* into a report
     """
+    pass
+
+
+# -----------------------------------------------------------------------------
+def sum_data(data):
+    """
+    Compute subtotals and total for *data*
+    """
+    pass
+
 
 # -----------------------------------------------------------------------------
 def generate_report(opts):
@@ -906,8 +917,9 @@ def generate_report(opts):
     datl = filter_data_temporal(opts)
     datl = filter_data_regexp(opts, datl)
     datd = sum_data(datl)
-    rval = format_report_x(dat)
+    rval = format_report_x(datd)
     return rval
+
 
 # -----------------------------------------------------------------------------
 def write_report_regexp(opts, testing=False):
@@ -1018,6 +1030,15 @@ def write_report(opts, testing=False):
         timeclose(coll, last, time.time(), True)
         rval = format_report(start, end, coll, testing)
     return rval
+
+
+# ---------------------------------------------------------------------------
+def ymdhms(epoch):
+    """
+    Convert epoch time to %Y.%m%d %H:%M:%S and return it
+    """
+    return time.strftime("%Y.%m%d %H:%M:%S", time.localtime(epoch))
+
 
 # ---------------------------------------------------------------------------
 toolframe.ez_launch(__name__, main)
