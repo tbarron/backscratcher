@@ -157,24 +157,6 @@ def test_nv_deped_show_pxr(capsys):
 
 
 # -----------------------------------------------------------------------------
-def test_nv_stash_noval(capsys):
-    """
-    Attempt to stash an evar (environment variable) that has no value
-    """
-    pytest.fail('obsolete')
-    nvtool_trial(nvtool.nv_stash, capsys, ['NOVAL'], 'No value for $NOVAL')
-
-# -----------------------------------------------------------------------------
-def test_nv_stash_val(capsys):
-    """
-    Attempt to stash an evar (environment variable) that has a value
-    """
-    pytest.fail('obsolete')
-    nvtool_trial(nvtool.nv_stash,
-                 capsys,
-                 ['PATH'],
-                 [_ + '\n' for _ in os.getenv('PATH').split(':')])
-
 # -----------------------------------------------------------------------------
 def test_nv_load(tmpdir, capsys):
     """
