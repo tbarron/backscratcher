@@ -8,6 +8,8 @@ import pexpect
 import pytest
 
 from bscr import nvtool
+import tbx
+
 
 # -----------------------------------------------------------------------------
 def test_nv_decap_dir(capsys):
