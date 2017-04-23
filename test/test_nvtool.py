@@ -186,14 +186,33 @@ def test_nv_load_pxr(tmpdir, capsys):
 
 
 # -----------------------------------------------------------------------------
-def test_nv_show(capsys):
+def test_nv_show_dir(capsys):
     """
     Test nv_show
     """
-    nvtool_trial(nvtool.nv_show,
-                 capsys,
-                 ['PATH'],
-                 ['\n   ' + _ for _ in os.getenv('PATH').split(':')])
+    indata = pathish(['foo, $HOME, aardvark'])
+    exp = showish(['foo, $HOME, aardvark'], "\n    ")
+    with tbx.tmpenv(XPATH=indata):
+        nvtool.nv_show(**{'VAR': os.getenv("XPATH")})
+        output, _ = capsys.readouterr()
+    assert exp in output
+
+
+# -----------------------------------------------------------------------------
+def test_nv_show_pxr(capsys):
+    """
+    Test pexpect.run('nvtool show $PATH')
+    """
+    pytest.debug_func()
+    seed = 'foo, $HOME/bin, aardvark'
+    indata = pathish(seed)
+    exp = showish(seed, "\r\n   ")
+    with tbx.tmpenv(XPATH=indata):
+        cmd = "nvtool show {}".format(os.getenv('XPATH'))
+        output = pexpect.run(cmd)
+    assert exp in output
+
+
 
 # -----------------------------------------------------------------------------
 def test_nv_remove_join(capsys):
