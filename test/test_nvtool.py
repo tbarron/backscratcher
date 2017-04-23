@@ -2,6 +2,7 @@
 Tests for nvtool
 """
 import os
+import re
 
 import pexpect
 import pytest
@@ -176,15 +177,36 @@ def test_nv_help(capsys):
         assert "Traceback" not in result
         assert _ in result
 
+
+# -----------------------------------------------------------------------------
+def showish(seq, sep):
+    """
+    """
+    if isinstance(seq, str):
+        rval = sep.join([_.strip() for _ in re.split("[,:]", seq)])
+    elif isinstance(seq, list):
+        rval = sep.join(seq)
+    else:
+        rval = None
+    return rval
     
 # -----------------------------------------------------------------------------
 def pathish(seq):
     """
-    Given a comma-separated list in string *seq*, compose and return a
-    colon-separated list with whitespace squeezed out
+    Given a comma- or colon-separated list in string *seq*, compose and return
+    a string containing a colon-separated list with whitespace squeezed out.
+
+    Given a list in *seq*, compose and return a string containing a
+    colon-separated list of the elements.
     """
-    return ":".join([_.strip() for _ in seq.split(",")])
-    
+    if isinstance(seq, str):
+        rval = ":".join([_.strip() for _ in re.split("[,:]", seq)])
+    elif isinstance(seq, list):
+        rval = ":".join(seq)
+    else:
+        rval = None
+    return rval
+
 # -----------------------------------------------------------------------------
 def nvtool_trial(function, capsys, testin, expected):
     """
