@@ -157,17 +157,31 @@ def test_nv_deped_show_pxr(capsys):
 
 
 # -----------------------------------------------------------------------------
-# -----------------------------------------------------------------------------
-def test_nv_load(tmpdir, capsys):
+def test_nv_load_dir(tmpdir, capsys):
     """
-    Test nv_load
+    Test nvtool.nv_load(**{'FILE': filename})
     """
+    indata = ['foo, $HOME, aardvark']
+    exp = ':'.join(indata)
     loadable = tmpdir.join('loadable')
-    loadable.write(''.join(['foo\n', '$HOME\n', 'aardvark\n', ]))
-    nvtool_trial(nvtool.nv_load,
-                 capsys,
-                 [loadable.strpath],
-                 'foo:$HOME:aardvark')
+    loadable.write(showish(['foo, $HOME, aardvark'], '\n'))
+    nvtool.nv_load(**{'FILE': loadable.strpath})
+    output, _ = capsys.readouterr()
+    assert exp in output
+
+
+# -----------------------------------------------------------------------------
+def test_nv_load_pxr(tmpdir, capsys):
+    """
+    Test pexpect.run('nvtool load FILE')
+    """
+    indata = ['foo, $HOME, aardvark']
+    exp = ':'.join(indata)
+    loadable = tmpdir.join('loadable')
+    loadable.write(showish(['foo, $HOME, aardvark'], '\n'))
+    output = pexpect.run("nvtool load {}".format(loadable.strpath))
+    assert exp in output
+
 
 # -----------------------------------------------------------------------------
 def test_nv_show(capsys):
