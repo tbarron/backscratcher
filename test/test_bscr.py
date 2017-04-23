@@ -14,6 +14,15 @@ import pytest
 import unittest
 
 
+# -----------------------------------------------------------------------------
+def test_bscr_cl_util_dispatch_deprecate(capsys):
+    """
+    Verify that util.dispatch warns that it's deprecated when bscr runs
+    """
+    result = pexpect.run("bscr help")
+    assert "util.dispatch is deprecated" in result
+
+
 # -------------------------------------------------------------------------
 def test_bscr_version_help():
     """
@@ -67,9 +76,10 @@ class TestScripts(th.HelpedTestCase):
                         "Not expecting 'Traceback' in %s" %
                         U.lquote(result))
         self.assertTrue("Backscratcher version" in result)
-        self.assertEqual(2, len(result.split("\n")),
-                         "Expected only 1 newlines in %s" %
-                         U.lquote(result))
+        # self.assertEqual(2, len(result.split("\n")),
+        #                  "Expected only 1 newlines in %s" %
+        #                  U.lquote(result))
+        self.assertTrue("util.dispatch is deprecated" in result)
 
     # -------------------------------------------------------------------------
     def test_which_module(self):

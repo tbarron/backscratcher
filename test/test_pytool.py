@@ -284,7 +284,12 @@ class TestPytool(th.HelpedTestCase):
                 self.fail('unexpected exception')
 
             got = S.before.split('\r\n')
-            expected = ['newpy - Create a new python program',
+            expected = ["/Users/tbarron/prj/github/backscratcher/bscr/"
+                                "util.py:207: UserWarning: util.dispatch is "
+                                "deprecated in favor of docopt_dispatch",
+                                "  warnings.warn(\"util.dispatch is "
+                                "deprecated in favor of docopt_dispatch\")",
+                        'newpy - Create a new python program',
                         '',
                         '    usage: pytool newpy <program-name>',
                         '',
@@ -316,7 +321,12 @@ class TestPytool(th.HelpedTestCase):
                 self.fail('unexpected exception')
 
             got = S.before.split('\r\n')
-            expected = ['newtool - Create a new tool-style program',
+            expected = ["/Users/tbarron/prj/github/backscratcher/bscr/"
+                                "util.py:207: UserWarning: util.dispatch is "
+                                "deprecated in favor of docopt_dispatch",
+                                "  warnings.warn(\"util.dispatch is "
+                                "deprecated in favor of docopt_dispatch\")",
+                        'newtool - Create a new tool-style program',
                         '',
                         '    usage: pytool newtool <program-name> <prefix>',
                         '',

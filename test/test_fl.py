@@ -5,6 +5,7 @@ from bscr import fl
 from bscr import util
 import os
 import pexpect
+import pytest
 import random
 import re
 import shutil
@@ -117,7 +118,12 @@ class TestFL(th.HelpedTestCase):
             util.writefile('old/mrpm2.2009-08-31',
                            ['copy of another test file\n'])
 
-            expected = ['diff ./mrpm1.2009-10-01 mrpm1\r',
+            expected = ["/Users/tbarron/prj/github/backscratcher/bscr/util.py:207: "
+                        "UserWarning: util.dispatch is deprecated "
+                        "in favor of docopt_dispatch\r",
+                        "  warnings.warn(\"util.dispatch is deprecated"
+                        " in favor of docopt_dispatch\")\r",
+                        'diff ./mrpm1.2009-10-01 mrpm1\r',
                         '1c1\r',
                         '< copy of test file\r',
                         '---\r',
@@ -127,7 +133,12 @@ class TestFL(th.HelpedTestCase):
             got = pexpect.run("%s diff mrpm1" % cmd).split("\n")
             self.assertEqual(expected, got)
 
-            expected = ['diff ./old/mrpm2.2009-08-31 mrpm2\r',
+            expected = ["/Users/tbarron/prj/github/backscratcher/bscr/util.py:207: "
+                        "UserWarning: util.dispatch is deprecated "
+                        "in favor of docopt_dispatch\r",
+                        "  warnings.warn(\"util.dispatch is deprecated"
+                        " in favor of docopt_dispatch\")\r",
+                        'diff ./old/mrpm2.2009-08-31 mrpm2\r',
                         '1c1\r',
                         '< copy of another test file\r',
                         '---\r',
@@ -380,12 +391,17 @@ class TestFL_edit(th.HelpedTestCase):
          - f{1,2} edited correctly
          - f{1,2}.original exists with unchanged content
         """
-        self.fl_edit_ok(eopt="s/foo/bar/",
-                        files=2,
-                        inp=self.testdata,
-                        exp=["one bar two bar three",
-                             "bar four five bar",
-                             "six seven eight bar nine"])
+        self.fl_edit_warn(eopt="s/foo/bar/",
+                          files=2,
+                          inp=self.testdata,
+                          exp=["one bar two bar three",
+                               "bar four five bar",
+                               "six seven eight bar nine"],
+                          warn=["/Users/tbarron/prj/github/backscratcher/bscr/"
+                                "util.py:207: UserWarning: util.dispatch is "
+                                "deprecated in favor of docopt_dispatch",
+                                "  warnings.warn(\"util.dispatch is "
+                                "deprecated in favor of docopt_dispatch\")"])
 
     # -------------------------------------------------------------------------
     def test_fl_edit_sub_bol(self):
@@ -395,12 +411,17 @@ class TestFL_edit(th.HelpedTestCase):
          - f2 edited correctly
          - f{1,2}.original have unchanged content
         """
-        self.fl_edit_ok(eopt="s/^foo/bar/",
-                        files=2,
-                        inp=self.testdata,
-                        exp=["one foo two foo three",
-                             "bar four five foo",
-                             "six seven eight foo nine"])
+        self.fl_edit_warn(eopt="s/^foo/bar/",
+                          files=2,
+                          inp=self.testdata,
+                          exp=["one foo two foo three",
+                               "bar four five foo",
+                               "six seven eight foo nine"],
+                          warn=["/Users/tbarron/prj/github/backscratcher/bscr/"
+                                "util.py:207: UserWarning: util.dispatch is "
+                                "deprecated in favor of docopt_dispatch",
+                                "  warnings.warn(\"util.dispatch is "
+                                "deprecated in favor of docopt_dispatch\")"])
 
     # -------------------------------------------------------------------------
     def test_fl_edit_i_old(self):
@@ -410,13 +431,19 @@ class TestFL_edit(th.HelpedTestCase):
          - f1.old exists
          - f1.original does not exist
         """
-        self.fl_edit_ok(eopt="s/[rv]e/n/",
-                        iopt="old",
-                        files=1,
-                        inp=self.testdata,
-                        exp=["one foo two foo thne",
-                             "foo four fin foo",
-                             "six senn eight foo nine"])
+        pytest.debug_func()
+        self.fl_edit_warn(eopt="s/[rv]e/n/",
+                          iopt="old",
+                          files=1,
+                          inp=self.testdata,
+                          exp=["one foo two foo thne",
+                               "foo four fin foo",
+                               "six senn eight foo nine"],
+                          warn=["/Users/tbarron/prj/github/backscratcher/bscr/"
+                                "util.py:207: UserWarning: util.dispatch is "
+                                "deprecated in favor of docopt_dispatch",
+                                "  warnings.warn(\"util.dispatch is "
+                                "deprecated in favor of docopt_dispatch\")"])
 
     # -------------------------------------------------------------------------
     def test_fl_edit_xlate_rot13(self):
@@ -428,12 +455,17 @@ class TestFL_edit(th.HelpedTestCase):
         """
         prev = "abcdefghijklmnopqrstuvwxyz"
         post = "nopqrstuvwxyzabcdefghijklm"
-        self.fl_edit_ok(eopt="y/%s/%s/" % (prev, post),
-                        files=2,
-                        inp=self.testdata,
-                        exp=["bar sbb gjb sbb guerr",
-                             "sbb sbhe svir sbb",
-                             "fvk frira rvtug sbb avar"])
+        self.fl_edit_warn(eopt="y/%s/%s/" % (prev, post),
+                          files=2,
+                          inp=self.testdata,
+                          exp=["bar sbb gjb sbb guerr",
+                               "sbb sbhe svir sbb",
+                               "fvk frira rvtug sbb avar"],
+                          warn=["/Users/tbarron/prj/github/backscratcher/bscr/"
+                                "util.py:207: UserWarning: util.dispatch is "
+                                "deprecated in favor of docopt_dispatch",
+                                "  warnings.warn(\"util.dispatch is "
+                                "deprecated in favor of docopt_dispatch\")"])
 
     # -------------------------------------------------------------------------
     def test_fl_edit_xlate_ret(self):
@@ -443,12 +475,18 @@ class TestFL_edit(th.HelpedTestCase):
          - f{1,2}.original have correct original content
         """
         rdata = [x.rstrip() + "\r\n" for x in self.testdata]
-        self.fl_edit_ok(eopt="y/\r//",
-                        files=2,
-                        inp=rdata,
-                        exp=["one foo two foo three",
-                             "foo four five foo",
-                             "six seven eight foo nine"])
+        self.fl_edit_warn(eopt="y/\r//",
+                          files=2,
+                          inp=rdata,
+                          exp=["one foo two foo three",
+                               "foo four five foo",
+                               "six seven eight foo nine"],
+                          warn=["/Users/tbarron/prj/github/backscratcher/bscr/"
+                                "util.py:207: UserWarning: util.dispatch is "
+                                "deprecated in favor of docopt_dispatch",
+                                "  warnings.warn(\"util.dispatch is "
+                                "deprecated in favor of docopt_dispatch\")"])
+
 
     # -------------------------------------------------------------------------
     def fl_edit_flawed(self, cmd, exp):
@@ -461,6 +499,50 @@ class TestFL_edit(th.HelpedTestCase):
         self.assertTrue(exp in result,
                         "\nExpected '%s' in \n%s" %
                         (exp, util.lquote(result)))
+
+    # -------------------------------------------------------------------------
+    def fl_edit_warn(self, eopt='', iopt='', files=0,
+                     inp=None, exp=None, warn=None):
+        """
+        Common code for all the test_fl_edit_* routines
+        """
+        fl = []
+        inp = inp or []
+        exp = exp or []
+        warn = warn or []
+        for idx in range(files):
+            (fd, fp) = tempfile.mkstemp(dir=self.testdir)
+            os.close(fd)
+            fl.append(fp)
+            util.writefile(fp, inp)
+
+        suffix = 'original'
+        with util.Chdir(self.testdir):
+            cmd = "fl edit "
+            if eopt != '':
+                cmd += '-e "%s" ' % eopt
+            if iopt != '':
+                cmd += '-i %s ' % iopt
+                suffix = iopt
+            if 0 < len(fl):
+                cmd += " ".join(fl)
+            result = pexpect.run(cmd)
+
+            self.assertTrue(result == "\r\n".join(warn + [""]),
+                            "Expected '%s' to contain '%s'"
+                            % (result, "\r\n".join(warn + [""])))
+            for fp in fl:
+                forig = fp + "." + suffix
+                self.assertTrue(util.exists(forig),
+                                "Expected %s to exist" % forig)
+                self.assertTrue("foo four five foo" in util.contents(forig),
+                                "Contents of %s have changed" % forig)
+                self.assertTrue(util.exists(fp),
+                                "Expected %s to exist" % fp)
+                self.assertEq(exp, util.contents(fp))
+
+            for fp in fl:
+                util.safe_unlink(fp)
 
     # -------------------------------------------------------------------------
     def fl_edit_ok(self, eopt='', iopt='', files=0, inp=[], exp=[]):

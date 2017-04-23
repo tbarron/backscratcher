@@ -39,6 +39,7 @@ def pytest_configure(config):
     # pdb.set_trace()
     if config.getoption("--all"):
         config.option.__dict__['exitfirst'] = False
+        config.option.__dict__['maxfail'] = 2000
 
 # -----------------------------------------------------------------------------
 def pytest_runtest_setup(item):

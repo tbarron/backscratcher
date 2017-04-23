@@ -24,5 +24,5 @@ def test_pylint():
     Run pylint to check the quality of the code
     """
     # result = pexpect.run("pylint -rn bscr")
-    result = pexpect.run("flake8 bscr")
+    result = pexpect.run("flake8 bscr test")
     assert result == ''

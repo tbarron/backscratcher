@@ -16,6 +16,7 @@ import subprocess as subp
 import sys
 import termios
 import time
+import warnings
 
 import pexpect
 
@@ -203,6 +204,7 @@ def dispatch(mname, prefix, args):
     Call a subfunction from module *mname* based on *prefix* and *args*
     !@! test?
     """
+    warnings.warn("util.dispatch is deprecated in favor of docopt_dispatch")
     try:
         func_name = args[1]
     except IndexError:
