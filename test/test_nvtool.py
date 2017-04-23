@@ -3,55 +3,96 @@ Tests for nvtool
 """
 import os
 
+import pexpect
 import pytest
 
 from bscr import nvtool
 
 # -----------------------------------------------------------------------------
-def test_nv_decap(capsys):
+def test_nv_decap_dir(capsys):
     """
     'A:B:C:D' => 'B:C:D'
     ':foobar:heffalump' => 'foobar:heffalump'
     ''  => ''
     """
-    nvtool_trial(nvtool.nv_decap, capsys, ["A:B:C:D"], "B:C:D")
-    nvtool_trial(nvtool.nv_decap,
-                 capsys,
-                 [":foobar:heffalump:"],
-                 "foobar:heffalump:")
-    nvtool_trial(nvtool.nv_decap, capsys, [""], "")
+    pytest.debug_func()
+    indata, exp = pathish("A, B, C, D"), pathish("B, C, D")
+    nvtool.nv_decap(**{'VAR': indata})
+    output, _ = capsys.readouterr()
+    assert indata not in output
+    assert exp in output
 
-    path = os.getenv('PATH')
-    headless = ':'.join(path.split(':')[1:])
-    nvtool_trial(nvtool.nv_decap, capsys, [path], headless)
 
 # -----------------------------------------------------------------------------
-def test_nv_dedup(capsys):
+def test_nv_decap_pxr(capsys):
+    """
+    'A:B:C:D' => 'B:C:D'
+    ':foobar:heffalump' => 'foobar:heffalump'
+    ''  => ''
+    """
+    pytest.debug_func()
+    indata, exp = pathish("A,B,C,D"), pathish("B,C,D")
+    output = pexpect.run("nvtool decap {}".format(indata))
+    assert indata not in output
+    assert exp in output
+
+
+# -----------------------------------------------------------------------------
+def test_nv_dedup_dir(capsys):
     """
     'X:Y:Z:Z:Y' -> 'X:Y:Z'
     """
-    nvtool_trial(nvtool.nv_dedup, capsys, ['X:Y:Z:Z:Y'], 'X:Y:Z')
-    nvtool_trial(nvtool.nv_dedup, capsys, ['X::Z::Y'], 'X::Z:Y')
+    pytest.debug_func()
+    indata, exp = pathish('X,Y,Z,Z,Y'), pathish('X,Y,Z')
+    nvtool.nv_dedup(**{'VAR': indata})
+    output, _ = capsys.readouterr()
+    assert exp in output
+    assert indata not in output
+
 
 # -----------------------------------------------------------------------------
-def test_nv_dedup_s(capsys):
+def test_nv_dedup_pxr(capsys):
     """
-    -s option triggers a different output format
+    'X:Y:Z:Z:Y' -> 'X:Y:Z'
     """
-    nvtool_trial(nvtool.nv_dedup,
-                   capsys,
-                   ['-s', 'X:Y:Z:Z:Y'],
-                   '   X\n   Y\n   Z')
-    nvtool_trial(nvtool.nv_dedup,
-                   capsys,
-                   ['-s', 'X::Z::Y'],
-                   '   X\n   \n   Z\n   Y')
+    pytest.debug_func()
+    indata, exp = 'X:Y:Z:Z:Y', 'X:Y:Z'
+    output = pexpect.run("nvtool dedup X:Y:Z:Z:Y")
+    assert exp in output
+    assert indata not in output
+
+
+# -----------------------------------------------------------------------------
+def test_nv_dedup_show_dir(capsys):
+    """
+    'X:Y:Z:Z:Y' -> 'X:Y:Z'
+    """
+    pytest.debug_func()
+    indata, exp = 'X:Y:Z:Z:Y', '   X\n   Y\n   Z'
+    nvtool.nv_dedup_show(**{'VAR': indata})
+    output, _ = capsys.readouterr()
+    assert exp in output
+    assert indata not in output
+
+
+# -----------------------------------------------------------------------------
+def test_nv_dedup_show_pxr(capsys):
+    """
+    'X:Y:Z:Z:Y' -> '   X\r\n   Y\r\n   Z'
+    """
+    pytest.debug_func()
+    indata, exp = ":".join(list("XYZZY")), "\r\n   ".join(list("XYZ"))
+    output = pexpect.run("nvtool dedup --show X:Y:Z:Z:Y")
+    assert exp in output
+    assert indata not in output
+
 
 # -----------------------------------------------------------------------------
 def test_nv_deped(capsys):
     """
     Test nv_deped()
     """
+    pytest.fail('obsolete')
     nvtool_trial(nvtool.nv_deped, capsys, ['X:Y:Z:Z:Y'], 'X:Y:Z:Z')
     nvtool_trial(nvtool.nv_deped, capsys, ['X::Z::Y'], 'X::Z:')
     
@@ -60,6 +101,7 @@ def test_nv_stash_noval(capsys):
     """
     Attempt to stash an evar (environment variable) that has no value
     """
+    pytest.fail('obsolete')
     nvtool_trial(nvtool.nv_stash, capsys, ['NOVAL'], 'No value for $NOVAL')
     
 # -----------------------------------------------------------------------------
@@ -67,6 +109,7 @@ def test_nv_stash_val(capsys):
     """
     Attempt to stash an evar (environment variable) that has a value
     """
+    pytest.fail('obsolete')
     nvtool_trial(nvtool.nv_stash,
                  capsys,
                  ['PATH'],
@@ -117,10 +160,37 @@ def test_nv_remove_show(capsys):
     nvtool_trial(nvtool.nv_remove, capsys, ['-s', 'impl', testin], s_exp)
 
 # -----------------------------------------------------------------------------
+def test_nv_help(capsys):
+    """
+    Verify that util.dispatch warns that it's deprecated when nvtool runs
+    """
+    pytest.debug_func()
+    cmdlist = "help decap dedup deped load remove show".split()
+    result = pexpect.run("nvtool help")
+    assert "nvtool examples:" in result
+    for _ in cmdlist:
+        assert _ in result
+
+    for _ in cmdlist:
+        result = pexpect.run("nvtool help {}".format(_))
+        assert "Traceback" not in result
+        assert _ in result
+
+    
+# -----------------------------------------------------------------------------
+def pathish(seq):
+    """
+    Given a comma-separated list in string *seq*, compose and return a
+    colon-separated list with whitespace squeezed out
+    """
+    return ":".join([_.strip() for _ in seq.split(",")])
+    
+# -----------------------------------------------------------------------------
 def nvtool_trial(function, capsys, testin, expected):
     """
     Run an nvtool function on an input and verify the result
     """
+    pytest.fail('obs')
     function(testin)
     stdo, _ = capsys.readouterr()
     if isinstance(expected, str):
