@@ -6,13 +6,12 @@ A 'pathish' is a PATH-formatted environment variable. Examples include $PATH,
 $MANPATH, $PYTHONPATH, etc.
 
 Usage:    nvtool help [COMMAND]
-          nvtool decap VAR
+          nvtool decap [--show] VAR
           nvtool dedup [--show] VAR
-          nvtool deped VAR
+          nvtool deped [--show] VAR
           nvtool load FILE
-          nvtool remove VAR SEGMENT
+          nvtool remove [--show] SEGMENT VAR
           nvtool show VAR
-          nvtool stash VAR FILE
 
 nvtool examples:
 
@@ -24,7 +23,7 @@ nvtool examples:
 
     export PATH=`nvtool dedup $PATH`
         Remove duplicate elements of $PATH
-        
+
     export PATH=`nvtool deped $PATH`
         Remove the last element of $PATH
 
@@ -68,9 +67,20 @@ def nv_help(**kwa):
 
 
 # ---------------------------------------------------------------------------
+@dispatch.on('decap', '--show', 'VAR')
+def nv_decap_show(**kwa):
+    """
+    Remove the head of a PATH type variable. Output in show format.
+    """
+    pieces = kwa['VAR'].split(':')
+    print('\n   '.join(pieces[1:]))
+
+
+# -----------------------------------------------------------------------------
 @dispatch.on('decap', 'VAR')
 def nv_decap(**kwa):
-    """decap - remove the head of a PATH type variable
+    """
+    Remove the head of a PATH type variable. Output in colon-separated format.
     """
     pieces = kwa['VAR'].split(':')
     print(':'.join(pieces[1:]))
@@ -91,7 +101,7 @@ def nv_dedup_show(**kwa):
         print("   {}".format(item))
 
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 @dispatch.on('dedup', 'VAR')
 def nv_dedup(**kwa):
     """dedup - display the contents of a PATH variable without duplicates
@@ -107,46 +117,58 @@ def nv_dedup(**kwa):
 
 
 # ---------------------------------------------------------------------------
-def nv_deped(argv):
+@dispatch.on('deped', '--show', 'VAR')
+def nv_deped_show(**kwa):
+    """
+    Remove the foot (last entry) of a PATHISH. Output in show format
+    """
+    pieces = kwa['VAR'].split(':')
+    print('\n   '.join(pieces[:-1]))
+
+
+# ---------------------------------------------------------------------------
+@dispatch.on('deped', 'VAR')
+def nv_deped(**kwa):
     """deped - remove the foot (last entry) of a PATH type variable
     """
-    pieces = argv[0].split(':')
+    pieces = kwa['VAR'].split(':')
     print(':'.join(pieces[:-1]))
 
 
 # ---------------------------------------------------------------------------
-def nv_stash(argv):
-    """stash - write an env var contents in a format suitable for editing
-
-    usage: nvtool stash VARNAME > filename
-
-    With load, stash can be used to edit environment variables like $PATH.
-    For example,
-
-        $ nvtool stash PATH > mypath
-        $ vi mypath
-        $ export PATH=`nvtool load mypath`
-    """
-    prs = optparse.OptionParser()
-    prs.add_option('-d', '--debug',
-                   action='store_true', default=False, dest='debug',
-                   help='start the debugger')
-    (opts, args) = prs.parse_args(argv)
-
-    if opts.debug:               # pragma: no coverage
-        pdb.set_trace()
-
-    varname = args[0]
-    val = os.getenv(varname)
-    if val is None:
-        print "No value for $%s" % varname
-    else:
-        for piece in val.split(":"):
-            print piece
+# def nv_stash(argv):
+#     """stash - write an env var contents in a format suitable for editing
+#
+#     usage: nvtool stash VARNAME > filename
+#
+#     With load, stash can be used to edit environment variables like $PATH.
+#     For example,
+#
+#         $ nvtool stash PATH > mypath
+#         $ vi mypath
+#         $ export PATH=`nvtool load mypath`
+#     """
+#     prs = optparse.OptionParser()
+#     prs.add_option('-d', '--debug',
+#                    action='store_true', default=False, dest='debug',
+#                    help='start the debugger')
+#     (opts, args) = prs.parse_args(argv)
+#
+#     if opts.debug:               # pragma: no coverage
+#         pdb.set_trace()
+#
+#     varname = args[0]
+#     val = os.getenv(varname)
+#     if val is None:
+#         print "No value for $%s" % varname
+#     else:
+#         for piece in val.split(":"):
+#             print piece
 
 
 # ---------------------------------------------------------------------------
-def nv_load(argv):
+@dispatch.on('load', 'FILE')
+def nv_load(**kwa):
     """load - read a file to set the content of a variable
 
     usage: export PATH=`nvtool load <filename>`
@@ -158,59 +180,42 @@ def nv_load(argv):
         $ vi mypath
         $ export PATH=`nvtool load mypath`
     """
-    prs = optparse.OptionParser()
-    prs.add_option('-d', '--debug',
-                   action='store_true', default=False, dest='debug',
-                   help='start the debugger')
-    (opts, args) = prs.parse_args(argv)
-
-    if opts.debug:          # pragma: no coverage
-        pdb.set_trace()
-
-    fname = args[0]
-    rbl = open(fname, 'r')
-    lines = rbl.readlines()
+    with open(kwa['FILE'], 'r') as rbl:
+        lines = rbl.readlines()
     result = ":".join([_.strip() for _ in lines])
-    rbl.close()
     print result
 
 
 # ---------------------------------------------------------------------------
-def nv_show(argv):
+@dispatch.on('show', 'VAR')
+def nv_show(**kwa):
     """show - display the contents of a PATH variable in an easy to read format
     """
-    for item in argv[0].split(':'):
+    for item in kwa['VAR'].split(':'):
         print "   " + item
 
 
 # ---------------------------------------------------------------------------
-def nv_remove(argv):
-    """remove - remove entries that match the argument
-
-    !@! needs test
+@dispatch.on('remove', '--show', 'SEGMENT', 'VAR')
+def nv_remove_show(**kwa):
     """
-    prs = optparse.OptionParser()
-    prs.add_option('-d', '--debug',
-                   action='store_true', default=False, dest='debug',
-                   help='start the debugger')
-#     prs.add_option('-j', '--join',
-#                    action='store_true', default=True, dest='join',
-#                    help='colon separated format (default)')
-    prs.add_option('-s', '--show',
-                   action='store_true', default=False, dest='show',
-                   help='newline separated format')
-    (opts, args) = prs.parse_args(argv)
+    Remove entries that match the argument. Output in show format.
+    """
+    pieces = kwa['VAR'].split(':')
+    result = [_ for _ in pieces if kwa['SEGMENT'] not in _]
+    for item in result:
+        print "    " + item
 
-    if opts.debug:                 # pragma: no coverage
-        pdb.set_trace()
+# ---------------------------------------------------------------------------
+@dispatch.on('remove', 'SEGMENT', 'VAR')
+def nv_remove(**kwa):
+    """
+    Remove entries that match the argument. Output in join format.
+    """
+    pieces = kwa['VAR'].split(':')
+    result = [_ for _ in pieces if kwa['SEGMENT'] not in _]
+    print(":".join(result))
 
-    pieces = args[1].split(':')
-    result = [_ for _ in pieces if args[0] not in _]
-    if opts.show:
-        for item in result:
-            print "   " + item
-    else:
-        print(":".join(result))
 
 # ---------------------------------------------------------------------------
 # xtoolframe.tf_launch("nv")
