@@ -12,9 +12,7 @@ from bscr import nvtool
 # -----------------------------------------------------------------------------
 def test_nv_decap_dir(capsys):
     """
-    'A:B:C:D' => 'B:C:D'
-    ':foobar:heffalump' => 'foobar:heffalump'
-    ''  => ''
+    Test nvtool.nv_decap(**{'VAR': PATHISH})
     """
     pytest.debug_func()
     indata, exp = pathish("A, B, C, D"), pathish("B, C, D")
@@ -27,9 +25,7 @@ def test_nv_decap_dir(capsys):
 # -----------------------------------------------------------------------------
 def test_nv_decap_pxr(capsys):
     """
-    'A:B:C:D' => 'B:C:D'
-    ':foobar:heffalump' => 'foobar:heffalump'
-    ''  => ''
+    Test pexpect.run('nvtool decap PATHISH')
     """
     pytest.debug_func()
     indata, exp = pathish("A,B,C,D"), pathish("B,C,D")
@@ -39,9 +35,34 @@ def test_nv_decap_pxr(capsys):
 
 
 # -----------------------------------------------------------------------------
+def test_nv_decap_show_dir(capsys):
+    """
+    Test nvtool.nv_decap_show(**{'VAR': PATHISH})
+    """
+    pytest.debug_func()
+    indata, exp = pathish('X:Y:Z:Z:Y'), showish(list("YZZY"), "\n   ")
+    nvtool.nv_decap_show(**{'VAR': indata})
+    output, _ = capsys.readouterr()
+    assert exp in output
+    assert indata not in output
+
+
+# -----------------------------------------------------------------------------
+def test_nv_decap_show_pxr(capsys):
+    """
+    Test pexpect.run('nvtool decap --show PATHISH')
+    """
+    pytest.debug_func()
+    indata, exp = pathish("X, Y, Z, Z, Y"), showish(list("YZZY"), "\r\n   ")
+    output = pexpect.run("nvtool decap --show X:Y:Z:Z:Y")
+    assert exp in output
+    assert indata not in output
+
+
+# -----------------------------------------------------------------------------
 def test_nv_dedup_dir(capsys):
     """
-    'X:Y:Z:Z:Y' -> 'X:Y:Z'
+    Test nvtool.nv_dedup(**{'VAR': PATHISH})
     """
     pytest.debug_func()
     indata, exp = pathish('X,Y,Z,Z,Y'), pathish('X,Y,Z')
@@ -54,10 +75,10 @@ def test_nv_dedup_dir(capsys):
 # -----------------------------------------------------------------------------
 def test_nv_dedup_pxr(capsys):
     """
-    'X:Y:Z:Z:Y' -> 'X:Y:Z'
+    Test pexpect.run('nvtool dedup PATHISH')
     """
     pytest.debug_func()
-    indata, exp = 'X:Y:Z:Z:Y', 'X:Y:Z'
+    indata, exp = pathish('X:Y:Z:Z:Y'), pathish('X:Y:Z')
     output = pexpect.run("nvtool dedup X:Y:Z:Z:Y")
     assert exp in output
     assert indata not in output
@@ -66,10 +87,10 @@ def test_nv_dedup_pxr(capsys):
 # -----------------------------------------------------------------------------
 def test_nv_dedup_show_dir(capsys):
     """
-    'X:Y:Z:Z:Y' -> 'X:Y:Z'
+    Test nvtool.nv_dedup_show(**{'VAR': PATHISH})
     """
     pytest.debug_func()
-    indata, exp = 'X:Y:Z:Z:Y', '   X\n   Y\n   Z'
+    indata, exp = pathish('X:Y:Z:Z:Y'), showish(list("XYZ"), "\n   ")
     nvtool.nv_dedup_show(**{'VAR': indata})
     output, _ = capsys.readouterr()
     assert exp in output
@@ -79,24 +100,62 @@ def test_nv_dedup_show_dir(capsys):
 # -----------------------------------------------------------------------------
 def test_nv_dedup_show_pxr(capsys):
     """
-    'X:Y:Z:Z:Y' -> '   X\r\n   Y\r\n   Z'
+    Test pexpect.run('nvtool dedup --show PATHISH')
     """
     pytest.debug_func()
-    indata, exp = ":".join(list("XYZZY")), "\r\n   ".join(list("XYZ"))
-    output = pexpect.run("nvtool dedup --show X:Y:Z:Z:Y")
+    indata, exp = pathish("X, Y, Z, Z, Y"), showish(list("XYZ"), "\r\n   ")
+    output = pexpect.run("nvtool dedup --show {}".format(indata))
     assert exp in output
     assert indata not in output
 
 
 # -----------------------------------------------------------------------------
-def test_nv_deped(capsys):
+def test_nv_deped_dir(capsys):
+    """
+    Test nvtool.nv_deped(**{'VAR': PATHISH})
+    """
+    pytest.debug_func()
+    indata, exp = pathish('X,Y,Z,Z,Y'), pathish(list('XYZZ'))
+    nvtool.nv_deped(**{'VAR': indata})
+    output, _ = capsys.readouterr()
+    assert exp in output
+    assert indata not in output
+
+# -----------------------------------------------------------------------------
+def test_nv_deped_pxr(capsys):
+    """
+    Test pexpect.run('nvtool deped PATHISH')
+    """
+    pytest.debug_func()
+    indata, exp = pathish('X:Y:Z:Z:Y'), pathish(list("XYZZ"))
+    output = pexpect.run("nvtool deped {}".format(indata))
+    assert exp in output
+    assert indata not in output
+
+# -----------------------------------------------------------------------------
+def test_nv_deped_show_dir(capsys):
     """
     Test nv_deped()
     """
-    pytest.fail('obsolete')
-    nvtool_trial(nvtool.nv_deped, capsys, ['X:Y:Z:Z:Y'], 'X:Y:Z:Z')
-    nvtool_trial(nvtool.nv_deped, capsys, ['X::Z::Y'], 'X::Z:')
-    
+    pytest.debug_func()
+    indata, exp = pathish('X:Y:Z:Z:Y'), showish(list("XYZZ"), "\n   ")
+    nvtool.nv_deped_show(**{'VAR': indata})
+    output, _ = capsys.readouterr()
+    assert exp in output
+    assert indata not in output
+
+# -----------------------------------------------------------------------------
+def test_nv_deped_show_pxr(capsys):
+    """
+    Test nv_deped()
+    """
+    pytest.debug_func()
+    indata, exp = pathish(list("XYZZY")), showish(list("XYZ"), "\r\n   ")
+    output = pexpect.run("nvtool deped --show {}".format(indata))
+    assert exp in output
+    assert indata not in output
+
+
 # -----------------------------------------------------------------------------
 def test_nv_stash_noval(capsys):
     """
@@ -104,7 +163,7 @@ def test_nv_stash_noval(capsys):
     """
     pytest.fail('obsolete')
     nvtool_trial(nvtool.nv_stash, capsys, ['NOVAL'], 'No value for $NOVAL')
-    
+
 # -----------------------------------------------------------------------------
 def test_nv_stash_val(capsys):
     """
@@ -115,7 +174,7 @@ def test_nv_stash_val(capsys):
                  capsys,
                  ['PATH'],
                  [_ + '\n' for _ in os.getenv('PATH').split(':')])
-    
+
 # -----------------------------------------------------------------------------
 def test_nv_load(tmpdir, capsys):
     """
@@ -127,7 +186,7 @@ def test_nv_load(tmpdir, capsys):
                  capsys,
                  [loadable.strpath],
                  'foo:$HOME:aardvark')
-    
+
 # -----------------------------------------------------------------------------
 def test_nv_show(capsys):
     """
