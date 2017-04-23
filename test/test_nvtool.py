@@ -213,28 +213,56 @@ def test_nv_show_pxr(capsys):
     assert exp in output
 
 
-
 # -----------------------------------------------------------------------------
-def test_nv_remove_join(capsys):
+def test_nv_remove_join_dir(capsys):
     """
     Test nv_remove
     """
     pytest.debug_func()
     testin = 'beautiful:explicit:simple:complex:sparse'
-    c_exp = 'beautiful:explicit:complex:sparse'
-    s_exp = ['   \n' + _ for _ in c_exp.split(':')]
-    nvtool_trial(nvtool.nv_remove, capsys, ['impl', testin], c_exp)
+    exp = 'beautiful:explicit:complex:sparse'
+    nvtool.nv_remove(**{'SEGMENT': 'simple', 'VAR': testin})
+    output, _ = capsys.readouterr()
+    assert exp in output
+
 
 # -----------------------------------------------------------------------------
-def test_nv_remove_show(capsys):
+def test_nv_remove_join_pxr(capsys):
     """
     Test nv_remove
     """
     pytest.debug_func()
     testin = 'beautiful:explicit:simple:complex:sparse'
-    c_exp = 'beautiful:explicit:complex:sparse'
-    s_exp = ['   \n' + _ for _ in c_exp.split(':')]
-    nvtool_trial(nvtool.nv_remove, capsys, ['-s', 'impl', testin], s_exp)
+    exp = 'beautiful:explicit:complex:sparse'
+    output = pexpect.run("nvtool remove simple {}".format(testin))
+    assert exp in output
+    assert testin not in output
+
+
+# -----------------------------------------------------------------------------
+def test_nv_remove_show_dir(capsys):
+    """
+    Test nv_remove
+    """
+    pytest.debug_func()
+    testin = 'beautiful:explicit:simple:complex:sparse'
+    exp = showish('beautiful:explicit:complex:sparse', "\n    ")
+    nvtool.nv_remove_show(**{'SEGMENT': 'simple', 'VAR': testin})
+    output, _ = capsys.readouterr()
+    assert exp in output
+
+
+# -----------------------------------------------------------------------------
+def test_nv_remove_show_pxr(capsys):
+    """
+    Test nv_remove
+    """
+    pytest.debug_func()
+    testin = 'beautiful:explicit:simple:complex:sparse'
+    exp = showish('beautiful:explicit:complex:sparse', "\r\n    ")
+    output = pexpect.run("nvtool remove --show simple {}".format(testin))
+    assert exp in output
+
 
 # -----------------------------------------------------------------------------
 def test_nv_help(capsys):
@@ -265,7 +293,7 @@ def showish(seq, sep):
     else:
         rval = None
     return rval
-    
+
 # -----------------------------------------------------------------------------
 def pathish(seq):
     """
