@@ -57,6 +57,9 @@ def main(args=None):                                    # pragma: no coverage
 # ---------------------------------------------------------------------------
 @dispatch.on('help')
 def nv_help(**kwa):
+    """
+    Show the help information from __doc__
+    """
     pring = False
     for line in __doc__.split("\n"):
         if pring:
