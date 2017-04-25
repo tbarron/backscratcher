@@ -3,8 +3,23 @@
 pytool - produce skeletons for python programs
 
 Usage:
-   pytool <function> <arguments>
-   'pytool help' for details
+    pytool help [COMMAND]
+    pytool newpy PROGRAM
+    pytool newtool PROGRAM
+
+---
+pytool examples:
+
+    pytool help
+        Display this list of command descriptions
+
+    pytool newpy PROGRAM
+        Create a new python program named PROGRAM
+
+    pytool newtool PROGRAM
+        Create a new python tool-type program based on docopt_dispatch named
+        PROGRAM
+---
 
 Copyright (C) 1995 - <the end of time>  Tom Barron
   tom.barron@comcast.net
