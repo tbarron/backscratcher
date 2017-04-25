@@ -62,6 +62,39 @@ def test_newpy_prog_pxr(tmpdir, fx_nopred):
     assert exp == got
 
 
+# -----------------------------------------------------------------------------
+def test_newpy_overwriting_no(tmpdir):
+    """
+    Run 'pytool newpy xyzzy' when xyzzy already exists. Verify
+    that confirmation is requested. Answer 'no' and verify that
+    the existing file is not overwritten.
+    """
+    xyzzy = testfile(tmpdir, "xyzzy", content="original xyzzy\n")
+    xyzzy_py = testfile(tmpdir, "xyzzy.py", content="original xyzzy.py\n")
+    with U.Chdir(tmpdir.strpath):
+        cmd = pexpect.which("pytool")
+        S = pexpect.spawn("{} newpy xyzzy".format(cmd))
+        which = S.expect([r'you sure\? >',
+                          'Error:',
+                          pexpect.EOF])
+        if which == 0:
+            S.sendline('no')
+            S.expect(pexpect.EOF)
+        elif which == 1:
+            print S.before + S.after
+            pytest.fail('unexpected exception')
+        else:
+            pytest.fail('should have asked about overwriting xyzzy')
+
+        expected = ['original xyzzy']
+        got = U.contents(xyzzy.strpath)
+        assert(expected == got)
+
+        expected = ['original xyzzy.py']
+        got = U.contents(xyzzy_py.strpath)
+        assert(expected == got)
+
+
             self.assertEqual(exp, got,
                              "\nExpected '%s',\n     got '%s'" %
                              (exp, got))
