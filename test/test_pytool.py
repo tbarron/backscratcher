@@ -6,6 +6,7 @@ import sys
 import pexpect
 import pytest
 
+from bscr import pytool
 from bscr import testhelp as th
 from bscr import util as U
 
@@ -21,6 +22,25 @@ def test_newpy_nothing():
                 "pytool newpy PROGRAM",
                 "pytool newtool PROGRAM"]:
         assert exp in result
+
+
+# -----------------------------------------------------------------------------
+def test_newpy_prog_dir(tmpdir, fx_nopred):
+    """
+    Run 'pytool.pt_newpy(**{'newpy': True, 'PROGRAM': 'xyzzy'})'. Verify that
+    xyzzy and xyzzy.py are created and have the right contents.
+    """
+    pytest.debug_func()
+    pytool.pt_newpy(**{"newpy": True, "PROGRAM": "xyzzy"})
+
+    assert os.path.exists(fx_nopred.pname)
+    exp = os.path.abspath(fx_nopred.pname)
+    act = os.readlink(fx_nopred.lname)
+    assert exp == act
+
+    got = U.contents(fx_nopred.pname)
+    exp = expected_xyzzy_py()
+    assert exp == got
 
 
             self.assertEqual(exp, got,
