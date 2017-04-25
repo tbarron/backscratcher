@@ -43,6 +43,25 @@ def test_newpy_prog_dir(tmpdir, fx_nopred):
     assert exp == got
 
 
+# -----------------------------------------------------------------------------
+def test_newpy_prog_pxr(tmpdir, fx_nopred):
+    """
+    Run 'pytool newpy xyzzy'. Verify that xyzzy and xyzzy.py are created
+    and have the right contents.
+    """
+    pytest.debug_func()
+    r = pexpect.run("pytool newpy {}".format(fx_nopred.lname))
+
+    assert os.path.exists(fx_nopred.pname)
+    exp = os.path.abspath(fx_nopred.pname)
+    act = os.readlink(fx_nopred.lname)
+    assert exp == act
+
+    got = U.contents(fx_nopred.pname)
+    exp = expected_xyzzy_py()
+    assert exp == got
+
+
             self.assertEqual(exp, got,
                              "\nExpected '%s',\n     got '%s'" %
                              (exp, got))
