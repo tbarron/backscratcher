@@ -9,6 +9,20 @@ import pytest
 from bscr import testhelp as th
 from bscr import util as U
 
+# -----------------------------------------------------------------------
+def test_newpy_nothing():
+    """
+    Run 'pytool newpy' with no other arguments. Should produce pytool's
+    'Usage:' message.
+    """
+    result = pexpect.run("pytool newpy")
+    for exp in ["Usage:",
+                "pytool help [COMMAND]",
+                "pytool newpy PROGRAM",
+                "pytool newtool PROGRAM"]:
+        assert exp in result
+
+
             self.assertEqual(exp, got,
                              "\nExpected '%s',\n     got '%s'" %
                              (exp, got))
