@@ -39,7 +39,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
-import optparse
+from docopt_dispatch import dispatch
 import os
 import re
 import sys
@@ -54,72 +54,84 @@ def main(args=None):
     """
     Where the action starts
     """
-    if args is None:
-        args = sys.argv
-    U.dispatch(__name__, 'pt', args)
+    dispatch(__doc__)
 
 
 # ---------------------------------------------------------------------------
-def pt_newpy(args):
+@dispatch.on('help')
+def help(**kwa):
+    """
+    Show the help information from __doc__
+    """
+    printing = False
+    for line in __doc__.split("\n"):
+        if printing:
+            if line.strip() == "---":
+                printing = False
+            else:
+                print line
+        if "examples:" in line:
+            print line
+            printing = True
+
+# ---------------------------------------------------------------------------
+@dispatch.on('newpy', 'PROGRAM')
+def pt_newpy(**kwa):
     """newpy - Create a new python program
 
     usage: pytool newpy <program-name>
 
     Creates executable file <program-name>.py with skeletal
-    contents. Run "<program-name>.py -L" to create link <program-name>.
+    contents. Run '<program-name>.py -L' to create link <program-name>.
     """
-    prs = optparse.OptionParser()
-    (_, argl) = prs.parse_args(args)
+    lname = kwa['PROGRAM']
+    pname = lname + '.py'
+    are_we_overwriting([lname, '%s.py' % pname])
 
-    if argl == []:
-        raise BSCR.Error('usage: pytool newpy <program-name>')
-    else:
-        lname = argl[0]
-        pname = lname + '.py'
-        are_we_overwriting([lname, '%s.py' % pname])
+    basename = U.basename(lname)
 
-        wbl = open(pname, 'w')
-        wbl.writelines(['#!/usr/bin/env python\n',
-                        '"""\n',
-                        '%s - program description\n' % lname,
-                        '"""\n',
-                        '\n',
-                        'import optparse\n',
-                        'import pdb\n',
-                        'import sys\n',
-                        'from bscr import toolframe\n',
-                        'import unittest\n',
-                        '\n',
-                        'def main(argv = None):\n',
-                        '    if argv == None:\n',
-                        '        argv = sys.argv\n',
-                        '\n',
-                        '    prs = optparse.OptionParser()\n',
-                        "    prs.add_option('-d', '--debug',\n",
-                        "                   action='store_true', "
-                        "default=False,\n",
-                        "                   dest='debug',\n",
-                        "                   help='run the debugger')\n",
-                        '    (opts, args) = prs.parse_args(argv)\n',
-                        '\n',
-                        '    if opts.debug:\n',
-                        '        pdb.set_trace()',
-                        '\n',
-                        '\n',
-                        '    # process arguments\n',
-                        '    for arg in args:\n',
-                        '        process(arg)\n',
-                        '\n',
-                        'class %sTest(unittest.TestCase):\n' %
-                        lname.capitalize(),
-                        '    def test_example(self):\n',
-                        '        pass\n',
-                        '\n',
-                        'toolframe.ez_launch(__name__, main)\n'])
-        wbl.close()
+    wbl = open(pname, 'w')
+    wbl.writelines(['#!/usr/bin/env python\n',
+                    '"""\n',
+                    '%s - program description\n' % basename,
+                    '"""\n',
+                    '\n',
+                    'import optparse\n',
+                    'import pdb\n',
+                    'import sys\n',
+                    'from bscr import toolframe\n',
+                    'import unittest\n',
+                    '\n',
+                    'def main(argv = None):\n',
+                    '    if argv == None:\n',
+                    '        argv = sys.argv\n',
+                    '\n',
+                    '    prs = optparse.OptionParser()\n',
+                    "    prs.add_option('-d', '--debug',\n",
+                    "                   action='store_true', "
+                    "default=False,\n",
+                    "                   dest='debug',\n",
+                    "                   help='run the debugger')\n",
+                    '    (opts, args) = prs.parse_args(argv)\n',
+                    '\n',
+                    '    if opts.debug:\n',
+                    '        pdb.set_trace()',
+                    '\n',
+                    '\n',
+                    '    # process arguments\n',
+                    '    for arg in args:\n',
+                    '        process(arg)\n',
+                    '\n',
+                    'class %sTest(unittest.TestCase):\n'
+                    % basename.capitalize(),
+                    '    def test_example(self):\n',
+                    '        pass\n',
+                    '\n',
+                    'toolframe.ez_launch(__name__, main)\n'])
+    wbl.close()
 
-        os.chmod(pname, 0755)
-        os.symlink(os.path.abspath(pname), lname)
+    os.chmod(pname, 0755)
+    os.symlink(os.path.abspath(pname), lname)
 
 
 # ---------------------------------------------------------------------------
