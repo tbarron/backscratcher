@@ -159,9 +159,38 @@ def test_newtool(tmpdir):
         got = toolname.read().split("\n")
         assert expected == got
 
-            self.assertEqual(exp, got,
-                             "\nExpected '%s',\n     got '%s'" %
-                             (exp, got))
+# -----------------------------------------------------------------------------
+def test_newtool_overwriting_no(tmpdir):
+    """
+    Run 'pytool newtool testtool tt' while testtool.py does exist. Verify
+    that we are prompted about overwriting. Answer 'no' and verify that the
+    original file is not overwritten.
+    """
+    pytest.debug_func()
+    tname = testfile(tmpdir, "testtool.py", content=["original testtool.py"])
+    tlink = testfile(tmpdir, "testtool", content=["original testtool"])
+    with U.Chdir(tmpdir.strpath):
+        cmd = pexpect.which("pytool")
+        if cmd is None:
+            pytest.skip("pytool not found")
+        S = pexpect.spawn("{} newtool {} tt".format(cmd, tlink))
+        which = S.expect([r'Are you sure\? >',
+                          'Error:',
+                          pexpect.EOF])
+        if which == 0:
+            S.sendline('no')
+            S.expect(pexpect.EOF)
+        elif which == 1:
+            print S.before + S.after
+            pytest.fail('unexpected exception')
+        else:
+            pytest.fail("should have asked about overwriting {}".format(tname))
+
+        for fname in [tlink, tname]:
+            exp = "original %s" % fname.basename
+            got = fname.read()
+            assert exp == got
+
 
                     '',
                     'import optparse',
