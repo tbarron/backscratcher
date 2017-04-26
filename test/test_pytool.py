@@ -19,8 +19,8 @@ def test_newpy_nothing():
     result = pexpect.run("pytool newpy")
     for exp in ["Usage:",
                 "pytool help [COMMAND]",
-                "pytool newpy PROGRAM",
-                "pytool newtool PROGRAM"]:
+                "pytool newpy [-d] PROGRAM",
+                "pytool newtool [-d] PROGRAM"]:
         assert exp in result
 
 
@@ -31,7 +31,7 @@ def test_newpy_prog_dir(tmpdir, fx_nopred):
     xyzzy and xyzzy.py are created and have the right contents.
     """
     pytest.debug_func()
-    pytool.pt_newpy(**{"newpy": True, "PROGRAM": "xyzzy"})
+    pytool.pt_newpy(**{"newpy": True, "PROGRAM": "xyzzy", "d": False})
 
     assert os.path.exists(fx_nopred.pname)
     exp = os.path.abspath(fx_nopred.pname)
