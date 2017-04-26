@@ -128,6 +128,37 @@ def test_newpy_overwriting_yes(tmpdir):
         assert expected == got
 
 
+# -----------------------------------------------------------------------------
+def test_newtool(tmpdir):
+    """
+    Run 'pytool newtool testtool' while testtool.py does not exist.
+    Verify that testtool.py is created and has the right contents.
+    """
+    pytest.debug_func()
+    toolname = testfile(tmpdir, "testtool.py")
+    toollink = testfile(tmpdir, "testtool")
+    with U.Chdir(tmpdir.strpath):
+        cmd = pexpect.which("pytool")
+        if cmd is None:
+            pytest.skip("pytool not found")
+        S = pexpect.spawn("{} newtool {} tt".format(cmd, toollink.strpath))
+        which = S.expect([r'Are you sure\? >',
+                          'Error:',
+                          pexpect.EOF])
+        if which == 0:
+            S.sendline('no')
+            S.expect(pexpect.EOF)
+            pytest.fail('should not have asked about overwriting')
+        elif which == 1:
+            print S.before + S.after
+            pytest.fail('unexpected exception')
+
+        assert toolname.strpath == toollink.readlink()
+
+        expected = expected_testtool_py()
+        got = toolname.read().split("\n")
+        assert expected == got
+
             self.assertEqual(exp, got,
                              "\nExpected '%s',\n     got '%s'" %
                              (exp, got))
