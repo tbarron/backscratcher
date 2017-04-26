@@ -228,38 +228,79 @@ def test_newtool_overwriting_yes(tmpdir):
         assert expected == got
 
 
-                    '',
-                    'import optparse',
-                    'import pdb',
-                    'import sys',
-                    'from bscr import toolframe',
-                    'import unittest',
-                    '',
-                    'def main(argv = None):',
-                    '    if argv == None:',
-                    '        argv = sys.argv',
-                    '',
-                    '    prs = optparse.OptionParser()',
-                    "    prs.add_option('-d', '--debug',",
-                    "                   action='store_true', default=False,",
-                    "                   dest='debug',",
-                    "                   help='run the debugger')",
-                    '    (opts, args) = prs.parse_args(argv)',
-                    "",
-                    "    if opts.debug:",
-                    "        pdb.set_trace()",
-                    '',
-                    '    # process arguments',
-                    '    for arg in args:',
-                    '        process(arg)',
-                    '',
-                    'class XyzzyTest(unittest.TestCase):',
-                    '    def test_example(self):',
-                    '        pass',
-                    '',
-                    'toolframe.ez_launch(__name__, main)', ]
+# -----------------------------------------------------------------------------
+def test_help(tmpdir):
+    """
+    Run 'pytool help'. Verify that the output is correct
+    """
+    with U.Chdir(tmpdir.strpath):
+        outputs = ["testtool", "testtool.py", "xyzzy", "xyzzy.py"]
+        U.safe_unlink(outputs)
+        cmd = pexpect.which("pytool")
+        S = pexpect.spawn("{} help".format(cmd))
+        which = S.expect([r"Are you sure\? >",
+                          "Error:",
+                          pexpect.EOF])
+        if which == 0:
+            S.sendline("no")
+            S.expect(pexpect.EOF)
+            pytest.fail("should not have asked about overwriting")
+        elif which == 1:
+            print S.before + S.after
+            pytest.fail("unexpected exception")
 
-        return expected
+        for file in outputs:
+            assert(not os.path.exists(file))
+
+
+# -----------------------------------------------------------------------------
+def test_help_newpy(tmpdir):
+    """
+    Run 'pytool help newpy'. Verify that the output is correct.
+    """
+    with U.Chdir(tmpdir.strpath):
+        cmd = pexpect.which("pytool")
+        S = pexpect.spawn("{} help newpy".format(cmd))
+        which = S.expect([r"Are you sure\? >",
+                          "Error:",
+                          pexpect.EOF])
+        if which == 0:
+            S.sendline("no")
+            S.expect(pexpect.EOF)
+            pytest.fail("should not have asked about overwriting")
+        elif which == 1:
+            print S.before + S.after
+            pytest.fail("unexpected exception")
+
+        got = S.before.split("\r\n")
+        exp = expected_help()
+        assert exp == got
+
+
+# -----------------------------------------------------------------------------
+def test_help_newtool(tmpdir):
+    """
+    Run 'pytool help newtool'. Verify that the output is correct.
+    """
+    with U.Chdir(tmpdir.strpath):
+        cmd = pexpect.which("pytool")
+        S = pexpect.spawn("{} help newtool".format(cmd))
+        which = S.expect([r"Are you sure\? >",
+                          "Error:",
+                          pexpect.EOF])
+    if which == 0:
+        S.sendline("no")
+        S.expect(pexpect.EOF)
+        pytest.fail("should not have asked about overwriting")
+    elif which == 1:
+        print S.before + S.after
+        pytest.fail("unexpected exception")
+
+    got = S.before.split("\r\n")
+    exp = expected_help()
+    assert exp == got
+
+
 # -------------------------------------------------------------------------------
 def expected_testtool_py():
     """
