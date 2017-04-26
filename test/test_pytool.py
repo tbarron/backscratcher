@@ -10,7 +10,7 @@ from bscr import pytool
 from bscr import testhelp as th
 from bscr import util as U
 
-# -----------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def test_newpy_nothing():
     """
     Run 'pytool newpy' with no other arguments. Should produce pytool's
@@ -69,8 +69,8 @@ def test_newpy_overwriting_no(tmpdir):
     that confirmation is requested. Answer 'no' and verify that
     the existing file is not overwritten.
     """
-    xyzzy = testfile(tmpdir, "xyzzy", content="original xyzzy\n")
-    xyzzy_py = testfile(tmpdir, "xyzzy.py", content="original xyzzy.py\n")
+    xyzzy = toyfile(tmpdir, "xyzzy", content="original xyzzy\n")
+    xyzzy_py = toyfile(tmpdir, "xyzzy.py", content="original xyzzy.py\n")
     with U.Chdir(tmpdir.strpath):
         cmd = pexpect.which("pytool")
         S = pexpect.spawn("{} newpy xyzzy".format(cmd))
@@ -102,8 +102,8 @@ def test_newpy_overwriting_yes(tmpdir):
     Verify that confirmation is requested. Answer 'yes' and verify
     that the existing file IS overwritten.
     """
-    xyzzy = testfile(tmpdir, "xyzzy", content="original xyzzy")
-    xyzzy_py = testfile(tmpdir, "xyzzy.py", content="original xyzzy.py")
+    xyzzy = toyfile(tmpdir, "xyzzy", content="original xyzzy")
+    xyzzy_py = toyfile(tmpdir, "xyzzy.py", content="original xyzzy.py")
     with U.Chdir(tmpdir.strpath):
         cmd = pexpect.which('pytool')
         S = pexpect.spawn('%s newpy %s' % (cmd, xyzzy.strpath))
@@ -135,8 +135,8 @@ def test_newtool(tmpdir):
     Verify that testtool.py is created and has the right contents.
     """
     pytest.debug_func()
-    toolname = testfile(tmpdir, "testtool.py")
-    toollink = testfile(tmpdir, "testtool")
+    toolname = toyfile(tmpdir, "testtool.py")
+    toollink = toyfile(tmpdir, "testtool")
     with U.Chdir(tmpdir.strpath):
         cmd = pexpect.which("pytool")
         if cmd is None:
@@ -167,8 +167,8 @@ def test_newtool_overwriting_no(tmpdir):
     original file is not overwritten.
     """
     pytest.debug_func()
-    tname = testfile(tmpdir, "testtool.py", content=["original testtool.py"])
-    tlink = testfile(tmpdir, "testtool", content=["original testtool"])
+    tname = toyfile(tmpdir, "testtool.py", content=["original testtool.py"])
+    tlink = toyfile(tmpdir, "testtool", content=["original testtool"])
     with U.Chdir(tmpdir.strpath):
         cmd = pexpect.which("pytool")
         if cmd is None:
@@ -200,8 +200,8 @@ def test_newtool_overwriting_yes(tmpdir):
     original file is overwritten.
     """
     pytest.debug_func()
-    tname = testfile(tmpdir, "testtool.py", content=["original testtool.py"])
-    tlink = testfile(tmpdir, "testtool", content=["original testtool"])
+    tname = toyfile(tmpdir, "testtool.py", content=["original testtool.py"])
+    tlink = toyfile(tmpdir, "testtool", content=["original testtool"])
     with U.Chdir(tmpdir.strpath):
         cmd = pexpect.which("pytool")
         if cmd is None:
