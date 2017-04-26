@@ -3,9 +3,9 @@ import os
 import pdb
 import pytest
 import random
-import time
 
 
+# -----------------------------------------------------------------------------
 def randomize(ref=None, direction=None, window=None):
     """
     Return a random value based on *ref* (*direction*) randint(*window*).

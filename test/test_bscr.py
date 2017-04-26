@@ -2,11 +2,7 @@
 
 import bscr
 import bscr.bscr
-from bscr import fl
 import glob
-import pdb
-import os
-import sys
 from bscr import testhelp as th
 from bscr import util as U
 import pexpect

@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 from bscr import chron
 from bscr import testhelp as th
-from bscr import util as U
-import pexpect
-import unittest
 
 
 # -----------------------------------------------------------------------------

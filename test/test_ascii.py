@@ -1,13 +1,8 @@
 #!/usr/bin/env python
-from bscr import ascii
-import copy
+from bscr import ascii                                      # noqa: ignore=F401
 import os
-import sys
-import pdb
 import pexpect
 from bscr import testhelp as th
-from bscr import toolframe
-import unittest
 from bscr import util as U
 
 

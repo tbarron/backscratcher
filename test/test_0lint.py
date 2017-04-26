@@ -6,17 +6,8 @@ This file checks for best practice compliance.
 
 Conveniently, pylint takes care of all of this
 """
-import glob
-import inspect
-import os
-import pdb
 import pexpect
-import re
-import sys
-from bscr import testhelp as th
-import types
-import unittest
-from bscr import util as U
+
 
 # -----------------------------------------------------------------------------
 def test_pylint():

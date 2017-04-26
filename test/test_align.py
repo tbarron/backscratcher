@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 import os
-import sys
-from bscr import align
-import pdb
+from bscr import align                                      # noqa: ignore=F401
 import pexpect
 from bscr import testhelp as th
-from bscr import toolframe
-import unittest
 from bscr import util as U
 
 

@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-import bscr
-import pdb
 from bscr import fl
 from bscr import util
 import os
@@ -13,7 +11,6 @@ import stat
 import tempfile
 from bscr import testhelp as th
 import time
-import unittest
 from bscr import util as U
 
 

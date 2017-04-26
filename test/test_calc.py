@@ -1,8 +1,6 @@
 #!/usr/bin/env python
-from bscr import calc
 import pexpect
-import sys
-import unittest
+from bscr import calc                      # noqa: ignore=F401
 from bscr import testhelp as th
 from bscr import util as U
 

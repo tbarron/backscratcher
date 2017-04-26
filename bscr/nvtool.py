@@ -39,11 +39,6 @@ nvtool examples:
         'nvtool load ...'
 """
 from docopt_dispatch import dispatch
-import optparse
-import os
-import pdb
-import sys
-import util
 
 
 # ---------------------------------------------------------------------------

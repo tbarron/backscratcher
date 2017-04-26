@@ -2,10 +2,7 @@
 import bscr
 from bscr import dt
 from bscr import testhelp as th
-from bscr import util as U
-import pexpect
 import time
-import unittest
 
 
 # ---------------------------------------------------------------------------
