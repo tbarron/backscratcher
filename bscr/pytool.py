@@ -4,8 +4,8 @@ pytool - produce skeletons for python programs
 
 Usage:
     pytool help [COMMAND]
-    pytool newpy PROGRAM
-    pytool newtool PROGRAM
+    pytool newpy [-d] PROGRAM
+    pytool newtool [-d] PROGRAM PREFIX
 
 ---
 pytool examples:
@@ -16,7 +16,7 @@ pytool examples:
     pytool newpy PROGRAM
         Create a new python program named PROGRAM
 
-    pytool newtool PROGRAM
+    pytool newtool PROGRAM PREFIX
         Create a new python tool-type program based on docopt_dispatch named
         PROGRAM
 ---
@@ -41,6 +41,7 @@ GNU General Public License for more details.
 """
 from docopt_dispatch import dispatch
 import os
+import pdb
 import re
 import sys
 
@@ -84,6 +85,8 @@ def pt_newpy(**kwa):
     Creates executable file <program-name>.py with skeletal
     contents. Run '<program-name>.py -L' to create link <program-name>.
     """
+    if kwa['d']:
+        pdb.set_trace()
     lname = kwa['PROGRAM']
     pname = lname + '.py'
     are_we_overwriting([lname, '{}.py'.format(pname)])
@@ -135,7 +138,8 @@ def pt_newpy(**kwa):
 
 
 # ---------------------------------------------------------------------------
-def pt_newtool(args):
+@dispatch.on('newtool', 'PROGRAM', 'PREFIX')
+def pt_newtool(**kwa):
     """newtool - Create a new tool-style program
 
     usage: pytool newtool <program-name> <prefix>
@@ -144,43 +148,38 @@ def pt_newtool(args):
     contents. The structure of the program is such that it is easy
     to add and describe new subfunctions.
     """
-    prs = optparse.OptionParser()
-    (_, argl) = prs.parse_args(args)
+    lname = kwa["PROGRAM"]
+    pname = lname + '.py'
+    prefix = kwa["PREFIX"]
+    are_we_overwriting([lname, pname])
 
-    if argl == [] or len(argl) != 2:
-        U.fatal('usage: pytool newtool <program-name> <prefix>')
-    else:
-        lname = argl[0]
-        pname = lname + '.py'
-        prefix = argl[1]
-        are_we_overwriting([lname, pname])
+    basename = U.basename(lname)
+    wbl = open(pname, 'w')
+    wbl.writelines(["#!/usr/bin/env python\n",
+                    "\"\"\"\n",
+                    "{} - program description\n".format(basename),
+                    "\"\"\"\n",
+                    "\n",
+                    "from bscr import util as U\n",
+                    "import optparse\n",
+                    "import os\n",
+                    "import re\n",
+                    "import sys\n",
+                    "\n",
+                    "# ---------------------------------------"
+                    "------------------------------------\n",
+                    "def {}_example(argv):\n".format(prefix),
+                    "    print('this is an example')\n",
+                    "\n",
+                    "# ---------------------------------------"
+                    "------------------------------------\n",
+                    "if __name__ == '__main__':\n",
+                    "    U.dispatch('__main__',"
+                    " '{}', sys.argv)".format(prefix)])
+    wbl.close()
 
-        wbl = open(pname, 'w')
-        wbl.writelines(['#!/usr/bin/env python\n',
-                        '"""\n',
-                        '%s - program description\n' % lname,
-                        '"""\n',
-                        '\n',
-                        'from bscr import util as U\n',
-                        'import optparse\n',
-                        'import os\n',
-                        'import re\n',
-                        'import sys\n',
-                        '\n',
-                        '# ---------------------------------------'
-                        '------------------------------------\n',
-                        'def %s_example(argv):\n' % prefix,
-                        '    print("this is an example")\n',
-                        "\n",
-                        '# ---------------------------------------'
-                        '------------------------------------\n',
-                        "if __name__ == '__main__':\n",
-                        "    U.dispatch('__main__', '%s', sys.argv)\n"
-                        % prefix, ])
-        wbl.close()
-
-        os.chmod(pname, 0755)
-        os.symlink(os.path.abspath(pname), lname)
+    os.chmod(pname, 0755)
+    os.symlink(os.path.abspath(pname), lname)
 
 
 # ---------------------------------------------------------------------------
