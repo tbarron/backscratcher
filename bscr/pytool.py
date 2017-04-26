@@ -86,48 +86,48 @@ def pt_newpy(**kwa):
     """
     lname = kwa['PROGRAM']
     pname = lname + '.py'
-    are_we_overwriting([lname, '%s.py' % pname])
+    are_we_overwriting([lname, '{}.py'.format(pname)])
 
     basename = U.basename(lname)
 
     wbl = open(pname, 'w')
-    wbl.writelines(['#!/usr/bin/env python\n',
-                    '"""\n',
-                    '%s - program description\n' % basename,
-                    '"""\n',
-                    '\n',
-                    'import optparse\n',
-                    'import pdb\n',
-                    'import sys\n',
-                    'from bscr import toolframe\n',
-                    'import unittest\n',
-                    '\n',
-                    'def main(argv = None):\n',
-                    '    if argv == None:\n',
-                    '        argv = sys.argv\n',
-                    '\n',
-                    '    prs = optparse.OptionParser()\n',
+    wbl.writelines(["#!/usr/bin/env python\n",
+                    "\"\"\"\n",
+                    "%s - program description\n" % basename,
+                    "\"\"\"\n",
+                    "\n",
+                    "import optparse\n",
+                    "import pdb\n",
+                    "import sys\n",
+                    "from bscr import toolframe\n",
+                    "import unittest\n",
+                    "\n",
+                    "def main(argv = None):\n",
+                    "    if argv == None:\n",
+                    "        argv = sys.argv\n",
+                    "\n",
+                    "    prs = optparse.OptionParser()\n",
                     "    prs.add_option('-d', '--debug',\n",
                     "                   action='store_true', "
                     "default=False,\n",
                     "                   dest='debug',\n",
                     "                   help='run the debugger')\n",
-                    '    (opts, args) = prs.parse_args(argv)\n',
-                    '\n',
-                    '    if opts.debug:\n',
-                    '        pdb.set_trace()',
-                    '\n',
-                    '\n',
-                    '    # process arguments\n',
-                    '    for arg in args:\n',
-                    '        process(arg)\n',
-                    '\n',
-                    'class %sTest(unittest.TestCase):\n'
+                    "    (opts, args) = prs.parse_args(argv)\n",
+                    "\n",
+                    "    if opts.debug:\n",
+                    "        pdb.set_trace()",
+                    "\n",
+                    "\n",
+                    "    # process arguments\n",
+                    "    for arg in args:\n",
+                    "        process(arg)\n",
+                    "\n",
+                    "class %sTest(unittest.TestCase):\n"
                     % basename.capitalize(),
-                    '    def test_example(self):\n',
-                    '        pass\n',
-                    '\n',
-                    'toolframe.ez_launch(__name__, main)\n'])
+                    "    def test_example(self):\n",
+                    "        pass\n",
+                    "\n",
+                    "toolframe.ez_launch(__name__, main)\n"])
     wbl.close()
 
     os.chmod(pname, 0755)
