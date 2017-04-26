@@ -260,3 +260,130 @@ def test_newtool_overwriting_yes(tmpdir):
                     'toolframe.ez_launch(__name__, main)', ]
 
         return expected
+# -------------------------------------------------------------------------------
+def expected_testtool_py():
+    """
+    The expected output of a new tool request
+    """
+    expected = ["#!/usr/bin/env python",
+                "\"\"\"",
+                "testtool - program description",
+                "\"\"\"",
+                "",
+                "from bscr import util as U",
+                "import optparse",
+                "import os",
+                "import re",
+                "import sys",
+                "",
+                "# ----------------------------------------------------"
+                + "-----------------------",
+                "def tt_example(argv):",
+                "    print('this is an example')",
+                "",
+                "# ----------------------------------------------------"
+                + "-----------------------",
+                "if __name__ == '__main__':",
+                "    U.dispatch('__main__', 'tt', sys.argv)"]
+
+    return expected
+
+# -----------------------------------------------------------------------------
+def expected_xyzzy_py():
+    """
+    The expected output of a new py request
+    """
+    expected = ["#!/usr/bin/env python",
+                "\"\"\"",
+                "xyzzy - program description",
+                "\"\"\"",
+                "",
+                "import optparse",
+                "import pdb",
+                "import sys",
+                "from bscr import toolframe",
+                "import unittest",
+                "",
+                "def main(argv = None):",
+                "    if argv == None:",
+                "        argv = sys.argv",
+                "",
+                "    prs = optparse.OptionParser()",
+                "    prs.add_option('-d', '--debug',",
+                "                   action='store_true', default=False,",
+                "                   dest='debug',",
+                "                   help='run the debugger')",
+                "    (opts, args) = prs.parse_args(argv)",
+                "",
+                "    if opts.debug:",
+                "        pdb.set_trace()",
+                "",
+                "    # process arguments",
+                "    for arg in args:",
+                "        process(arg)",
+                "",
+                "class XyzzyTest(unittest.TestCase):",
+                "    def test_example(self):",
+                "        pass",
+                "",
+                "toolframe.ez_launch(__name__, main)"]
+
+    return expected
+
+
+# -----------------------------------------------------------------------------
+def expected_help():
+    """
+    The expected output of 'pytool help'
+    """
+    expected = ["pytool examples:",
+                "",
+                "    pytool help",
+                "        Display this list of command descriptions",
+                "",
+                "    pytool newpy PROGRAM",
+                "        Create a new python program named PROGRAM",
+                "",
+                "    pytool newtool PROGRAM PREFIX",
+                "        Create a new python tool-type program based on "
+                "docopt_dispatch named",
+                "        PROGRAM",
+                "",
+                ]
+    return expected
+
+
+# -----------------------------------------------------------------------------
+@pytest.fixture
+def fx_nopred(tmpdir):
+    """
+    Fixture for newpy test with no predecessor to the new program
+    """
+    with U.Chdir(tmpdir.strpath):
+        fx_nopred.lname = 'xyzzy'
+        fx_nopred.pname = fx_nopred.lname + '.py'
+        assert not os.path.exists(fx_nopred.lname)
+        assert not os.path.exists(fx_nopred.pname)
+
+        yield fx_nopred
+
+
+# -----------------------------------------------------------------------------
+def toyfile(where, name, exists=False, content=None):
+    """
+    Create a thing for a test to play with. Verify where.strpath/name does not
+    exist. If *exists*, create it. If *content* != None, put content in it.
+    Return the py.path.local object.
+    """
+    rval = where.join(name)
+    assert not rval.exists()
+    if exists:
+        rval.ensure()
+    if content:
+        if isinstance(content, str):
+            rval.write(content)
+        elif isinstance(content, list):
+            rval.write(''.join(content))
+        else:
+            rval.write(str(content))
+    return rval
