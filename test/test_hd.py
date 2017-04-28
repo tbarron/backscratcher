@@ -4,8 +4,6 @@ from bscr import hd
 from bscr import testhelp as th
 from bscr import util as U
 from StringIO import StringIO as sio
-import pexpect
-import unittest
 
 
 # -----------------------------------------------------------------------------

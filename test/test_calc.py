@@ -12,8 +12,8 @@ class TestCalc(th.HelpedTestCase):
         """
         Example calc session
         """
-        calc = U.script_location("calc")
-        S = pexpect.spawn(calc)
+        scrpath = U.script_location("calc")
+        S = pexpect.spawn(scrpath)
         # S.logfile = sys.stdout
         S.expect("> ")
 

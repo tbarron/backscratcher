@@ -4,16 +4,15 @@ Tests for pfind
 import copy
 import grp
 import os
-import pdb
 import pwd
 import re
 import time
 
-import py
 import pytest
 
 import tbx
 from bscr import pfind
+
 
 # -----------------------------------------------------------------------------
 def test_digest_keys():
@@ -31,6 +30,7 @@ def test_digest_keys():
 
     assert isinstance(dgst['paths'], list)
 
+
 # -----------------------------------------------------------------------------
 def test_digest_xspace():
     """
@@ -46,6 +46,7 @@ def test_digest_xspace():
     for item in dgst['exclude']:
         assert item == item.strip()
 
+
 # -----------------------------------------------------------------------------
 def test_everything(tmpdir, pfind_fx):
     """
@@ -55,6 +56,7 @@ def test_everything(tmpdir, pfind_fx):
     opts = {'--name': '*', '--exclude': None, '<dir>': [tmpdir.strpath]}
     result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, pfind_fx.data.keys())
+
 
 # -----------------------------------------------------------------------------
 def test_some_noex(tmpdir, pfind_fx):
@@ -71,6 +73,7 @@ def test_some_noex(tmpdir, pfind_fx):
     result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, exp)
 
+
 # -----------------------------------------------------------------------------
 def test_nothing_noex(tmpdir, pfind_fx):
     """
@@ -80,6 +83,7 @@ def test_nothing_noex(tmpdir, pfind_fx):
     opts = {'--name': '*z*', '--exclude': None, '<dir>': [tmpdir.strpath]}
     result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, [])
+
 
 # -----------------------------------------------------------------------------
 def test_everything_exdir(tmpdir, pfind_fx):
@@ -94,6 +98,7 @@ def test_everything_exdir(tmpdir, pfind_fx):
     result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, exp)
 
+
 # -----------------------------------------------------------------------------
 def test_everything_exleaf(tmpdir, pfind_fx):
     """
@@ -105,6 +110,7 @@ def test_everything_exleaf(tmpdir, pfind_fx):
     result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, exp)
 
+
 # -----------------------------------------------------------------------------
 def test_everything_exall(tmpdir, pfind_fx):
     """
@@ -115,6 +121,7 @@ def test_everything_exall(tmpdir, pfind_fx):
             '<dir>': [tmpdir.strpath]}
     result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, [])
+
 
 # -----------------------------------------------------------------------------
 def test_some_exdir(tmpdir, pfind_fx):
@@ -131,6 +138,7 @@ def test_some_exdir(tmpdir, pfind_fx):
     result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, exp)
 
+
 # -----------------------------------------------------------------------------
 def test_some_exleaf(tmpdir, pfind_fx):
     """
@@ -145,6 +153,7 @@ def test_some_exleaf(tmpdir, pfind_fx):
     result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, exp)
 
+
 # -----------------------------------------------------------------------------
 def test_some_exall(tmpdir, pfind_fx):
     """
@@ -155,6 +164,7 @@ def test_some_exall(tmpdir, pfind_fx):
             '<dir>': [tmpdir.strpath]}
     result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, [])
+
 
 # -----------------------------------------------------------------------------
 def test_nothing_exall(tmpdir, pfind_fx):
@@ -167,6 +177,7 @@ def test_nothing_exall(tmpdir, pfind_fx):
     result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, [])
 
+
 # -----------------------------------------------------------------------------
 def test_parse_time():
     """
@@ -176,6 +187,7 @@ def test_parse_time():
     assert pfind.parse_time('2016.0101') == 1451624400.0
     assert pfind.parse_time('2015.1219.175455') == 1450565695.0
 
+
 # -----------------------------------------------------------------------------
 def test_parse_time_fail():
     """
@@ -183,10 +195,11 @@ def test_parse_time_fail():
     """
     pytest.debug_func()
     tdata = "01/17/2016"
-    exp =  "time data {0} does not match any of the formats".format(tdata)
+    exp = "time data {0} does not match any of the formats".format(tdata)
     with pytest.raises(ValueError) as err:
         assert pfind.parse_time(tdata) == 1451624400.0
     assert exp in str(err)
+
 
 # -----------------------------------------------------------------------------
 def test_age(tmpdir, pfind_fx):
@@ -202,6 +215,7 @@ def test_age(tmpdir, pfind_fx):
     result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, exp)
 
+
 # -----------------------------------------------------------------------------
 def test_newer_ymd(tmpdir, pfind_fx):
     """
@@ -213,6 +227,7 @@ def test_newer_ymd(tmpdir, pfind_fx):
             '<dir>': [tmpdir.strpath]}
     result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, exp)
+
 
 # -----------------------------------------------------------------------------
 def test_newer_path(tmpdir, pfind_fx):
@@ -226,6 +241,7 @@ def test_newer_path(tmpdir, pfind_fx):
     result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, exp)
 
+
 # -----------------------------------------------------------------------------
 def test_older_ymd(tmpdir, pfind_fx):
     """
@@ -238,6 +254,7 @@ def test_older_ymd(tmpdir, pfind_fx):
     result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, exp)
 
+
 # -----------------------------------------------------------------------------
 def test_older_path(tmpdir, pfind_fx):
     """
@@ -249,6 +266,7 @@ def test_older_path(tmpdir, pfind_fx):
             '<dir>': [tmpdir.strpath]}
     result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, exp)
+
 
 # -----------------------------------------------------------------------------
 def test_ownership(tmpdir, pfind_fx):
@@ -265,6 +283,7 @@ def test_ownership(tmpdir, pfind_fx):
     opts = {'--group': gname, '<dir>': [tmpdir.strpath]}
     result = pfind.get_hitlist(opts=opts)
     validate_result(pfind_fx, result, exp)
+
 
 # -----------------------------------------------------------------------------
 @pytest.fixture
@@ -302,17 +321,17 @@ def pfind_fx(tmpdir):
                                      'atime': tbx.randomize(anc, -1, day),
                                      'dir': False},
                      'mature/three': {'mtime': tbx.randomize(mat-1, -1, day),
-                                     'atime': tbx.randomize(mat-1, -1, day),
-                                     'dir': False
-                                    },
+                                      'atime': tbx.randomize(mat-1, -1, day),
+                                      'dir': False
+                                      },
                      'mature/four': {'mtime': tbx.randomize(mat-1, -1, day),
                                      'atime': tbx.randomize(mat-1, -1, day),
                                      'group': True,
                                      'dir': False
-                                    },
+                                     },
                      'young/five': {'mtime': tbx.randomize(mat+1, 1, day),
-                                     'atime': tbx.randomize(mat+1, 1, day),
-                                     'dir': False
+                                    'atime': tbx.randomize(mat+1, 1, day),
+                                    'dir': False
                                     },
                      'young/six': {'mtime': tbx.randomize(mat+1, 1, day),
                                    'atime': tbx.randomize(mat+1, 1, day),
@@ -323,7 +342,7 @@ def pfind_fx(tmpdir):
                                    'atime': mat,
                                    'dir': False
                                    }
-        }
+                     }
 
     for pstr in pfind_fx.data:
         path = tmpdir.join(pstr)
@@ -339,26 +358,23 @@ def pfind_fx(tmpdir):
 
     return pfind_fx
 
+
 # -----------------------------------------------------------------------------
 def alt_group(path=None):
     """
     Change the group ownership of a path.local object
     """
     try:
-        newgrp = alt_group.gid
         rval = alt_group.gname
     except AttributeError:
         usr = pwd.getpwnam(os.getenv('LOGNAME'))
         grpl = [_ for _ in grp.getgrall() if usr.pw_name in _.gr_mem]
         grpnl = [_ for _ in grpl if not _.gr_name.startswith('_')]
         grpalt = [_ for _ in grpnl if _.gr_gid != usr.pw_gid]
-        newgrp = alt_group.gid = grpalt[0].gr_gid
         rval = alt_group.gname = grpalt[0].gr_name
 
-    if path:
-        # path.chgrp(alt_group.gid)
-        pass
     return rval
+
 
 # -----------------------------------------------------------------------------
 def list_minus(keep, drop):
@@ -374,6 +390,7 @@ def list_minus(keep, drop):
                 except ValueError:
                     pass
     return rval
+
 
 # -----------------------------------------------------------------------------
 def validate_result(pfind_fx, result, expected):

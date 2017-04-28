@@ -115,7 +115,8 @@ class TestFL(th.HelpedTestCase):
             util.writefile('old/mrpm2.2009-08-31',
                            ['copy of another test file\n'])
 
-            expected = ["/Users/tbarron/prj/github/backscratcher/bscr/util.py:207: "
+            expected = ["/Users/tbarron/prj/github/backscratcher/"
+                        "bscr/util.py:207: "
                         "UserWarning: util.dispatch is deprecated "
                         "in favor of docopt_dispatch\r",
                         "  warnings.warn(\"util.dispatch is deprecated"
@@ -130,7 +131,8 @@ class TestFL(th.HelpedTestCase):
             got = pexpect.run("%s diff mrpm1" % cmd).split("\n")
             self.assertEqual(expected, got)
 
-            expected = ["/Users/tbarron/prj/github/backscratcher/bscr/util.py:207: "
+            expected = ["/Users/tbarron/prj/github/backscratcher/"
+                        "bscr/util.py:207: "
                         "UserWarning: util.dispatch is deprecated "
                         "in favor of docopt_dispatch\r",
                         "  warnings.warn(\"util.dispatch is deprecated"
@@ -483,7 +485,6 @@ class TestFL_edit(th.HelpedTestCase):
                                 "deprecated in favor of docopt_dispatch",
                                 "  warnings.warn(\"util.dispatch is "
                                 "deprecated in favor of docopt_dispatch\")"])
-
 
     # -------------------------------------------------------------------------
     def fl_edit_flawed(self, cmd, exp):

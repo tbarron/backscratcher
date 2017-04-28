@@ -1,14 +1,11 @@
 import os
-import pdb
-import shutil
-import sys
 
 import pexpect
 import pytest
 
 from bscr import pytool
-from bscr import testhelp as th
 from bscr import util as U
+
 
 # -----------------------------------------------------------------------------
 def test_newpy_nothing():
@@ -51,6 +48,7 @@ def test_newpy_prog_pxr(tmpdir, fx_nopred):
     """
     pytest.debug_func()
     r = pexpect.run("pytool newpy {}".format(fx_nopred.lname))
+    assert r == ""
 
     assert os.path.exists(fx_nopred.pname)
     exp = os.path.abspath(fx_nopred.pname)
@@ -158,6 +156,7 @@ def test_newtool(tmpdir):
         expected = expected_testtool_py()
         got = toolname.read().split("\n")
         assert expected == got
+
 
 # -----------------------------------------------------------------------------
 def test_newtool_overwriting_no(tmpdir):
@@ -328,6 +327,7 @@ def expected_testtool_py():
                 "    U.dispatch('__main__', 'tt', sys.argv)"]
 
     return expected
+
 
 # -----------------------------------------------------------------------------
 def expected_xyzzy_py():

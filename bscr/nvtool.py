@@ -204,6 +204,7 @@ def nv_remove_show(**kwa):
     for item in result:
         print "    " + item
 
+
 # ---------------------------------------------------------------------------
 @dispatch.on('remove', 'SEGMENT', 'VAR')
 def nv_remove(**kwa):

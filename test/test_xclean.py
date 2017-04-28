@@ -4,10 +4,7 @@ from bscr import util as U
 import os
 import pexpect
 import shutil
-import StringIO as sio
-import sys
 from bscr import testhelp as th
-import unittest
 
 
 # -----------------------------------------------------------------------------

@@ -2,11 +2,10 @@
 """
 jcal tests
 """
-from bscr import jcal
+from bscr import jcal                          # noqa: ignore=F401
 import pexpect
 from bscr import testhelp as th
 from bscr import util as U
-import unittest
 
 
 # -----------------------------------------------------------------------------

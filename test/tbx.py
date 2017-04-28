@@ -28,7 +28,7 @@ def randomize(ref=None, direction=None, window=None):
     return random.randint(low, high)
 
 
-
+# -----------------------------------------------------------------------------
 @contextlib.contextmanager
 def tmpenv(*a, **kw):
     """
@@ -60,16 +60,18 @@ def tmpenv(*a, **kw):
                 # tmpenv((k1, v1), (k2, v2), ...)
                 for t in a:
                     if 2 != len(t):
-                        raise StandardError("tuple wrong length: '%s'" % str(t))
+                        raise StandardError("tuple wrong length: '%s'"
+                                            % str(t))
                     tputenv(t[0], t[1])
             elif type(a[0]) == list and type(a[0][0]) == tuple:
                 # tmpenv([(k1, v1), (k2, v2), ...])
                 if 1 < len(a):
-                    raise StandardError("unknown extra arguments: '%s'" % a[1:])
+                    raise StandardError("unknown extra arguments: '%s'"
+                                        % a[1:])
                 for k, v in a[0]:
                     tputenv(k, v)
             elif 0 != len(a) % 2:
-                raise StandardError("tmpenv expects an even number of arguments")
+                raise StandardError("tmpenv expects even number of arguments")
             else:
                 # tmpenv(k1, v1, k2, v2, ...)
                 for i in range(0, len(a), 2):

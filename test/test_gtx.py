@@ -1,9 +1,7 @@
 import os
-import pdb
 import pexpect
 import pytest
 import py
-from bscr import testhelp
 from bscr import util as U
 
 
@@ -110,7 +108,7 @@ def test_gtx_hooks_create_all_nothing(tmpdir):
             S.expect(r"Shall I add one\? >")
             S.sendline("y")
         elif 1 == which:
-            self.unexpected_in("already has link", S.before)
+            pytest.fail("'already has link' was not expected")
         else:
             break
 

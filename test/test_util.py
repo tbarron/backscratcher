@@ -2,7 +2,6 @@ import bscr
 from bscr import testhelp as th
 from bscr import util as U
 import os
-import pdb
 import pytest
 import re
 import shutil
@@ -435,7 +434,6 @@ class TestUtil(th.HelpedTestCase):
         get an exception
         """
         with U.Chdir(self.testdir):
-            now = int(time.time())
             self.assertRaisesMsg(bscr.Error,
                                  "argument must be list or string",
                                  U.touch,

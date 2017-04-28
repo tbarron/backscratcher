@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 from bscr import mag
 from bscr import util as U
-import os
-import pdb
 import pexpect
-import sys
 from bscr import testhelp as th
-import unittest
 
 
 # ---------------------------------------------------------------------------
@@ -24,7 +20,6 @@ class TestMag(th.HelpedTestCase):
         """
         Test 'mag' for bits (1000^0)
         """
-        a = mag.main(['./mag', '999'], True)
         self.magtest('999 = 999.00 b')
 
     # -------------------------------------------------------------------------
@@ -32,7 +27,6 @@ class TestMag(th.HelpedTestCase):
         """
         Test 'mag' for bits (1024^0)
         """
-        a = mag.main(['./mag', '999', '-b'], True)
         self.magtest('999 = 999.00 b')
 
     # -------------------------------------------------------------------------
@@ -40,7 +34,6 @@ class TestMag(th.HelpedTestCase):
         """
         Test 'mag' for kilobits (1000^1)
         """
-        a = mag.main(['./mag', '98765'], True)
         self.magtest('98765 = 98.77 Kb')
 
     # -------------------------------------------------------------------------
@@ -48,7 +41,6 @@ class TestMag(th.HelpedTestCase):
         """
         Test 'mag' for kibibits (1024^1)
         """
-        a = mag.main(['./mag', '-b', '98765'], True)
         self.magtest('98765 = 96.45 Kib')
 
     # -------------------------------------------------------------------------
@@ -56,7 +48,6 @@ class TestMag(th.HelpedTestCase):
         """
         Test 'mag' for megabits (1000^2)
         """
-        a = mag.main(['./mag', '98765432'], True)
         self.magtest('98765432 = 98.77 Mb')
 
     # -------------------------------------------------------------------------
@@ -64,7 +55,6 @@ class TestMag(th.HelpedTestCase):
         """
         Test 'mag' for mebibits (1024^2)
         """
-        a = mag.main(['./mag', '-b', '98765432'], True)
         self.magtest('98765432 = 94.19 Mib')
 
     # -------------------------------------------------------------------------
@@ -72,7 +62,6 @@ class TestMag(th.HelpedTestCase):
         """
         Test 'mag' for gigabits (1000^3)
         """
-        a = mag.main(['./mag', '12398765432'], True)
         self.magtest('12398765432 = 12.40 Gb')
 
     # -------------------------------------------------------------------------
@@ -80,7 +69,6 @@ class TestMag(th.HelpedTestCase):
         """
         Test 'mag' for gibibits (1024^3)
         """
-        a = mag.main(['./mag', '-b', '12398765432'], True)
         self.magtest('12398765432 = 11.55 Gib')
 
     # -------------------------------------------------------------------------
@@ -88,7 +76,6 @@ class TestMag(th.HelpedTestCase):
         """
         Test 'mag' for terabits (1000^4)
         """
-        a = mag.main(['./mag', '12390008765432'], True)
         self.magtest('12390008765432 = 12.39 Tb')
 
     # -------------------------------------------------------------------------

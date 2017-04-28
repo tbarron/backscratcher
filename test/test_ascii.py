@@ -65,8 +65,8 @@ class TestAscii(th.HelpedTestCase):
         """
         Run ascii and see if its output matches what is expected.
         """
-        ascii = U.script_location("ascii")
-        result = pexpect.run(ascii)
+        zzz = U.script_location("ascii")
+        result = pexpect.run(zzz)
         self.assertEq("\r\n".join(self.exp), result)
 
     # -------------------------------------------------------------------------
@@ -86,8 +86,8 @@ class TestAscii(th.HelpedTestCase):
         Run ascii and verify output ends with a newline
         """
         # pdb.set_trace()
-        ascii = U.script_location("ascii")
-        result = pexpect.run(ascii)
+        zzz = U.script_location("ascii")
+        result = pexpect.run(zzz)
         self.assertTrue(result.endswith("\n"),
                         "ascii output should end with newline")
 

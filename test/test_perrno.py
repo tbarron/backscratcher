@@ -5,9 +5,7 @@ perrno tests
 from bscr import perrno
 from bscr import util as U
 import pexpect
-import sys
 from bscr import testhelp as th
-import unittest
 
 
 # -----------------------------------------------------------------------------

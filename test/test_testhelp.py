@@ -1,6 +1,4 @@
 from bscr import testhelp as th
-import StringIO
-import sys
 
 
 # ---------------------------------------------------------------------------

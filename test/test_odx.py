@@ -1,14 +1,8 @@
 #!/usr/bin/env python
 from bscr import odx
 from bscr import util as U
-from contextlib import closing
-import os
-import pdb
 import pexpect
-import StringIO as sio
-import sys
 from bscr import testhelp
-import unittest
 
 # odx(25)         => 25 -> 031 / 25 / 0x19
 # odx(0124)       => 0124 -> 0124 / 84 / 0x54

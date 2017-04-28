@@ -7,6 +7,7 @@ import pytest
 
 from bscr import mcal
 
+
 # -----------------------------------------------------------------------------
 def test_mcal_first_day():
     """
@@ -17,6 +18,7 @@ def test_mcal_first_day():
     validate_first_day(2003, 7, 1)
     validate_first_day(2003, 1, 2)
     validate_first_day(2003, 5, 3)
+
 
 # -----------------------------------------------------------------------------
 def test_mcal_gen_month():
@@ -32,6 +34,7 @@ def test_mcal_gen_month():
     assert "  8  9 10 11 12 13 14" in result
     assert " 15 16 17 18 19 20 21" in result
     assert " 22 23 24 25 26 27 28" in result
+
 
 # -----------------------------------------------------------------------------
 def test_mcal_main_h(capsys):
@@ -49,11 +52,12 @@ def test_mcal_main_h(capsys):
                      '    -m <month>  Month of calendar',
                      '    -w          Print a wide calendar showing two '
                      'months',
-                    ])
-    with pytest.raises(SystemExit) as err:
+                     ])
+    with pytest.raises(SystemExit):
         mcal.main(['-h'])
     stdo, _ = capsys.readouterr()
     assert exp.strip() == stdo.strip()
+
 
 # -----------------------------------------------------------------------------
 def test_mcal_main_noarg():
@@ -66,6 +70,7 @@ def test_mcal_main_noarg():
     assert "  1" in actual
     assert " 28" in actual
 
+
 # -----------------------------------------------------------------------------
 def test_mcal_main_y():
     """
@@ -77,6 +82,7 @@ def test_mcal_main_y():
     assert time.strftime("2001.%m") in actual
     assert "  1" in actual
     assert " 28" in actual
+
 
 # -----------------------------------------------------------------------------
 def test_mcal_main_ym():
@@ -93,9 +99,10 @@ def test_mcal_main_ym():
                      ' 22 23 24 25 26 27 28',
                      '                     ',
                      '                     ',
-                    ])
+                     ])
     actual = mcal.main(['-y 1999', '-m 2'])
     assert actual == exp
+
 
 # -----------------------------------------------------------------------------
 def test_mcal_main_m():
@@ -108,6 +115,7 @@ def test_mcal_main_m():
     assert time.strftime("%Y.09") in actual
     assert "  1" in actual
     assert " 28" in actual
+
 
 # -----------------------------------------------------------------------------
 def test_mcal_main_w():
@@ -125,6 +133,7 @@ def test_mcal_main_w():
     assert " 28" in actual
     assert " 31" in actual
 
+
 # -----------------------------------------------------------------------------
 def test_mcal_main_yw():
     """
@@ -141,11 +150,12 @@ def test_mcal_main_yw():
     assert " 28" in actual
     assert " 31" in actual
 
+
 # -----------------------------------------------------------------------------
 def test_mcal_main_ymw():
     """
-    mcal.main(['-y <year>', '-m <month>', '-w']) should return a string containing
-    the specified and following month in the specified year
+    mcal.main(['-y <year>', '-m <month>', '-w']) should return a string
+    containing the specified and following month in the specified year
     """
     pytest.debug_func()
     year = 1902
@@ -157,6 +167,7 @@ def test_mcal_main_ymw():
     assert "  1" in actual
     assert " 28" in actual
     assert " 31" in actual
+
 
 # -----------------------------------------------------------------------------
 def test_mcal_main_mw():
@@ -174,6 +185,7 @@ def test_mcal_main_mw():
     assert "  1" in actual
     assert " 28" in actual
     assert " 31" in actual
+
 
 # -----------------------------------------------------------------------------
 def test_mcal_next_day():
@@ -196,6 +208,7 @@ def test_mcal_next_day():
     validate_next_day('2004.1130', '2004.1201')
     validate_next_day('2004.1231', '2005.0101')
 
+
 # -----------------------------------------------------------------------------
 def test_mcal_next_month():
     """
@@ -207,6 +220,7 @@ def test_mcal_next_month():
         assert mcal.next_month(2004, mon) == (2004, mon+1)
     assert mcal.next_month(2004, 12) == (2005, 1)
 
+
 # -----------------------------------------------------------------------------
 def test_mcal_title():
     """
@@ -216,6 +230,7 @@ def test_mcal_title():
     result = mcal.title(1999, 2)
     assert result == '       1999.02       '
 
+
 # -----------------------------------------------------------------------------
 def validate_first_day(year, month, wday):
     """
@@ -223,6 +238,7 @@ def validate_first_day(year, month, wday):
     """
     fday = mcal.first_day(year, month)
     assert fday.tm_wday == wday
+
 
 # -----------------------------------------------------------------------------
 def validate_next_day(pred, succ):

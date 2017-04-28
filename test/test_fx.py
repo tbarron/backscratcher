@@ -5,14 +5,11 @@ import glob
 import re
 import optparse
 import os
-import pdb
 import pexpect
 import shutil
-import StringIO
-import sys
-import unittest
 
 import pytest
+
 
 # ---------------------------------------------------------------------------
 def test_psys_quiet(tmpdir, capsys, data):
@@ -26,6 +23,7 @@ def test_psys_quiet(tmpdir, capsys, data):
         actual, _ = capsys.readouterr()
         assert exp == actual
 
+
 # ---------------------------------------------------------------------------
 @pytest.fixture
 def data(tmpdir, request):
@@ -36,6 +34,7 @@ def data(tmpdir, request):
         for stem in ['a.xyzzy', 'b.xyzzy', 'c.xyzzy', 'tmpfile']:
             path = tmpdir.join(stem)
             path.ensure()
+
 
 # ---------------------------------------------------------------------------
 class TestFx(th.HelpedTestCase):
@@ -307,7 +306,6 @@ class TestFx(th.HelpedTestCase):
                 U.touch(a)
             expected = "".join(['rename %s.pl %s.xyzzy\n' % (x, x) for x in
                                 [q.replace('.pl', '') for q in arglist]])
-            exp = [re.sub('.pl', '.xyzzy', x) for x in arglist]
             v = optparse.Values({'dryrun': True, 'quiet': True,
                                  'edit': 's/.pl/.xyzzy'})
 
@@ -332,7 +330,6 @@ class TestFx(th.HelpedTestCase):
                 U.touch(a)
             expected = "".join(['rename %s.pl %s.xyzzy\n' % (x, x) for x in
                                 [q.replace('.pl', '') for q in arglist]])
-            exp = [re.sub('.pl', '.xyzzy', x) for x in arglist]
             v = optparse.Values({'dryrun': True, 'quiet': False,
                                  'edit': 's/.pl/.xyzzy'})
 

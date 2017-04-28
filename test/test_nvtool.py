@@ -123,6 +123,7 @@ def test_nv_deped_dir(capsys):
     assert exp in output
     assert indata not in output
 
+
 # -----------------------------------------------------------------------------
 def test_nv_deped_pxr(capsys):
     """
@@ -133,6 +134,7 @@ def test_nv_deped_pxr(capsys):
     output = pexpect.run("nvtool deped {}".format(indata))
     assert exp in output
     assert indata not in output
+
 
 # -----------------------------------------------------------------------------
 def test_nv_deped_show_dir(capsys):
@@ -145,6 +147,7 @@ def test_nv_deped_show_dir(capsys):
     output, _ = capsys.readouterr()
     assert exp in output
     assert indata not in output
+
 
 # -----------------------------------------------------------------------------
 def test_nv_deped_show_pxr(capsys):
@@ -294,6 +297,7 @@ def showish(seq, sep):
         rval = None
     return rval
 
+
 # -----------------------------------------------------------------------------
 def pathish(seq):
     """
@@ -310,6 +314,7 @@ def pathish(seq):
     else:
         rval = None
     return rval
+
 
 # -----------------------------------------------------------------------------
 def nvtool_trial(function, capsys, testin, expected):

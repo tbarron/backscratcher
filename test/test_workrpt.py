@@ -1,6 +1,5 @@
 import optparse
 import os
-import pdb
 import re
 import time
 
@@ -208,7 +207,7 @@ def test_workrpt_order(tmpdir, fx_wrprep):
                                 'start': '2015.0107',
                                 'end': '2015.0107',
                                 'dayflag': False})
-        r = wr.write_report(opts, True)
+        wr.write_report(opts, True)
     assert_includes(str(err), 'Dates or times out of order')
 
 
@@ -243,7 +242,7 @@ class workrptTest(th.HelpedTestCase):
         assert(wr.day_offset('') == 3)
         e = None
         try:
-            q = wr.day_offset('x')
+            wr.day_offset('x')
         except KeyError, e:
             pass
         assert(str(e) == "'x'")
