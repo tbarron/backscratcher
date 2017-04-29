@@ -96,24 +96,6 @@ def bscr_help(**kwa):
 
 
 # -----------------------------------------------------------------------------
-# def bscr_readme(args):
-#     """readme - display the package README file
-#
-#     usage: bscr readme
-#     """
-#     try:
-#         readme = resource_string(__name__, "README")
-#     except:
-#         raise bscr.Error("Can't find the README file")
-#
-#     try:
-#         pager.page(StringIO.StringIO(readme))
-#     except NameError:
-#         print(readme)
-#         print("(*** 'pip install pager' to get internal paging ***)")
-
-
-# -----------------------------------------------------------------------------
 # needs test
 def bscr_roots(args):
     """roots - display bscr root and git repo location
