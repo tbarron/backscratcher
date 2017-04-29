@@ -40,9 +40,10 @@ def bscr_help_commands(**kwa):
             "calc        - simple python expression evaluator",
             "chron       - stopwatch and timer",
             "dt          - date and time manipulations",
+            "filter      - report interesting items",
             "fl          - retrieve and report information about files",
-            "gtx         - git helper extensions",
             "fx          - command line special effects",
+            "gtx         - git helper extensions",
             "hd          - hexdump",
             "jcal        - generate various kinds of calendars",
             "list        - minus, union, or intersect two lists",
@@ -113,6 +114,7 @@ def bscr_help(**kwa):
 
 
 # -----------------------------------------------------------------------------
+# needs test
 def bscr_roots(args):
     """roots - display bscr root and git repo location
 
@@ -127,6 +129,7 @@ def bscr_roots(args):
 
 
 # -----------------------------------------------------------------------------
+# needs test
 def bscr_uninstall(args):
     """uninstall - remove bscr from your system
 
