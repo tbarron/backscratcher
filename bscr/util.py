@@ -191,11 +191,14 @@ def contents(filename, string=False):
 
 
 # ---------------------------------------------------------------------------
-def dirname(rpath):
+def dirname(rpath, level=1):
     """
     Convenience wrapper for os.path.dirname()
     """
-    return os.path.dirname(rpath)
+    rval = rpath
+    for idx in range(level):
+        rval = os.path.dirname(rval)
+    return rval
 
 
 # -----------------------------------------------------------------------------
