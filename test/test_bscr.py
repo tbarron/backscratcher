@@ -3,12 +3,10 @@
 import bscr
 import bscr.bscr
 import glob
-from bscr import testhelp as th
 from bscr import util as U
 import pexpect
 import pytest
 import re
-import unittest
 
 
 # -----------------------------------------------------------------------------
@@ -74,7 +72,7 @@ def test_bscr_help_CMD_dir(capsys):
     for fname in [x for x in dir(bscr.bscr) if x.startswith('bscr_')]:
         cname = fname.replace("bscr_", "")
         bscr.bscr.bscr_help(**{"d": False, "COMMAND": cname})
-        result, _ = capsys.readouterr()
+        result, ign = capsys.readouterr()
         func = getattr(bscr.bscr, fname)
         for line in [_.strip() for _ in result.replace("\r", "").split("\n")]:
             assert line in func.__doc__
@@ -104,8 +102,8 @@ def test_bscr_help_command_dir(capsys):
     bscr.bscr.bscr_help_commands(**{})
     result, _ = capsys.readouterr()
     bscr_dir = U.dirname(bscr.__file__)
-    for item in [_ for _ in glob.glob("{}/*.py".format(bscr_dir))
-                 if '__' not in _]:
+    for item in [x for x in glob.glob("{}/*.py".format(bscr_dir))
+                 if '__' not in x]:
         name = U.basename(item.replace(".py", ""))
         if name not in ignore:
             assert name in result
@@ -168,4 +166,3 @@ def test_bscr_uninstall_pxr():
     """
     """
     pytest.fail('construction')
-
