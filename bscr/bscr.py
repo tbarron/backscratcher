@@ -100,60 +100,6 @@ def bscr_roots(args):
 
 
 # -----------------------------------------------------------------------------
-def bscr_test(args):
-    """test - run tests
-
-    usage: bscr test [-t py.test|green|nosetests|unittest] [-n] [-d]
-
-    Without -t, we use the first available of py.test, green, nosetests, or
-    unittest. With -t, we attempt to run the tests with the specified test
-    runner.
-
-    The tests are optimized for py.test. They may not work well under green
-    or nose.
-    """
-    cmd = util.cmdline([{'opts': ['--dry-run', '-n'],
-                         'action': 'store_true',
-                         'help': 'see what would happen'},
-                        {'name': 'tester',
-                         'help': 'select a test runner'}])
-    (opts, args) = cmd.parse(args)
-
-    with util.Chdir(util.dirname(__file__)):
-        target = util.pj(os.path.dirname(__file__), 'test')
-        print("Running tests in %s" % target)
-        if opts.tester == '':
-            if which('py.test'):
-                util.run('py.test %s' % target, not opts.dryrun)
-            elif which('green'):
-                util.run('green -v %s' % target, not opts.dryrun)
-            elif which('nosetests') and importable('nose_ignoredoc'):
-                testl = glob.glob(util.pj(target, 'test_*.py'))
-                util.run('nosetests -v -c nose.cfg %s' % " ".join(testl),
-                         not opts.dryrun)
-            else:
-                testl = glob.glob(util.pj(target, 'test_*.py'))
-                for tst in testl:
-                    util.run("%s -v" % tst, not opts.dryrun)
-                    # p = subp.Popen([t, '-v'])
-                    # p.wait()
-        elif opts.tester == 'py.test':
-            util.run('py.test %s' % target, not opts.dryrun)
-        elif opts.tester == 'green':
-            util.run('green -v %s' % target, not opts.dryrun)
-        elif opts.tester == 'nose':
-            testl = glob.glob(util.pj(target, 'test_*.py'))
-            util.run('nosetests -v -c nose.cfg %s' % " ".join(testl),
-                     not opts.dryrun)
-        elif opts.tester == 'unittest':
-            testl = glob.glob(util.pj(target, 'test_*.py'))
-            for tst in testl:
-                util.run("%s -v" % tst, not opts.dryrun)
-        else:
-            raise SystemExit("unrecognized tester: '%s'" % opts.tester)
-
-
-# -----------------------------------------------------------------------------
 def bscr_uninstall(args):
     """uninstall - remove bscr from your system
 
