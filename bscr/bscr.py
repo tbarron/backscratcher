@@ -96,15 +96,14 @@ def bscr_help(**kwa):
 
 
 # -----------------------------------------------------------------------------
-# needs test
-def bscr_roots(args):
+@dispatch.on('roots')
+def bscr_roots(**kwa):
     """roots - display bscr root and git repo location
 
     usage: bscr roots
     """
-    cmd = util.cmdline([])
-    (_, _) = cmd.parse(args)
-
+    if kwa["d"]:
+        pdb.set_trace()
     print("bscr root: %s" % util.bscr_root())
     print(" git root: %s" % util.git_root())
     print("in_bscr_repo: %s" % util.in_bscr_repo())
