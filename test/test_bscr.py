@@ -7,66 +7,135 @@ from bscr import testhelp as th
 from bscr import util as U
 import pexpect
 import pytest
+import re
 import unittest
 
 
-# -------------------------------------------------------------------------
-def test_bscr_version_help():
+# -----------------------------------------------------------------------------
+def test_bscr_version_dir(capsys):
     """
-    Test 'bscr version -h'
+    Test 'bscr version'
     """
     pytest.debug_func()
-    cmd = "bscr version -h"
-    result = th.rm_cov_warn(pexpect.run(cmd))
+    bscr.bscr.bscr_version()
+    result, _ = capsys.readouterr()
     assert "Traceback" not in result
-    assert "Usage: bscr [options]" in result
-    assert "-d, --debug    run under the debugger" in result
+    assert "Usage: bscr [options]" not in result
+    assert "-d, --debug    run under the debugger" not in result
+    assert re.findall("Backscratcher version \d+\.\d+.\d+", result)
+
+
+# -----------------------------------------------------------------------------
+def test_bscr_version_pxr():
+    """
+    Test 'bscr version'
+    """
+    pytest.debug_func()
+    result = pexpect.run("bscr version")
+    assert "Traceback" not in result
+    assert "Usage: bscr [options]" not in result
+    assert "-d, --debug    run under the debugger" not in result
+    assert re.findall("Backscratcher version \d+\.\d+.\d+", result)
+
+
+# -----------------------------------------------------------------------------
+def test_bscr_help_dir(capsys):
+    """
+    Test 'bscr help'
+    """
+    pytest.debug_func()
+    bscr.bscr.bscr_help(**{"d": False, "COMMAND": None})
+    result, _ = capsys.readouterr()
+    assert "Traceback" not in result
+    for f in [x for x in dir(bscr.bscr) if x.startswith('bscr_')]:
+        subc = f.replace('bscr_', '')
+        assert subc in result
+
+
+# -----------------------------------------------------------------------------
+def test_bscr_help_pxr():
+    """
+    Test 'bscr help'
+    """
+    pytest.debug_func()
+    result = pexpect.run('bscr help')
+    assert "Traceback" not in result
+    for f in [x for x in dir(bscr.bscr) if x.startswith('bscr_')]:
+        subc = f.replace('bscr_', '')
+        assert subc in result
+
+
+# -----------------------------------------------------------------------------
+def test_bscr_help_cmd_dir(capsys):
+    """
+    Test 'bscr help COMMAND'
+    """
+    pytest.debug_func()
+    for fname in [x for x in dir(bscr.bscr) if x.startswith('bscr_')]:
+        cname = fname.replace("bscr_", "")
+        bscr.bscr.bscr_help(**{"d": False, "COMMAND": cname})
+        result, _ = capsys.readouterr()
+        func = getattr(bscr.bscr, fname)
+        for line in [_.strip() for _ in result.replace("\r", "").split("\n")]:
+            assert line in func.__doc__
+
+
+# -----------------------------------------------------------------------------
+def test_bscr_help_cmd_pxr():
+    """
+    Test 'bscr help COMMAND'
+    """
+    pytest.debug_func()
+    for fname in [x for x in dir(bscr.bscr) if x.startswith('bscr_')]:
+        cname = fname.replace("bscr_", "")
+        result = pexpect.run("bscr help {}".format(cname))
+        func = getattr(bscr.bscr, fname)
+        for line in [_.strip() for _ in result.replace("\r", "").split("\n")]:
+            assert line in func.__doc__
+
+
+# -----------------------------------------------------------------------------
+def test_bscr_location():
+    """
+    Check the location of the bscr module we're loading
+    """
+    pytest.debug_func()
+    location = U.dirname(__file__, 2)
+    bscr_loc = U.dirname(bscr.bscr.__file__, 2)
+    assert location == bscr_loc
 
 
 # -----------------------------------------------------------------------------
 class TestScripts(th.HelpedTestCase):
-    # -------------------------------------------------------------------------
-    def test_bscr_help(self):
-        """
-        Test 'bscr help'
-        """
-        self.dbgfunc()
-        cmd = pexpect.which('bscr')
-        result = pexpect.run('%s help' % cmd)
-        self.assertFalse('Traceback' in result)
-        for f in [x for x in dir(bscr.bscr) if x.startswith('bscr_')]:
-            subc = f.replace('bscr_', '')
-            self.assertTrue('%s - ' % subc in result)
+    # # -------------------------------------------------------------------------
+    # def test_bscr_help_help(self):
+    #     """
+    #     Test 'bscr help help'
+    #     """
+    #     self.dbgfunc()
+    #     cmd = pexpect.which('bscr')
+    #     result = pexpect.run('%s help help' % cmd)
+    #     self.assertFalse('Traceback' in result)
+    #     self.assertTrue('help - show a list' in result)
+    #     self.assertTrue('With no arguments' in result)
+    #     self.assertTrue('With a command as argument' in result)
 
-    # -------------------------------------------------------------------------
-    def test_bscr_help_help(self):
-        """
-        Test 'bscr help help'
-        """
-        self.dbgfunc()
-        cmd = pexpect.which('bscr')
-        result = pexpect.run('%s help help' % cmd)
-        self.assertFalse('Traceback' in result)
-        self.assertTrue('help - show a list' in result)
-        self.assertTrue('With no arguments' in result)
-        self.assertTrue('With a command as argument' in result)
-
-    # -------------------------------------------------------------------------
-    def test_bscr_version(self):
-        """
-        Test 'bscr version'
-        """
-        self.dbgfunc()
-        cmd = "bscr version -v"
-        result = th.rm_cov_warn(pexpect.run(cmd))
-        self.assertTrue("Traceback" not in result,
-                        "Not expecting 'Traceback' in %s" %
-                        U.lquote(result))
-        self.assertTrue("Backscratcher version" in result)
-        # self.assertEqual(2, len(result.split("\n")),
-        #                  "Expected only 1 newlines in %s" %
-        #                  U.lquote(result))
-        self.assertTrue("util.dispatch is deprecated" not in result)
+    # # -------------------------------------------------------------------------
+    # def test_bscr_version(self):
+    #     """
+    #     Test 'bscr version'
+    #     """
+    #     self.dbgfunc()
+    #     cmd = "bscr version -v"
+    #     result = th.rm_cov_warn(pexpect.run(cmd))
+    #     self.assertTrue("Traceback" not in result,
+    #                     "Not expecting 'Traceback' in %s" %
+    #                     U.lquote(result))
+    #     self.assertTrue("Backscratcher version" in result)
+    #     # self.assertEqual(2, len(result.split("\n")),
+    #     #                  "Expected only 1 newlines in %s" %
+    #     #                  U.lquote(result))
+    #     self.assertTrue("util.dispatch is deprecated" not in result)
 
     # -------------------------------------------------------------------------
     def test_which_module(self):
