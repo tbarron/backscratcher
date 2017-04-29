@@ -1,8 +1,16 @@
 """
 Backscratcher help and management
+
+Usage:   bscr [-d] help [COMMAND]
+         bscr [-d] help_commands
+         bscr [-d] roots
+         bscr [-d] uninstall
+         bscr [-d] version
 """
+from docopt_dispatch import dispatch
 import glob
 import os
+import pdb
 import re
 import shutil
 import sys
@@ -12,20 +20,19 @@ from version import __version__
 
 
 # -----------------------------------------------------------------------------
-def main(args=None):
+def main():
     """
     Command line entry point
     """
-    if args is None:
-        args = sys.argv
-    util.dispatch('bscr.bscr', 'bscr', args)
+    dispatch(__doc__)
 
 
 # -----------------------------------------------------------------------------
-def bscr_help_commands(args=None):
-    """help_commands - list the commands that are part of backscratcher
+@dispatch.on('help_commands')
+def bscr_help_commands(**kwa):
     """
-
+    help_commands - list the commands that are part of backscratcher
+    """
     cmdl = ["align       - use spaces to spread input lines so that " +
             "columns line up",
             "ascii       - display the ASCII collating sequence",
@@ -65,6 +72,26 @@ def bscr_help_commands(args=None):
             print("   %s" % line)
         else:
             print(" * %s" % line)
+
+
+# -----------------------------------------------------------------------------
+@dispatch.on('help')
+def bscr_help(**kwa):
+    """
+    Describe the functions provided by bscr
+
+    'bscr help' provides a list of available functions
+
+    'bscr help FUNCTION' provides a description of FUNCTION
+    """
+    if kwa['d']:
+        pdb.set_trace()
+    if kwa["COMMAND"]:
+        fname = "bscr_" + kwa["COMMAND"]
+        fobj = globals()[fname]
+        print(fobj.__doc__)
+    else:
+        print(__doc__)
 
 
 # -----------------------------------------------------------------------------
@@ -142,19 +169,12 @@ def bscr_uninstall(args):
 
 
 # -----------------------------------------------------------------------------
-def bscr_version(args):
+@dispatch.on('version')
+def bscr_version(**kwa):
     """version - report the version of this backscratcher instance
 
     usage: bscr version
     """
-    cmd = util.cmdline([{'opts': ['-v', '--verbose'],
-                         'action': 'store_true',
-                         'default': False,
-                         'dest': 'verbose',
-                         'help': 'show more info'
-                         }])
-    (_, _) = cmd.parse(args)
-
     print("Backscratcher version %s" % __version__)
 
 
