@@ -139,11 +139,16 @@ def test_bscr_location():
 
 
 # -----------------------------------------------------------------------------
-def test_bscr_roots_dir():
+def test_bscr_roots_dir(capsys):
     """
     Report paths for bscr and its git repo
     """
-    pytest.fail('construction')
+    bscr.bscr.bscr_roots(**{'d': False})
+    result, _ = capsys.readouterr()
+    assert "Traceback" not in result
+    assert "bscr root:" in result
+    assert "git root:" in result
+    assert "in_bscr_repo:" in result
 
 
 # -----------------------------------------------------------------------------
@@ -151,7 +156,11 @@ def test_bscr_roots_pxr():
     """
     Report paths for bscr and its git repo
     """
-    pytest.fail('construction')
+    result = pexpect.run("bscr roots")
+    assert "Traceback" not in result
+    assert "bscr root:" in result
+    assert "git root:" in result
+    assert "in_bscr_repo:" in result
 
 
 # -----------------------------------------------------------------------------
