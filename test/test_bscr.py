@@ -66,7 +66,7 @@ def test_bscr_help_pxr():
 
 
 # -----------------------------------------------------------------------------
-def test_bscr_help_cmd_dir(capsys):
+def test_bscr_help_CMD_dir(capsys):
     """
     Test 'bscr help COMMAND'
     """
@@ -81,7 +81,7 @@ def test_bscr_help_cmd_dir(capsys):
 
 
 # -----------------------------------------------------------------------------
-def test_bscr_help_cmd_pxr():
+def test_bscr_help_CMD_pxr():
     """
     Test 'bscr help COMMAND'
     """
@@ -92,6 +92,41 @@ def test_bscr_help_cmd_pxr():
         func = getattr(bscr.bscr, fname)
         for line in [_.strip() for _ in result.replace("\r", "").split("\n")]:
             assert line in func.__doc__
+
+
+# -----------------------------------------------------------------------------
+def test_bscr_help_command_dir(capsys):
+    """
+    Check the output of 'bscr help_commands'
+    """
+    pytest.debug_func()
+    ignore = ["testhelp", "toolframe", "util", "version"]
+    bscr.bscr.bscr_help_commands(**{})
+    result, _ = capsys.readouterr()
+    bscr_dir = U.dirname(bscr.__file__)
+    for item in [_ for _ in glob.glob("{}/*.py".format(bscr_dir))
+                 if '__' not in _]:
+        name = U.basename(item.replace(".py", ""))
+        if name not in ignore:
+            assert name in result
+    pass
+
+
+# -----------------------------------------------------------------------------
+def test_bscr_help_command_pxr(capsys):
+    """
+    Check the output of 'bscr help_commands'
+    """
+    pytest.debug_func()
+    ignore = ["testhelp", "toolframe", "util", "version"]
+    result = pexpect.run("bscr help_commands")
+    bscr_dir = U.dirname(bscr.__file__)
+    for item in [_ for _ in glob.glob("{}/*.py".format(bscr_dir))
+                 if '__' not in _]:
+        name = U.basename(item.replace(".py", ""))
+        if name not in ignore:
+            assert name in result
+    pass
 
 
 # -----------------------------------------------------------------------------
@@ -106,91 +141,31 @@ def test_bscr_location():
 
 
 # -----------------------------------------------------------------------------
-class TestScripts(th.HelpedTestCase):
-    # # -------------------------------------------------------------------------
-    # def test_bscr_help_help(self):
-    #     """
-    #     Test 'bscr help help'
-    #     """
-    #     self.dbgfunc()
-    #     cmd = pexpect.which('bscr')
-    #     result = pexpect.run('%s help help' % cmd)
-    #     self.assertFalse('Traceback' in result)
-    #     self.assertTrue('help - show a list' in result)
-    #     self.assertTrue('With no arguments' in result)
-    #     self.assertTrue('With a command as argument' in result)
+def test_bscr_roots_dir():
+    """
+    Report paths for bscr and its git repo
+    """
+    pytest.fail('construction')
 
-    # # -------------------------------------------------------------------------
-    # def test_bscr_version(self):
-    #     """
-    #     Test 'bscr version'
-    #     """
-    #     self.dbgfunc()
-    #     cmd = "bscr version -v"
-    #     result = th.rm_cov_warn(pexpect.run(cmd))
-    #     self.assertTrue("Traceback" not in result,
-    #                     "Not expecting 'Traceback' in %s" %
-    #                     U.lquote(result))
-    #     self.assertTrue("Backscratcher version" in result)
-    #     # self.assertEqual(2, len(result.split("\n")),
-    #     #                  "Expected only 1 newlines in %s" %
-    #     #                  U.lquote(result))
-    #     self.assertTrue("util.dispatch is deprecated" not in result)
 
-    # -------------------------------------------------------------------------
-    def test_which_module(self):
-        """
-        Verify that we're importing the right align module
-        """
-        self.dbgfunc()
-        self.assertModule('bscr.bscr', __file__)
+# -----------------------------------------------------------------------------
+def test_bscr_roots_pxr():
+    """
+    Report paths for bscr and its git repo
+    """
+    pytest.fail('construction')
 
-    # -------------------------------------------------------------------------
-    def test_python_which(self):
-        """
-        Calling python_which('sys') should get back a string containing the
-        same path as sys.__file__
-        """
-        def rshave(path, comp):
-            while comp in path:
-                path = U.dirname(path)
-            return path
 
-        self.dbgfunc()
-        act = rshave(bscr.python_which('unittest'), 'unittest')
-        exp = rshave(unittest.__file__, 'unittest')
-        self.assertEq(exp, act)
+# -----------------------------------------------------------------------------
+def test_bscr_uninstall_dir():
+    """
+    """
+    pytest.fail('construction')
 
-        self.assertEq(rshave(U.__file__, 'util'),
-                      rshave(bscr.python_which('bscr/util'), 'util'))
-        self.assertEq(rshave(U.__file__, 'util'),
-                      rshave(bscr.python_which('bscr.util'), 'util'))
 
-    # -------------------------------------------------------------------------
-    def test_perl_which(self):
-        """
-        Calling perl_which('Digest::MD5') should get back a string containing
-        the same path as sys.__file__
-        """
-        self.dbgfunc()
-        perlinc = pexpect.run("perl -e 'print(\"@INC\");'")
-        found = False
-        for path in perlinc.split():
-            exp = U.pj(path, "Digest", "MD5.pm")
-            if glob.glob(exp):
-                found = True
-                break
-        if found:
-            self.assertEq(exp, bscr.perl_which('Digest::MD5'))
-        else:
-            pytest.skip("Digest/MD5 not found in perl @INC")
+# -----------------------------------------------------------------------------
+def test_bscr_uninstall_pxr():
+    """
+    """
+    pytest.fail('construction')
 
-    # -------------------------------------------------------------------------
-    def test_bash_which(self):
-        """
-        Calling bash_which('emacs') should get back a string with a path to the
-        emacs executable
-        """
-        self.dbgfunc()
-        self.assertEq(pexpect.which("emacs"),
-                      bscr.bash_which("emacs"))
