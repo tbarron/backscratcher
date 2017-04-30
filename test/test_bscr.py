@@ -164,14 +164,26 @@ def test_bscr_roots_pxr():
 
 
 # -----------------------------------------------------------------------------
-def test_bscr_uninstall_dir():
-    """
-    """
-    pytest.fail('construction')
+# def test_bscr_uninstall_dir(tmpdir):
+#     """
+#     Install bscr in a virtualenv so we can test uninstalling it
+#     """
+#     pytest.debug_func()
+#     root = U.git_root()
+#     with U.Chdir(tmpdir.strpath):
+#         result = pexpect.run("virtualenv testenv")
+#         activate_this = "testenv/bin/activate_this.py"
+#         execfile(activate_this, dict(__file__=activate_this))
+#         result = pexpect.run("pip install {}".format(root))
+#         where = pexpect.which("bscr")
+#         assert root not in where
+#         assert tmpdir.strpath in where
+#         pexpect.run("bscr uninstall")
+#         pass
 
 
 # -----------------------------------------------------------------------------
-def test_bscr_uninstall_pxr():
-    """
-    """
-    pytest.fail('construction')
+# def test_bscr_uninstall_pxr():
+#     """
+#     """
+#     pytest.fail('construction')
