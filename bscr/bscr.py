@@ -8,11 +8,8 @@ Usage:   bscr [-d] help [COMMAND]
          bscr [-d] version
 """
 from docopt_dispatch import dispatch
-import glob
 import os
 import pdb
-import re
-import shutil
 import sys
 
 import util
