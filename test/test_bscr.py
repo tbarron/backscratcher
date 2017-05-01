@@ -73,8 +73,10 @@ def test_bscr_help_CMD_dir(capsys):
         cname = fname.replace("bscr_", "")
         bscr.bscr.bscr_help(**{"d": False, "COMMAND": cname})
         result, ign = capsys.readouterr()
+        assert result.strip() != ""
         func = getattr(bscr.bscr, fname)
-        for line in [_.strip() for _ in result.replace("\r", "").split("\n")]:
+        for line in [_ for _ in result.replace("\r", "").split("\n")]:
+            assert line.strip() == "" or line.startswith("    ")
             assert line in func.__doc__
 
 
@@ -87,8 +89,10 @@ def test_bscr_help_CMD_pxr():
     for fname in [x for x in dir(bscr.bscr) if x.startswith('bscr_')]:
         cname = fname.replace("bscr_", "")
         result = pexpect.run("bscr help {}".format(cname))
+        assert result.strip() != ""
         func = getattr(bscr.bscr, fname)
-        for line in [_.strip() for _ in result.replace("\r", "").split("\n")]:
+        for line in [_ for _ in result.replace("\r", "").split("\n")]:
+            assert line.strip() == "" or line.startswith("    ")
             assert line in func.__doc__
 
 
