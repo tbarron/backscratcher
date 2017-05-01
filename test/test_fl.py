@@ -14,6 +14,58 @@ import time
 from bscr import util as U
 
 
+# -----------------------------------------------------------------------------
+def test_diff(tmpdir):
+    """
+    Test 'fl diff'
+    """
+    pytest.debug_func()
+    mrpm1 = tmpdir.join("mrpm1")
+    mrpm1.write("this is a test file\n")
+
+    mrpm2 = tmpdir.join("mrpm2")
+    mrpm2.write("this is a test file\n")
+
+    mrpm1_dt = tmpdir.join("mprm1.2009-10-01")
+    mrpm1_dt.write("copy of test file\n")
+
+    olddir = tmpdir.join("old").ensure(dir=True)
+    mrpm2_dt = olddir.join("mrpm2.2009-08-31")
+    mrpm2_dt.write("copy of another test file\n")
+
+    with U.Chdir(tmpdir.strpath):
+        expected = ["/Users/tbarron/prj/github/backscratcher/"
+                    "bscr/util.py:210: "
+                    "UserWarning: util.dispatch is deprecated "
+                    "in favor of docopt_dispatch\r",
+                    "  warnings.warn(\"util.dispatch is deprecated"
+                    " in favor of docopt_dispatch\")\r",
+                    'diff ./mrpm1.2009-10-01 mrpm1\r',
+                    '1c1\r',
+                    '< copy of test file\r',
+                    '---\r',
+                    '> this is a test file\r',
+                    '']
+        cmd = U.script_location("fl")
+        got = pexpect.run("{} diff {}".format(cmd, mrpm1.basename)).split("\n")
+        assert expected == got
+
+        expected = ["/Users/tbarron/prj/github/backscratcher/"
+                    "bscr/util.py:210: "
+                    "UserWarning: util.dispatch is deprecated "
+                    "in favor of docopt_dispatch\r",
+                    "  warnings.warn(\"util.dispatch is deprecated"
+                    " in favor of docopt_dispatch\")\r",
+                    'diff ./old/mrpm2.2009-08-31 mrpm2\r',
+                    '1c1\r',
+                    '< copy of another test file\r',
+                    '---\r',
+                    '> this is another test file\r',
+                    '']
+        got = pexpect.run("%s diff mrpm2" % cmd).split("\n")
+        assert expected == got
+
+
 # ---------------------------------------------------------------------------
 def setUpModule():
     """
