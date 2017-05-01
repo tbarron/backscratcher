@@ -8,6 +8,19 @@ History
   2011.0202     tpb   0.11   add -L trick
                              add stubs for future routines
 
+Usage:
+          fl [-d] [-n] diff FILE ...
+          fl [-d] [-n] edit
+          fl [-d] [-n] revert FILE
+          fl [-d] [-n] rm_cr
+          fl [-d] [-n] save FILE ...
+          fl [-d] [-n] set_atime_to_mtime
+          fl [-d] [-n] set_mtime_to_atime
+          fl [-d] [-n] times
+          fl [-d] [-n] unreadable
+
+Examples:
+
   fl [-n/--noexec] {save|diff|revert} file1 file2 file3 ...
   fl [-n/--noexec] [--nopreserve] {apply|backout} filename
 
@@ -101,7 +114,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
-
+from docopt_dispatch import dispatch
 import optparse
 import os
 import pdb
@@ -118,25 +131,22 @@ def main(args=None):
     """
     CLEP
     """
-    if args is None:
-        args = sys.argv
-    util.dispatch('bscr.fl', 'fl', args)
+    dispatch(__doc__)
 
 
 # ---------------------------------------------------------------------------
-def fl_diff(args):
-    """diff - compare file to its most recently 'saved' version
+@dispatch.on('diff')
+def fl_diff(**kwa):
+    """
+    diff - compare file to its most recently 'saved' version
 
     usage: fl diff file1 file2 file3 ...
 
     """
-    prs = optparse.OptionParser()
-    prs.add_option('-n', '--noexec',
-                   default=True, action='store_false', dest='xable',
-                   help='just do a dry run')
-    (opts, args) = prs.parse_args(args)
+    if kwa["d"]:
+        pdb.set_trace()
 
-    for filename in args:
+    for filename in kwa["FILE"]:
         dirname = os.path.dirname(filename)
         if dirname == '':
             dirname = '.'
@@ -147,7 +157,7 @@ def fl_diff(args):
         cmd = 'diff %s %s' % (counterpath, filename)
         print cmd
         sys.stdout.flush()
-        util.run(cmd, opts.xable)
+        util.run(cmd, not kwa['n'])
 
 
 # ---------------------------------------------------------------------------
