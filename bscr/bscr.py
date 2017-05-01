@@ -95,7 +95,8 @@ def bscr_help(**kwa):
 # -----------------------------------------------------------------------------
 @dispatch.on('roots')
 def bscr_roots(**kwa):
-    """roots - display bscr root and git repo location
+    """
+    roots - display bscr root and git repo location
 
     usage: bscr roots
     """
@@ -152,7 +153,8 @@ def bscr_roots(**kwa):
 # -----------------------------------------------------------------------------
 @dispatch.on('version')
 def bscr_version(**kwa):
-    """version - report the version of this backscratcher instance
+    """
+    version - report the version of this backscratcher instance
 
     usage: bscr version
     """
