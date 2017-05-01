@@ -108,45 +108,45 @@ def bscr_roots(**kwa):
 
 # -----------------------------------------------------------------------------
 # needs test
-def bscr_uninstall(args):
-    """uninstall - remove bscr from your system
-
-    If you installed with pip, you can also uninstall with pip:
-
-        pip uninstall bscr
-
-    However, if you used easy_install, or if you just downloaded the tarball
-    and ran 'python setup.py install', uninstalling can be a pain. bscr
-    provides an easier way:
-
-        bscr uninstall
-
-    will remove bscr from your system.
-    """
-    bscrpkg = os.path.dirname(__file__)
-    sitepkg = os.path.dirname(bscrpkg)
-    if os.path.isdir(util.pj(sitepkg, '.git')):
-        print("Cowardly refusing to uninstall from a .git repo")
-    else:
-        eggl = glob.glob(util.pj(sitepkg, 'backscratcher*egg*'))
-        egg = eggl[0]
-        iflist = util.contents(util.pj(egg, 'installed-files.txt'))
-        print("Preparing to uninstall:")
-        with util.Chdir(egg):
-            afpl = [os.path.abspath(rfp.strip()) for rfp in iflist]
-        for afp in afpl:
-            print("   " + afp)
-        print("   rmdir " + bscrpkg)
-        answer = raw_input("Proceed? > ")
-        if re.match("yes", answer):
-            for afp in afpl:
-                if os.path.isdir(afp):
-                    shutil.rmtree(afp)
-                elif os.path.exists(afp):
-                    os.unlink(afp)
-            shutil.rmtree(bscrpkg)
-
-    return None
+# def bscr_uninstall(args):
+#     """uninstall - remove bscr from your system
+#
+#     If you installed with pip, you can also uninstall with pip:
+#
+#         pip uninstall bscr
+#
+#     However, if you used easy_install, or if you just downloaded the tarball
+#     and ran 'python setup.py install', uninstalling can be a pain. bscr
+#     provides an easier way:
+#
+#         bscr uninstall
+#
+#     will remove bscr from your system.
+#     """
+#     bscrpkg = os.path.dirname(__file__)
+#     sitepkg = os.path.dirname(bscrpkg)
+#     if os.path.isdir(util.pj(sitepkg, '.git')):
+#         print("Cowardly refusing to uninstall from a .git repo")
+#     else:
+#         eggl = glob.glob(util.pj(sitepkg, 'backscratcher*egg*'))
+#         egg = eggl[0]
+#         iflist = util.contents(util.pj(egg, 'installed-files.txt'))
+#         print("Preparing to uninstall:")
+#         with util.Chdir(egg):
+#             afpl = [os.path.abspath(rfp.strip()) for rfp in iflist]
+#         for afp in afpl:
+#             print("   " + afp)
+#         print("   rmdir " + bscrpkg)
+#         answer = raw_input("Proceed? > ")
+#         if re.match("yes", answer):
+#             for afp in afpl:
+#                 if os.path.isdir(afp):
+#                     shutil.rmtree(afp)
+#                 elif os.path.exists(afp):
+#                     os.unlink(afp)
+#             shutil.rmtree(bscrpkg)
+#
+#     return None
 
 
 # -----------------------------------------------------------------------------
