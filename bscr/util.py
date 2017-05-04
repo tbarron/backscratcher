@@ -392,8 +392,12 @@ def run(cmd, xable, verbose=False):
     if xable:
         if verbose:
             print cmd
-        pipe = subp.Popen(shlex.split(cmd))
-        pipe.wait()
+        pipe = subp.Popen(shlex.split(cmd),
+                          stdout=subp.PIPE,
+                          stderr=subp.STDOUT)
+        (out, err) = pipe.communicate()
+        # pipe.wait()
+        return out
     else:
         print "would do '%s'" % cmd
 
