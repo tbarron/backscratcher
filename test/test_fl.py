@@ -632,3 +632,52 @@ class TestFL_edit(th.HelpedTestCase):
 
             for fp in fl:
                 util.safe_unlink(fp)
+
+
+# -----------------------------------------------------------------------------
+def makefile(loc, basename, content=None, ensure=False, dir=False):
+    """
+    Return a py.path.local based on *loc*.join(*basename*). If *ensure*, touch
+    it. If *dir*, make it a directory
+    """
+    rval = loc.join(basename)
+    if content is not None:
+        rval.write(content)
+    elif ensure:
+        rval.ensure(dir=dir)
+    return rval
+
+
+# -----------------------------------------------------------------------------
+@pytest.fixture
+def fx_match(tmpdir):
+    """
+    Set up some matching files for fl diff
+    """
+    this = fx_match
+    this.mrpm1 = makefile(tmpdir, "mrpm1", content="this is a test file\n")
+    this.mrpm2 = makefile(tmpdir, "mrpm2",
+                          content="this is another test file\n")
+    this.mprm1_dt = makefile(tmpdir, "mrpm1.2009-10-01",
+                             content="copy of test file\n")
+    this.olddir = makefile(tmpdir, "old", dir=True, ensure=True)
+    this.mprm2_dt = makefile(this.olddir, "mrpm2.2009-08-31",
+                             content="copy of another test file\n")
+
+    this.mrpm1_diff_exp = [u'diff ./mrpm1.2009-10-01 mrpm1',
+                           u'1c1',
+                           u'< copy of test file',
+                           u'---',
+                           u'> this is a test file',
+                           u'',
+                           u'']
+
+    this.mrpm2_diff_exp = [u'diff ./old/mrpm2.2009-08-31 mrpm2',
+                           u'1c1',
+                           u'< copy of another test file',
+                           u'---',
+                           u'> this is another test file',
+                           u'',
+                           u'']
+
+    return this
