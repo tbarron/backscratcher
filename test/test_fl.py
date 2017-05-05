@@ -236,6 +236,30 @@ def test_mrpm_old_none(tmpdir):
     assert result is None
 
 
+# -----------------------------------------------------------------------------
+def test_mrpm_old_nosuch_hit(tmpdir):
+    """
+    Test for most_recent_prefix_match() with non-existent stem file, a ./old
+    directory, and no matches in . or ./old
+    """
+    olddir = makefile(tmpdir, "old", ensure=True, dir=True)
+    tfile = makefile(tmpdir, "mrpm", ensure=False)
+    mfile = makefile(olddir, "mrpm.suffix", ensure=True)
+    result = fl.most_recent_prefix_match(tmpdir.strpath, tfile.basename)
+    assert mfile.strpath == result
+
+
+# -----------------------------------------------------------------------------
+def test_mrpm_old_nosuch_none(tmpdir):
+    """
+    Test for most_recent_prefix_match() with non-existent stem file, a ./old
+    directory, and no matches in . or ./old
+    """
+    olddir = makefile(tmpdir, "old", ensure=True, dir=True)
+    tfile = makefile(tmpdir, "mrpm", ensure=False)
+    makefile(olddir, "mrpm.suffix", ensure=False)
+    result = fl.most_recent_prefix_match(tmpdir.strpath, tfile.basename)
+    assert result is None
 
 
 # ---------------------------------------------------------------------------
