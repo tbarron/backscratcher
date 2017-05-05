@@ -184,6 +184,31 @@ def test_mrpm_cwd_none(tmpdir):
     assert result is None
 
 
+# -----------------------------------------------------------------------------
+def test_mrpm_cwd_nosuch_hit(tmpdir):
+    """
+    Test for most_recent_prefix_match() with non-existent stem file but a valid
+    match in the current directory
+    """
+    pytest.debug_func()
+    testfile = tmpdir.join("mrpm")
+    mfile = makefile(tmpdir, "mrpm.suffix", content="This is the backup")
+    result = fl.most_recent_prefix_match(tmpdir.strpath, testfile.basename)
+    assert result == mfile.strpath
+
+
+# -----------------------------------------------------------------------------
+def test_mrpm_cwd_nosuch_none(tmpdir):
+    """
+    Test for most_recent_prefix_match() with non-existent stem file and no
+    matches in the current directory
+    """
+    pytest.debug_func()
+    testfile = tmpdir.join("mrpm")
+    result = fl.most_recent_prefix_match(tmpdir.strpath, testfile.basename)
+    assert result is None
+
+
 
 
 # ---------------------------------------------------------------------------
