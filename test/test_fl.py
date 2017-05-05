@@ -209,6 +209,33 @@ def test_mrpm_cwd_nosuch_none(tmpdir):
     assert result is None
 
 
+# -----------------------------------------------------------------------------
+def test_mrpm_old_hit(tmpdir):
+    """
+    Test for most_recent_prefix_match() with a ./old directory and no matches
+    in . or ./old
+    """
+    pytest.debug_func()
+    olddir = makefile(tmpdir, "old", ensure=True, dir=True)
+    testfile = makefile(tmpdir, "mrpm", ensure=True)
+    match = makefile(olddir, "mrpm.abc.def", ensure=True)
+    result = fl.most_recent_prefix_match(tmpdir.strpath, testfile.basename)
+    assert result == match.strpath
+
+
+# -----------------------------------------------------------------------------
+def test_mrpm_old_none(tmpdir):
+    """
+    Test for most_recent_prefix_match() with a ./old directory and no matches
+    in . or ./old
+    """
+    pytest.debug_func()
+    makefile(tmpdir, "old", ensure=True, dir=True)
+    testfile = makefile(tmpdir, "mrpm", ensure=True)
+    result = fl.most_recent_prefix_match(tmpdir.strpath, testfile.basename)
+    assert result is None
+
+
 
 
 # ---------------------------------------------------------------------------
