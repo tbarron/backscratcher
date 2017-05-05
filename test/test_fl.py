@@ -66,6 +66,20 @@ def test_amtime_mtoa(tmpdir):
     assert s[stat.ST_ATIME] == s[stat.ST_MTIME]
 
 
+# -----------------------------------------------------------------------------
+def test_command_line():
+    """
+    Running the command with no arguments should get help output
+    """
+    thisone = util.script_location("fl")
+
+    result = pexpect.run(thisone)
+    assert "Traceback" not in result
+    assert "diff" in result
+    assert "save" in result
+    assert "times" in result
+
+
 
     mrpm2 = tmpdir.join("mrpm2")
     mrpm2.write("this is a test file\n")
@@ -136,25 +150,11 @@ def tearDownModule():
 # -----------------------------------------------------------------------------
 class TestFL(th.HelpedTestCase):
     # tests needed:
-    #   'fl' -- test_command_line
     #   'fl help' -- test_fl_help
     #   'fl help help' -- test_fl_help_help
     #   'fl help rm_cr'
     #   'fl times'
     #   'fl nosuchcmd'
-    # -------------------------------------------------------------------------
-    def test_command_line(self):
-        """
-        Running the command with no arguments should get help output
-        """
-        thisone = util.script_location("fl")
-
-        # print(thisone)
-        result = pexpect.run(thisone)
-        self.assertNotIn("Traceback", result)
-        self.assertIn("diff", result)
-        self.assertIn("save", result)
-        self.assertIn("times", result)
 
     # -------------------------------------------------------------------------
     def test_fl_help(self):
