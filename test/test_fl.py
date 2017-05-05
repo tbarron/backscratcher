@@ -80,16 +80,41 @@ def test_command_line():
     assert "times" in result
 
 
+# -----------------------------------------------------------------------------
+def test_diff_match_dir(tmpdir, capsys, fx_match):
+    """
+    Test fl.fl_diff(**{'d': False, 'FILE': filename}) when a prefix match
+    exists
+    """
+    pytest.debug_func()
+    with U.Chdir(tmpdir.strpath):
+        fl.fl_diff(**{"d": False, "n": False,
+                      "FILE": [fx_match.mrpm1.basename]})
+        got, _ = capsys.readouterr()
+        assert fx_match.mrpm1_diff_exp == got.split("\n")
 
-    mrpm2 = tmpdir.join("mrpm2")
-    mrpm2.write("this is a test file\n")
+        fl.fl_diff(**{"d": False, "n": False, "FILE": ["mrpm2"]})
+        got, _ = capsys.readouterr()
+        assert "\n".join(fx_match.mrpm2_diff_exp) == got
 
-    mrpm1_dt = tmpdir.join("mprm1.2009-10-01")
-    mrpm1_dt.write("copy of test file\n")
 
-    olddir = tmpdir.join("old").ensure(dir=True)
-    mrpm2_dt = olddir.join("mrpm2.2009-08-31")
-    mrpm2_dt.write("copy of another test file\n")
+# -----------------------------------------------------------------------------
+def test_diff_match_pxr(tmpdir, fx_match):
+    """
+    Test 'fl diff FILENAME' when a prefix match exists
+    """
+    pytest.debug_func()
+    with U.Chdir(tmpdir.strpath):
+        cmd = "{} diff {}".format(U.script_location("fl"),
+                                  fx_match.mrpm1.basename)
+        got = pexpect.run(cmd).split("\n")
+        assert fx_match.mrpm1_diff_exp == [_.rstrip() for _ in got]
+
+        cmd = "{} diff {}".format(U.script_location("fl"),
+                                  fx_match.mrpm2.basename)
+        got = pexpect.run(cmd).split("\n")
+        assert fx_match.mrpm2_diff_exp == [_.rstrip() for _ in got]
+
 
     with U.Chdir(tmpdir.strpath):
         expected = ["/Users/tbarron/prj/github/backscratcher/"
