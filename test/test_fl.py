@@ -3,6 +3,7 @@ from bscr import fl
 from bscr import util
 import os
 import pexpect
+import py
 import pytest
 import random
 import re
@@ -635,16 +636,41 @@ class TestFL_edit(th.HelpedTestCase):
 
 
 # -----------------------------------------------------------------------------
-def makefile(loc, basename, content=None, ensure=False, dir=False):
+def makefile(loc, basename, content=None, ensure=False, dir=False,
+             copy=None, atime=0, mtime=0):
     """
     Return a py.path.local based on *loc*.join(*basename*). If *ensure*, touch
     it. If *dir*, make it a directory
     """
     rval = loc.join(basename)
-    if content is not None:
-        rval.write(content)
+    if copy:
+        if dir:
+            raise U.Error("*dir* must be false if *copy* is not None")
+        if isinstance(copy, py.path.local):
+            copy.copy(rval)
+        elif isinstance(copy, str):
+            copy = py.path.local(copy)
+            copy.copy(rval)
+        else:
+            raise U.Error("*copy* must be a py.path.local or an str")
+    elif content:
+        if dir:
+            raise U.Error("*dir* must be false if *content* is not None")
+        if isinstance(content, str):
+            rval.write(content)
+        elif isinstance(content, list):
+            rval.write("\n".join(content))
+        else:
+            rval.write(str(content))
     elif ensure:
         rval.ensure(dir=dir)
+
+    if rval.exists():
+        if atime != 0 or mtime != 0:
+            atime = atime or time.time()
+            mtime = mtime or time.time()
+            os.utime(rval.strpath, (atime, mtime))
+
     return rval
 
 
