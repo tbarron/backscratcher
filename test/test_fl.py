@@ -116,37 +116,36 @@ def test_diff_match_pxr(tmpdir, fx_match):
         assert fx_match.mrpm2_diff_exp == [_.rstrip() for _ in got]
 
 
+# -----------------------------------------------------------------------------
+def test_diff_nomatch_dir(tmpdir, capsys):
+    """
+    Test fl.fl_diff(**{'d': False, 'FILE': [nomatch]}) when no prefix match
+    exists
+    """
+    pytest.debug_func()
+    nomatch = makefile(tmpdir, "nomatch", ensure=True)
     with U.Chdir(tmpdir.strpath):
-        expected = ["/Users/tbarron/prj/github/backscratcher/"
-                    "bscr/util.py:210: "
-                    "UserWarning: util.dispatch is deprecated "
-                    "in favor of docopt_dispatch\r",
-                    "  warnings.warn(\"util.dispatch is deprecated"
-                    " in favor of docopt_dispatch\")\r",
-                    'diff ./mrpm1.2009-10-01 mrpm1\r',
-                    '1c1\r',
-                    '< copy of test file\r',
-                    '---\r',
-                    '> this is a test file\r',
-                    '']
-        cmd = U.script_location("fl")
-        got = pexpect.run("{} diff {}".format(cmd, mrpm1.basename)).split("\n")
-        assert expected == got
+        fl.fl_diff(**{"d": False, "FILE": [nomatch.basename]})
+        exp = "No prefix match found for nomatch\n"
+        got, _ = capsys.readouterr()
+        assert exp == got
 
-        expected = ["/Users/tbarron/prj/github/backscratcher/"
-                    "bscr/util.py:210: "
-                    "UserWarning: util.dispatch is deprecated "
-                    "in favor of docopt_dispatch\r",
-                    "  warnings.warn(\"util.dispatch is deprecated"
-                    " in favor of docopt_dispatch\")\r",
-                    'diff ./old/mrpm2.2009-08-31 mrpm2\r',
-                    '1c1\r',
-                    '< copy of another test file\r',
-                    '---\r',
-                    '> this is another test file\r',
-                    '']
-        got = pexpect.run("%s diff mrpm2" % cmd).split("\n")
-        assert expected == got
+
+# -----------------------------------------------------------------------------
+def test_diff_nomatch_pxr(tmpdir):
+    """
+    Test pexpect.run('fl diff nomatch') where there's no prefix match for the
+    file
+    """
+    pytest.debug_func()
+    nomatch = makefile(tmpdir, "nomatch", ensure=True)
+    with U.Chdir(tmpdir.strpath):
+        cmd = "fl diff {}".format(nomatch.basename)
+        result = pexpect.run(cmd)
+        exp = "No prefix match found for nomatch\r\n"
+        assert exp == result
+
+
 
 
 # ---------------------------------------------------------------------------
