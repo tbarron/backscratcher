@@ -20,21 +20,36 @@ def test_amtime_atom_dir(tmpdir):
     """
     Test fl_set_atime_to_mtime()
     """
+    pytest.debug_func()
     atime = int(time.time() - random.randint(1000, 2000))
     mtime = int(time.time() + random.randint(1000, 2000))
     atom = makefile(tmpdir, "atom", content="This is the test file",
                     atime=atime, mtime=mtime)
-    fl.fl_set_atime_to_mtime([atom.strpath])
+    fl.fl_set_atime_to_mtime(**{"FILE": [atom.strpath], "d": False})
     s = os.stat(atom.strpath)
     assert mtime == s[stat.ST_MTIME]
     assert mtime == s[stat.ST_ATIME]
     assert s[stat.ST_ATIME] == s[stat.ST_MTIME]
 
 
+# -----------------------------------------------------------------------------
+def test_amtime_atom_pxr(tmpdir):
+    """
+    Test fl_set_atime_to_mtime()
     """
     pytest.debug_func()
-    mrpm1 = tmpdir.join("mrpm1")
-    mrpm1.write("this is a test file\n")
+    atime = int(time.time() - random.randint(1000, 2000))
+    mtime = int(time.time() + random.randint(1000, 2000))
+    atom = makefile(tmpdir, "atom", content="This is the test file",
+                    atime=atime, mtime=mtime)
+    result = pexpect.run("fl set_atime_to_mtime {}".format(atom.strpath))
+    assert result == ""
+    s = os.stat(atom.strpath)
+    assert mtime == s[stat.ST_MTIME]
+    assert mtime == s[stat.ST_ATIME]
+    assert s[stat.ST_ATIME] == s[stat.ST_MTIME]
+
+
 
     mrpm2 = tmpdir.join("mrpm2")
     mrpm2.write("this is a test file\n")
