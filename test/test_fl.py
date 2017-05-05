@@ -268,22 +268,6 @@ class TestFL(th.HelpedTestCase):
             assert(util.contents('mrpm2') == ['REVERTED'])
 
     # -----------------------------------------------------------------------
-    def test_atom(self):
-        """
-        Test set_atime_to_mtime
-        """
-        with util.Chdir("fl_tests"):
-            filename = 'atom'
-            open(filename, 'w').close()
-            os.utime(filename, (time.time() - random.randint(1000, 2000),
-                                time.time() + random.randint(1000, 2000)))
-            s = os.stat(filename)
-            assert(s[stat.ST_ATIME] != s[stat.ST_MTIME])
-            fl.fl_set_atime_to_mtime([filename])
-            s = os.stat(filename)
-            assert(s[stat.ST_ATIME] == s[stat.ST_MTIME])
-
-    # -----------------------------------------------------------------------
     def test_mtoa(self):
         """
         Test set_mtime_to_atime
