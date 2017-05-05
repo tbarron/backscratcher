@@ -159,6 +159,31 @@ def test_fl_help_pxr():
         assert "{} - ".format(subc) in  result
 
 
+# -----------------------------------------------------------------------------
+def test_mrpm_cwd_hit(tmpdir):
+    """
+    Test for most_recent_prefix_match() with no matches in the current
+    directory
+    """
+    pytest.debug_func()
+    testfile = makefile(tmpdir, "mrpm", ensure=True)
+    match = makefile(tmpdir, "mrpm.2009.0217", ensure=True)
+    result = fl.most_recent_prefix_match(tmpdir.strpath, testfile.basename)
+    assert result == match.strpath
+
+
+# -----------------------------------------------------------------------------
+def test_mrpm_cwd_none(tmpdir):
+    """
+    Test for most_recent_prefix_match() with no matches in the current
+    directory
+    """
+    pytest.debug_func()
+    testfile = makefile(tmpdir, "mrpm", ensure=True)
+    result = fl.most_recent_prefix_match(tmpdir.strpath, testfile.basename)
+    assert result is None
+
+
 
 
 # ---------------------------------------------------------------------------
