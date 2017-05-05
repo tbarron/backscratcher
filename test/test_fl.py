@@ -51,7 +51,7 @@ def test_amtime_atom_pxr(tmpdir):
 
 
 # -----------------------------------------------------------------------------
-def test_amtime_mtoa(tmpdir):
+def test_amtime_mtoa_dir(tmpdir):
     """
     Test fl_set_mtime_to_atime()
     """
@@ -59,7 +59,23 @@ def test_amtime_mtoa(tmpdir):
     mtime = int(time.time() + random.randint(1000, 2000))
     atom = makefile(tmpdir, "mtoa", content="This is the test file",
                     atime=atime, mtime=mtime)
-    fl.fl_set_mtime_to_atime([atom.strpath])
+    fl.fl_set_mtime_to_atime(**{"FILE": [atom.strpath], "d": False})
+    s = os.stat(atom.strpath)
+    assert s[stat.ST_ATIME] == atime
+    assert s[stat.ST_MTIME] == atime
+    assert s[stat.ST_ATIME] == s[stat.ST_MTIME]
+
+
+# -----------------------------------------------------------------------------
+def test_amtime_mtoa_pxr(tmpdir):
+    """
+    Test fl_set_mtime_to_atime()
+    """
+    atime = int(time.time() - random.randint(1000, 2000))
+    mtime = int(time.time() + random.randint(1000, 2000))
+    atom = makefile(tmpdir, "mtoa", content="This is the test file",
+                    atime=atime, mtime=mtime)
+    result = pexpect.run("fl set_mtime_to_atime {}".format(atom.strpath))
     s = os.stat(atom.strpath)
     assert s[stat.ST_ATIME] == atime
     assert s[stat.ST_MTIME] == atime
