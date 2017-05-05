@@ -388,3 +388,5 @@ def most_recent_prefix_match(dirn, filename):
     if recent_file != '':
         # print 'mrpm returning %s/%s' % (dir, recent_file)
         return '%s/%s' % (dirn, recent_file)
+    else:
+        return None
