@@ -153,11 +153,13 @@ def fl_diff(**kwa):
 
         counterpath = most_recent_prefix_match(dirname,
                                                os.path.basename(filename))
-
-        cmd = 'diff %s %s' % (counterpath, filename)
-        print cmd
-        sys.stdout.flush()
-        util.run(cmd, not kwa['n'])
+        if counterpath is None:
+            print("No prefix match found for {}".format(filename))
+        else:
+            cmd = 'diff %s %s' % (counterpath, filename)
+            print cmd
+            print util.run(cmd, not kwa['n'])
+            sys.stdout.flush()
 
 
 # ---------------------------------------------------------------------------
