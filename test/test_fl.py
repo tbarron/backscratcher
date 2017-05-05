@@ -50,6 +50,22 @@ def test_amtime_atom_pxr(tmpdir):
     assert s[stat.ST_ATIME] == s[stat.ST_MTIME]
 
 
+# -----------------------------------------------------------------------------
+def test_amtime_mtoa(tmpdir):
+    """
+    Test fl_set_mtime_to_atime()
+    """
+    atime = int(time.time() - random.randint(1000, 2000))
+    mtime = int(time.time() + random.randint(1000, 2000))
+    atom = makefile(tmpdir, "mtoa", content="This is the test file",
+                    atime=atime, mtime=mtime)
+    fl.fl_set_mtime_to_atime([atom.strpath])
+    s = os.stat(atom.strpath)
+    assert s[stat.ST_ATIME] == atime
+    assert s[stat.ST_MTIME] == atime
+    assert s[stat.ST_ATIME] == s[stat.ST_MTIME]
+
+
 
     mrpm2 = tmpdir.join("mrpm2")
     mrpm2.write("this is a test file\n")
