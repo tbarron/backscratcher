@@ -327,7 +327,8 @@ def fl_set_atime_to_mtime(**kwa):
 
 
 # ---------------------------------------------------------------------------
-def fl_set_mtime_to_atime(args):
+@dispatch.on('set_mtime_to_atime')
+def fl_set_mtime_to_atime(**kwa):
     """set_mtime_to_atime - mtime <= atime
 
     usage: fl set_mtime_to_atime file file file ...
@@ -335,7 +336,9 @@ def fl_set_mtime_to_atime(args):
     For each file listed, set the file's mtime to be the same as its
     atime value.
     """
-    for filename in args:
+    if kwa["d"]:
+        pdb.set_trace()
+    for filename in kwa["FILE"]:
         mdat = os.stat(filename)
         os.utime(filename, (mdat.st_atime, mdat.st_atime))
 
