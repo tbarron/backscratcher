@@ -16,9 +16,21 @@ from bscr import util as U
 
 
 # -----------------------------------------------------------------------------
-def test_diff(tmpdir):
+def test_amtime_atom_dir(tmpdir):
     """
-    Test 'fl diff'
+    Test fl_set_atime_to_mtime()
+    """
+    atime = int(time.time() - random.randint(1000, 2000))
+    mtime = int(time.time() + random.randint(1000, 2000))
+    atom = makefile(tmpdir, "atom", content="This is the test file",
+                    atime=atime, mtime=mtime)
+    fl.fl_set_atime_to_mtime([atom.strpath])
+    s = os.stat(atom.strpath)
+    assert mtime == s[stat.ST_MTIME]
+    assert mtime == s[stat.ST_ATIME]
+    assert s[stat.ST_ATIME] == s[stat.ST_MTIME]
+
+
     """
     pytest.debug_func()
     mrpm1 = tmpdir.join("mrpm1")
