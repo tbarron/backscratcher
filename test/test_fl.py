@@ -303,29 +303,6 @@ def tearDownModule():
 
 # -----------------------------------------------------------------------------
 class TestFL(th.HelpedTestCase):
-    # tests needed:
-    #   'fl help help' -- test_fl_help_help
-    #   'fl help rm_cr'
-    #   'fl times'
-    #   'fl nosuchcmd'
-
-    # -----------------------------------------------------------------------
-    def test_most_recent_prefix_match(self):
-        """
-        Test the routine most_recent_prefix_match()
-        """
-        with util.Chdir("fl_tests"):
-            util.writefile('mrpm1', ['this is a test file'])
-            util.writefile('mrpm2', ['this is another test file'])
-            os.system('cp mrpm1 mrpm1.2009-10-01')
-            os.system('cp mrpm2 old/mrpm2.2009-08-31')
-
-            a = fl.most_recent_prefix_match('.', 'mrpm1')
-            self.assertEq('./mrpm1.2009-10-01', a)
-
-            a = fl.most_recent_prefix_match('.', 'mrpm2')
-            self.assertEq('./old/mrpm2.2009-08-31', a)
-
     # -----------------------------------------------------------------------
     def test_revert(self):
         """
