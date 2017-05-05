@@ -14,8 +14,8 @@ Usage:
           fl [-d] [-n] revert FILE
           fl [-d] [-n] rm_cr
           fl [-d] [-n] save FILE ...
-          fl [-d] [-n] set_atime_to_mtime
-          fl [-d] [-n] set_mtime_to_atime
+          fl [-d] [-n] set_atime_to_mtime FILE ...
+          fl [-d] [-n] set_mtime_to_atime FILE ...
           fl [-d] [-n] times
           fl [-d] [-n] unreadable
 
@@ -308,7 +308,8 @@ def fl_save(args):
 
 
 # ---------------------------------------------------------------------------
-def fl_set_atime_to_mtime(args):
+@dispatch.on('set_atime_to_mtime')
+def fl_set_atime_to_mtime(**kwa):
     """set_atime_to_mtime - atime <= mtime
 
     usage: fl set_atime_to_mtime file file file ...
@@ -316,7 +317,9 @@ def fl_set_atime_to_mtime(args):
     For each file listed, set the file's atime to be the same as its
     mtime value.
     """
-    for filename in args:
+    if kwa["d"]:
+        pdb.set_trace()
+    for filename in kwa["FILE"]:
         mdat = os.stat(filename)
         os.utime(filename, (mdat.st_mtime, mdat.st_mtime))
 
