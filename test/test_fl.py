@@ -309,20 +309,6 @@ class TestFL(th.HelpedTestCase):
     #   'fl times'
     #   'fl nosuchcmd'
 
-    # -------------------------------------------------------------------------
-    def test_fl_help_help(self):
-        """
-        'fl help help' should get help for the help command
-        """
-        cmd = pexpect.which('fl')
-        result = pexpect.run('%s help help' % cmd)
-        self.assertFalse('Traceback' in result)
-        for f in ['help - show a list of available commands',
-                  'With no arguments, show a list of commands',
-                  'With a command as argument, show help for that command',
-                  ]:
-            self.assertTrue(f in result)
-
     # -----------------------------------------------------------------------
     def test_most_recent_prefix_match(self):
         """
