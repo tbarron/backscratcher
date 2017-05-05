@@ -325,49 +325,6 @@ class TestFL(th.HelpedTestCase):
             self.assertEq('./old/mrpm2.2009-08-31', a)
 
     # -----------------------------------------------------------------------
-    def test_diff(self):
-        """
-        Test diff
-        """
-        with util.Chdir("fl_tests"):
-            util.writefile('mrpm1', ['this is a test file\n'])
-            util.writefile('mrpm2', ['this is another test file\n'])
-            util.writefile('mrpm1.2009-10-01', ['copy of test file\n'])
-            util.writefile('old/mrpm2.2009-08-31',
-                           ['copy of another test file\n'])
-
-            expected = ["/Users/tbarron/prj/github/backscratcher/"
-                        "bscr/util.py:207: "
-                        "UserWarning: util.dispatch is deprecated "
-                        "in favor of docopt_dispatch\r",
-                        "  warnings.warn(\"util.dispatch is deprecated"
-                        " in favor of docopt_dispatch\")\r",
-                        'diff ./mrpm1.2009-10-01 mrpm1\r',
-                        '1c1\r',
-                        '< copy of test file\r',
-                        '---\r',
-                        '> this is a test file\r',
-                        '']
-            cmd = util.script_location("fl")
-            got = pexpect.run("%s diff mrpm1" % cmd).split("\n")
-            self.assertEqual(expected, got)
-
-            expected = ["/Users/tbarron/prj/github/backscratcher/"
-                        "bscr/util.py:207: "
-                        "UserWarning: util.dispatch is deprecated "
-                        "in favor of docopt_dispatch\r",
-                        "  warnings.warn(\"util.dispatch is deprecated"
-                        " in favor of docopt_dispatch\")\r",
-                        'diff ./old/mrpm2.2009-08-31 mrpm2\r',
-                        '1c1\r',
-                        '< copy of another test file\r',
-                        '---\r',
-                        '> this is another test file\r',
-                        '']
-            got = pexpect.run("%s diff mrpm2" % cmd).split("\n")
-            self.assertEqual(expected, got)
-
-    # -----------------------------------------------------------------------
     def test_revert(self):
         """
         Test revert
