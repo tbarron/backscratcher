@@ -146,6 +146,19 @@ def test_diff_nomatch_pxr(tmpdir):
         assert exp == result
 
 
+# -----------------------------------------------------------------------------
+def test_fl_help_pxr():
+    """
+    'fl help' should get help output
+    """
+    cmd = util.script_location("fl")
+    result = pexpect.run('{} help'.format(cmd))
+    assert "Traceback" not in result
+    for f in [x for x in dir(fl) if x.startswith('bscr_')]:
+        subc = f.replace('bscr_', '')
+        assert "{} - ".format(subc) in  result
+
+
 
 
 # ---------------------------------------------------------------------------
@@ -174,23 +187,10 @@ def tearDownModule():
 # -----------------------------------------------------------------------------
 class TestFL(th.HelpedTestCase):
     # tests needed:
-    #   'fl help' -- test_fl_help
     #   'fl help help' -- test_fl_help_help
     #   'fl help rm_cr'
     #   'fl times'
     #   'fl nosuchcmd'
-
-    # -------------------------------------------------------------------------
-    def test_fl_help(self):
-        """
-        'fl help' should get help output
-        """
-        cmd = util.script_location("fl")
-        result = pexpect.run('%s help' % cmd)
-        self.assertFalse('Traceback' in result)
-        for f in [x for x in dir(fl) if x.startswith('bscr_')]:
-            subc = f.replace('bscr_', '')
-            self.assertTrue('%s - ' % subc in result)
 
     # -------------------------------------------------------------------------
     def test_fl_help_help(self):
