@@ -248,7 +248,7 @@ def editfile(filename, opn, prev, post, suffix=None):
 
 
 # ---------------------------------------------------------------------------
-def fl_revert(args):
+def fl_revert(**kwa):
     """revert - revert <file> back to its most recent saved version
 
     usage: fl revert <file> <file> <file> ...
@@ -256,13 +256,9 @@ def fl_revert(args):
     For each file listed in the command line, look for 'save'd version
     and bring it back. The current file is renamed <file>.new.
     """
-    prs = optparse.OptionParser()
-    prs.add_option('-n', '--noexec',
-                   default=True, action='store_false', dest='xable',
-                   help='just do a dry run')
-    (opts, args) = prs.parse_args(args)
-
-    for filename in args:
+    if kwa["d"]:
+        pdb.set_trace()
+    for filename in kwa["FILE"]:
         dirn = os.path.dirname(filename)
         if dirn == '':
             dirn = '.'
@@ -270,8 +266,8 @@ def fl_revert(args):
         counterpath = most_recent_prefix_match(dirn,
                                                os.path.basename(filename))
 
-        util.run('mv %s %s.new' % (filename, filename), opts.xable)
-        util.run('mv %s %s' % (counterpath, filename), opts.xable)
+        util.run('mv %s %s.new' % (filename, filename), not kwa["n"])
+        util.run('mv %s %s' % (counterpath, filename), not kwa["n"])
 
 
 # ---------------------------------------------------------------------------
