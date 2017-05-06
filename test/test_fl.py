@@ -279,7 +279,7 @@ def test_mrpm_old_nosuch_none(tmpdir):
 
 
 # ---------------------------------------------------------------------------
-def test_revert_cdx(tmpdir, fx_match):
+def test_revert_cdx(tmpdir, fx_match, capsys):
     """
     nomatch/cwd/old = c ; dir/pxr = d ; exec/noexec = x
 
@@ -290,12 +290,15 @@ def test_revert_cdx(tmpdir, fx_match):
     with U.Chdir(tmpdir.strpath):
         fl.fl_revert(**{"FILE": [fx_match.mrpm1.basename],
                         "d": False, "n": False})
+        result, _ = capsys.readouterr()
+        for exp in fx_match.mrpm1_rvt_exp:
+            assert exp in result
         assert fx_match.mrpm1.read() == "copy of test file\n"
         assert new.read() == "this is a test file\n"
 
 
 # ---------------------------------------------------------------------------
-def test_revert_cdn(tmpdir, fx_match):
+def test_revert_cdn(tmpdir, fx_match, capsys):
     """
     nomatch/cwd/old = c ; dir/pxr = d ; exec/noexec = n
 
@@ -307,6 +310,9 @@ def test_revert_cdn(tmpdir, fx_match):
     with U.Chdir(tmpdir.strpath):
         fl.fl_revert(**{"FILE": [fx_match.mrpm1.basename],
                         "d": False, "n": True})
+        result, _ = capsys.readouterr()
+        for exp in fx_match.mrpm1_rvt_exp:
+            assert exp in result
         assert not new.exists()
         assert fx_match.mrpm1.read() == "this is a test file\n"
 
