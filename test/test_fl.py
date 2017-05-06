@@ -311,6 +311,23 @@ def test_revert_cdn(tmpdir, fx_match):
         assert fx_match.mrpm1.read() == "this is a test file\n"
 
 
+# ---------------------------------------------------------------------------
+def test_revert_cpx(tmpdir, fx_match):
+    """
+    nomatch/cwd/old = c ; dir/pxr = p ; exec/noexec = x
+
+    Test pexpect.run('fl revert FILE') with a prefix match in the current
+    directory
+    """
+    pytest.debug_func()
+    new = tmpdir.join("mrpm1.new")
+    with U.Chdir(tmpdir.strpath):
+        result = pexpect.run("fl revert {}".format(fx_match.mrpm1.basename))
+        assert result == ""
+        assert fx_match.mrpm1.read() == "copy of test file\n"
+        assert new.read() == "this is a test file\n"
+
+
 
 
 # ---------------------------------------------------------------------------
