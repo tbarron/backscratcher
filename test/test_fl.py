@@ -824,10 +824,10 @@ def fx_match(tmpdir):
     this.mrpm1 = makefile(tmpdir, "mrpm1", content="this is a test file\n")
     this.mrpm2 = makefile(tmpdir, "mrpm2",
                           content="this is another test file\n")
-    this.mprm1_dt = makefile(tmpdir, "mrpm1.2009-10-01",
+    this.mrpm1_dt = makefile(tmpdir, "mrpm1.2009-10-01",
                              content="copy of test file\n")
     this.olddir = makefile(tmpdir, "old", dir=True, ensure=True)
-    this.mprm2_dt = makefile(this.olddir, "mrpm2.2009-08-31",
+    this.mrpm2_dt = makefile(this.olddir, "mrpm2.2009-08-31",
                              content="copy of another test file\n")
 
     this.mrpm1_diff_exp = [u'diff ./mrpm1.2009-10-01 mrpm1',
@@ -845,5 +845,14 @@ def fx_match(tmpdir):
                            u'> this is another test file',
                            u'',
                            u'']
-
+    newname = this.mrpm1.basename + ".new"
+    this.mrpm1_rvt_exp = ["os.rename({}, {})".format(this.mrpm1.basename,
+                                                     newname),
+                          "os.rename(./{}, {})".format(this.mrpm1_dt.basename,
+                                                     this.mrpm1.basename)]
+    newname = this.mrpm2.basename + ".new"
+    this.mrpm2_rvt_exp = ["os.rename({}, {})".format(this.mrpm2.basename,
+                                                     newname),
+                          "os.rename({}, {})".format(this.mrpm2_dt.basename,
+                                                     this.mrpm2.basename)]
     return this
