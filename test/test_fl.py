@@ -279,6 +279,20 @@ def test_mrpm_old_nosuch_none(tmpdir):
 
 
 # ---------------------------------------------------------------------------
+def test_revert_match_cwd_dir(tmpdir, fx_match):
+    """
+    Test 'fl.fl_revert()' with a prefix match in the current directory
+    """
+    pytest.debug_func()
+    new = tmpdir.join("mrpm1.new")
+    with U.Chdir(tmpdir.strpath):
+        fl.fl_revert(**{"FILE": [fx_match.mrpm1.basename],
+                        "d": False, "n": False})
+        assert fx_match.mrpm1.read() == "copy of test file\n"
+        assert new.read() == "this is a test file\n"
+
+
+# ---------------------------------------------------------------------------
 def setUpModule():
     """
     Run once before any of the tests in this module
