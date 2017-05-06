@@ -248,6 +248,7 @@ def editfile(filename, opn, prev, post, suffix=None):
 
 
 # ---------------------------------------------------------------------------
+@dispatch.on('revert')
 def fl_revert(**kwa):
     """revert - revert <file> back to its most recent saved version
 
