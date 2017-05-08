@@ -354,6 +354,26 @@ def test_revert_cpn(tmpdir, fx_match):
         assert fx_match.mrpm1.read() == "this is a test file\n"
 
 
+# ---------------------------------------------------------------------------
+def test_revert_odx(tmpdir, fx_match, capsys):
+    """
+    nomatch/cwd/old = o ; dir/pxr = d ; exec/noexec = x
+
+    Test fl.fl_revert(**{'FILE': [fx_match.mrpm2.basename], ... }) with a
+    prefix match in ./old
+    """
+    pytest.debug_func()
+    new = tmpdir.join("mrpm2.new")
+    with U.Chdir(tmpdir.strpath):
+        fl.fl_revert(**{"FILE": [fx_match.mrpm2.basename],
+                        "d": False, "n": False})
+        result, _ = capsys.readouterr()
+        for exp in fx_match.mrpm2_rvt_exp:
+            assert exp in result
+        assert new.exists()
+        assert fx_match.mrpm2.read() == "copy of another test file\n"
+
+
 
 
 # ---------------------------------------------------------------------------
@@ -879,6 +899,7 @@ def fx_match(tmpdir):
     newname = this.mrpm2.basename + ".new"
     this.mrpm2_rvt_exp = ["os.rename({}, {})".format(this.mrpm2.basename,
                                                      newname),
-                          "os.rename({}, {})".format(this.mrpm2_dt.basename,
-                                                     this.mrpm2.basename)]
+                          "{}/{}, {})".format("os.rename(./old",
+                                              this.mrpm2_dt.basename,
+                                              this.mrpm2.basename)]
     return this
