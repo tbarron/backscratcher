@@ -267,8 +267,17 @@ def fl_revert(**kwa):
         counterpath = most_recent_prefix_match(dirn,
                                                os.path.basename(filename))
 
-        util.run('mv %s %s.new' % (filename, filename), not kwa["n"])
-        util.run('mv %s %s' % (counterpath, filename), not kwa["n"])
+        newname = filename + ".new"
+        if kwa["n"]:
+            print("would do 'os.rename({0}, {1})'".format(filename,
+                                                          newname))
+            print("would do 'os.rename({0}, {1})'".format(counterpath,
+                                                          filename))
+        else:
+            print("os.rename({0}, {1})".format(filename, newname))
+            os.rename(filename, newname)
+            print("os.rename({0}, {1})".format(counterpath, filename))
+            os.rename(counterpath, filename)
 
 
 # ---------------------------------------------------------------------------
