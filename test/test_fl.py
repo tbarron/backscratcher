@@ -312,7 +312,7 @@ def test_revert_cdn(tmpdir, fx_match, capsys):
                         "d": False, "n": True})
         result, _ = capsys.readouterr()
         for exp in fx_match.mrpm1_rvt_exp:
-            assert exp in result
+            assert "would do '{}'".format(exp) in result
         assert not new.exists()
         assert fx_match.mrpm1.read() == "this is a test file\n"
 
@@ -329,9 +329,29 @@ def test_revert_cpx(tmpdir, fx_match):
     new = tmpdir.join("mrpm1.new")
     with U.Chdir(tmpdir.strpath):
         result = pexpect.run("fl revert {}".format(fx_match.mrpm1.basename))
-        assert result == ""
+        for exp in fx_match.mrpm1_rvt_exp:
+            assert exp in result
         assert fx_match.mrpm1.read() == "copy of test file\n"
         assert new.read() == "this is a test file\n"
+
+
+# ---------------------------------------------------------------------------
+def test_revert_cpn(tmpdir, fx_match):
+    """
+    nomatch/cwd/old = c ; dir/pxr = p ; exec/noexec = n
+
+    Test pexpect.run('fl revert -n FILE') with a prefix match in the current
+    directory and noexec == True
+    """
+    pytest.debug_func()
+    new = tmpdir.join("mrpm1.new")
+    with U.Chdir(tmpdir.strpath):
+        result = pexpect.run("fl revert -n {}".format(fx_match.mrpm1.basename))
+        assert "would do 'os.rename(" in result
+        for exp in fx_match.mrpm1_rvt_exp:
+            assert "would do '{}'".format(exp) in result
+        assert not new.exists()
+        assert fx_match.mrpm1.read() == "this is a test file\n"
 
 
 
