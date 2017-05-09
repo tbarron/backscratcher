@@ -164,129 +164,100 @@ def test_diff_nomatch_pxr(tmpdir):
 
 
 # -----------------------------------------------------------------------------
-def test_editfile_delete(tmpdir):
+def test_editfile_delete(tmpdir, fx_edit):
     """
     fl.editfile('legit', 's', 'foo', '', None)
     """
     pytest.debug_func()
-    fp = tmpdir.join(U.function_name())
-    forig = tmpdir.join(fp.basename + ".original")
-    tdata = ["foo bar",
-             "bar foo",
-             "barfoo",
-             "foobar foo",
-             "loofafool"]
-    xdata = [re.sub('^foo', '', z) for z in tdata]
-    fp.write("\n".join(tdata))
+    xdata = [re.sub('^foo', '', z) for z in fx_edit.tdata]
+    fx_edit.fp.write("\n".join(fx_edit.tdata))
 
-    fl.editfile(fp.strpath, 's', '^foo', '', None)
+    fl.editfile(fx_edit.fp.strpath, 's', '^foo', '', None)
 
-    assert fp.exists()
-    assert forig.exists()
-    assert "\n".join(xdata) == fp.read()
-    assert "\n".join(tdata) == forig.read()
+    assert fx_edit.fp.exists()
+    assert fx_edit.forig.exists()
+    assert "\n".join(xdata) == fx_edit.fp.read()
+    assert "\n".join(fx_edit.tdata) == fx_edit.forig.read()
 
 
 # -----------------------------------------------------------------------------
-def test_editfile_empty(tmpdir):
+def test_editfile_empty(tmpdir, fx_edit):
     """
     fl.editfile('emptyfile', 's', 'foo', 'bar', None)
     => rename emptyfile emptyfile.original, both empty
     """
     pytest.debug_func()
-    fp = tmpdir.join("emptyfile")
-    forig = tmpdir.join(fp.basename + ".original")
-    fp.ensure()
+    fx_edit.fp.ensure()
 
-    fl.editfile(fp.strpath, 's', 'foo', 'bar', None)
+    fl.editfile(fx_edit.fp.strpath, 's', 'foo', 'bar', None)
 
-    assert fp.exists()
-    assert forig.exists()
-    assert "" == fp.read()
-    assert "" == forig.read()
+    assert fx_edit.fp.exists()
+    assert fx_edit.forig.exists()
+    assert "" == fx_edit.fp.read()
+    assert "" == fx_edit.forig.read()
 
 
 # -----------------------------------------------------------------------------
-def test_editfile_legit(tmpdir):
+def test_editfile_legit(tmpdir, fx_edit):
     """
     fl.editfile('legit', 's', 'foo', 'bar', None)
     """
     pytest.debug_func()
-    fp = tmpdir.join("legit")
-    forig = tmpdir.join(fp.basename + ".original")
-    tdata = ["foo bar",
-             "bar foo",
-             "barfoo",
-             "foobar foo",
-             "loofafool"]
-    xdata = [z.replace('foo', 'bar') for z in tdata]
-    fp.write("\n".join(tdata))
+    xdata = [z.replace('foo', 'bar') for z in fx_edit.tdata]
+    fx_edit.fp.write("\n".join(fx_edit.tdata))
 
-    fl.editfile(fp.strpath, 's', 'foo', 'bar', None)
+    fl.editfile(fx_edit.fp.strpath, 's', 'foo', 'bar', None)
 
-    assert fp.exists()
-    assert forig.exists()
-    assert "\n".join(xdata) == fp.read()
-    assert "\n".join(tdata) == forig.read()
+    assert fx_edit.fp.exists()
+    assert fx_edit.forig.exists()
+    assert "\n".join(xdata) == fx_edit.fp.read()
+    assert "\n".join(fx_edit.tdata) == fx_edit.forig.read()
 
 
 # -----------------------------------------------------------------------------
-def test_editfile_nosuch():
+def test_editfile_nosuch(tmpdir, fx_edit):
     """
     fl.editfile('nosuchfile', 'foo', 'bar', None)
     => should throw an exception
     """
     with pytest.raises(IOError) as err:
-        fl.editfile("nosuchfile", 's', 'foo', 'bar', None)
-    assert "No such file or directory: 'nosuchfile'" in str(err)
+        fl.editfile(fx_edit.fp.strpath, 's', 'foo', 'bar', None)
+    exp = "No such file or directory: '{}'".format(fx_edit.fp.strpath)
+    assert exp in str(err)
 
 
 # -----------------------------------------------------------------------------
-def test_editfile_rgx(tmpdir):
+def test_editfile_rgx(tmpdir, fx_edit):
     """
     fl.editfile('legit', 's', 'foo', 'bar', None)
     """
-    fp = tmpdir.join(U.function_name())
-    forig = tmpdir.join(fp.basename + ".original")
-    tdata = ["foo bar",
-             "bar foo",
-             "barfoo",
-             "foobar foo",
-             "loofafool"]
-    xdata = [re.sub('^foo', 'bar', z) for z in tdata]
-    fp.write("\n".join(tdata))
+    xdata = [re.sub('^foo', 'bar', z) for z in fx_edit.tdata]
+    fx_edit.fp.write("\n".join(fx_edit.tdata))
 
-    fl.editfile(fp.strpath, 's', '^foo', 'bar', None)
+    fl.editfile(fx_edit.fp.strpath, 's', '^foo', 'bar', None)
 
-    assert fp.exists()
-    assert forig.exists()
-    assert "\n".join(xdata) == fp.read()
-    assert "\n".join(tdata) == forig.read()
+    assert fx_edit.fp.exists()
+    assert fx_edit.forig.exists()
+    assert "\n".join(xdata) == fx_edit.fp.read()
+    assert "\n".join(fx_edit.tdata) == fx_edit.forig.read()
 
 
 # -----------------------------------------------------------------------------
-def test_editfile_suffix(tmpdir):
+def test_editfile_suffix(tmpdir, fx_edit):
     """
     fl.editfile('legit', 's', 'foo', 'bar', 'old')
     """
-    fp = tmpdir.join(U.function_name())
-    forig = tmpdir.join(fp.basename + ".original")
-    fold = tmpdir.join(fp.basename + ".old")
-    tdata = ["foo bar",
-             "bar foo",
-             "barfoo",
-             "foobar foo",
-             "loofafool"]
-    xdata = [z.replace('foo', 'bar') for z in tdata]
-    fp.write("\n".join(tdata))
+    fold = tmpdir.join(fx_edit.fp.basename + ".old")
+    xdata = [z.replace('foo', 'bar') for z in fx_edit.tdata]
+    fx_edit.fp.write("\n".join(fx_edit.tdata))
 
-    fl.editfile(fp.strpath, 's', 'foo', 'bar', 'old')
+    fl.editfile(fx_edit.fp.strpath, 's', 'foo', 'bar', 'old')
 
-    assert fp.exists()
+    assert fx_edit.fp.exists()
     assert fold.exists()
-    assert not forig.exists()
-    assert "\n".join(xdata) == fp.read()
-    assert "\n".join(tdata) == fold.read()
+    assert not fx_edit.forig.exists()
+    assert "\n".join(xdata) == fx_edit.fp.read()
+    assert "\n".join(fx_edit.tdata) == fold.read()
 
 
 # -----------------------------------------------------------------------------
