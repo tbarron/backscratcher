@@ -242,6 +242,29 @@ def test_editfile_nosuch():
 
 
 # -----------------------------------------------------------------------------
+def test_editfile_rgx(tmpdir):
+    """
+    fl.editfile('legit', 's', 'foo', 'bar', None)
+    """
+    fp = tmpdir.join(U.function_name())
+    forig = tmpdir.join(fp.basename + ".original")
+    tdata = ["foo bar",
+             "bar foo",
+             "barfoo",
+             "foobar foo",
+             "loofafool"]
+    xdata = [re.sub('^foo', 'bar', z) for z in tdata]
+    fp.write("\n".join(tdata))
+
+    fl.editfile(fp.strpath, 's', '^foo', 'bar', None)
+
+    assert fp.exists()
+    assert forig.exists()
+    assert "\n".join(xdata) == fp.read()
+    assert "\n".join(tdata) == forig.read()
+
+
+# -----------------------------------------------------------------------------
 def test_fl_help_pxr():
     """
     'fl help' should get help output
@@ -652,28 +675,6 @@ class TestFL_edit(th.HelpedTestCase):
         U.writefile(fp, tdata, newlines=True)
 
         fl.editfile(fp, 's', 'foo', 'bar', 'old')
-
-        self.assertEq(True, U.exists(fp))
-        self.assertEq(True, U.exists(forig))
-        self.assertEq(xdata, U.contents(fp))
-        self.assertEq(tdata, U.contents(forig))
-
-    # -------------------------------------------------------------------------
-    def test_editfile_rgx(self):
-        """
-        fl.editfile('legit', 's', 'foo', 'bar', None)
-        """
-        fp = U.pj(self.testdir, U.function_name())
-        forig = fp + ".original"
-        tdata = ["foo bar",
-                 "bar foo",
-                 "barfoo",
-                 "foobar foo",
-                 "loofafool"]
-        xdata = [re.sub('^foo', 'bar', z) for z in tdata]
-        U.writefile(fp, tdata, newlines=True)
-
-        fl.editfile(fp, 's', '^foo', 'bar', None)
 
         self.assertEq(True, U.exists(fp))
         self.assertEq(True, U.exists(forig))
