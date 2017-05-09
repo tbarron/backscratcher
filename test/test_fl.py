@@ -681,28 +681,6 @@ class TestFL_edit(th.HelpedTestCase):
         self.assertEq(tdata, U.contents(forig))
 
     # -------------------------------------------------------------------------
-    def test_editfile_delete(self):
-        """
-        fl.editfile('legit', 's', 'foo', '', None)
-        """
-        fp = U.pj(self.testdir, U.function_name())
-        forig = fp + ".original"
-        tdata = ["foo bar",
-                 "bar foo",
-                 "barfoo",
-                 "foobar foo",
-                 "loofafool"]
-        xdata = [re.sub('^foo', '', z) for z in tdata]
-        U.writefile(fp, tdata, newlines=True)
-
-        fl.editfile(fp, 's', '^foo', '', None)
-
-        self.assertEq(True, U.exists(fp))
-        self.assertEq(True, U.exists(forig))
-        self.assertEq(xdata, U.contents(fp))
-        self.assertEq(tdata, U.contents(forig))
-
-    # -------------------------------------------------------------------------
     def test_fl_edit_noarg(self):
         """
         fl edit                          => help msg
