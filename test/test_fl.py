@@ -394,6 +394,24 @@ def test_revert_odn(tmpdir, fx_match, capsys):
         assert fx_match.mrpm2.read() == "this is another test file\n"
 
 
+# ---------------------------------------------------------------------------
+def test_revert_opx(tmpdir, fx_match):
+    """
+    nomatch/cwd/old = o ; dir/pxr = p ; exec/noexec = x
+
+    Test pexpect.run('fl revert FILE') with a prefix match in the current
+    directory
+    """
+    pytest.debug_func()
+    new = tmpdir.join("mrpm2.new")
+    with U.Chdir(tmpdir.strpath):
+        result = pexpect.run("fl revert {}".format(fx_match.mrpm2.basename))
+        for exp in fx_match.mrpm2_rvt_exp:
+            assert exp in result
+        assert new.exists()
+        assert fx_match.mrpm2.read() == "copy of another test file\n"
+
+
 
 
 # ---------------------------------------------------------------------------
