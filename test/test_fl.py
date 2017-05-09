@@ -206,7 +206,7 @@ def test_editfile_empty(tmpdir):
     assert "" == forig.read()
 
 
-# -------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def test_editfile_legit(tmpdir):
     """
     fl.editfile('legit', 's', 'foo', 'bar', None)
@@ -228,6 +228,17 @@ def test_editfile_legit(tmpdir):
     assert forig.exists()
     assert "\n".join(xdata) == fp.read()
     assert "\n".join(tdata) == forig.read()
+
+
+# -----------------------------------------------------------------------------
+def test_editfile_nosuch():
+    """
+    fl.editfile('nosuchfile', 'foo', 'bar', None)
+    => should throw an exception
+    """
+    with pytest.raises(IOError) as err:
+        fl.editfile("nosuchfile", 's', 'foo', 'bar', None)
+    assert "No such file or directory: 'nosuchfile'" in str(err)
 
 
 # -----------------------------------------------------------------------------
@@ -624,21 +635,6 @@ class TestFL_edit(th.HelpedTestCase):
         Clean up test directory
         """
         shutil.rmtree(cls.testdir)
-
-    # -------------------------------------------------------------------------
-    def test_editfile_nosuch(self):
-        """
-        fl.editfile('nosuchfile', 'foo', 'bar', None)
-         => should throw an exception
-        """
-        self.assertRaisesMsg(IOError,
-                             "No such file or directory: 'nosuchfile'",
-                             fl.editfile,
-                             'nosuchfile',
-                             's',
-                             'foo',
-                             'bar',
-                             None)
 
     # -------------------------------------------------------------------------
     def test_editfile_suffix(self):
