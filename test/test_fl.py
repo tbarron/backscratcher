@@ -302,8 +302,7 @@ def test_revert_cdn(tmpdir, fx_match, capsys):
     """
     nomatch/cwd/old = c ; dir/pxr = d ; exec/noexec = n
 
-    Test 'fl.fl_revert()' with a prefix match in the current directory and
-    noexec True
+    Test 'fl.fl_revert('n': True)' with a prefix match in the current directory
     """
     pytest.debug_func()
     new = tmpdir.join("mrpm1.new")
@@ -341,7 +340,7 @@ def test_revert_cpn(tmpdir, fx_match):
     nomatch/cwd/old = c ; dir/pxr = p ; exec/noexec = n
 
     Test pexpect.run('fl revert -n FILE') with a prefix match in the current
-    directory and noexec == True
+    directory
     """
     pytest.debug_func()
     new = tmpdir.join("mrpm1.new")
@@ -379,8 +378,8 @@ def test_revert_odn(tmpdir, fx_match, capsys):
     """
     nomatch/cwd/old = o ; dir/pxr = d ; exec/noexec = n
 
-    Test pexpect.run('fl revert FILE') with a prefix match in the current
-    directory
+    Test fl.fl_revert(**{'FILE': [fx_match.mrpm2.basename], 'n': True, ... })
+    with a prefix match in ./old
     """
     pytest.debug_func()
     new = tmpdir.join("mrpm2.new")
@@ -399,8 +398,7 @@ def test_revert_opx(tmpdir, fx_match):
     """
     nomatch/cwd/old = o ; dir/pxr = p ; exec/noexec = x
 
-    Test pexpect.run('fl revert FILE') with a prefix match in the current
-    directory
+    Test pexpect.run('fl revert FILE') with a prefix match in ./old
     """
     pytest.debug_func()
     new = tmpdir.join("mrpm2.new")
