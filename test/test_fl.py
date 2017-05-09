@@ -188,6 +188,25 @@ def test_editfile_delete(tmpdir):
 
 
 # -----------------------------------------------------------------------------
+def test_editfile_empty(tmpdir):
+    """
+    fl.editfile('emptyfile', 's', 'foo', 'bar', None)
+    => rename emptyfile emptyfile.original, both empty
+    """
+    pytest.debug_func()
+    fp = tmpdir.join("emptyfile")
+    forig = tmpdir.join(fp.basename + ".original")
+    fp.ensure()
+
+    fl.editfile(fp.strpath, 's', 'foo', 'bar', None)
+
+    assert fp.exists()
+    assert forig.exists()
+    assert "" == fp.read()
+    assert "" == forig.read()
+
+
+# -----------------------------------------------------------------------------
 def test_fl_help_pxr():
     """
     'fl help' should get help output
@@ -596,23 +615,6 @@ class TestFL_edit(th.HelpedTestCase):
                              'foo',
                              'bar',
                              None)
-
-    # -------------------------------------------------------------------------
-    def test_editfile_empty(self):
-        """
-        fl.editfile('emptyfile', 's', 'foo', 'bar', None)
-         => rename emptyfile emptyfile.original, both empty
-        """
-        fpath = U.pj(self.testdir, 'emptyfile')
-        forig = fpath + ".original"
-        U.touch(fpath)
-
-        fl.editfile(fpath, 's', 'foo', 'bar', None)
-
-        self.assertEq(True, U.exists(fpath))
-        self.assertEq(True, U.exists(forig))
-        self.assertEq([], U.contents(fpath))
-        self.assertEq([], U.contents(forig))
 
     # -------------------------------------------------------------------------
     def test_editfile_legit(self):
