@@ -77,6 +77,7 @@ def test_amtime_mtoa_pxr(tmpdir):
                     atime=atime, mtime=mtime)
     result = pexpect.run("fl set_mtime_to_atime {}".format(atom.strpath))
     s = os.stat(atom.strpath)
+    assert result == ""
     assert s[stat.ST_ATIME] == atime
     assert s[stat.ST_MTIME] == atime
     assert s[stat.ST_ATIME] == s[stat.ST_MTIME]
@@ -172,7 +173,7 @@ def test_fl_help_pxr():
     assert "Traceback" not in result
     for f in [x for x in dir(fl) if x.startswith('bscr_')]:
         subc = f.replace('bscr_', '')
-        assert "{} - ".format(subc) in  result
+        assert "{} - ".format(subc) in result
 
 
 # -----------------------------------------------------------------------------
@@ -987,7 +988,7 @@ def fx_match(tmpdir):
     this.mrpm1_rvt_exp = ["os.rename({}, {})".format(this.mrpm1.basename,
                                                      newname),
                           "os.rename(./{}, {})".format(this.mrpm1_dt.basename,
-                                                     this.mrpm1.basename)]
+                                                       this.mrpm1.basename)]
     newname = this.mrpm2.basename + ".new"
     this.mrpm2_rvt_exp = ["os.rename({}, {})".format(this.mrpm2.basename,
                                                      newname),
