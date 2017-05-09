@@ -543,57 +543,6 @@ def tearDownModule():
 
 
 # -----------------------------------------------------------------------------
-class TestFL(th.HelpedTestCase):
-    # -----------------------------------------------------------------------
-    def test_revert(self):
-        """
-        Test revert
-        """
-        with util.Chdir("fl_tests"):
-            util.writefile('mrpm1', ['this is a test file\n'])
-            util.writefile('mrpm2', ['this is another test file\n'])
-            util.writefile('mrpm1.2009-10-01', ['reverted\n'])
-            util.writefile('old/mrpm2.2009-08-31',
-                           ['REVERTED\n'])
-
-            fl = util.script_location("fl")
-            os.system('%s revert mrpm1' % fl)
-            assert(os.path.exists('mrpm1.new'))
-            assert(os.path.exists('mrpm1'))
-            assert(not os.path.exists('mrpm1.2009-10-01'))
-            assert(util.contents('mrpm1') == ['reverted'])
-
-            os.system('%s revert mrpm2' % fl)
-            assert(os.path.exists('mrpm2.new'))
-            assert(os.path.exists('mrpm2'))
-            assert(not os.path.exists('old/mrpm2.2009-08-31'))
-            assert(util.contents('mrpm2') == ['REVERTED'])
-
-    # -----------------------------------------------------------------------
-    def test_mtoa(self):
-        """
-        Test set_mtime_to_atime
-        """
-        with util.Chdir("fl_tests"):
-            filename = 'mtoa'
-            open(filename, 'w').close()
-            os.utime(filename, (time.time() - random.randint(1000, 2000),
-                                time.time() + random.randint(1000, 2000)))
-            s = os.stat(filename)
-            assert(s[stat.ST_ATIME] != s[stat.ST_MTIME])
-            fl.fl_set_mtime_to_atime([filename])
-            s = os.stat(filename)
-            assert(s[stat.ST_ATIME] == s[stat.ST_MTIME])
-
-    # -------------------------------------------------------------------------
-    def test_which_module(self):
-        """
-        Verify that we're importing the right align module
-        """
-        self.assertModule('bscr.fl', __file__)
-
-
-# -----------------------------------------------------------------------------
 class TestFL_edit(th.HelpedTestCase):
     testdir = tempfile.mkdtemp(dir="/tmp")
     testdata = ["one foo two foo three\n",
