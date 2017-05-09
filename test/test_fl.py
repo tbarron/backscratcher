@@ -475,6 +475,28 @@ def test_revert_ndn(tmpdir, fx_match, capsys):
         assert fx_match.mrpm1.read() == "this is a test file\n"
 
 
+# ---------------------------------------------------------------------------
+def test_revert_npx(tmpdir, fx_match):
+    """
+    nomatch/cwd/old = n ; dir/pxr = p ; exec/noexec = x
+
+    Test pexpect.run('fl revert FILE') with no prefix match in cwd or ./old
+    """
+    pytest.debug_func()
+    new = tmpdir.join("mrpm1.new")
+    fx_match.mrpm1_dt.remove()
+
+    with U.Chdir(tmpdir.strpath):
+        result = pexpect.run("fl revert {}".format(fx_match.mrpm1.basename))
+        assert not new.exists()
+        exp = "{} {}\r\n".format("No prefix match found for",
+                                 fx_match.mrpm1.basename)
+        assert exp in result
+        for exp in fx_match.mrpm1_rvt_exp + fx_match.mrpm2_rvt_exp:
+            assert exp not in result
+        assert fx_match.mrpm1.read() == "this is a test file\n"
+
+
 
 
 # ---------------------------------------------------------------------------
