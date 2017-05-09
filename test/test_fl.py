@@ -265,6 +265,31 @@ def test_editfile_rgx(tmpdir):
 
 
 # -----------------------------------------------------------------------------
+def test_editfile_suffix(tmpdir):
+    """
+    fl.editfile('legit', 's', 'foo', 'bar', 'old')
+    """
+    fp = tmpdir.join(U.function_name())
+    forig = tmpdir.join(fp.basename + ".original")
+    fold = tmpdir.join(fp.basename + ".old")
+    tdata = ["foo bar",
+             "bar foo",
+             "barfoo",
+             "foobar foo",
+             "loofafool"]
+    xdata = [z.replace('foo', 'bar') for z in tdata]
+    fp.write("\n".join(tdata))
+
+    fl.editfile(fp.strpath, 's', 'foo', 'bar', 'old')
+
+    assert fp.exists()
+    assert fold.exists()
+    assert not forig.exists()
+    assert "\n".join(xdata) == fp.read()
+    assert "\n".join(tdata) == fold.read()
+
+
+# -----------------------------------------------------------------------------
 def test_fl_help_pxr():
     """
     'fl help' should get help output
@@ -658,28 +683,6 @@ class TestFL_edit(th.HelpedTestCase):
         Clean up test directory
         """
         shutil.rmtree(cls.testdir)
-
-    # -------------------------------------------------------------------------
-    def test_editfile_suffix(self):
-        """
-        fl.editfile('legit', 's', 'foo', 'bar', 'old')
-        """
-        fp = U.pj(self.testdir, U.function_name())
-        forig = fp + ".old"
-        tdata = ["foo bar",
-                 "bar foo",
-                 "barfoo",
-                 "foobar foo",
-                 "loofafool"]
-        xdata = [z.replace('foo', 'bar') for z in tdata]
-        U.writefile(fp, tdata, newlines=True)
-
-        fl.editfile(fp, 's', 'foo', 'bar', 'old')
-
-        self.assertEq(True, U.exists(fp))
-        self.assertEq(True, U.exists(forig))
-        self.assertEq(xdata, U.contents(fp))
-        self.assertEq(tdata, U.contents(forig))
 
     # -------------------------------------------------------------------------
     def test_fl_edit_noarg(self):
