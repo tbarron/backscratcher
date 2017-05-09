@@ -206,6 +206,30 @@ def test_editfile_empty(tmpdir):
     assert "" == forig.read()
 
 
+# -------------------------------------------------------------------------
+def test_editfile_legit(tmpdir):
+    """
+    fl.editfile('legit', 's', 'foo', 'bar', None)
+    """
+    pytest.debug_func()
+    fp = tmpdir.join("legit")
+    forig = tmpdir.join(fp.basename + ".original")
+    tdata = ["foo bar",
+             "bar foo",
+             "barfoo",
+             "foobar foo",
+             "loofafool"]
+    xdata = [z.replace('foo', 'bar') for z in tdata]
+    fp.write("\n".join(tdata))
+
+    fl.editfile(fp.strpath, 's', 'foo', 'bar', None)
+
+    assert fp.exists()
+    assert forig.exists()
+    assert "\n".join(xdata) == fp.read()
+    assert "\n".join(tdata) == forig.read()
+
+
 # -----------------------------------------------------------------------------
 def test_fl_help_pxr():
     """
@@ -615,28 +639,6 @@ class TestFL_edit(th.HelpedTestCase):
                              'foo',
                              'bar',
                              None)
-
-    # -------------------------------------------------------------------------
-    def test_editfile_legit(self):
-        """
-        fl.editfile('legit', 's', 'foo', 'bar', None)
-        """
-        fp = U.pj(self.testdir, 'legit')
-        forig = fp + ".original"
-        tdata = ["foo bar",
-                 "bar foo",
-                 "barfoo",
-                 "foobar foo",
-                 "loofafool"]
-        xdata = [z.replace('foo', 'bar') for z in tdata]
-        U.writefile(fp, tdata, newlines=True)
-
-        fl.editfile(fp, 's', 'foo', 'bar', None)
-
-        self.assertEq(True, U.exists(fp))
-        self.assertEq(True, U.exists(forig))
-        self.assertEq(xdata, U.contents(fp))
-        self.assertEq(tdata, U.contents(forig))
 
     # -------------------------------------------------------------------------
     def test_editfile_suffix(self):
