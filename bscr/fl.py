@@ -268,7 +268,9 @@ def fl_revert(**kwa):
                                                os.path.basename(filename))
 
         newname = filename + ".new"
-        if kwa["n"]:
+        if counterpath is None:
+            print("No prefix match found for {}".format(filename))
+        elif kwa["n"]:
             print("would do 'os.rename({0}, {1})'".format(filename,
                                                           newname))
             print("would do 'os.rename({0}, {1})'".format(counterpath,
