@@ -164,6 +164,30 @@ def test_diff_nomatch_pxr(tmpdir):
 
 
 # -----------------------------------------------------------------------------
+def test_editfile_delete(tmpdir):
+    """
+    fl.editfile('legit', 's', 'foo', '', None)
+    """
+    pytest.debug_func()
+    fp = tmpdir.join(U.function_name())
+    forig = tmpdir.join(fp.basename + ".original")
+    tdata = ["foo bar",
+             "bar foo",
+             "barfoo",
+             "foobar foo",
+             "loofafool"]
+    xdata = [re.sub('^foo', '', z) for z in tdata]
+    fp.write("\n".join(tdata))
+
+    fl.editfile(fp.strpath, 's', '^foo', '', None)
+
+    assert fp.exists()
+    assert forig.exists()
+    assert "\n".join(xdata) == fp.read()
+    assert "\n".join(tdata) == forig.read()
+
+
+# -----------------------------------------------------------------------------
 def test_fl_help_pxr():
     """
     'fl help' should get help output
