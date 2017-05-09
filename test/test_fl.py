@@ -961,6 +961,23 @@ def makefile(loc, basename, content=None, ensure=False, dir=False,
 
 # -----------------------------------------------------------------------------
 @pytest.fixture
+def fx_edit(tmpdir, request):
+    """
+    Set up test data for editfile tests
+    """
+    # pdb.set_trace()
+    fx_edit.tdata = ["foo bar",
+                     "bar foo",
+                     "barfoo",
+                     "foobar foo",
+                     "loofafool"]
+    fx_edit.fp = tmpdir.join(request.function.func_name)
+    fx_edit.forig = tmpdir.join(fx_edit.fp.basename + ".original")
+    return fx_edit
+
+
+# -----------------------------------------------------------------------------
+@pytest.fixture
 def fx_match(tmpdir):
     """
     Set up some matching files for fl diff
