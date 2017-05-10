@@ -195,6 +195,18 @@ def test_edit_i_old(tmpdir):
 
 
 # -----------------------------------------------------------------------------
+def test_edit_i_reqarg(tmpdir):
+    """
+    fl edit -i                       => -i requires argument
+    check for message that -i requires argument
+    """
+    pytest.debug_func()
+    result = pexpect.run("fl edit -i")
+    assert "Traceback" not in result
+    assert "Usage:" in result
+
+
+# -----------------------------------------------------------------------------
 def test_editfile_delete(tmpdir, fx_edit):
     """
     fl.editfile('legit', 's', 'foo', '', None)
@@ -693,15 +705,6 @@ class TestFL_edit(th.HelpedTestCase):
         """
         self.fl_edit_flawed("fl edit",
                             "usage: fl edit [-i <suffix>] -e <cmd> f1 f2 ...")
-
-    # -------------------------------------------------------------------------
-    def test_fl_edit_i_reqarg(self):
-        """
-        fl edit -i                       => -i requires argument
-        check for message that -i requires argument
-        """
-        self.fl_edit_flawed("fl edit -i",
-                            "-i option requires an argument")
 
     # -------------------------------------------------------------------------
     def test_fl_edit_nofiles(self):
