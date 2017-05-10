@@ -164,6 +164,17 @@ def test_diff_nomatch_pxr(tmpdir):
 
 
 # -----------------------------------------------------------------------------
+def test_edit_e_reqarg(tmpdir):
+    """
+    fl edit -e => -e requires an argument
+    """
+    pytest.debug_func()
+    result = pexpect.run("fl edit -e")
+    assert "Traceback" not in result
+    assert "Usage:" in result
+
+
+# -----------------------------------------------------------------------------
 def test_editfile_delete(tmpdir, fx_edit):
     """
     fl.editfile('legit', 's', 'foo', '', None)
@@ -662,16 +673,6 @@ class TestFL_edit(th.HelpedTestCase):
         """
         self.fl_edit_flawed("fl edit",
                             "usage: fl edit [-i <suffix>] -e <cmd> f1 f2 ...")
-
-    # -------------------------------------------------------------------------
-    def test_fl_edit_e_reqarg(self):
-        """
-        fl edit -e                       => -e requires argument
-        check for
-         - message that -e requires an argument
-        """
-        self.fl_edit_flawed("fl edit -e",
-                            "-e option requires an argument")
 
     # -------------------------------------------------------------------------
     def test_fl_edit_i_reqarg(self):
