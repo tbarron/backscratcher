@@ -10,7 +10,7 @@ History
 
 Usage:
           fl [-d] [-n] diff FILE ...
-          fl [-d] [-n] edit
+          fl [-d] [-n] edit -e CMD [-i SUFFIX] FILE ...
           fl [-d] [-n] revert FILE
           fl [-d] [-n] rm_cr
           fl [-d] [-n] save FILE ...
@@ -163,36 +163,26 @@ def fl_diff(**kwa):
 
 
 # ---------------------------------------------------------------------------
-def fl_edit(argl):
+@dispatch.on('edit')
+def fl_edit(**kwa):
     """edit - edit files in place
 
     usage: fl edit [-i <suffix>] -e <edit-cmd> file1 file2 file3 ...
 
     """
-    prs = optparse.OptionParser()
-    prs.add_option('-d', '--debug',
-                   default=False, action='store_true', dest='debug',
-                   help='run the debugger')
-    prs.add_option('-e', '--edit',
-                   default='', action='store', dest='edit_cmd',
-                   help='edit command')
-    prs.add_option('-i', '--init',
-                   default='', action='store', dest='suffix',
-                   help='suffix for original files')
-    (opts, args) = prs.parse_args(argl)
-
-    if opts.debug:
+    if kwa['d']:
         pdb.set_trace()
 
-    if opts.suffix == '':
+    if kwa['i']:
         suffix = 'original'
     else:
-        suffix = opts.suffix
+        suffix = kwa['SUFFIX']
 
-    if opts.edit_cmd == '':
+    if kwa['CMD'] == '':
         util.fatal("usage: fl edit [-i <suffix>] -e <cmd> f1 f2 ...")
 
-    ecmd = opts.edit_cmd.split(opts.edit_cmd[1])
+    ecmd = kwa['CMD']
+    ecmd = ecmd.split(ecmd[1])
     if all([ecmd[0] != 's', ecmd[0] != 'y']):
         raise BSCR.Error("Only 's' and 'y' supported for -e right now")
 
@@ -201,10 +191,10 @@ def fl_edit(argl):
 
     (opn, prev, post) = ecmd[0:3]
 
-    if 0 == len(args):
+    if 0 == len(kwa['FILE']):
         util.fatal("no files on command line to edit")
     else:
-        for filename in args:
+        for filename in kwa['FILE']:
             editfile(filename, opn, prev, post, suffix)
 
 
