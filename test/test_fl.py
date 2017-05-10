@@ -218,6 +218,18 @@ def test_edit_noarg():
 
 
 # -----------------------------------------------------------------------------
+def test_fl_edit_nofiles(tmpdir):
+    """
+    fl edit -e 's/foo/bar/'          => no files to edit
+    check for message that there are no files to edit
+    """
+    pytest.debug_func()
+    result = pexpect.run("fl edit -e \"s/foo/bar/\"")
+    assert "Traceback" not in result
+    assert "Usage:" in result
+
+
+# -----------------------------------------------------------------------------
 def test_editfile_delete(tmpdir, fx_edit):
     """
     fl.editfile('legit', 's', 'foo', '', None)
@@ -708,15 +720,6 @@ class TestFL_edit(th.HelpedTestCase):
         Clean up test directory
         """
         shutil.rmtree(cls.testdir)
-
-    # -------------------------------------------------------------------------
-    def test_fl_edit_nofiles(self):
-        """
-        fl edit -e "s/foo/bar/"          => no files to edit
-        check for message that there are no files to edit
-        """
-        self.fl_edit_flawed("fl edit -e 's/foo/bar/'",
-                            "no files on command line to edit")
 
     # -------------------------------------------------------------------------
     def test_fl_edit_sub_mid(self):
