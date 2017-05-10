@@ -218,7 +218,7 @@ def test_edit_noarg():
 
 
 # -----------------------------------------------------------------------------
-def test_fl_edit_nofiles(tmpdir):
+def test_edit_nofiles(tmpdir):
     """
     fl edit -e 's/foo/bar/'          => no files to edit
     check for message that there are no files to edit
