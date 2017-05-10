@@ -175,6 +175,26 @@ def test_edit_e_reqarg(tmpdir):
 
 
 # -----------------------------------------------------------------------------
+def test_edit_i_old(tmpdir):
+    """
+    fl edit -i old -e 's/x/y' f1    => rename original to f1.old
+    """
+    pytest.debug_func()
+    tdata = ["one foo two foo three",
+             "foo four five foo",
+             "six seven eight foo nine",]
+    xdata = [re.sub("[rv]e", "n", _) for _ in tdata]
+    f1 = tmpdir.join("f1")
+    f1.write("\n".join(tdata))
+    with U.Chdir(tmpdir.strpath):
+        cmd = "fl edit -e s/[rv]e/n/ -i old {}".format(f1.basename)
+        result = pexpect.run(cmd)
+        assert result == ""
+        for exp in xdata:
+            assert exp in f1.read()
+
+
+# -----------------------------------------------------------------------------
 def test_editfile_delete(tmpdir, fx_edit):
     """
     fl.editfile('legit', 's', 'foo', '', None)
@@ -726,28 +746,6 @@ class TestFL_edit(th.HelpedTestCase):
                           exp=["one foo two foo three",
                                "bar four five foo",
                                "six seven eight foo nine"],
-                          warn=["/Users/tbarron/prj/github/backscratcher/bscr/"
-                                "util.py:207: UserWarning: util.dispatch is "
-                                "deprecated in favor of docopt_dispatch",
-                                "  warnings.warn(\"util.dispatch is "
-                                "deprecated in favor of docopt_dispatch\")"])
-
-    # -------------------------------------------------------------------------
-    def test_fl_edit_i_old(self):
-        """
-        fl edit -i old -e "s/x/y/" f1    => rename original to f1.old
-         - f1 edited correctly
-         - f1.old exists
-         - f1.original does not exist
-        """
-        pytest.debug_func()
-        self.fl_edit_warn(eopt="s/[rv]e/n/",
-                          iopt="old",
-                          files=1,
-                          inp=self.testdata,
-                          exp=["one foo two foo thne",
-                               "foo four fin foo",
-                               "six senn eight foo nine"],
                           warn=["/Users/tbarron/prj/github/backscratcher/bscr/"
                                 "util.py:207: UserWarning: util.dispatch is "
                                 "deprecated in favor of docopt_dispatch",
