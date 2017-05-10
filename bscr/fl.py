@@ -115,7 +115,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
 from docopt_dispatch import dispatch
-import optparse
 import os
 import pdb
 import re
