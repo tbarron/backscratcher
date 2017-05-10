@@ -207,6 +207,17 @@ def test_edit_i_reqarg(tmpdir):
 
 
 # -----------------------------------------------------------------------------
+def test_edit_noarg():
+    """
+    fl edit                          => help msg
+    """
+    pytest.debug_func()
+    result = pexpect.run("fl edit")
+    assert "Traceback" not in result
+    assert "Usage:" in result
+
+
+# -----------------------------------------------------------------------------
 def test_editfile_delete(tmpdir, fx_edit):
     """
     fl.editfile('legit', 's', 'foo', '', None)
@@ -697,14 +708,6 @@ class TestFL_edit(th.HelpedTestCase):
         Clean up test directory
         """
         shutil.rmtree(cls.testdir)
-
-    # -------------------------------------------------------------------------
-    def test_fl_edit_noarg(self):
-        """
-        fl edit                          => help msg
-        """
-        self.fl_edit_flawed("fl edit",
-                            "usage: fl edit [-i <suffix>] -e <cmd> f1 f2 ...")
 
     # -------------------------------------------------------------------------
     def test_fl_edit_nofiles(self):
