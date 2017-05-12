@@ -830,26 +830,6 @@ class TestFL_edit(th.HelpedTestCase):
                                 "deprecated in favor of docopt_dispatch\")"])
 
     # -------------------------------------------------------------------------
-    def test_fl_edit_sub_bol(self):
-        """
-        fl edit -e "s/^foo/bar/" f1 f2   => edit at beginning of line
-         - f1 edited correctly
-         - f2 edited correctly
-         - f{1,2}.original have unchanged content
-        """
-        self.fl_edit_warn(eopt="s/^foo/bar/",
-                          files=2,
-                          inp=self.testdata,
-                          exp=["one foo two foo three",
-                               "bar four five foo",
-                               "six seven eight foo nine"],
-                          warn=["/Users/tbarron/prj/github/backscratcher/bscr/"
-                                "util.py:207: UserWarning: util.dispatch is "
-                                "deprecated in favor of docopt_dispatch",
-                                "  warnings.warn(\"util.dispatch is "
-                                "deprecated in favor of docopt_dispatch\")"])
-
-    # -------------------------------------------------------------------------
     def test_fl_edit_xlate_rot13(self):
         """
         fl edit -e "y/a-z/n-za-m/" f1 f2 => rot13
