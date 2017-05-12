@@ -188,10 +188,8 @@ def test_edit_i_old_dir(tmpdir, capsys):
     f2 = makefile(tmpdir, "f2", content="\n".join(tdata))
     with U.Chdir(tmpdir.strpath):
         fl.fl_edit(**{"d": False,
-                      "e": True,
-                      "CMD": "s/^foo/bar/",
-                      "i": True,
-                      "SUFFIX": "old",
+                      "e": "s/^foo/bar/",
+                      "i": "old",
                       "FILE": ["f1", "f2"]})
         result, _ = capsys.readouterr()
         assert result == ""
@@ -275,14 +273,11 @@ def test_edit_sub_bol_dir(tmpdir):
     f2.write("\n".join(tdata))
     f2_orig = tmpdir.join(f2.basename + ".original")
 
-    # result = pexpect.run("fl edit -e s/^foo/bar/ f1 f2")
     with U.Chdir(tmpdir.strpath):
         fl.fl_edit(**{"d": False,
-                      "e": True,
-                      "i": False,
-                      "CMD": "s/^foo/bar/",
-                      "FILE": ["f1", "f2"],
-                      "SUFFIX": ""})
+                      "e": "s/^foo/bar/",
+                      "i": "",
+                      "FILE": ["f1", "f2"]})
 
     for line in xdata:
         assert line in f1.read()
