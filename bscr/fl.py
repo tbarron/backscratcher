@@ -10,7 +10,7 @@ History
 
 Usage:
           fl [-d] [-n] diff <FILE> ...
-          fl [-d] [-n] edit -e <CMD> <FILE> ... [-i <SUFFIX>]
+          fl [-d] [-n] edit -e=<CMD> <FILE> ... [-i=<SUFFIX>]
           fl [-d] [-n] revert <FILE>
           fl [-d] [-n] rm_cr
           fl [-d] [-n] save <FILE> ...
@@ -18,6 +18,10 @@ Usage:
           fl [-d] [-n] set_mtime_to_atime <FILE> ...
           fl [-d] [-n] times
           fl [-d] [-n] unreadable
+
+Options:
+          -i=<SUFFIX>    suffix for original backup
+          -e=<CMD>       how to edit the file
 
 Examples:
 
@@ -172,16 +176,17 @@ def fl_edit(**kwa):
     if kwa['d']:
         pdb.set_trace()
 
-    if kwa['i']:
-        suffix = kwa['SUFFIX'] or 'original'
+    if 'i' in kwa:
+        suffix = kwa['i'] or 'original'
     else:
         suffix = 'original'
 
-    if kwa['CMD'] == '':
+    if 'e' in kwa and kwa['e'] == '':
         util.fatal("usage: fl edit [-i <suffix>] -e <cmd> f1 f2 ...")
 
-    ecmd = kwa['CMD']
-    ecmd = ecmd.split(ecmd[1])
+    ecmd = kwa['e']
+    sep = kwa['e'][1]
+    ecmd = ecmd.split(sep)
     if all([ecmd[0] != 's', ecmd[0] != 'y']):
         raise BSCR.Error("Only 's' and 'y' supported for -e right now")
 
