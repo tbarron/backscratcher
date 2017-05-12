@@ -291,6 +291,38 @@ def test_edit_sub_bol_dir(tmpdir):
     pass
 
 
+# -----------------------------------------------------------------------------
+def test_edit_sub_bol_pxr(tmpdir):
+    """
+    fl edit -e 's/^foo/bar/'f1 f2   => edit at beginning of line
+     - f1 edited correctly
+     - f2 edited correctly
+     - f{1,2}.original have unchanged content
+    """
+    pytest.debug_func()
+    tdata = ["one foo two foo three",
+             "foo four five foo",
+             "six seven eight foo nine",]
+    xdata = [re.sub("^foo", "bar", _) for _ in tdata]
+
+    f1 = tmpdir.join("f1")
+    f1.write("\n".join(tdata))
+    f1_orig = tmpdir.join(f1.basename + ".original")
+    f2 = tmpdir.join("f2")
+    f2.write("\n".join(tdata))
+    f2_orig = tmpdir.join(f2.basename + ".original")
+
+    with U.Chdir(tmpdir.strpath):
+        result = pexpect.run("fl edit -e s/^foo/bar/ f1 f2")
+
+    for line in xdata:
+        assert line in f1.read()
+        assert line in f2.read()
+
+    pass
+
+
+# -----------------------------------------------------------------------------
 def test_editfile_delete(tmpdir, fx_edit):
     """
     fl.editfile('legit', 's', 'foo', '', None)
