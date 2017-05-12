@@ -175,7 +175,32 @@ def test_edit_e_reqarg(tmpdir):
 
 
 # -----------------------------------------------------------------------------
-def test_edit_i_old(tmpdir):
+def test_edit_i_old_dir(tmpdir, capsys):
+    """
+    fl edit -i old -e 's/x/y' f1    => rename original to f1.old
+    """
+    pytest.debug_func()
+    tdata = ["one foo two foo three",
+             "foo four five foo",
+             "six seven eight foo nine",]
+    xdata = [re.sub("^foo", "bar", _) for _ in tdata]
+    f1 = makefile(tmpdir, "f1", content="\n".join(tdata))
+    f2 = makefile(tmpdir, "f2", content="\n".join(tdata))
+    with U.Chdir(tmpdir.strpath):
+        fl.fl_edit(**{"d": False,
+                      "e": True,
+                      "CMD": "s/^foo/bar/",
+                      "i": True,
+                      "SUFFIX": "old",
+                      "FILE": ["f1", "f2"]})
+        result, _ = capsys.readouterr()
+        assert result == ""
+        for exp in xdata:
+            assert exp in f1.read()
+
+
+# -----------------------------------------------------------------------------
+def test_edit_i_old_pxr(tmpdir):
     """
     fl edit -i old -e 's/x/y' f1    => rename original to f1.old
     """
