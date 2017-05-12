@@ -9,13 +9,13 @@ History
                              add stubs for future routines
 
 Usage:
-          fl [-d] [-n] diff FILE ...
-          fl [-d] [-n] edit -e CMD [-i SUFFIX] FILE ...
-          fl [-d] [-n] revert FILE
+          fl [-d] [-n] diff <FILE> ...
+          fl [-d] [-n] edit -e <CMD> <FILE> ... [-i <SUFFIX>]
+          fl [-d] [-n] revert <FILE>
           fl [-d] [-n] rm_cr
-          fl [-d] [-n] save FILE ...
-          fl [-d] [-n] set_atime_to_mtime FILE ...
-          fl [-d] [-n] set_mtime_to_atime FILE ...
+          fl [-d] [-n] save <FILE> ...
+          fl [-d] [-n] set_atime_to_mtime <FILE> ...
+          fl [-d] [-n] set_mtime_to_atime <FILE> ...
           fl [-d] [-n] times
           fl [-d] [-n] unreadable
 
@@ -173,9 +173,9 @@ def fl_edit(**kwa):
         pdb.set_trace()
 
     if kwa['i']:
-        suffix = 'original'
+        suffix = kwa['SUFFIX'] or 'original'
     else:
-        suffix = kwa['SUFFIX']
+        suffix = 'original'
 
     if kwa['CMD'] == '':
         util.fatal("usage: fl edit [-i <suffix>] -e <cmd> f1 f2 ...")
