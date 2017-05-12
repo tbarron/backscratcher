@@ -310,9 +310,40 @@ def test_edit_sub_bol_pxr(tmpdir):
     with U.Chdir(tmpdir.strpath):
         result = pexpect.run("fl edit -e s/^foo/bar/ f1 f2")
 
+# -------------------------------------------------------------------------
+def test_edit_sub_mid_dir(tmpdir, capsys):
+    """
+    fl edit -e 's/foo/bar/' f1 f2    => change 'foo' to 'bar' in f1, f2
+    check for
+     - f{1,2} edited correctly
+     - f{1,2}.original exists with unchanged content
+    """
+    pytest.debug_func()
+    tdata = ["one foo two foo three",
+             "foo four five foo",
+             "six seven eight foo nine",]
+    xdata = [re.sub("foo", "bar", _) for _ in tdata]
+
+    f1 = makefile(tmpdir, "f1", content="\n".join(tdata))
+    f1_orig = tmpdir.join(f1.basename + ".original")
+    f2 = makefile(tmpdir, "f2", content="\n".join(tdata))
+    f2_orig = tmpdir.join(f2.basename + ".original")
+
+    with U.Chdir(tmpdir.strpath):
+        fl.fl_edit(**{"d": False,
+                      "e": "s/foo/bar/",
+                      "i": "",
+                      "FILE": ["f1", "f2"]})
+        result, _ = capsys.readouterr()
+
+    assert result == ""
     for line in xdata:
         assert line in f1.read()
         assert line in f2.read()
+    assert f1_orig.exists()
+    assert f2_orig.exists()
+
+
 
     pass
 
