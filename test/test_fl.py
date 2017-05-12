@@ -266,11 +266,9 @@ def test_edit_sub_bol_dir(tmpdir):
              "six seven eight foo nine",]
     xdata = [re.sub("^foo", "bar", _) for _ in tdata]
 
-    f1 = tmpdir.join("f1")
-    f1.write("\n".join(tdata))
+    f1 = makefile(tmpdir, "f1", content="\n".join(tdata))
     f1_orig = tmpdir.join(f1.basename + ".original")
-    f2 = tmpdir.join("f2")
-    f2.write("\n".join(tdata))
+    f2 = makefile(tmpdir, "f2", content="\n".join(tdata))
     f2_orig = tmpdir.join(f2.basename + ".original")
 
     with U.Chdir(tmpdir.strpath):
