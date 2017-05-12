@@ -253,7 +253,7 @@ def test_edit_nofiles(tmpdir):
 
 
 # -----------------------------------------------------------------------------
-def test_edit_sub_bol_dir(tmpdir):
+def test_edit_sub_bol_dir(tmpdir, capsys):
     """
     fl edit -e 's/^foo/bar/'f1 f2   => edit at beginning of line
      - f1 edited correctly
@@ -276,12 +276,14 @@ def test_edit_sub_bol_dir(tmpdir):
                       "e": "s/^foo/bar/",
                       "i": "",
                       "FILE": ["f1", "f2"]})
+        result, _ = capsys.readouterr()
 
+    assert result == ""
     for line in xdata:
         assert line in f1.read()
         assert line in f2.read()
-
-    pass
+    assert f1_orig.exists()
+    assert f2_orig.exists()
 
 
 # -----------------------------------------------------------------------------
@@ -307,6 +309,14 @@ def test_edit_sub_bol_pxr(tmpdir):
 
     with U.Chdir(tmpdir.strpath):
         result = pexpect.run("fl edit -e s/^foo/bar/ f1 f2")
+
+    assert result == ""
+    for line in xdata:
+        assert line in f1.read()
+        assert line in f2.read()
+    assert f1_orig.exists()
+    assert f2_orig.exists()
+
 
 # -------------------------------------------------------------------------
 def test_edit_sub_mid_dir(tmpdir, capsys):
