@@ -874,26 +874,6 @@ class TestFL_edit(th.HelpedTestCase):
         shutil.rmtree(cls.testdir)
 
     # -------------------------------------------------------------------------
-    def test_fl_edit_sub_mid(self):
-        """
-        fl edit -e "s/foo/bar/" f1 f2    => change "foo" to "bar" in f1, f2
-        check for
-         - f{1,2} edited correctly
-         - f{1,2}.original exists with unchanged content
-        """
-        self.fl_edit_warn(eopt="s/foo/bar/",
-                          files=2,
-                          inp=self.testdata,
-                          exp=["one bar two bar three",
-                               "bar four five bar",
-                               "six seven eight bar nine"],
-                          warn=["/Users/tbarron/prj/github/backscratcher/bscr/"
-                                "util.py:207: UserWarning: util.dispatch is "
-                                "deprecated in favor of docopt_dispatch",
-                                "  warnings.warn(\"util.dispatch is "
-                                "deprecated in favor of docopt_dispatch\")"])
-
-    # -------------------------------------------------------------------------
     def test_fl_edit_xlate_rot13(self):
         """
         fl edit -e "y/a-z/n-za-m/" f1 f2 => rot13
