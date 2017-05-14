@@ -1158,3 +1158,22 @@ def fx_tdata():
              "foo four five foo",
              "six seven eight foo nine", ]
     return tdata
+
+
+# -----------------------------------------------------------------------------
+@pytest.fixture
+def fx_amtime(tmpdir):
+    """
+    Set up some atime, mtime test data
+    """
+    fx_amtime.exptime = None
+    atime = fx_amtime.atime = int(time.time() - random.randint(1000, 2000))
+    mtime = fx_amtime.mtime = int(time.time() + random.randint(1000, 2000))
+    fx_amtime.testfile = makefile(tmpdir, "testfile", atime=atime, mtime=mtime,
+                                  content="This is the test file")
+    yield fx_amtime
+    s = os.stat(fx_amtime.testfile.strpath)
+    assert fx_amtime.exptime == s[stat.ST_MTIME]
+    assert fx_amtime.exptime == s[stat.ST_ATIME]
+    assert s[stat.ST_ATIME] == s[stat.ST_MTIME]
+
