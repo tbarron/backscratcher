@@ -182,8 +182,13 @@ def test_edit_i_old_dir(tmpdir, capsys, fx_tdata):
     pytest.debug_func()
     tdata = fx_tdata
     xdata = [re.sub("^foo", "bar", _) for _ in tdata]
-    f1 = makefile(tmpdir, "f1", content="\n".join(tdata))
-    f2 = makefile(tmpdir, "f2", content="\n".join(tdata))
+    L = globals()
+    for name, content in [("f1", "\n".join(tdata)),
+                          ("f2", "\n".join(tdata)),
+                          ("f1.old", None),
+                          ("f2.old", None)]:
+        L[name] = makefile(tmpdir, name, content=content)
+
     with U.Chdir(tmpdir.strpath):
         fl.fl_edit(**{"d": False,
                       "e": "s/^foo/bar/",
@@ -192,7 +197,7 @@ def test_edit_i_old_dir(tmpdir, capsys, fx_tdata):
         result, _ = capsys.readouterr()
         assert result == ""
         for exp in xdata:
-            assert exp in f1.read()
+            assert exp in f1.read()    # noqa: ignore=F821
 
 
 # -----------------------------------------------------------------------------
