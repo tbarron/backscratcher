@@ -375,6 +375,54 @@ def test_edit_sub_mid_pxr(tmpdir, fx_tdata):
     assert f2_orig.exists()
 
 
+# -------------------------------------------------------------------------
+def test_edit_xlate_ret_dir(tmpdir, capsys, fx_seven):
+    """
+    fl edit -e "y/\r//" f1 f2        => remove \r characters
+        - f{1,2} edited correctly
+        - f{1,2}.original have correct original content
+    """
+    pytest.debug_func()
+
+    with U.Chdir(tmpdir.strpath):
+        fl.fl_edit(**{"d": False,
+                      "e": "y/\r//",
+                      "i": "",
+                      "FILE": ["f1", "f2"]})
+        result, _ = capsys.readouterr()
+
+    assert result == ""
+    for fh in fx_seven.input_l:
+        for line in fx_seven.tdata:
+            assert line in fh.read()
+        assert "\r" not in fh.read()
+    for fh in fx_seven.orig_l:
+        assert fh.exists()
+        assert "\n\r" in fh.read()
+
+
+# -------------------------------------------------------------------------
+def test_edit_xlate_ret_pxr(tmpdir, fx_seven):
+    """
+    fl edit -e 'y/\r//' f1 f2        => remove \r characters
+        - f{1,2} edited correctly
+        - f{1,2}.original have correct original content
+    """
+    pytest.debug_func()
+
+    with U.Chdir(tmpdir.strpath):
+        result = pexpect.run("fl edit -e \"y/\r//\" f1 f2")
+
+    assert result == ""
+    for fh in fx_seven.input_l:
+        for line in fx_seven.tdata:
+            assert line in fh.read()
+        assert "\r" not in fh.read()
+    for fh in fx_seven.orig_l:
+        assert fh.exists()
+        assert "\n\r" in fh.read()
+
+
 # -----------------------------------------------------------------------------
 def test_editfile_delete(tmpdir, fx_edit):
     """
@@ -883,26 +931,6 @@ class TestFL_edit(th.HelpedTestCase):
                           exp=["bar sbb gjb sbb guerr",
                                "sbb sbhe svir sbb",
                                "fvk frira rvtug sbb avar"],
-                          warn=["/Users/tbarron/prj/github/backscratcher/bscr/"
-                                "util.py:207: UserWarning: util.dispatch is "
-                                "deprecated in favor of docopt_dispatch",
-                                "  warnings.warn(\"util.dispatch is "
-                                "deprecated in favor of docopt_dispatch\")"])
-
-    # -------------------------------------------------------------------------
-    def test_fl_edit_xlate_ret(self):
-        """
-        fl edit -e "y/\r//" f1 f2        => remove \r characters
-         - f{1,2} edited correctly
-         - f{1,2}.original have correct original content
-        """
-        rdata = [x.rstrip() + "\r\n" for x in self.testdata]
-        self.fl_edit_warn(eopt="y/\r//",
-                          files=2,
-                          inp=rdata,
-                          exp=["one foo two foo three",
-                               "foo four five foo",
-                               "six seven eight foo nine"],
                           warn=["/Users/tbarron/prj/github/backscratcher/bscr/"
                                 "util.py:207: UserWarning: util.dispatch is "
                                 "deprecated in favor of docopt_dispatch",
