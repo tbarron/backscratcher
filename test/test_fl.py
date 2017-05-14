@@ -16,71 +16,47 @@ from bscr import util as U
 
 
 # -----------------------------------------------------------------------------
-def test_amtime_atom_dir(tmpdir):
+def test_amtime_atom_dir(tmpdir, fx_amtime):
     """
     Test fl_set_atime_to_mtime()
     """
     pytest.debug_func()
-    atime = int(time.time() - random.randint(1000, 2000))
-    mtime = int(time.time() + random.randint(1000, 2000))
-    atom = makefile(tmpdir, "atom", content="This is the test file",
-                    atime=atime, mtime=mtime)
-    fl.fl_set_atime_to_mtime(**{"FILE": [atom.strpath], "d": False})
-    s = os.stat(atom.strpath)
-    assert mtime == s[stat.ST_MTIME]
-    assert mtime == s[stat.ST_ATIME]
-    assert s[stat.ST_ATIME] == s[stat.ST_MTIME]
+    fl.fl_set_atime_to_mtime(**{"FILE": [fx_amtime.testfile.strpath],
+                                "d": False})
+    fx_amtime.exptime = fx_amtime.mtime
 
 
 # -----------------------------------------------------------------------------
-def test_amtime_atom_pxr(tmpdir):
+def test_amtime_atom_pxr(tmpdir, fx_amtime):
     """
     Test fl_set_atime_to_mtime()
     """
     pytest.debug_func()
-    atime = int(time.time() - random.randint(1000, 2000))
-    mtime = int(time.time() + random.randint(1000, 2000))
-    atom = makefile(tmpdir, "atom", content="This is the test file",
-                    atime=atime, mtime=mtime)
-    result = pexpect.run("fl set_atime_to_mtime {}".format(atom.strpath))
+    cmd = "fl set_atime_to_mtime {}".format(fx_amtime.testfile.strpath)
+    result = pexpect.run(cmd)
     assert result == ""
-    s = os.stat(atom.strpath)
-    assert mtime == s[stat.ST_MTIME]
-    assert mtime == s[stat.ST_ATIME]
-    assert s[stat.ST_ATIME] == s[stat.ST_MTIME]
+    fx_amtime.exptime = fx_amtime.mtime
 
 
 # -----------------------------------------------------------------------------
-def test_amtime_mtoa_dir(tmpdir):
+def test_amtime_mtoa_dir(tmpdir, fx_amtime):
     """
     Test fl_set_mtime_to_atime()
     """
-    atime = int(time.time() - random.randint(1000, 2000))
-    mtime = int(time.time() + random.randint(1000, 2000))
-    atom = makefile(tmpdir, "mtoa", content="This is the test file",
-                    atime=atime, mtime=mtime)
-    fl.fl_set_mtime_to_atime(**{"FILE": [atom.strpath], "d": False})
-    s = os.stat(atom.strpath)
-    assert s[stat.ST_ATIME] == atime
-    assert s[stat.ST_MTIME] == atime
-    assert s[stat.ST_ATIME] == s[stat.ST_MTIME]
+    fl.fl_set_mtime_to_atime(**{"FILE": [fx_amtime.testfile.strpath],
+                                "d": False})
+    fx_amtime.exptime = fx_amtime.atime
 
 
 # -----------------------------------------------------------------------------
-def test_amtime_mtoa_pxr(tmpdir):
+def test_amtime_mtoa_pxr(tmpdir, fx_amtime):
     """
     Test fl_set_mtime_to_atime()
     """
-    atime = int(time.time() - random.randint(1000, 2000))
-    mtime = int(time.time() + random.randint(1000, 2000))
-    atom = makefile(tmpdir, "mtoa", content="This is the test file",
-                    atime=atime, mtime=mtime)
-    result = pexpect.run("fl set_mtime_to_atime {}".format(atom.strpath))
-    s = os.stat(atom.strpath)
+    cmd = "fl set_mtime_to_atime {}".format(fx_amtime.testfile.strpath)
+    result = pexpect.run(cmd)
     assert result == ""
-    assert s[stat.ST_ATIME] == atime
-    assert s[stat.ST_MTIME] == atime
-    assert s[stat.ST_ATIME] == s[stat.ST_MTIME]
+    fx_amtime.exptime = fx_amtime.atime
 
 
 # -----------------------------------------------------------------------------
