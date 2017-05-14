@@ -362,6 +362,7 @@ def test_edit_sub_mid_pxr(tmpdir, fx_tdata):
     with U.Chdir(tmpdir.strpath):
         result = pexpect.run("fl edit -e s/foo/bar/ f1 f2")
 
+    assert "Traceback" not in result
     for line in xdata:
         assert line in f1.read()
         assert line in f2.read()
