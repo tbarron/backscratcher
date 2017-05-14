@@ -156,11 +156,10 @@ def test_edit_i_old_dir(tmpdir, capsys, fx_tdata):
     fl edit -i old -e 's/x/y' f1    => rename original to f1.old
     """
     pytest.debug_func()
-    tdata = fx_tdata
-    xdata = [re.sub("^foo", "bar", _) for _ in tdata]
+    xdata = [re.sub("^foo", "bar", _) for _ in fx_tdata]
     L = globals()
-    for name, content in [("f1", "\n".join(tdata)),
-                          ("f2", "\n".join(tdata)),
+    for name, content in [("f1", "\n".join(fx_tdata)),
+                          ("f2", "\n".join(fx_tdata)),
                           ("f1.old", None),
                           ("f2.old", None)]:
         L[name] = makefile(tmpdir, name, content=content)
@@ -182,10 +181,9 @@ def test_edit_i_old_pxr(tmpdir, fx_tdata):
     fl edit -i old -e 's/x/y' f1    => rename original to f1.old
     """
     pytest.debug_func()
-    tdata = fx_tdata
-    xdata = [re.sub("[rv]e", "n", _) for _ in tdata]
+    xdata = [re.sub("[rv]e", "n", _) for _ in fx_tdata]
     f1 = tmpdir.join("f1")
-    f1.write("\n".join(tdata))
+    f1.write("\n".join(fx_tdata))
     with U.Chdir(tmpdir.strpath):
         cmd = "fl edit -e s/[rv]e/n/ -i old {}".format(f1.basename)
         result = pexpect.run(cmd)
@@ -238,12 +236,11 @@ def test_edit_sub_bol_dir(tmpdir, capsys, fx_tdata):
      - f{1,2}.original have unchanged content
     """
     pytest.debug_func()
-    tdata = fx_tdata
-    xdata = [re.sub("^foo", "bar", _) for _ in tdata]
+    xdata = [re.sub("^foo", "bar", _) for _ in fx_tdata]
 
-    f1 = makefile(tmpdir, "f1", content="\n".join(tdata))
+    f1 = makefile(tmpdir, "f1", content="\n".join(fx_tdata))
     f1_orig = tmpdir.join(f1.basename + ".original")
-    f2 = makefile(tmpdir, "f2", content="\n".join(tdata))
+    f2 = makefile(tmpdir, "f2", content="\n".join(fx_tdata))
     f2_orig = tmpdir.join(f2.basename + ".original")
 
     with U.Chdir(tmpdir.strpath):
@@ -270,14 +267,13 @@ def test_edit_sub_bol_pxr(tmpdir, fx_tdata):
      - f{1,2}.original have unchanged content
     """
     pytest.debug_func()
-    tdata = fx_tdata
-    xdata = [re.sub("^foo", "bar", _) for _ in tdata]
+    xdata = [re.sub("^foo", "bar", _) for _ in fx_tdata]
 
     f1 = tmpdir.join("f1")
-    f1.write("\n".join(tdata))
+    f1.write("\n".join(fx_tdata))
     f1_orig = tmpdir.join(f1.basename + ".original")
     f2 = tmpdir.join("f2")
-    f2.write("\n".join(tdata))
+    f2.write("\n".join(fx_tdata))
     f2_orig = tmpdir.join(f2.basename + ".original")
 
     with U.Chdir(tmpdir.strpath):
@@ -300,12 +296,11 @@ def test_edit_sub_mid_dir(tmpdir, capsys, fx_tdata):
      - f{1,2}.original exists with unchanged content
     """
     pytest.debug_func()
-    tdata = fx_tdata
-    xdata = [re.sub("foo", "bar", _) for _ in tdata]
+    xdata = [re.sub("foo", "bar", _) for _ in fx_tdata]
 
-    f1 = makefile(tmpdir, "f1", content="\n".join(tdata))
+    f1 = makefile(tmpdir, "f1", content="\n".join(fx_tdata))
     f1_orig = tmpdir.join(f1.basename + ".original")
-    f2 = makefile(tmpdir, "f2", content="\n".join(tdata))
+    f2 = makefile(tmpdir, "f2", content="\n".join(fx_tdata))
     f2_orig = tmpdir.join(f2.basename + ".original")
 
     with U.Chdir(tmpdir.strpath):
@@ -332,12 +327,11 @@ def test_edit_sub_mid_pxr(tmpdir, fx_tdata):
      - f{1,2}.original exists with unchanged content
     """
     pytest.debug_func()
-    tdata = fx_tdata
-    xdata = [re.sub("foo", "bar", _) for _ in tdata]
+    xdata = [re.sub("foo", "bar", _) for _ in fx_tdata]
 
-    f1 = makefile(tmpdir, "f1", content="\n".join(tdata))
+    f1 = makefile(tmpdir, "f1", content="\n".join(fx_tdata))
     f1_orig = tmpdir.join(f1.basename + ".original")
-    f2 = makefile(tmpdir, "f2", content="\n".join(tdata))
+    f2 = makefile(tmpdir, "f2", content="\n".join(fx_tdata))
     f2_orig = tmpdir.join(f2.basename + ".original")
 
     with U.Chdir(tmpdir.strpath):
