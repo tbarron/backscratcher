@@ -175,14 +175,12 @@ def test_edit_e_reqarg(tmpdir):
 
 
 # -----------------------------------------------------------------------------
-def test_edit_i_old_dir(tmpdir, capsys):
+def test_edit_i_old_dir(tmpdir, capsys, fx_tdata):
     """
     fl edit -i old -e 's/x/y' f1    => rename original to f1.old
     """
     pytest.debug_func()
-    tdata = ["one foo two foo three",
-             "foo four five foo",
-             "six seven eight foo nine",]
+    tdata = fx_tdata
     xdata = [re.sub("^foo", "bar", _) for _ in tdata]
     f1 = makefile(tmpdir, "f1", content="\n".join(tdata))
     f2 = makefile(tmpdir, "f2", content="\n".join(tdata))
@@ -198,14 +196,12 @@ def test_edit_i_old_dir(tmpdir, capsys):
 
 
 # -----------------------------------------------------------------------------
-def test_edit_i_old_pxr(tmpdir):
+def test_edit_i_old_pxr(tmpdir, fx_tdata):
     """
     fl edit -i old -e 's/x/y' f1    => rename original to f1.old
     """
     pytest.debug_func()
-    tdata = ["one foo two foo three",
-             "foo four five foo",
-             "six seven eight foo nine",]
+    tdata = fx_tdata
     xdata = [re.sub("[rv]e", "n", _) for _ in tdata]
     f1 = tmpdir.join("f1")
     f1.write("\n".join(tdata))
@@ -253,7 +249,7 @@ def test_edit_nofiles(tmpdir):
 
 
 # -----------------------------------------------------------------------------
-def test_edit_sub_bol_dir(tmpdir, capsys):
+def test_edit_sub_bol_dir(tmpdir, capsys, fx_tdata):
     """
     fl edit -e 's/^foo/bar/'f1 f2   => edit at beginning of line
      - f1 edited correctly
@@ -261,9 +257,7 @@ def test_edit_sub_bol_dir(tmpdir, capsys):
      - f{1,2}.original have unchanged content
     """
     pytest.debug_func()
-    tdata = ["one foo two foo three",
-             "foo four five foo",
-             "six seven eight foo nine",]
+    tdata = fx_tdata
     xdata = [re.sub("^foo", "bar", _) for _ in tdata]
 
     f1 = makefile(tmpdir, "f1", content="\n".join(tdata))
@@ -287,7 +281,7 @@ def test_edit_sub_bol_dir(tmpdir, capsys):
 
 
 # -----------------------------------------------------------------------------
-def test_edit_sub_bol_pxr(tmpdir):
+def test_edit_sub_bol_pxr(tmpdir, fx_tdata):
     """
     fl edit -e 's/^foo/bar/'f1 f2   => edit at beginning of line
      - f1 edited correctly
@@ -295,9 +289,7 @@ def test_edit_sub_bol_pxr(tmpdir):
      - f{1,2}.original have unchanged content
     """
     pytest.debug_func()
-    tdata = ["one foo two foo three",
-             "foo four five foo",
-             "six seven eight foo nine",]
+    tdata = fx_tdata
     xdata = [re.sub("^foo", "bar", _) for _ in tdata]
 
     f1 = tmpdir.join("f1")
@@ -319,7 +311,7 @@ def test_edit_sub_bol_pxr(tmpdir):
 
 
 # -------------------------------------------------------------------------
-def test_edit_sub_mid_dir(tmpdir, capsys):
+def test_edit_sub_mid_dir(tmpdir, capsys, fx_tdata):
     """
     fl edit -e 's/foo/bar/' f1 f2    => change 'foo' to 'bar' in f1, f2
     check for
@@ -327,9 +319,7 @@ def test_edit_sub_mid_dir(tmpdir, capsys):
      - f{1,2}.original exists with unchanged content
     """
     pytest.debug_func()
-    tdata = ["one foo two foo three",
-             "foo four five foo",
-             "six seven eight foo nine",]
+    tdata = fx_tdata
     xdata = [re.sub("foo", "bar", _) for _ in tdata]
 
     f1 = makefile(tmpdir, "f1", content="\n".join(tdata))
@@ -353,7 +343,7 @@ def test_edit_sub_mid_dir(tmpdir, capsys):
 
 
 # -------------------------------------------------------------------------
-def test_edit_sub_mid_pxr(tmpdir):
+def test_edit_sub_mid_pxr(tmpdir, fx_tdata):
     """
     fl edit -e "s/foo/bar/" f1 f2    => change "foo" to "bar" in f1, f2
     check for
@@ -361,9 +351,7 @@ def test_edit_sub_mid_pxr(tmpdir):
      - f{1,2}.original exists with unchanged content
     """
     pytest.debug_func()
-    tdata = ["one foo two foo three",
-             "foo four five foo",
-             "six seven eight foo nine",]
+    tdata = fx_tdata
     xdata = [re.sub("foo", "bar", _) for _ in tdata]
 
     f1 = makefile(tmpdir, "f1", content="\n".join(tdata))
@@ -1056,7 +1044,6 @@ def fx_edit(tmpdir, request):
     """
     Set up test data for editfile tests
     """
-    # pdb.set_trace()
     fx_edit.tdata = ["foo bar",
                      "bar foo",
                      "barfoo",
