@@ -1110,3 +1110,30 @@ def fx_match(tmpdir):
                                               this.mrpm2_dt.basename,
                                               this.mrpm2.basename)]
     return this
+
+
+# -----------------------------------------------------------------------------
+@pytest.fixture
+def fx_seven(tmpdir, fx_tdata):
+    """
+    Set up some test data
+    """
+    fx_seven.tdata = fx_tdata
+    f1 = makefile(tmpdir, "f1", content="\n\r".join(fx_tdata))
+    f2 = makefile(tmpdir, "f2", content="\n\r".join(fx_tdata))
+    fx_seven.input_l = [f1, f2]
+    fx_seven.orig_l = [tmpdir.join(f1.basename + ".original"),
+                       tmpdir.join(f2.basename + ".original")]
+    return fx_seven
+
+
+# -----------------------------------------------------------------------------
+@pytest.fixture
+def fx_tdata():
+    """
+    Set up some test data
+    """
+    tdata = ["one foo two foo three",
+             "foo four five foo",
+             "six seven eight foo nine", ]
+    return tdata
