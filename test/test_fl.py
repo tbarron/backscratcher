@@ -140,14 +140,12 @@ def test_diff_nomatch_pxr(tmpdir):
 
 
 # -----------------------------------------------------------------------------
-def test_edit_e_reqarg(tmpdir):
+def test_edit_e_reqarg(fx_usg_no_trbk):
     """
     fl edit -e => -e requires an argument
     """
     pytest.debug_func()
-    result = pexpect.run("fl edit -e")
-    assert "Traceback" not in result
-    assert "Usage:" in result
+    fx_usg_no_trbk.result = pexpect.run("fl edit -e")
 
 
 # -----------------------------------------------------------------------------
@@ -193,38 +191,32 @@ def test_edit_i_old_pxr(tmpdir, fx_tdata):
 
 
 # -----------------------------------------------------------------------------
-def test_edit_i_reqarg(tmpdir):
+def test_edit_i_reqarg(fx_usg_no_trbk):
     """
     fl edit -i                       => -i requires argument
     check for message that -i requires argument
     """
     pytest.debug_func()
-    result = pexpect.run("fl edit -i")
-    assert "Traceback" not in result
-    assert "Usage:" in result
+    fx_usg_no_trbk.result = pexpect.run("fl edit -i")
 
 
 # -----------------------------------------------------------------------------
-def test_edit_noarg():
+def test_edit_noarg(fx_usg_no_trbk):
     """
     fl edit                          => help msg
     """
     pytest.debug_func()
-    result = pexpect.run("fl edit")
-    assert "Traceback" not in result
-    assert "Usage:" in result
+    fx_usg_no_trbk.result = pexpect.run("fl edit")
 
 
 # -----------------------------------------------------------------------------
-def test_edit_nofiles(tmpdir):
+def test_edit_nofiles(fx_usg_no_trbk):
     """
     fl edit -e 's/foo/bar/'          => no files to edit
     check for message that there are no files to edit
     """
     pytest.debug_func()
-    result = pexpect.run("fl edit -e \"s/foo/bar/\"")
-    assert "Traceback" not in result
-    assert "Usage:" in result
+    fx_usg_no_trbk.result = pexpect.run("fl edit -e \"s/foo/bar/\"")
 
 
 # -----------------------------------------------------------------------------
@@ -1116,6 +1108,18 @@ def fx_seven(tmpdir, fx_tdata):
     fx_seven.orig_l = [tmpdir.join(f1.basename + ".original"),
                        tmpdir.join(f2.basename + ".original")]
     return fx_seven
+
+
+# -----------------------------------------------------------------------------
+@pytest.fixture
+def fx_usg_no_trbk():
+    """
+    result should contain 'Usage:' but not 'Traceback'
+    """
+    fx_usg_no_trbk.result = None
+    yield fx_usg_no_trbk
+    assert "Traceback" not in fx_usg_no_trbk.result
+    assert "Usage:" in fx_usg_no_trbk.result
 
 
 # -----------------------------------------------------------------------------
