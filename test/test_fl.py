@@ -304,6 +304,33 @@ def test_edit_xlate_ret_pxr(tmpdir, fx_seven):
 
 
 # -----------------------------------------------------------------------------
+def test_edit_xlate_rot13_dir(tmpdir, capsys, fx_rot13):
+    """
+    """
+    pytest.debug_func()
+    with U.Chdir(tmpdir.strpath):
+        fl.fl_edit(**{"d": False,
+                      "e": "y/{}/{}/".format(fx_rot13.prev, fx_rot13.post),
+                      "i": "",
+                      "FILE": [_.basename for _ in fx_rot13.input_l]})
+        fx_rot13.result, _ = capsys.readouterr()
+
+
+# -----------------------------------------------------------------------------
+def test_edit_xlate_rot13_pxr(tmpdir, fx_rot13):
+    """
+    fl edit -e 'y/ALPHA/ALPHA-13/' f1 f2
+    """
+    pytest.debug_func()
+    with U.Chdir(tmpdir.strpath):
+        flist = " ".join([_.basename for _ in fx_rot13.input_l])
+        cmd = "fl edit -e \"y/{}/{}/\" {}".format(fx_rot13.prev,
+                                                  fx_rot13.post,
+                                                  flist)
+        result = pexpect.run(cmd)
+
+
+# -----------------------------------------------------------------------------
 def test_editfile_delete(tmpdir, fx_edit):
     """
     fl.editfile('legit', 's', 'foo', '', None)
@@ -794,28 +821,6 @@ class TestFL_edit(th.HelpedTestCase):
         Clean up test directory
         """
         shutil.rmtree(cls.testdir)
-
-    # -------------------------------------------------------------------------
-    def test_fl_edit_xlate_rot13(self):
-        """
-        fl edit -e "y/a-z/n-za-m/" f1 f2 => rot13
-        check for
-         - f{1,2} edited correctly
-         - f{1,2}.original exist with correct content
-        """
-        prev = "abcdefghijklmnopqrstuvwxyz"
-        post = "nopqrstuvwxyzabcdefghijklm"
-        self.fl_edit_warn(eopt="y/%s/%s/" % (prev, post),
-                          files=2,
-                          inp=self.testdata,
-                          exp=["bar sbb gjb sbb guerr",
-                               "sbb sbhe svir sbb",
-                               "fvk frira rvtug sbb avar"],
-                          warn=["/Users/tbarron/prj/github/backscratcher/bscr/"
-                                "util.py:207: UserWarning: util.dispatch is "
-                                "deprecated in favor of docopt_dispatch",
-                                "  warnings.warn(\"util.dispatch is "
-                                "deprecated in favor of docopt_dispatch\")"])
 
     # -------------------------------------------------------------------------
     def fl_edit_flawed(self, cmd, exp):
