@@ -174,20 +174,17 @@ def test_edit_i_old_dir(tmpdir, capsys, fx_tdata):
 
 
 # -----------------------------------------------------------------------------
-def test_edit_i_old_pxr(tmpdir, fx_tdata):
+def test_edit_i_old_pxr(tmpdir, fx_orig):
     """
     fl edit -i old -e 's/x/y' f1    => rename original to f1.old
     """
     pytest.debug_func()
-    xdata = [re.sub("[rv]e", "n", _) for _ in fx_tdata]
-    f1 = tmpdir.join("f1")
-    f1.write("\n".join(fx_tdata))
+    fx_orig.xdata = [re.sub("[rv]e", "n", _) for _ in fx_orig.tdata]
     with U.Chdir(tmpdir.strpath):
-        cmd = "fl edit -e s/[rv]e/n/ -i old {}".format(f1.basename)
-        result = pexpect.run(cmd)
-        assert result == ""
-        for exp in xdata:
-            assert exp in f1.read()
+        fname = fx_orig.files['f1'].basename
+        cmd = "fl edit -e s/[rv]e/n/ -i old {}".format(fname)
+        fx_orig.result = pexpect.run(cmd)
+    fx_orig.files['f1_orig'] = makefile(tmpdir, "f1.old")
 
 
 # -----------------------------------------------------------------------------
