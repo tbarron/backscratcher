@@ -1112,19 +1112,15 @@ def fx_seven(tmpdir, fx_tdata):
     fx_seven.input_l = [f1, f2]
     fx_seven.orig_l = [tmpdir.join(f1.basename + ".original"),
                        tmpdir.join(f2.basename + ".original")]
-    return fx_seven
-
-
-# -----------------------------------------------------------------------------
-@pytest.fixture
-def fx_usg_no_trbk():
-    """
-    result should contain 'Usage:' but not 'Traceback'
-    """
-    fx_usg_no_trbk.result = None
-    yield fx_usg_no_trbk
-    assert "Traceback" not in fx_usg_no_trbk.result
-    assert "Usage:" in fx_usg_no_trbk.result
+    yield fx_seven
+    assert fx_seven.result == ""
+    for fh in fx_seven.input_l:
+        for line in fx_seven.tdata:
+            assert line in fh.read()
+        assert "\r" not in fh.read()
+    for fh in fx_seven.orig_l:
+        assert fh.exists()
+        assert "\n\r" in fh.read()
 
 
 # -----------------------------------------------------------------------------
