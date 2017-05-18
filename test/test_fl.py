@@ -1134,6 +1134,34 @@ def fx_orig(tmpdir, fx_tdata):
 
 # -----------------------------------------------------------------------------
 @pytest.fixture
+def fx_orig2(tmpdir, fx_tdata):
+    """
+    """
+    fx_orig2.tdata = fx_tdata
+    f1 = makefile(tmpdir, "f1", content="\n".join(fx_tdata))
+    f2 = makefile(tmpdir, "f2", content="\n".join(fx_tdata))
+    f1_original = makefile(tmpdir, "f1.original")
+    f2_original = makefile(tmpdir, "f2.original")
+    fx_orig2.files = {'f1': f1,
+                      'f2': f2,
+                      'f1_orig': f1_original,
+                      'f2_orig': f2_original}
+
+    yield fx_orig2
+
+    assert fx_orig2.result == ""
+    for fkey in fx_orig2.files:
+        assert fx_orig2.files[fkey].exists()
+    for exp in fx_orig2.xdata:
+        assert exp in f1.read()
+        assert exp in f2.read()
+    for exp in fx_orig2.tdata:
+        assert exp in fx_orig2.files['f1_orig'].read()
+        assert exp in fx_orig2.files['f2_orig'].read()
+
+
+# -----------------------------------------------------------------------------
+@pytest.fixture
 def fx_seven(tmpdir, fx_tdata):
     """
     Set up some test data
