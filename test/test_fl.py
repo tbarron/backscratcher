@@ -1115,6 +1115,28 @@ def fx_match(tmpdir):
 
 # -----------------------------------------------------------------------------
 @pytest.fixture
+def fx_orig(tmpdir, fx_tdata):
+    """
+    """
+    fx_orig.tdata = fx_tdata
+    f1 = makefile(tmpdir, "f1", content="\n".join(fx_tdata))
+    f1_original = makefile(tmpdir, "f1.original")
+    fx_orig.files = {'f1': f1,
+                     'f1_orig': f1_original}
+
+    yield fx_orig
+
+    assert fx_orig.result == ""
+    for fkey in fx_orig.files:
+        assert fx_orig.files[fkey].exists()
+    for exp in fx_orig.xdata:
+        assert exp in f1.read()
+    for exp in fx_orig.tdata:
+        assert exp in fx_orig.files['f1_orig'].read()
+
+
+# -----------------------------------------------------------------------------
+@pytest.fixture
 def fx_seven(tmpdir, fx_tdata):
     """
     Set up some test data
