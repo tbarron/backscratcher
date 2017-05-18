@@ -1036,6 +1036,24 @@ def makefile(loc, basename, content=None, ensure=False, dir=False,
 
 # -----------------------------------------------------------------------------
 @pytest.fixture
+def fx_amtime(tmpdir):
+    """
+    Set up some atime, mtime test data
+    """
+    fx_amtime.exptime = None
+    atime = fx_amtime.atime = int(time.time() - random.randint(1000, 2000))
+    mtime = fx_amtime.mtime = int(time.time() + random.randint(1000, 2000))
+    fx_amtime.testfile = makefile(tmpdir, "testfile", atime=atime, mtime=mtime,
+                                  content="This is the test file")
+    yield fx_amtime
+    s = os.stat(fx_amtime.testfile.strpath)
+    assert fx_amtime.exptime == s[stat.ST_MTIME]
+    assert fx_amtime.exptime == s[stat.ST_ATIME]
+    assert s[stat.ST_ATIME] == s[stat.ST_MTIME]
+
+
+# -----------------------------------------------------------------------------
+@pytest.fixture
 def fx_edit(tmpdir, request):
     """
     Set up test data for editfile tests
@@ -1136,18 +1154,11 @@ def fx_tdata():
 
 # -----------------------------------------------------------------------------
 @pytest.fixture
-def fx_amtime(tmpdir):
+def fx_usg_no_trbk():
     """
-    Set up some atime, mtime test data
+    result should contain 'Usage:' but not 'Traceback'
     """
-    fx_amtime.exptime = None
-    atime = fx_amtime.atime = int(time.time() - random.randint(1000, 2000))
-    mtime = fx_amtime.mtime = int(time.time() + random.randint(1000, 2000))
-    fx_amtime.testfile = makefile(tmpdir, "testfile", atime=atime, mtime=mtime,
-                                  content="This is the test file")
-    yield fx_amtime
-    s = os.stat(fx_amtime.testfile.strpath)
-    assert fx_amtime.exptime == s[stat.ST_MTIME]
-    assert fx_amtime.exptime == s[stat.ST_ATIME]
-    assert s[stat.ST_ATIME] == s[stat.ST_MTIME]
-
+    fx_usg_no_trbk.result = None
+    yield fx_usg_no_trbk
+    assert "Traceback" not in fx_usg_no_trbk.result
+    assert "Usage:" in fx_usg_no_trbk.result
