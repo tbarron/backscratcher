@@ -9,6 +9,7 @@ import random
 import re
 import shutil
 import stat
+import string
 import tempfile
 from bscr import testhelp as th
 import time
@@ -1078,6 +1079,33 @@ def fx_orig2(tmpdir, fx_tdata):
     for exp in fx_orig2.tdata:
         assert exp in fx_orig2.files['f1_orig'].read()
         assert exp in fx_orig2.files['f2_orig'].read()
+
+
+# -----------------------------------------------------------------------------
+@pytest.fixture
+def fx_rot13(tmpdir, fx_tdata):
+    """
+    Set up some test data
+    """
+    fx_rot13.tdata = fx_tdata
+    fx_rot13.prev = string.lowercase
+    fx_rot13.post = string.lowercase[13:]+string.lowercase[:13]
+    table = string.maketrans(fx_rot13.prev, fx_rot13.post)
+    fx_rot13.exp = [_.translate(table) for _ in fx_tdata]
+    f1 = makefile(tmpdir, "f1", content="\n".join(fx_tdata))
+    f2 = makefile(tmpdir, "f2", content="\n".join(fx_tdata))
+    fx_rot13.input_l = [f1, f2]
+    fx_rot13.orig_l = [tmpdir.join(f1.basename + ".original"),
+                       tmpdir.join(f2.basename + ".original")]
+    yield fx_rot13
+    assert fx_rot13.result == ""
+    for fh in fx_rot13.input_l:
+        for line in fx_rot13.exp:
+            assert line in fh.read()
+    for fh in fx_rot13.orig_l:
+        assert fh.exists()
+        for line in fx_rot13.tdata:
+            assert line in fh.read()
 
 
 # -----------------------------------------------------------------------------
