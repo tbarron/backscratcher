@@ -149,28 +149,22 @@ def test_edit_e_reqarg(fx_usg_no_trbk):
 
 
 # -----------------------------------------------------------------------------
-def test_edit_i_old_dir(tmpdir, capsys, fx_tdata):
+def test_edit_i_old_dir(tmpdir, capsys, fx_orig2):
     """
     fl edit -i old -e 's/x/y' f1    => rename original to f1.old
     """
     pytest.debug_func()
-    xdata = [re.sub("^foo", "bar", _) for _ in fx_tdata]
-    L = globals()
-    for name, content in [("f1", "\n".join(fx_tdata)),
-                          ("f2", "\n".join(fx_tdata)),
-                          ("f1.old", None),
-                          ("f2.old", None)]:
-        L[name] = makefile(tmpdir, name, content=content)
-
+    fx_orig2.xdata = [re.sub("^foo", "bar", _) for _ in fx_orig2.tdata]
     with U.Chdir(tmpdir.strpath):
         fl.fl_edit(**{"d": False,
                       "e": "s/^foo/bar/",
                       "i": "old",
                       "FILE": ["f1", "f2"]})
         result, _ = capsys.readouterr()
-        assert result == ""
-        for exp in xdata:
-            assert exp in f1.read()    # noqa: ignore=F821
+        fx_orig2.result = result
+
+    fx_orig2.files['f1_orig'] = makefile(tmpdir, "f1.old")
+    fx_orig2.files['f2_orig'] = makefile(tmpdir, "f2.old")
 
 
 # -----------------------------------------------------------------------------
@@ -217,7 +211,7 @@ def test_edit_nofiles(fx_usg_no_trbk):
 
 
 # -----------------------------------------------------------------------------
-def test_edit_sub_bol_dir(tmpdir, capsys, fx_tdata):
+def test_edit_sub_bol_dir(tmpdir, capsys, fx_orig2):
     """
     fl edit -e 's/^foo/bar/'f1 f2   => edit at beginning of line
      - f1 edited correctly
@@ -225,30 +219,17 @@ def test_edit_sub_bol_dir(tmpdir, capsys, fx_tdata):
      - f{1,2}.original have unchanged content
     """
     pytest.debug_func()
-    xdata = [re.sub("^foo", "bar", _) for _ in fx_tdata]
-
-    f1 = makefile(tmpdir, "f1", content="\n".join(fx_tdata))
-    f1_orig = tmpdir.join(f1.basename + ".original")
-    f2 = makefile(tmpdir, "f2", content="\n".join(fx_tdata))
-    f2_orig = tmpdir.join(f2.basename + ".original")
-
+    fx_orig2.xdata = [re.sub("^foo", "bar", _) for _ in fx_orig2.tdata]
     with U.Chdir(tmpdir.strpath):
         fl.fl_edit(**{"d": False,
                       "e": "s/^foo/bar/",
                       "i": "",
                       "FILE": ["f1", "f2"]})
-        result, _ = capsys.readouterr()
-
-    assert result == ""
-    for line in xdata:
-        assert line in f1.read()
-        assert line in f2.read()
-    assert f1_orig.exists()
-    assert f2_orig.exists()
+        fx_orig2.result, _ = capsys.readouterr()
 
 
 # -----------------------------------------------------------------------------
-def test_edit_sub_bol_pxr(tmpdir, fx_tdata):
+def test_edit_sub_bol_pxr(tmpdir, fx_orig2):
     """
     fl edit -e 's/^foo/bar/'f1 f2   => edit at beginning of line
      - f1 edited correctly
@@ -256,28 +237,13 @@ def test_edit_sub_bol_pxr(tmpdir, fx_tdata):
      - f{1,2}.original have unchanged content
     """
     pytest.debug_func()
-    xdata = [re.sub("^foo", "bar", _) for _ in fx_tdata]
-
-    f1 = tmpdir.join("f1")
-    f1.write("\n".join(fx_tdata))
-    f1_orig = tmpdir.join(f1.basename + ".original")
-    f2 = tmpdir.join("f2")
-    f2.write("\n".join(fx_tdata))
-    f2_orig = tmpdir.join(f2.basename + ".original")
-
+    fx_orig2.xdata = [re.sub("^foo", "bar", _) for _ in fx_orig2.tdata]
     with U.Chdir(tmpdir.strpath):
-        result = pexpect.run("fl edit -e s/^foo/bar/ f1 f2")
-
-    assert result == ""
-    for line in xdata:
-        assert line in f1.read()
-        assert line in f2.read()
-    assert f1_orig.exists()
-    assert f2_orig.exists()
+        fx_orig2.result = pexpect.run("fl edit -e s/^foo/bar/ f1 f2")
 
 
 # -------------------------------------------------------------------------
-def test_edit_sub_mid_dir(tmpdir, capsys, fx_tdata):
+def test_edit_sub_mid_dir(tmpdir, capsys, fx_orig2):
     """
     fl edit -e 's/foo/bar/' f1 f2    => change 'foo' to 'bar' in f1, f2
     check for
@@ -285,30 +251,17 @@ def test_edit_sub_mid_dir(tmpdir, capsys, fx_tdata):
      - f{1,2}.original exists with unchanged content
     """
     pytest.debug_func()
-    xdata = [re.sub("foo", "bar", _) for _ in fx_tdata]
-
-    f1 = makefile(tmpdir, "f1", content="\n".join(fx_tdata))
-    f1_orig = tmpdir.join(f1.basename + ".original")
-    f2 = makefile(tmpdir, "f2", content="\n".join(fx_tdata))
-    f2_orig = tmpdir.join(f2.basename + ".original")
-
+    fx_orig2.xdata = [re.sub("foo", "bar", _) for _ in fx_orig2.tdata]
     with U.Chdir(tmpdir.strpath):
         fl.fl_edit(**{"d": False,
                       "e": "s/foo/bar/",
                       "i": "",
                       "FILE": ["f1", "f2"]})
-        result, _ = capsys.readouterr()
-
-    assert result == ""
-    for line in xdata:
-        assert line in f1.read()
-        assert line in f2.read()
-    assert f1_orig.exists()
-    assert f2_orig.exists()
+        fx_orig2.result, _ = capsys.readouterr()
 
 
 # -------------------------------------------------------------------------
-def test_edit_sub_mid_pxr(tmpdir, fx_tdata):
+def test_edit_sub_mid_pxr(tmpdir, fx_orig2):
     """
     fl edit -e "s/foo/bar/" f1 f2    => change "foo" to "bar" in f1, f2
     check for
@@ -316,22 +269,9 @@ def test_edit_sub_mid_pxr(tmpdir, fx_tdata):
      - f{1,2}.original exists with unchanged content
     """
     pytest.debug_func()
-    xdata = [re.sub("foo", "bar", _) for _ in fx_tdata]
-
-    f1 = makefile(tmpdir, "f1", content="\n".join(fx_tdata))
-    f1_orig = tmpdir.join(f1.basename + ".original")
-    f2 = makefile(tmpdir, "f2", content="\n".join(fx_tdata))
-    f2_orig = tmpdir.join(f2.basename + ".original")
-
+    fx_orig2.xdata = [re.sub("foo", "bar", _) for _ in fx_orig2.tdata]
     with U.Chdir(tmpdir.strpath):
-        result = pexpect.run("fl edit -e s/foo/bar/ f1 f2")
-
-    assert "Traceback" not in result
-    for line in xdata:
-        assert line in f1.read()
-        assert line in f2.read()
-    assert f1_orig.exists()
-    assert f2_orig.exists()
+        fx_orig2.result = pexpect.run("fl edit -e s/foo/bar/ f1 f2")
 
 
 # -------------------------------------------------------------------------
