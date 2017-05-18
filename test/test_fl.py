@@ -282,22 +282,12 @@ def test_edit_xlate_ret_dir(tmpdir, capsys, fx_seven):
         - f{1,2}.original have correct original content
     """
     pytest.debug_func()
-
     with U.Chdir(tmpdir.strpath):
         fl.fl_edit(**{"d": False,
                       "e": "y/\r//",
                       "i": "",
                       "FILE": ["f1", "f2"]})
-        result, _ = capsys.readouterr()
-
-    assert result == ""
-    for fh in fx_seven.input_l:
-        for line in fx_seven.tdata:
-            assert line in fh.read()
-        assert "\r" not in fh.read()
-    for fh in fx_seven.orig_l:
-        assert fh.exists()
-        assert "\n\r" in fh.read()
+        fx_seven.result, _ = capsys.readouterr()
 
 
 # -------------------------------------------------------------------------
@@ -308,18 +298,8 @@ def test_edit_xlate_ret_pxr(tmpdir, fx_seven):
         - f{1,2}.original have correct original content
     """
     pytest.debug_func()
-
     with U.Chdir(tmpdir.strpath):
         result = pexpect.run("fl edit -e \"y/\r//\" f1 f2")
-
-    assert result == ""
-    for fh in fx_seven.input_l:
-        for line in fx_seven.tdata:
-            assert line in fh.read()
-        assert "\r" not in fh.read()
-    for fh in fx_seven.orig_l:
-        assert fh.exists()
-        assert "\n\r" in fh.read()
 
 
 # -----------------------------------------------------------------------------
