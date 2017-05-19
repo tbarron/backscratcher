@@ -7,6 +7,17 @@ from bscr import util as U
 
 
 # -----------------------------------------------------------------------------
+def test_ascii(fx_ascii):
+    """
+    Run ascii and see if its output matches what is expected.
+    """
+    pytest.debug_func()
+    cmd = pexpect.which("ascii")
+    result = pexpect.run(cmd)
+    assert "\r\n".join(fx_ascii.exp) == result
+
+
+# -------------------------------------------------------------------------
 def test_ascii_standalone():
     """
     Make these tests stand-alone
@@ -67,15 +78,6 @@ class TestAscii(th.HelpedTestCase):
         "0x7c |   0x7d }   0x7e ~   ",
         ""
         ]
-
-    # -------------------------------------------------------------------------
-    def test_ascii(self):
-        """
-        Run ascii and see if its output matches what is expected.
-        """
-        zzz = U.script_location("ascii")
-        result = pexpect.run(zzz)
-        self.assertEq("\r\n".join(self.exp), result)
 
     # -------------------------------------------------------------------------
     def test_ascii_help(self):
