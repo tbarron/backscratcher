@@ -30,6 +30,17 @@ def test_ascii_help():
 
 
 # -------------------------------------------------------------------------
+def test_final_newline(fx_ascii):
+    """
+    Run ascii and verify output ends with a newline
+    """
+    pytest.debug_func()
+    cmd = pexpect.which("ascii")
+    result = pexpect.run(cmd)
+    assert "\r\n".join(fx_ascii.exp) == result
+
+
+# -----------------------------------------------------------------------------
 @pytest.fixture
 def fx_ascii():
     """
@@ -132,17 +143,6 @@ class TestAscii(th.HelpedTestCase):
         "0x7c |   0x7d }   0x7e ~   ",
         ""
         ]
-
-    # -------------------------------------------------------------------------
-    def test_final_newline(self):
-        """
-        Run ascii and verify output ends with a newline
-        """
-        # pdb.set_trace()
-        zzz = U.script_location("ascii")
-        result = pexpect.run(zzz)
-        self.assertTrue(result.endswith("\n"),
-                        "ascii output should end with newline")
 
     # -------------------------------------------------------------------------
     def test_which_module(self):
