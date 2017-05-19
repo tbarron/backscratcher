@@ -38,6 +38,21 @@ def test_digit_alignment(fx_data):
     S.close()
 
 
+# -------------------------------------------------------------------------
+def test_named_input(fx_data):
+    """
+    Handle both input on stdin as well as input from a named file.
+    """
+    tfilename = 'testdata'
+    f = open(tfilename, 'w')
+    for line in fx_data.tdata:
+        f.write(line + "\n")
+    f.close()
+
+    script = U.script_location("align")
+    fx_data.result = th.rm_cov_warn(pexpect.run("%s %s" % (script, tfilename)))
+
+
 # -----------------------------------------------------------------------------
 def test_standalone():
     """
@@ -94,21 +109,6 @@ class TestAlign(th.HelpedTestCase):
            "mno          qprs         \r\n" +
            "foobard  simplification  denomination  vituperation" +
            "  spalshy      \r\n")
-
-    # -------------------------------------------------------------------------
-    def test_named_input(self):
-        """
-        Handle both input on stdin as well as input from a named file.
-        """
-        tfilename = 'testdata'
-        f = open(tfilename, 'w')
-        for line in self.tdata:
-            f.write(line + "\n")
-        f.close()
-
-        script = U.script_location("align")
-        x = th.rm_cov_warn(pexpect.run("%s %s" % (script, tfilename)))
-        self.assertEq(self.exp, x)
 
     # -------------------------------------------------------------------------
     # @unittest.skip("under construction")
