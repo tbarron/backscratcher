@@ -18,6 +18,18 @@ def test_ascii(fx_ascii):
 
 
 # -------------------------------------------------------------------------
+def test_ascii_help():
+    """
+    Run 'ascii --help' and validate the output
+    """
+    pytest.debug_func()
+    cmd = pexpect.which("ascii")
+    result = pexpect.run("%s --help" % cmd)
+    exp = "Display ASCII collating sequence"
+    assert exp in result
+
+
+# -------------------------------------------------------------------------
 @pytest.fixture
 def fx_ascii():
     """
@@ -120,17 +132,6 @@ class TestAscii(th.HelpedTestCase):
         "0x7c |   0x7d }   0x7e ~   ",
         ""
         ]
-
-    # -------------------------------------------------------------------------
-    def test_ascii_help(self):
-        """
-        Run 'ascii --help' and validate the output
-        """
-        cmd = U.script_location("ascii")
-        result = pexpect.run("%s --help" % cmd)
-        exp = "Display ASCII collating sequence"
-        self.assertTrue(exp in result, "Expected '%s' in %s" %
-                        (exp, U.lquote(result)))
 
     # -------------------------------------------------------------------------
     def test_final_newline(self):
