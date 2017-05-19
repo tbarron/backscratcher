@@ -1,6 +1,15 @@
 #!/usr/bin/env python
 from bscr import chron
 from bscr import testhelp as th
+import pytest
+
+
+# -----------------------------------------------------------------------------
+def test_standalone():
+    """
+    Make these tests stand-alone
+    """
+    pytest.fail("Make chron tests stand-alone")
 
 
 # -----------------------------------------------------------------------------

@@ -4,6 +4,15 @@ from bscr import hd
 from bscr import testhelp as th
 from bscr import util as U
 from StringIO import StringIO as sio
+import pytest
+
+
+# -----------------------------------------------------------------------------
+def test_standalone():
+    """
+    Make these tests stand-alone
+    """
+    pytest.fail("Make {} tests stand-alone".format(__file__))
 
 
 # -----------------------------------------------------------------------------

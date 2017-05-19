@@ -2,8 +2,17 @@
 from bscr import ascii                                      # noqa: ignore=F401
 import os
 import pexpect
+import pytest
 from bscr import testhelp as th
 from bscr import util as U
+
+
+# -----------------------------------------------------------------------------
+def test_ascii_standalone():
+    """
+    Make these tests stand-alone
+    """
+    pytest.fail("Make ascii tests stand-alone")
 
 
 # ---------------------------------------------------------------------------

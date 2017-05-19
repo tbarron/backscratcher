@@ -1,4 +1,13 @@
 from bscr import testhelp as th
+import pytest
+
+
+# -----------------------------------------------------------------------------
+def test_deprecate():
+    """
+    Make these tests stand-alone
+    """
+    pytest.fail("Deprecate and remove testhelp tests and payload")
 
 
 # ---------------------------------------------------------------------------

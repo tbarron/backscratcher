@@ -3,6 +3,15 @@ from bscr import list
 from bscr import testhelp as th
 from bscr import util as U
 import pprint
+import pytest
+
+
+# -----------------------------------------------------------------------------
+def test_list_standalone():
+    """
+    Make these tests stand-alone
+    """
+    pytest.fail("Make list tests stand-alone")
 
 
 # -----------------------------------------------------------------------------

@@ -2,6 +2,7 @@
 from bscr import odx
 from bscr import util as U
 import pexpect
+import pytest
 from bscr import testhelp
 
 # odx(25)         => 25 -> 031 / 25 / 0x19
@@ -10,6 +11,14 @@ from bscr import testhelp
 # odx(2ab)        => ValueError
 # odx(0987)       => ValueError
 # odx(0x5234g7)   => ValueError
+
+
+# -----------------------------------------------------------------------------
+def test_standalone():
+    """
+    Make these tests stand-alone
+    """
+    pytest.fail("Make {} tests stand-alone".format(__file__))
 
 
 # -----------------------------------------------------------------------------

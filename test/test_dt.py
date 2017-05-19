@@ -2,7 +2,16 @@
 import bscr
 from bscr import dt
 from bscr import testhelp as th
+import pytest
 import time
+
+
+# -----------------------------------------------------------------------------
+def test_standalone():
+    """
+    Make these tests stand-alone
+    """
+    pytest.fail("Make {} tests stand-alone".format(__file__))
 
 
 # ---------------------------------------------------------------------------

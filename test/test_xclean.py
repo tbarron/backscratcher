@@ -3,8 +3,17 @@ import bscr.xclean
 from bscr import util as U
 import os
 import pexpect
+import pytest
 import shutil
 from bscr import testhelp as th
+
+
+# -----------------------------------------------------------------------------
+def test_standalone():
+    """
+    Make these tests stand-alone
+    """
+    pytest.fail("Make {} tests stand-alone".format(__file__))
 
 
 # -----------------------------------------------------------------------------

@@ -2,7 +2,16 @@
 from bscr import mag
 from bscr import util as U
 import pexpect
+import pytest
 from bscr import testhelp as th
+
+
+# -----------------------------------------------------------------------------
+def test_mag_standalone():
+    """
+    Make these tests stand-alone
+    """
+    pytest.fail("Make mag tests stand-alone")
 
 
 # ---------------------------------------------------------------------------

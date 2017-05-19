@@ -5,7 +5,16 @@ perrno tests
 from bscr import perrno
 from bscr import util as U
 import pexpect
+import pytest
 from bscr import testhelp as th
+
+
+# -----------------------------------------------------------------------------
+def test_perrno_standalone():
+    """
+    Make these tests stand-alone
+    """
+    pytest.fail("Make perrno tests stand-alone")
 
 
 # -----------------------------------------------------------------------------

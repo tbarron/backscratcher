@@ -2,8 +2,17 @@
 import os
 from bscr import align                                      # noqa: ignore=F401
 import pexpect
+import pytest
 from bscr import testhelp as th
 from bscr import util as U
+
+
+# -----------------------------------------------------------------------------
+def test_standalone():
+    """
+    Make these tests stand-alone
+    """
+    pytest.fail("Make align tests stand-alone")
 
 
 # -----------------------------------------------------------------------------

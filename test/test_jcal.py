@@ -6,6 +6,15 @@ from bscr import jcal                          # noqa: ignore=F401
 import pexpect
 from bscr import testhelp as th
 from bscr import util as U
+import pytest
+
+
+# -----------------------------------------------------------------------------
+def test_standalone():
+    """
+    Make these tests stand-alone
+    """
+    pytest.fail("Make {} tests stand-alone".format(__file__))
 
 
 # -----------------------------------------------------------------------------

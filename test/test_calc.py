@@ -1,8 +1,17 @@
 #!/usr/bin/env python
 import pexpect
 from bscr import calc                      # noqa: ignore=F401
+import pytest
 from bscr import testhelp as th
 from bscr import util as U
+
+
+# -----------------------------------------------------------------------------
+def test_standalone():
+    """
+    Make these tests stand-alone
+    """
+    pytest.fail("Make calc tests stand-alone")
 
 
 # -----------------------------------------------------------------------------

@@ -10,6 +10,14 @@ import time
 
 
 # -----------------------------------------------------------------------------
+def test_standalone():
+    """
+    Make these tests stand-alone
+    """
+    pytest.fail("Make {} tests stand-alone".format(__file__))
+
+
+# -----------------------------------------------------------------------------
 def cmdline_arg_list():
     """
     Example argument structure for U.cmdline()

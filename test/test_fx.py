@@ -11,6 +11,14 @@ import shutil
 import pytest
 
 
+# -----------------------------------------------------------------------------
+def test_standalone():
+    """
+    Make these tests stand-alone
+    """
+    pytest.fail("Make {} tests stand-alone".format(__file__))
+
+
 # ---------------------------------------------------------------------------
 def test_psys_quiet(tmpdir, capsys, data):
     """
