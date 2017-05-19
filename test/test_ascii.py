@@ -1,9 +1,6 @@
 from bscr import ascii                                      # noqa: ignore=F401
-import os
 import pexpect
 import pytest
-from bscr import testhelp as th
-from bscr import util as U
 
 
 # -----------------------------------------------------------------------------
