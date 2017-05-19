@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from bscr import mag
 from bscr import util as U
 import pexpect

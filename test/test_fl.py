@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from bscr import fl
 from bscr import util
 import os

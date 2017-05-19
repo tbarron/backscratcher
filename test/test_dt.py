@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import bscr
 from bscr import dt
 from bscr import testhelp as th

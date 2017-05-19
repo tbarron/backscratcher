@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import bscr
 import bscr.bscr
 import glob

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from bscr import hd
 from bscr import testhelp as th
 from bscr import util as U

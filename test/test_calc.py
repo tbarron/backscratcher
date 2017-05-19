@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import pexpect
 from bscr import calc                      # noqa: ignore=F401
 import pytest

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from bscr import ascii                                      # noqa: ignore=F401
 import os
 import pexpect

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from bscr import chron
 from bscr import testhelp as th
 import pytest

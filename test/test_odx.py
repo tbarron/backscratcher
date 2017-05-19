@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from bscr import odx
 from bscr import util as U
 import pexpect

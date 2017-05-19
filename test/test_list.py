@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from bscr import list
 from bscr import testhelp as th
 from bscr import util as U

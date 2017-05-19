@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import bscr.xclean
 from bscr import util as U
 import os
