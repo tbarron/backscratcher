@@ -1,4 +1,3 @@
-import os
 from bscr import align                                      # noqa: ignore=F401
 import pexpect
 import pytest
@@ -26,7 +25,6 @@ def test_digit_alignment(fx_data):
     Words that contain valid numeric specifications should be right
     aligned. Words containing non-numeric values should be left aligned.
     """
-    # script = U.script_location("align")
     script = pexpect.which("align")
     S = pexpect.spawn(script)
     S.setecho(False)
