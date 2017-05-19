@@ -1,8 +1,5 @@
 import pexpect
 from bscr import calc                      # noqa: ignore=F401
-import pytest
-from bscr import testhelp as th
-from bscr import util as U
 
 
 # -------------------------------------------------------------------------
