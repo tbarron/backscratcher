@@ -6,6 +6,20 @@ from bscr import testhelp as th
 from bscr import util as U
 
 
+# -------------------------------------------------------------------------
+def test_align_help():
+    """
+    Verify that 'align --help' does the right thing
+    """
+    pytest.debug_func()
+    cmd = pexpect.which("align")
+    result = pexpect.run("%s --help" % cmd)
+    nexp = "Traceback"
+    assert nexp not in result
+    exp = "Align columns from input"
+    assert exp in result
+
+
 # -----------------------------------------------------------------------------
 def test_standalone():
     """
@@ -41,22 +55,6 @@ class TestAlign(th.HelpedTestCase):
            "mno          qprs         \r\n" +
            "foobard  simplification  denomination  vituperation" +
            "  spalshy      \r\n")
-
-    # -------------------------------------------------------------------------
-    def test_align_help(self):
-        """
-        Verify that 'align --help' does the right thing
-        """
-        cmd = U.script_location("align")
-        result = pexpect.run("%s --help" % cmd)
-        nexp = "Traceback"
-        self.assertFalse(nexp in result,
-                         "Not expecting '%s' in %s" %
-                         (nexp, U.lquote(result)))
-        exp = "Align columns from input"
-        self.assertTrue(exp in result,
-                        "Expected '%s' in %s" %
-                        (exp, U.lquote(result)))
 
     # -------------------------------------------------------------------------
     def test_digit_alignment(self):
