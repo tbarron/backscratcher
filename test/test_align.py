@@ -37,18 +37,15 @@ def test_digit_alignment(fx_data):
 
 
 # -------------------------------------------------------------------------
-def test_named_input(fx_data):
+def test_named_input(tmpdir, fx_data):
     """
     Handle both input on stdin as well as input from a named file.
     """
-    tfilename = 'testdata'
-    f = open(tfilename, 'w')
-    for line in fx_data.tdata:
-        f.write(line + "\n")
-    f.close()
-
+    tfile = tmpdir.join("testdata")
+    tfile.write("\n".join(fx_data.tdata) + "\n")
     script = U.script_location("align")
-    fx_data.result = th.rm_cov_warn(pexpect.run("%s %s" % (script, tfilename)))
+    result = pexpect.run("{} {}".format(script, tfile.strpath))
+    fx_data.result = th.rm_cov_warn(result)
 
 
 # -----------------------------------------------------------------------------
