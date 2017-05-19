@@ -7,11 +7,8 @@ import py
 import pytest
 import random
 import re
-import shutil
 import stat
 import string
-import tempfile
-from bscr import testhelp as th
 import time
 from bscr import util as U
 
