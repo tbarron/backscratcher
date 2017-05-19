@@ -20,6 +20,24 @@ def test_align_help():
     assert exp in result
 
 
+# -------------------------------------------------------------------------
+def test_digit_alignment(fx_data):
+    """
+    Words that contain valid numeric specifications should be right
+    aligned. Words containing non-numeric values should be left aligned.
+    """
+    # script = U.script_location("align")
+    script = pexpect.which("align")
+    S = pexpect.spawn(script)
+    S.setecho(False)
+    for line in fx_data.tdata:
+        S.sendline(line)
+    S.send("\004")
+    S.expect(pexpect.EOF)
+    fx_data.result = th.rm_cov_warn(S.before)
+    S.close()
+
+
 # -----------------------------------------------------------------------------
 def test_standalone():
     """
@@ -55,23 +73,6 @@ class TestAlign(th.HelpedTestCase):
            "mno          qprs         \r\n" +
            "foobard  simplification  denomination  vituperation" +
            "  spalshy      \r\n")
-
-    # -------------------------------------------------------------------------
-    def test_digit_alignment(self):
-        """
-        Words that contain valid numeric specifications should be right
-        aligned. Words containing non-numeric values should be left aligned.
-        """
-        script = U.script_location("align")
-        S = pexpect.spawn(script)
-        S.setecho(False)
-        for line in self.tdata:
-            S.sendline(line)
-        S.send("\004")
-        S.expect(pexpect.EOF)
-        x = th.rm_cov_warn(S.before)
-        S.close()
-        self.assertEq(self.exp, x)
 
     # -------------------------------------------------------------------------
     def test_named_input(self):
