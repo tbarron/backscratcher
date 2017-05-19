@@ -47,6 +47,27 @@ def test_standalone():
 
 
 # -----------------------------------------------------------------------------
+@pytest.fixture
+def fx_data():
+    """
+    Test input and expected output for tests
+    """
+    fx_data.tdata = [" 1234  -12342 2342.9324 -1234.9238 "
+                     "7.82734E+25 -2.2343E-17",
+                     "abc  def ghi jkl mno qprs",
+                     "foobard simplification denomination"
+                     " vituperation spalshy"]
+    fx_data.exp = ("   1234          -12342     2342.9324    -1234.9238  " +
+                   "7.82734E+25  -2.2343E-17  \r\n" +
+                   "abc      def             ghi           jkl           " +
+                   "mno          qprs         \r\n" +
+                   "foobard  simplification  denomination  vituperation" +
+                   "  spalshy      \r\n")
+    yield fx_data
+    assert fx_data.exp == fx_data.result
+
+
+# -----------------------------------------------------------------------------
 def tearDownModule():
     """
     This one too
