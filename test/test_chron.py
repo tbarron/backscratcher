@@ -1,39 +1,25 @@
 from bscr import chron
-from bscr import testhelp as th
+import pexpect
 import pytest
 
 
-# -----------------------------------------------------------------------------
-def test_standalone():
+# -------------------------------------------------------------------------
+def test_hms_seconds():
     """
-    Make these tests stand-alone
+    Converting %H:%M:%S to an epoch time
     """
-    pytest.fail("Make chron tests stand-alone")
+    pytest.debug_func()
+    exp = 3923
+    act = chron.hms_seconds("1:05:23")
+    assert exp == act
 
 
-# -----------------------------------------------------------------------------
-class TestChron(th.HelpedTestCase):
-    # -------------------------------------------------------------------------
-    def test_hms_seconds(self):
-        """
-        Converting %H:%M:%S to an epoch time
-        """
-        exp = 3923
-        act = chron.hms_seconds("1:05:23")
-        self.assertEqual(exp, act,
-                         "Expected %d, got %d" % (exp, act))
-
-    # -------------------------------------------------------------------------
-    def test_chron_help(self):
-        """
-        Verify that 'chron --help' does the right thing
-        """
-        self.assertOptionHelp("chron",
-                              "chronometer/stopwatch")
-
-    # -------------------------------------------------------------------------
-    def test_which_module(self):
-        """
-        Verify that we're importing the right align module
-        """
-        self.assertModule('bscr.chron', __file__)
+# -------------------------------------------------------------------------
+def test_chron_help():
+    """
+    Verify that 'chron --help' does the right thing
+    """
+    pytest.debug_func()
+    result = pexpect.run("chron --help")
+    assert "Usage: chron" in result
+    assert "chronometer/stopwatch" in result
