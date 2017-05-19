@@ -54,14 +54,6 @@ def test_named_input(fx_data):
 
 
 # -----------------------------------------------------------------------------
-def test_standalone():
-    """
-    Make these tests stand-alone
-    """
-    pytest.fail("Make align tests stand-alone")
-
-
-# -----------------------------------------------------------------------------
 @pytest.fixture
 def fx_data():
     """
@@ -80,40 +72,3 @@ def fx_data():
                    "  spalshy      \r\n")
     yield fx_data
     assert fx_data.exp == fx_data.result
-
-
-# -----------------------------------------------------------------------------
-def tearDownModule():
-    """
-    This one too
-    """
-    flist = ['testdata']
-    if os.getenv('KEEPFILES') is not None:
-        return
-    for fname in flist:
-        if os.path.exists(fname):
-            os.unlink(fname)
-
-
-# -----------------------------------------------------------------------------
-class TestAlign(th.HelpedTestCase):
-    """
-    Test suite for align
-    """
-    tdata = [" 1234  -12342 2342.9324 -1234.9238 7.82734E+25 -2.2343E-17",
-             "abc  def ghi jkl mno qprs",
-             "foobard simplification denomination vituperation spalshy"]
-    exp = ("   1234          -12342     2342.9324    -1234.9238  " +
-           "7.82734E+25  -2.2343E-17  \r\n" +
-           "abc      def             ghi           jkl           " +
-           "mno          qprs         \r\n" +
-           "foobard  simplification  denomination  vituperation" +
-           "  spalshy      \r\n")
-
-    # -------------------------------------------------------------------------
-    # @unittest.skip("under construction")
-    def test_which_module(self):
-        """
-        Verify that we're importing the right align module
-        """
-        self.assertModule('bscr.align', __file__)
