@@ -300,7 +300,7 @@ def test_edit_xlate_ret_pxr(tmpdir, fx_seven):
     """
     pytest.debug_func()
     with U.Chdir(tmpdir.strpath):
-        result = pexpect.run("fl edit -e \"y/\r//\" f1 f2")
+        fx_seven.result = pexpect.run("fl edit -e \"y/\r//\" f1 f2")
 
 
 # -----------------------------------------------------------------------------
@@ -327,7 +327,7 @@ def test_edit_xlate_rot13_pxr(tmpdir, fx_rot13):
         cmd = "fl edit -e \"y/{}/{}/\" {}".format(fx_rot13.prev,
                                                   fx_rot13.post,
                                                   flist)
-        result = pexpect.run(cmd)
+        fx_rot13.result = pexpect.run(cmd)
 
 
 # -----------------------------------------------------------------------------
