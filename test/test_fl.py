@@ -958,6 +958,7 @@ def fx_rot13(tmpdir, fx_tdata):
     """
     Set up some test data
     """
+    fx_rot13.result = None
     fx_rot13.tdata = fx_tdata
     fx_rot13.prev = string.lowercase
     fx_rot13.post = string.lowercase[13:]+string.lowercase[:13]
@@ -985,6 +986,7 @@ def fx_seven(tmpdir, fx_tdata):
     """
     Set up some test data
     """
+    fx_seven.result = None
     fx_seven.tdata = fx_tdata
     f1 = makefile(tmpdir, "f1", content="\n\r".join(fx_tdata))
     f2 = makefile(tmpdir, "f2", content="\n\r".join(fx_tdata))
