@@ -137,6 +137,17 @@ def test_yesterday(fx_both):
 
 
 # -----------------------------------------------------------------------------
+def test_yesterday_plus7wk(fx_both):
+    """
+    yesterday
+    """
+    fx_both.expected = (7 * 7 - 1) * 24 * 3600
+    argl = ["yesterday", "7", "week"]
+    fx_both.parsed = dt.parse_whenspec(argl)
+    fx_both.reported = dt.report_date(default_format(), argl)
+
+
+# -----------------------------------------------------------------------------
 def default_format():
     """
     The default date/time/format
@@ -229,13 +240,6 @@ class TestDt(th.HelpedTestCase):
                                  testargs)
         else:
             self.fail("expected int or string, got '%s'" % a)
-
-    # -----------------------------------------------------------------------
-    def test_yesterday_plus7week(self):
-        """
-        multiple offsets
-        """
-        self.do_both(['yesterday', '7', 'week'], (7 * 7 - 1) * 24 * 3600)
 
     # -----------------------------------------------------------------------
     def test_next_minus3(self):
