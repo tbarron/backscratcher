@@ -29,6 +29,18 @@ def test_last(fx_botherr):
         dt.report_date(default_format(), ["last"])
 
 
+# -----------------------------------------------------------------------------
+def test_next(fx_botherr):
+    """
+    'next' as the argument should throw an exception
+    """
+    pytest.debug_func()
+    fx_botherr.exp = 'next: expected unit or weekday, found nothing'
+    with pytest.raises(bscr.Error) as fx_botherr.perr:
+        dt.parse_whenspec(["next"])
+    with pytest.raises(bscr.Error) as fx_botherr.rerr:
+        dt.report_date(default_format(), ["next"])
+
 
 # -----------------------------------------------------------------------------
 def test_today(fx_both):
@@ -154,14 +166,6 @@ class TestDt(th.HelpedTestCase):
                                  testargs)
         else:
             self.fail("expected int or string, got '%s'" % a)
-
-    # -----------------------------------------------------------------------
-    def test_next(self):
-        """
-        Error
-        """
-        self.do_both(['next'],
-                     'next: expected unit or weekday, found nothing')
 
     # -----------------------------------------------------------------------
     def test_last_week(self):
