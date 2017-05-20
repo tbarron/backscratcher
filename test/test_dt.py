@@ -12,9 +12,9 @@ def test_epoch(fx_both):
     """
     pytest.debug_func()
     fx_both.expected = -300
-    when = int(time.time()) + fx_both.expected
-    fx_both.parsed = dt.parse_whenspec([str(when)])
-    fx_both.reported = dt.report_date(default_format(), [str(when)])
+    argl = [str(int(time.time()) + fx_both.expected)]
+    fx_both.parsed = dt.parse_whenspec(argl)
+    fx_both.reported = dt.report_date(default_format(), argl)
 
 # -----------------------------------------------------------------------------
 def test_last(fx_botherr):
@@ -49,8 +49,9 @@ def test_today(fx_both):
     """
     pytest.debug_func()
     fx_both.expected = 0
-    fx_both.parsed = dt.parse_whenspec(["today"])
-    fx_both.reported = dt.report_date(default_format(), ["today"])
+    argl = ["today"]
+    fx_both.parsed = dt.parse_whenspec(argl)
+    fx_both.reported = dt.report_date(default_format(), argl)
 
 
 # -----------------------------------------------------------------------------
@@ -59,8 +60,9 @@ def test_tomorrow(fx_both):
     tomorrow
     """
     fx_both.expected = 24 * 3600
-    fx_both.parsed = dt.parse_whenspec(["tomorrow"])
-    fx_both.reported = dt.report_date(default_format(), ["tomorrow"])
+    argl = ["tomorrow"]
+    fx_both.parsed = dt.parse_whenspec(argl)
+    fx_both.reported = dt.report_date(default_format(), argl)
 
 
 # -----------------------------------------------------------------------------
@@ -69,8 +71,9 @@ def test_yesterday(fx_both):
     yesterday
     """
     fx_both.expected = -24 * 3600
-    fx_both.parsed = dt.parse_whenspec(["yesterday"])
-    fx_both.reported = dt.report_date(default_format(), ["yesterday"])
+    argl = ["yesterday"]
+    fx_both.parsed = dt.parse_whenspec(argl)
+    fx_both.reported = dt.report_date(default_format(), argl)
 
 
 # -----------------------------------------------------------------------------
