@@ -29,6 +29,16 @@ def test_today(fx_both):
 
 
 # -----------------------------------------------------------------------------
+def test_tomorrow(fx_both):
+    """
+    tomorrow
+    """
+    fx_both.expected = 24 * 3600
+    fx_both.parsed = dt.parse_whenspec(["tomorrow"])
+    fx_both.reported = dt.report_date(default_format(), ["tomorrow"])
+
+
+# -----------------------------------------------------------------------------
 def default_format():
     """
     The default date/time/format
@@ -110,13 +120,6 @@ class TestDt(th.HelpedTestCase):
                                  testargs)
         else:
             self.fail("expected int or string, got '%s'" % a)
-
-    # -----------------------------------------------------------------------
-    def test_tomorrow(self):
-        """
-        Tomorrow
-        """
-        self.do_both(['tomorrow'], 24 * 3600)
 
     # -----------------------------------------------------------------------
     def test_yesterday(self):
