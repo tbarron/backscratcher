@@ -68,6 +68,19 @@ def test_next(fx_botherr):
 
 
 # -----------------------------------------------------------------------------
+def test_next_minus3(fx_botherr):
+    """
+    """
+    pytest.debug_func()
+    fx_botherr.exp = 'next: expected unit or weekday, got number'
+    argl = ["next", "-3", "hour"]
+    with pytest.raises(bscr.Error) as fx_botherr.perr:
+        dt.parse_whenspec(argl)
+    with pytest.raises(bscr.Error) as fx_botherr.rerr:
+        dt.report_date(default_format(), argl)
+
+
+# -----------------------------------------------------------------------------
 def test_next_week(fx_both):
     """
     next week
@@ -240,14 +253,6 @@ class TestDt(th.HelpedTestCase):
                                  testargs)
         else:
             self.fail("expected int or string, got '%s'" % a)
-
-    # -----------------------------------------------------------------------
-    def test_next_minus3(self):
-        """
-        Hour offsest
-        """
-        self.do_both(['next', '-3', 'hour'],
-                     'next: expected unit or weekday, got number')
 
     # -----------------------------------------------------------------------
     def test_last_plus2day(self):
