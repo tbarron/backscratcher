@@ -6,6 +6,29 @@ import time
 
 
 # -----------------------------------------------------------------------------
+def default_format():
+    """
+    The default date/time/format
+    """
+    return "%Y.%m%d %H:%M:%S"
+
+
+# -----------------------------------------------------------------------------
+@pytest.fixture
+def fx_both():
+    """
+    """
+    fx_both.expected = None
+    fx_both.reported = None
+    fx_both.input = None
+    yield fx_both
+    when = int(time.time()) + fx_both.expected
+    assert fx_both.expected == fx_both.parsed
+    rptexp = time.strftime(default_format(), time.localtime(time.time() +
+                                                            fx_both.expected))
+    assert fx_both.reported == rptexp
+
+# -----------------------------------------------------------------------------
 def test_standalone():
     """
     Make these tests stand-alone
