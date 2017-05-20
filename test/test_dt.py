@@ -43,6 +43,18 @@ def test_last_week(fx_both):
 
 
 # -----------------------------------------------------------------------------
+def test_minus3month(fx_both):
+    """
+    three months in the past
+    """
+    pytest.debug_func()
+    fx_both.expected = -3 * 30 * 24 * 3600
+    argl = ["-3", "month"]
+    fx_both.parsed = dt.parse_whenspec(argl)
+    fx_both.reported = dt.report_date(default_format(), argl)
+
+
+# -----------------------------------------------------------------------------
 def test_next(fx_botherr):
     """
     'next' as the argument should throw an exception
@@ -206,13 +218,6 @@ class TestDt(th.HelpedTestCase):
                                  testargs)
         else:
             self.fail("expected int or string, got '%s'" % a)
-
-    # -----------------------------------------------------------------------
-    def test_minus3month(self):
-        """
-        month offset
-        """
-        self.do_both(['-3', 'month'], -3 * 30 * 24 * 3600)
 
     # -----------------------------------------------------------------------
     def test_tomorrow_plus2hour(self):
