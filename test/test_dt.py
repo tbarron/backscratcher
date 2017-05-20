@@ -6,6 +6,18 @@ import time
 
 
 # -----------------------------------------------------------------------------
+def test_epoch(fx_both):
+    """
+    offset seconds
+    """
+    pytest.debug_func()
+    fx_both.expected = -300
+    when = int(time.time()) + fx_both.expected
+    fx_both.parsed = dt.parse_whenspec([str(when)])
+    fx_both.reported = dt.report_date(default_format(), [str(when)])
+
+
+# -----------------------------------------------------------------------------
 def default_format():
     """
     The default date/time/format
@@ -87,14 +99,6 @@ class TestDt(th.HelpedTestCase):
                                  testargs)
         else:
             self.fail("expected int or string, got '%s'" % a)
-
-    # -----------------------------------------------------------------------
-    def test_epoch(self):
-        """
-        offset seconds
-        """
-        when = int(time.time()) - 300
-        self.do_both(['%d' % when], -300)
 
     # -----------------------------------------------------------------------
     def test_today(self):
