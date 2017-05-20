@@ -16,6 +16,19 @@ def test_epoch(fx_both):
     fx_both.parsed = dt.parse_whenspec([str(when)])
     fx_both.reported = dt.report_date(default_format(), [str(when)])
 
+# -----------------------------------------------------------------------------
+def test_last(fx_botherr):
+    """
+    'last' as the argument should throw an exception
+    """
+    pytest.debug_func()
+    fx_botherr.exp = 'last: expected unit or weekday, found nothing'
+    with pytest.raises(bscr.Error) as fx_botherr.perr:
+        dt.parse_whenspec(["last"])
+    with pytest.raises(bscr.Error) as fx_botherr.rerr:
+        dt.report_date(default_format(), ["last"])
+
+
 
 # -----------------------------------------------------------------------------
 def test_today(fx_both):
@@ -149,14 +162,6 @@ class TestDt(th.HelpedTestCase):
         """
         self.do_both(['next'],
                      'next: expected unit or weekday, found nothing')
-
-    # -----------------------------------------------------------------------
-    def test_last(self):
-        """
-        Error
-        """
-        self.do_both(['last'],
-                     'last: expected unit or weekday, found nothing')
 
     # -----------------------------------------------------------------------
     def test_last_week(self):
