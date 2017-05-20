@@ -58,6 +58,17 @@ def default_format():
 
 # -----------------------------------------------------------------------------
 @pytest.fixture
+def fx_botherr(request):
+    """
+    """
+    fx_botherr.exp = fx_botherr.perr = fx_botherr.rerr = None
+    yield fx_botherr
+    assert fx_botherr.exp in str(fx_botherr.perr)
+    assert fx_botherr.exp in str(fx_botherr.rerr)
+
+
+# -----------------------------------------------------------------------------
+@pytest.fixture
 def fx_both():
     """
     """
