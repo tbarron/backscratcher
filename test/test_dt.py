@@ -16,6 +16,7 @@ def test_epoch(fx_both):
     fx_both.parsed = dt.parse_whenspec(argl)
     fx_both.reported = dt.report_date(default_format(), argl)
 
+
 # -----------------------------------------------------------------------------
 def test_last(fx_botherr):
     """
@@ -27,6 +28,18 @@ def test_last(fx_botherr):
         dt.parse_whenspec(["last"])
     with pytest.raises(bscr.Error) as fx_botherr.rerr:
         dt.report_date(default_format(), ["last"])
+
+
+# -----------------------------------------------------------------------------
+def test_last_week(fx_both):
+    """
+    last week
+    """
+    pytest.debug_func()
+    fx_both.expected = -7 * 24 * 3600
+    argl = ["last", "week"]
+    fx_both.parsed = dt.parse_whenspec(argl)
+    fx_both.reported = dt.report_date(default_format(), argl)
 
 
 # -----------------------------------------------------------------------------
@@ -169,13 +182,6 @@ class TestDt(th.HelpedTestCase):
                                  testargs)
         else:
             self.fail("expected int or string, got '%s'" % a)
-
-    # -----------------------------------------------------------------------
-    def test_last_week(self):
-        """
-        relative week
-        """
-        self.do_both(['last', 'week'], -7 * 24 * 3600)
 
     # -----------------------------------------------------------------------
     def test_next_week(self):
