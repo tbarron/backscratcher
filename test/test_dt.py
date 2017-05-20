@@ -115,6 +115,17 @@ def test_tomorrow(fx_both):
 
 
 # -----------------------------------------------------------------------------
+def test_tomorrow_plus2hr(fx_both):
+    """
+    tomorrow
+    """
+    fx_both.expected = (24+2) * 3600
+    argl = ["tomorrow", "2", "hour"]
+    fx_both.parsed = dt.parse_whenspec(argl)
+    fx_both.reported = dt.report_date(default_format(), argl)
+
+
+# -----------------------------------------------------------------------------
 def test_yesterday(fx_both):
     """
     yesterday
@@ -218,13 +229,6 @@ class TestDt(th.HelpedTestCase):
                                  testargs)
         else:
             self.fail("expected int or string, got '%s'" % a)
-
-    # -----------------------------------------------------------------------
-    def test_tomorrow_plus2hour(self):
-        """
-        multiple offsets
-        """
-        self.do_both(['tomorrow', '2', 'hour'], (24+2) * 3600)
 
     # -----------------------------------------------------------------------
     def test_yesterday_plus7week(self):
