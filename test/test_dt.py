@@ -1,8 +1,21 @@
 import bscr
 from bscr import dt
 from bscr import testhelp as th
+import pexpect
 import pytest
 import time
+
+
+# -----------------------------------------------------------------------------
+def test_dt_help():
+    """
+    Verify that 'dt --help' does the right thing
+    """
+    pytest.debug_func()
+    result = pexpect.run("dt --help")
+    assert "playing with dates" in result
+    assert "Options:" in result
+    assert "--help" in result
 
 
 # -----------------------------------------------------------------------------
@@ -331,13 +344,6 @@ class TestDt(th.HelpedTestCase):
         Computing relative weekday
         """
         self.do_both(['next', 'sunday'], dt.time_to('sunday', 'next'))
-
-    # -------------------------------------------------------------------------
-    def test_dt_help(self):
-        """
-        Verify that 'dt --help' does the right thing
-        """
-        self.assertOptionHelp("dt", "playing with dates")
 
     # -------------------------------------------------------------------------
     def test_which_module(self):
