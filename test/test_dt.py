@@ -37,8 +37,13 @@ def test_last(fx_botherr):
     """
     pytest.debug_func()
     fx_botherr.exp = 'last: expected unit or weekday, found nothing'
+    argl = ["last"]
     with pytest.raises(bscr.Error) as fx_botherr.perr:
-        dt.parse_whenspec(["last"])
+        dt.parse_whenspec(argl)
+    with pytest.raises(bscr.Error) as fx_botherr.rerr:
+        dt.report_date(default_format(), argl)
+
+
 # -----------------------------------------------------------------------------
 def test_last_plus2day(fx_botherr):
     """
@@ -84,10 +89,11 @@ def test_next(fx_botherr):
     """
     pytest.debug_func()
     fx_botherr.exp = 'next: expected unit or weekday, found nothing'
+    argl = ["next"]
     with pytest.raises(bscr.Error) as fx_botherr.perr:
-        dt.parse_whenspec(["next"])
+        dt.parse_whenspec(argl)
     with pytest.raises(bscr.Error) as fx_botherr.rerr:
-        dt.report_date(default_format(), ["next"])
+        dt.report_date(default_format(), argl)
 
 
 # -----------------------------------------------------------------------------
