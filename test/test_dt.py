@@ -39,8 +39,18 @@ def test_last(fx_botherr):
     fx_botherr.exp = 'last: expected unit or weekday, found nothing'
     with pytest.raises(bscr.Error) as fx_botherr.perr:
         dt.parse_whenspec(["last"])
+# -----------------------------------------------------------------------------
+def test_last_plus2day(fx_botherr):
+    """
+    'last +2 day' as the argument should throw an exception
+    """
+    pytest.debug_func()
+    fx_botherr.exp = 'last: expected unit or weekday, got number'
+    argl = ["last", "+2", "day"]
+    with pytest.raises(bscr.Error) as fx_botherr.perr:
+        dt.parse_whenspec(argl)
     with pytest.raises(bscr.Error) as fx_botherr.rerr:
-        dt.report_date(default_format(), ["last"])
+        dt.report_date(default_format(), argl)
 
 
 # -----------------------------------------------------------------------------
@@ -266,14 +276,6 @@ class TestDt(th.HelpedTestCase):
                                  testargs)
         else:
             self.fail("expected int or string, got '%s'" % a)
-
-    # -----------------------------------------------------------------------
-    def test_last_plus2day(self):
-        """
-        Day offset
-        """
-        self.do_both(['last', '+2', 'day'],
-                     'last: expected unit or weekday, got number')
 
     # -----------------------------------------------------------------------
     def test_minus3hour(self):
