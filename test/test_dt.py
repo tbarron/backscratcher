@@ -201,11 +201,11 @@ def fx_both():
     fx_both.reported = None
     fx_both.input = None
     yield fx_both
-    when = int(time.time()) + fx_both.expected
     assert fx_both.expected == fx_both.parsed
     rptexp = time.strftime(default_format(), time.localtime(time.time() +
                                                             fx_both.expected))
     assert fx_both.reported == rptexp
+
 
 # -----------------------------------------------------------------------------
 def test_standalone():
