@@ -73,7 +73,7 @@ def test_last_week(fx_both):
 # -----------------------------------------------------------------------------
 def test_minus3month(fx_both):
     """
-    three months in the past
+    three months ago
     """
     pytest.debug_func()
     fx_both.expected = -3 * 30 * 24 * 3600
@@ -201,6 +201,7 @@ def default_format():
 @pytest.fixture
 def fx_botherr(request):
     """
+    Fixture that expects exceptions and checks the error they contain
     """
     fx_botherr.exp = fx_botherr.perr = fx_botherr.rerr = None
     yield fx_botherr
@@ -212,6 +213,8 @@ def fx_botherr(request):
 @pytest.fixture
 def fx_both():
     """
+    Fixture for successful tests. That is, tests that don't involve exceptions
+    being thrown.
     """
     fx_both.expected = None
     fx_both.reported = None
