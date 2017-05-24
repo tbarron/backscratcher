@@ -109,6 +109,18 @@ def test_next(fx_botherr):
 
 
 # -----------------------------------------------------------------------------
+def test_next_day(fx_both):
+    """
+    next day
+    """
+    pytest.debug_func()
+    fx_both.expected = 24 * 3600
+    argl = ["next", "day"]
+    fx_both.parsed = dt.parse_whenspec(argl)
+    fx_both.reported = dt.report_date(default_format(), argl)
+
+
+# -----------------------------------------------------------------------------
 def test_next_minus3(fx_botherr):
     """
     """
@@ -309,13 +321,6 @@ class TestDt(th.HelpedTestCase):
                                  testargs)
         else:
             self.fail("expected int or string, got '%s'" % a)
-
-    # -----------------------------------------------------------------------
-    def test_next_day(self):
-        """
-        Computing relative day -- tomorrow
-        """
-        self.do_both(['next', 'day'], 24 * 3600)
 
     # -----------------------------------------------------------------------
     def test_next_monday(self):
