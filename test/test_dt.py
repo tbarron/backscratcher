@@ -146,6 +146,18 @@ def test_plus5day(fx_both):
 
 
 # -----------------------------------------------------------------------------
+def test_plus2day(fx_both):
+    """
+    two days in the future
+    """
+    pytest.debug_func()
+    fx_both.expected = 2 * 24 * 3600
+    argl = ["+2", "day"]
+    fx_both.parsed = dt.parse_whenspec(argl)
+    fx_both.reported = dt.report_date(default_format(), argl)
+
+
+# -----------------------------------------------------------------------------
 def test_today(fx_both):
     """
     today
@@ -297,13 +309,6 @@ class TestDt(th.HelpedTestCase):
                                  testargs)
         else:
             self.fail("expected int or string, got '%s'" % a)
-
-    # -----------------------------------------------------------------------
-    def test_plus2day(self):
-        """
-        Computing date by day offset
-        """
-        self.do_both(['+2', 'day'], 2 * 24 * 3600)
 
     # -----------------------------------------------------------------------
     def test_next_day(self):
