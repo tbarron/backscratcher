@@ -71,6 +71,18 @@ def test_last_week(fx_both):
 
 
 # -----------------------------------------------------------------------------
+def test_minus3hour(fx_both):
+    """
+    three months ago
+    """
+    pytest.debug_func()
+    fx_both.expected = -3 * 3600
+    argl = ["-3", "hour"]
+    fx_both.parsed = dt.parse_whenspec(argl)
+    fx_both.reported = dt.report_date(default_format(), argl)
+
+
+# -----------------------------------------------------------------------------
 def test_minus3month(fx_both):
     """
     three months ago
@@ -285,13 +297,6 @@ class TestDt(th.HelpedTestCase):
                                  testargs)
         else:
             self.fail("expected int or string, got '%s'" % a)
-
-    # -----------------------------------------------------------------------
-    def test_minus3hour(self):
-        """
-        Computing by hour offset
-        """
-        self.do_both(['-3', 'hour'], -3 * 3600)
 
     # -----------------------------------------------------------------------
     def test_plus2day(self):
