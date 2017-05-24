@@ -59,6 +59,18 @@ def test_last_plus2day(fx_botherr):
 
 
 # -----------------------------------------------------------------------------
+def test_last_saturday(fx_both):
+    """
+    Computing relative weekday to last saturday
+    """
+    pytest.debug_func()
+    argl = ["last", "saturday"]
+    fx_both.expected = dt.time_to(argl[1], argl[0])
+    fx_both.parsed = dt.parse_whenspec(argl)
+    fx_both.reported = dt.report_date(default_format(), argl)
+
+
+# -----------------------------------------------------------------------------
 def test_last_thursday(fx_both):
     """
     Computing relative weekday to last thursday
@@ -381,13 +393,6 @@ class TestDt(th.HelpedTestCase):
                                  testargs)
         else:
             self.fail("expected int or string, got '%s'" % a)
-
-    # -----------------------------------------------------------------------
-    def test_last_saturday(self):
-        """
-        Computing relative weekday
-        """
-        self.do_both(['last', 'saturday'], dt.time_to('saturday', 'last'))
 
     # -----------------------------------------------------------------------
     def test_next_sunday(self):
