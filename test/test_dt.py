@@ -1,6 +1,5 @@
 import bscr
 from bscr import dt
-from bscr import testhelp as th
 import pexpect
 import pytest
 import time
@@ -344,71 +343,3 @@ def fx_both():
     rptexp = time.strftime(default_format(), time.localtime(time.time() +
                                                             fx_both.expected))
     assert fx_both.reported == rptexp
-
-
-# -----------------------------------------------------------------------------
-def test_standalone():
-    """
-    Make these tests stand-alone
-    """
-    pytest.fail("Make {} tests stand-alone".format(__file__))
-
-
-# ---------------------------------------------------------------------------
-class TestDt(th.HelpedTestCase):
-    # -----------------------------------------------------------------------
-    def default_fmt(self):
-        """
-        Defines the default date/time format
-        """
-        return '%Y.%m%d %H:%M:%S'
-
-    # -----------------------------------------------------------------------
-    def do_both(self, testargs, expected):
-        """
-        Test both parsing and date reporting
-        """
-        self.do_parse(testargs, expected)
-        self.do_report(testargs, expected)
-
-    # -----------------------------------------------------------------------
-    def do_parse(self, testargs, expected):
-        """
-        Test parsing a list of command line arguments
-        """
-        if type(expected) == int:
-            a = dt.parse_whenspec(testargs)
-            self.assertEqual(a, expected)
-        elif type(expected) == str:
-            self.assertRaisesMsg(bscr.Error,
-                                 expected,
-                                 dt.parse_whenspec,
-                                 testargs)
-        else:
-            self.fail("expected int or string, got '%s'" % a)
-
-    # -----------------------------------------------------------------------
-    def do_report(self, testargs, expected):
-        """
-        Test report_date()
-        """
-        if type(expected) == int:
-            a = dt.report_date(self.default_fmt(), testargs)
-            b = time.strftime(self.default_fmt(),
-                              time.localtime(time.time() + expected))
-            self.assertEqual(a, b)
-        elif type(expected) == str:
-            self.assertRaisesMsg(bscr.Error,
-                                 expected,
-                                 dt.report_date,
-                                 self.default_fmt(),
-                                 testargs)
-        else:
-            self.fail("expected int or string, got '%s'" % a)
-
-    # -------------------------------------------------------------------------
-    def test_which_module(self):
-        """
-        Verify that we're importing the right align module
-        """
-        self.assertModule('bscr.dt', __file__)
