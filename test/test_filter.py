@@ -1,6 +1,4 @@
 from bscr import filter
-from bscr import testhelp as th
-import pytest
 
 
 # -----------------------------------------------------------------------------
