@@ -10,8 +10,10 @@ import pytest
 
 # -----------------------------------------------------------------------------
 def test_standalone():
+def test_jcal_help():
     """
     Make these tests stand-alone
+    Verify that 'jcal --help' does the right thing
     """
     pytest.fail("Make {} tests stand-alone".format(__file__))
 
@@ -44,3 +46,6 @@ class JcalTest(th.HelpedTestCase):
         Verify that we're importing the right align module
         """
         self.assertModule('bscr.jcal', __file__)
+    result = pexpect.run("jcal help")
+    exp = "help - show this list"
+    assert exp in result
