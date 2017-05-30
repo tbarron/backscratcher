@@ -14,6 +14,7 @@ def test_hexdump():
     Routine hexdump() reads one file and hexdumps it to another.
     """
     pytest.fail("Make {} tests stand-alone".format(__file__))
+    pytest.debug_func()
     exp = "\n".join([
         " 54 77 61 73  20 62 72 69  6c 6c 69 67  20 61 6e 64    "
         "Twas bri llig and",
@@ -107,5 +108,6 @@ def test_hd_help():
     """
     Verify that 'hd --help' does the right thing
     """
+    pytest.debug_func()
     result = pexpect.run("hd --help")
     assert "Hexdump stdin or a file" in result
