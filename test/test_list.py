@@ -22,6 +22,17 @@ def test_generate_list(tmpdir):
 
 
 # -----------------------------------------------------------------------
+def test_list_intersect():
+    """
+    Test the intersect operation
+    """
+    a_list = ['one', 'two', 'three', 'four', 'five']
+    b_list = ['two', 'four', 'six', 'eight', 'ten']
+    isect = list.list_intersect(a_list, b_list)
+    assert sorted(isect) == ['four', 'two']
+
+
+# -----------------------------------------------------------------------
 def test_list_minus():
     """
     Test the minus operation
@@ -61,15 +72,6 @@ class TestList(th.HelpedTestCase):
         self.assertIn(exp, larg,
                       "'%s' is not in list '%s'" %
                       (exp, pprint.pformat(larg)))
-
-    # -----------------------------------------------------------------------
-    def test_list_intersect(self):
-        """
-        Test the intersect operation
-        """
-        a = list.list_intersect(['one', 'two', 'three', 'four', 'five'],
-                                ['two', 'four', 'six', 'eight', 'ten'])
-        assert(a == ['two', 'four'])
 
     # -------------------------------------------------------------------------
     # @unittest.skip("under construction")
