@@ -21,6 +21,17 @@ def test_generate_list(tmpdir):
     assert sorted(flist) == sorted(a)
 
 
+# -----------------------------------------------------------------------
+def test_list_minus():
+    """
+    Test the minus operation
+    """
+    a = list.list_minus(['one', 'two', 'three', 'four', 'five'],
+                        ['two', 'four', 'six', 'eight'])
+    assert a == ['one', 'three', 'five']
+
+
+# -----------------------------------------------------------------------------
 def test_list_standalone():
     """
     Make these tests stand-alone
@@ -38,15 +49,6 @@ class TestList(th.HelpedTestCase):
         self.assertIn(exp, larg,
                       "'%s' is not in list '%s'" %
                       (exp, pprint.pformat(larg)))
-
-    # -----------------------------------------------------------------------
-    def test_list_minus(self):
-        """
-        Test the minus operation
-        """
-        a = list.list_minus(['one', 'two', 'three', 'four', 'five'],
-                            ['two', 'four', 'six', 'eight'])
-        assert(a == ['one', 'three', 'five'])
 
     # -----------------------------------------------------------------------
     def test_list_union(self):
