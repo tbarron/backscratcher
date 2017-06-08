@@ -6,6 +6,21 @@ import pytest
 
 
 # -----------------------------------------------------------------------------
+def test_generate_list(tmpdir):
+    """
+    Generate a list from the output of a command
+    """
+    pytest.debug_func()
+    flist = ["abc", "def", "ghi"]
+    for fname in flist:
+        tmpdir.join(fname).ensure()
+    with U.Chdir(tmpdir.strpath):
+        a = list.generate_list("ls")
+        for fname in flist:
+            assert fname in a
+    assert sorted(flist) == sorted(a)
+
+
 def test_list_standalone():
     """
     Make these tests stand-alone
@@ -23,17 +38,6 @@ class TestList(th.HelpedTestCase):
         self.assertIn(exp, larg,
                       "'%s' is not in list '%s'" %
                       (exp, pprint.pformat(larg)))
-
-    # -------------------------------------------------------------------------
-    def test_generate_list(self):
-        """
-        Generate a list from the output of a command
-        """
-        with U.Chdir(U.dirname(__file__)):
-            a = list.generate_list("ls")
-            self.assertInList("__init__.py", a)
-            self.assertInList("test_list.py", a)
-            self.assertInList("test_util.py", a)
 
     # -----------------------------------------------------------------------
     def test_list_minus(self):
