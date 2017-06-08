@@ -31,6 +31,18 @@ def test_list_minus():
     assert a == ['one', 'three', 'five']
 
 
+# -----------------------------------------------------------------------
+def test_list_union():
+    """
+    Test the union operation
+    """
+    a_list = ['one', 'three', 'five']
+    b_list = ['two', 'four', 'five', 'six', 'two']
+    union = list.list_union(a_list, b_list)
+    union.sort()
+    assert(union == ['five', 'four', 'one', 'six', 'three', 'two'])
+
+
 # -----------------------------------------------------------------------------
 def test_list_standalone():
     """
@@ -49,16 +61,6 @@ class TestList(th.HelpedTestCase):
         self.assertIn(exp, larg,
                       "'%s' is not in list '%s'" %
                       (exp, pprint.pformat(larg)))
-
-    # -----------------------------------------------------------------------
-    def test_list_union(self):
-        """
-        Test the union operation
-        """
-        a = list.list_union(['one', 'three', 'five'],
-                            ['two', 'four', 'five', 'six', 'two'])
-        a.sort()
-        assert(a == ['five', 'four', 'one', 'six', 'three', 'two'])
 
     # -----------------------------------------------------------------------
     def test_list_intersect(self):
