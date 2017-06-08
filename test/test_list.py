@@ -1,6 +1,7 @@
 from bscr import list
 from bscr import testhelp as th
 from bscr import util as U
+import pexpect
 import pprint
 import pytest
 
@@ -19,6 +20,16 @@ def test_generate_list(tmpdir):
         for fname in flist:
             assert fname in a
     assert sorted(flist) == sorted(a)
+
+
+# -------------------------------------------------------------------------
+def test_list_help():
+    """
+    Verify that 'list --help' does the right thing
+    """
+    result = pexpect.run("list --help")
+    exp = "usage: list {minus|union|intersect} <list-1> <list-2>"
+    assert exp in result
 
 
 # -----------------------------------------------------------------------
@@ -72,16 +83,6 @@ class TestList(th.HelpedTestCase):
         self.assertIn(exp, larg,
                       "'%s' is not in list '%s'" %
                       (exp, pprint.pformat(larg)))
-
-    # -------------------------------------------------------------------------
-    # @unittest.skip("under construction")
-    def test_list_help(self):
-        """
-        Verify that 'list --help' does the right thing
-        """
-        self.assertOptionHelp("list",
-                              "usage: list {minus|union|intersect} " +
-                              "<list-1> <list-2>")
 
     # -------------------------------------------------------------------------
     def test_which_module(self):
