@@ -1,8 +1,8 @@
 from bscr import list
-from bscr import testhelp as th
+# from bscr import testhelp as th
 from bscr import util as U
 import pexpect
-import pprint
+# import pprint
 import pytest
 
 
@@ -63,30 +63,3 @@ def test_list_union():
     union = list.list_union(a_list, b_list)
     union.sort()
     assert(union == ['five', 'four', 'one', 'six', 'three', 'two'])
-
-
-# -----------------------------------------------------------------------------
-def test_list_standalone():
-    """
-    Make these tests stand-alone
-    """
-    pytest.fail("Make list tests stand-alone")
-
-
-# -----------------------------------------------------------------------------
-class TestList(th.HelpedTestCase):
-    # -------------------------------------------------------------------------
-    def assertInList(self, exp, larg):
-        """
-        Assert that *exp* is in *larg*
-        """
-        self.assertIn(exp, larg,
-                      "'%s' is not in list '%s'" %
-                      (exp, pprint.pformat(larg)))
-
-    # -------------------------------------------------------------------------
-    def test_which_module(self):
-        """
-        Verify that we're importing the right align module
-        """
-        self.assertModule('bscr.list', __file__)
