@@ -6,6 +6,16 @@ from bscr import testhelp as th
 
 
 # -----------------------------------------------------------------------------
+def test_bit(fx_mchk):
+    """
+    Test 'mag' for bits (1000^0)
+    """
+    pytest.debug_func()
+    result = mag.main(["./mag", "999"], True)
+    assert result == "999.00 b"
+
+
+# -----------------------------------------------------------------------------
 def test_mag_standalone():
     """
     Make these tests stand-alone
@@ -22,13 +32,6 @@ class TestMag(th.HelpedTestCase):
         """
         a = mag.main(['./mag'], True)
         assert(a == mag.usage())
-
-    # -------------------------------------------------------------------------
-    def test_bit(self):
-        """
-        Test 'mag' for bits (1000^0)
-        """
-        self.magtest('999 = 999.00 b')
 
     # -------------------------------------------------------------------------
     def test_bbit(self):
