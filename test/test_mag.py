@@ -15,6 +15,16 @@ def test_bit(fx_mchk):
     fx_mchk.result = mag.main(["./mag", fx_mchk.inp], True)
 
 
+# -----------------------------------------------------------------------------
+def test_bbit(fx_mchk):
+    """
+    Test 'mag' for bits (1024^0)
+    """
+    pytest.debug_func()
+    fx_mchk.inp, fx_mchk.exp = "999", "999.00 b"
+    fx_mchk.result = mag.main(["./mag", fx_mchk.inp], True)
+
+
 def test_usage():
     """
     'mag' with no args should get the usage message
@@ -46,13 +56,6 @@ def test_mag_standalone():
 
 # ---------------------------------------------------------------------------
 class TestMag(th.HelpedTestCase):
-    # -------------------------------------------------------------------------
-    def test_bbit(self):
-        """
-        Test 'mag' for bits (1024^0)
-        """
-        self.magtest('999 = 999.00 b')
-
     # -------------------------------------------------------------------------
     def test_kilo(self):
         """
