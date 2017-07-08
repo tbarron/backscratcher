@@ -35,6 +35,16 @@ def test_kilo(fx_mchk):
     fx_mchk.result = mag.main(["./mag", fx_mchk.inp], True)
 
 
+# -------------------------------------------------------------------------
+def test_bkilo(fx_mchk):
+    """
+    Test 'mag' for kibibits (1024^1)
+    """
+    pytest.debug_func()
+    fx_mchk.inp, fx_mchk.exp = "98765", "96.45 Kib"
+    fx_mchk.result = mag.main(["./mag", "-b", fx_mchk.inp], True)
+
+
 def test_usage():
     """
     'mag' with no args should get the usage message
@@ -66,13 +76,6 @@ def test_mag_standalone():
 
 # ---------------------------------------------------------------------------
 class TestMag(th.HelpedTestCase):
-    # -------------------------------------------------------------------------
-    def test_bkilo(self):
-        """
-        Test 'mag' for kibibits (1024^1)
-        """
-        self.magtest('98765 = 96.45 Kib')
-
     # -------------------------------------------------------------------------
     def test_mega(self):
         """
