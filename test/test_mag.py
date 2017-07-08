@@ -45,6 +45,16 @@ def test_bkilo(fx_mchk):
     fx_mchk.result = mag.main(["./mag", "-b", fx_mchk.inp], True)
 
 
+# -------------------------------------------------------------------------
+def test_mega(fx_mchk):
+    """
+    Test 'mag' for megabits (1000^2)
+    """
+    pytest.debug_func()
+    fx_mchk.inp, fx_mchk.exp = "98765432", "98.77 Mb"
+    fx_mchk.result = mag.main(["./mag", fx_mchk.inp], True)
+
+
 def test_usage():
     """
     'mag' with no args should get the usage message
@@ -76,13 +86,6 @@ def test_mag_standalone():
 
 # ---------------------------------------------------------------------------
 class TestMag(th.HelpedTestCase):
-    # -------------------------------------------------------------------------
-    def test_mega(self):
-        """
-        Test 'mag' for megabits (1000^2)
-        """
-        self.magtest('98765432 = 98.77 Mb')
-
     # -------------------------------------------------------------------------
     def test_bmega(self):
         """
