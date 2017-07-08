@@ -11,8 +11,10 @@ def test_bit(fx_mchk):
     Test 'mag' for bits (1000^0)
     """
     pytest.debug_func()
-    result = mag.main(["./mag", "999"], True)
-    assert result == "999.00 b"
+    fx_mchk.inp, fx_mchk.exp = "999", "999.00 b"
+    fx_mchk.result = mag.main(["./mag", fx_mchk.inp], True)
+
+
 
 
 # -----------------------------------------------------------------------------
