@@ -24,6 +24,16 @@ def test_usage():
 
 
 # -----------------------------------------------------------------------------
+@pytest.fixture
+def fx_mchk():
+    """
+    Check the result of mag tests
+    """
+    fx_mchk.inp = fx_mchk.exp = fx_mchk.result = None
+    yield fx_mchk
+    assert fx_mchk.exp in fx_mchk.result
+    expstr = "{} = {}".format(fx_mchk.inp, fx_mchk.exp)
+    assert expstr in fx_mchk.result
 
 
 # -----------------------------------------------------------------------------
