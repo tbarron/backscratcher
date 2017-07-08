@@ -76,6 +76,16 @@ def test_giga(fx_mchk):
 
 
 # -----------------------------------------------------------------------------
+def test_bgiga(fx_mchk):
+    """
+    Test 'mag' for gibibits (1024^3)
+    """
+    pytest.debug_func()
+    fx_mchk.inp, fx_mchk.exp = "12398765432", "11.55 Gb"
+    fx_mchk.result = mag.main(["./mag", "-b", fx_mchk.inp], True)
+
+
+# -----------------------------------------------------------------------------
 def test_usage():
     """
     'mag' with no args should get the usage message
@@ -107,13 +117,6 @@ def test_mag_standalone():
 
 # ---------------------------------------------------------------------------
 class TestMag(th.HelpedTestCase):
-    # -------------------------------------------------------------------------
-    def test_bgiga(self):
-        """
-        Test 'mag' for gibibits (1024^3)
-        """
-        self.magtest('12398765432 = 11.55 Gib')
-
     # -------------------------------------------------------------------------
     def test_tera(self):
         """
