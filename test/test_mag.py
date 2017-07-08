@@ -15,6 +15,15 @@ def test_bit(fx_mchk):
     fx_mchk.result = mag.main(["./mag", fx_mchk.inp], True)
 
 
+def test_usage():
+    """
+    'mag' with no args should get the usage message
+    """
+    a = mag.main(["./mag"], True)
+    assert a == mag.usage()
+
+
+# -----------------------------------------------------------------------------
 
 
 # -----------------------------------------------------------------------------
@@ -27,14 +36,6 @@ def test_mag_standalone():
 
 # ---------------------------------------------------------------------------
 class TestMag(th.HelpedTestCase):
-    # -------------------------------------------------------------------------
-    def test_usage(self):
-        """
-        'mag' with no args should get the usage message
-        """
-        a = mag.main(['./mag'], True)
-        assert(a == mag.usage())
-
     # -------------------------------------------------------------------------
     def test_bbit(self):
         """
