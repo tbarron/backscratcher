@@ -81,7 +81,8 @@ def test_bgiga(fx_mchk):
     Test 'mag' for gibibits (1024^3)
     """
     pytest.debug_func()
-    fx_mchk.inp, fx_mchk.exp = "12398765432", "11.55 Gb"
+    fx_mchk.inp, fx_mchk.exp = "12398765432", "11.55 Gib"
+    fx_mchk.result = mag.main(["./mag", "-b", fx_mchk.inp], True)
     fx_mchk.result = mag.main(["./mag", "-b", fx_mchk.inp], True)
 
 
