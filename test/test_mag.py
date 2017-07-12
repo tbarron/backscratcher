@@ -83,6 +83,18 @@ def test_bgiga(fx_mchk):
     pytest.debug_func()
     fx_mchk.inp, fx_mchk.exp = "12398765432", "11.55 Gib"
     fx_mchk.result = mag.main(["./mag", "-b", fx_mchk.inp], True)
+
+
+# -------------------------------------------------------------------------
+def test_tera(fx_mchk):
+    """
+    Test 'mag' for terabits (1000^4)
+    """
+    pytest.debug_func()
+    fx_mchk.inp, fx_mchk.exp = "12390008765432", "12.39 Tb"
+    fx_mchk.result = mag.main(["./mag", fx_mchk.inp], True)
+
+
     fx_mchk.result = mag.main(["./mag", "-b", fx_mchk.inp], True)
 
 
@@ -119,12 +131,6 @@ def test_mag_standalone():
 # ---------------------------------------------------------------------------
 class TestMag(th.HelpedTestCase):
     # -------------------------------------------------------------------------
-    def test_tera(self):
-        """
-        Test 'mag' for terabits (1000^4)
-        """
-        self.magtest('12390008765432 = 12.39 Tb')
-
     # -------------------------------------------------------------------------
     def test_btera(self):
         """
