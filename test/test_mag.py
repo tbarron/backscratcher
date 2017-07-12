@@ -95,6 +95,13 @@ def test_tera(fx_mchk):
     fx_mchk.result = mag.main(["./mag", fx_mchk.inp], True)
 
 
+# -----------------------------------------------------------------------------
+def test_btera(fx_mchk):
+    """
+    Test 'mag' for tibibits (1024^4)
+    """
+    pytest.debug_func()
+    fx_mchk.inp, fx_mchk.exp = "12390008765432", "11.27 Tib"
     fx_mchk.result = mag.main(["./mag", "-b", fx_mchk.inp], True)
 
 
@@ -130,14 +137,6 @@ def test_mag_standalone():
 
 # ---------------------------------------------------------------------------
 class TestMag(th.HelpedTestCase):
-    # -------------------------------------------------------------------------
-    # -------------------------------------------------------------------------
-    def test_btera(self):
-        """
-        Test 'mag' for tebibits (1024^4)
-        """
-        self.magtest('12398700065432 = 11.28 Tib')
-
     # -------------------------------------------------------------------------
     def test_peta(self):
         """
