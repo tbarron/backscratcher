@@ -1,8 +1,8 @@
 from bscr import odx
-from bscr import util as U
+# from bscr import util as U
 import pexpect
 import pytest
-from bscr import testhelp
+# from bscr import testhelp
 
 # odx(25)         => 25 -> 031 / 25 / 0x19
 # odx(0124)       => 0124 -> 0124 / 84 / 0x54
@@ -84,7 +84,7 @@ def test_odx_help():
            "Options:",
            "  -h, --help   show this help message and exit",
            "  -d, --debug  run under debugger",
-          ]
+           ]
     exp = "\r\n".join(txt) + "\r\n"
     actual = pexpect.run("odx --help")
     assert exp == actual
