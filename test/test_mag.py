@@ -181,7 +181,7 @@ def test_byotta(fx_mchk):
     Test 'mag' for tibibits (1024^8)
     """
     pytest.debug_func()
-    fx_mchk.inp, fx_mchk.exp = "39423487271233986700065432", "32.61 Zib"
+    fx_mchk.inp, fx_mchk.exp = "39423487271233986700065432", "32.61 Yib"
     fx_mchk.result = mag.main(["./mag", "-b", fx_mchk.inp], True)
 
 
@@ -205,61 +205,3 @@ def fx_mchk():
     assert fx_mchk.exp in fx_mchk.result
     expstr = "{} = {}".format(fx_mchk.inp, fx_mchk.exp)
     assert expstr in fx_mchk.result
-
-
-# -----------------------------------------------------------------------------
-def test_mag_standalone():
-    """
-    Make these tests stand-alone
-    """
-    pytest.fail("Make mag tests stand-alone")
-
-
-# ---------------------------------------------------------------------------
-class TestMag(th.HelpedTestCase):
-    # -------------------------------------------------------------------------
-    def magtest(self, string):
-        """
-        Test 'mag' for a specific value
-        """
-        d = string.split()
-        v = d[0]
-        if 'i' in d[3]:
-            args = ['./mag', '-b', v]
-        else:
-            args = ['./mag', v]
-
-        a = mag.main(args, True)
-        try:
-            assert(a == string)
-        except AssertionError:
-            print "\nexpected: '%s'" % a
-            print "result:   '%s'" % string
-
-    # -------------------------------------------------------------------------
-    def test_mag_help(self):
-        """
-        Verify that 'mag --help' does the right thing
-        """
-        cmd = U.script_location("mag")
-        result = pexpect.run("%s --help" % cmd)
-        exp = ["Usage: mag [-b] <number>",
-               "Report the order of magnitude of <number>",
-               "Options:",
-               "-h, --help    show this help message and exit",
-               "-b, --binary  div=1024 rather than 1000",
-               ]
-        self.assertTrue("Traceback" not in result,
-                        "Traceback not expected in %s" %
-                        U.lquote(result))
-        for item in exp:
-            self.assertTrue(item in result,
-                            "Expected '%s' in %s" %
-                            (item, U.lquote(result)))
-
-    # -------------------------------------------------------------------------
-    def test_which_module(self):
-        """
-        Verify that we're importing the right mag module
-        """
-        self.assertModule('bscr.mag', __file__)
