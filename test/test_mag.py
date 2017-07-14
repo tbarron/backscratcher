@@ -1,8 +1,8 @@
 from bscr import mag
-from bscr import util as U
-import pexpect
+# from bscr import util as U
+# import pexpect
 import pytest
-from bscr import testhelp as th
+# from bscr import testhelp as th
 
 
 # -----------------------------------------------------------------------------
