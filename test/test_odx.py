@@ -13,11 +13,63 @@ from bscr import testhelp
 
 
 # -----------------------------------------------------------------------------
-def test_standalone():
+def test_decimal_good():
     """
-    Make these tests stand-alone
+    Verify output of odx with good decimal input
     """
-    pytest.fail("Make {} tests stand-alone".format(__file__))
+    exp = "25 -> 031 / 25 / 0x19"
+    assert exp == odx.odx('25')
+
+
+# -----------------------------------------------------------------------------
+def test_decimal_bad():
+    """
+    Verify output of odx with bad decimal input
+    """
+    exp = "invalid literal for int() with base 10"
+    with pytest.raises(ValueError) as err:
+        odx.odx("2ab")
+    assert exp in str(err)
+
+
+# -----------------------------------------------------------------------------
+def test_octal_good():
+    """
+    Verify output of odx with good octal input
+    """
+    pytest.fail("construction")
+
+
+# -----------------------------------------------------------------------------
+def test_octal_bad():
+    """
+    Verify output of odx with bad octal input
+    """
+    pytest.fail("construction")
+
+
+# -----------------------------------------------------------------------------
+def test_hex_good():
+    """
+    Verify output of odx with good hex input
+    """
+    pytest.fail("construction")
+
+
+# -----------------------------------------------------------------------------
+def test_hex_bad():
+    """
+    Verify output of odx with bad hex input
+    """
+    pytest.fail("construction")
+
+
+# -----------------------------------------------------------------------------
+def test_odx_help():
+    """
+    Verify that 'odx --help' does the right thing
+    """
+    pytest.fail("construction")
 
 
 # -----------------------------------------------------------------------------
