@@ -145,6 +145,26 @@ def test_bexa(fx_mchk):
     fx_mchk.result = mag.main(["./mag", "-b", fx_mchk.inp], True)
 
 
+# -------------------------------------------------------------------------
+def test_zetta(fx_mchk):
+    """
+    Test 'mag' for terabits (1000^7)
+    """
+    pytest.debug_func()
+    fx_mchk.inp, fx_mchk.exp = "43541873239090087685432", "43.54 Zb"
+    fx_mchk.result = mag.main(["./mag", fx_mchk.inp], True)
+
+
+# -----------------------------------------------------------------------------
+def test_bzetta(fx_mchk):
+    """
+    Test 'mag' for tibibits (1024^7)
+    """
+    pytest.debug_func()
+    fx_mchk.inp, fx_mchk.exp = "23487271233986700065432", "19.89 Zib"
+    fx_mchk.result = mag.main(["./mag", "-b", fx_mchk.inp], True)
+
+
 # -----------------------------------------------------------------------------
 def test_usage():
     """
@@ -177,20 +197,6 @@ def test_mag_standalone():
 
 # ---------------------------------------------------------------------------
 class TestMag(th.HelpedTestCase):
-    # -------------------------------------------------------------------------
-    def test_zetta(self):
-        """
-        Test 'mag' for zettabits (1000^7)
-        """
-        self.magtest('43541873239090087685432 = 43.54 Zb')
-
-    # -------------------------------------------------------------------------
-    def test_bzetta(self):
-        """
-        Test 'mag' for zebibits (1024^7)
-        """
-        self.magtest('23487271233986700065432 = 19.89 Zib')
-
     # -------------------------------------------------------------------------
     def test_yotta(self):
         """
