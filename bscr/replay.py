@@ -5,23 +5,26 @@ replay - monitor the output of a command
 Repetitively clear the screen and run a command so changes in its
 output can be observed in real time.
 
-USAGE
-
-   replay -c "<command>"
-   replay [-i <time>] "<command>"
+Usage:   replay [-d] [-i ITERS] COMMAND
+         replay [-d] [-i ITERS] -s INTERVAL COMMAND
+         replay [-d] [-i ITERS] -p COMMAND
+         replay [-d] [-i ITERS] -t FILEPATH COMMAND
 
 OPTIONS
 
-   -c        Update the screen when the output changes
-   -i <sec>  Update the screen every <sec> seconds
+   -d           Use the python debugger
+   -s INTERVAL  Run the command every INTERVAL seconds
+   -i ITERS     Run the command ITERS times then exit
+   -p           Run the command when user hits ENTER
+   -t FILEPATH  Run the command when FILEPATH timestamp changes
 
 DESCRIPTION
 
 Repeatedly display the output of a command or series of commands until
 the user interrupts the program.
 
-With the -c option, the output is updated when it changes. The command
-is run once per second.
+With the no option (other than -d), the output is updated when it changes. The
+command is run once per second but the output is only reported when it changes.
 
 With the -i option, the output is updated every <interval> seconds.
 
