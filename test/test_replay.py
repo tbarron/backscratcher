@@ -1,16 +1,23 @@
 """
 Tests for replay
 """
-# import pexpect
+import pexpect
 import pytest
 
 
 # -----------------------------------------------------------------------------
-def test_interval():
+def test_prompt():
     """
-    'replay -i 7 CMD' should run CMD and show its output every 7 seconds
+    'replay -p CMD' should run CMD and show its output when user hits ENTER
     """
-    pytest.fail('construction')
+    pytest.debug_func()
+    S = pexpect.spawn("replay -p ls")
+    S.expect("Hit ENTER...")
+    assert "bscr" in S.before
+    S.sendline("")
+    S.expect("Hit ENTER...")
+    S.close()
+    pass
 
 
 # -----------------------------------------------------------------------------
