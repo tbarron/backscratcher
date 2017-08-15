@@ -53,9 +53,8 @@ GNU General Public License for more details.
 from docopt_dispatch import dispatch
 import os
 import pdb
-import sys
+import pexpect
 import time
-import util as U
 
 
 # -----------------------------------------------------------------------------
@@ -164,8 +163,6 @@ def rp_change(**kwa):
             result_b = pexpect.run(cmd)
         print result_b
         result_a = result_b
-
-
 
 
 # -----------------------------------------------------------------------------
