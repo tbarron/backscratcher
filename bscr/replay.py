@@ -66,33 +66,7 @@ def main(argv=None):
     (say, once every five seconds) or to regenerate an output when a file
     is updated.
     """
-    cmdline = U.cmdline([{'opts': ['-c', '--change'],
-                          'action': 'store_true',
-                          'default': False,
-                          'dest': 'change',
-                          'help': 'update on change'},
-                         {'opts': ['-d', '--debug'],
-                          'action': 'store_true',
-                          'default': False,
-                          'dest': 'debug',
-                          'help': 'run under debugger'},
-                         {'opts': ['-i', '--interval'],
-                          'action': 'store',
-                          'default': 10,
-                          'dest': 'interval',
-                          'help': 'seconds between updates'},
-                         {'opts': ['-p', '--prompt'],
-                          'action': 'store_true',
-                          'default': False,
-                          'dest': 'prompt',
-                          'help': 'update on user input'},
-                         {'opts': ['-t', '--trigger'],
-                          'action': 'store',
-                          'default': '',
-                          'dest': 'pathname',
-                          'help': 'update when mtime on pathname changes'}])
-    (opts, args) = cmdline.parse(argv)
-    if opts.debug:
+    if kwa['d']:
         pdb.set_trace()
 
     try:
