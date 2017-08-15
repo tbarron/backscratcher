@@ -98,6 +98,59 @@ def main(argv=None):
     except KeyboardInterrupt:
         print("")
         sys.exit()
+# -----------------------------------------------------------------------------
+@dispatch.on('-p', 'COMMAND')
+def rp_prompt(**kwa):
+    """
+    Replay COMMAND whenever user hits ENTER.
+    """
+    if kwa['d']:
+        pdb.set_trace()
+
+    cmd = kwa['COMMAND']
+    while True:
+        result = pexpect.run(cmd)
+        print " "
+        print result
+        raw_input("Hit ENTER...")
+        cmd = kwa['COMMAND']
+
+
+# -----------------------------------------------------------------------------
+@dispatch.on('-i', 'COMMAND')
+def rp_iters(**kwa):
+    if kwa['d']:
+        pdb.set_trace()
+
+    cmd = kwa['COMMAND']
+    icount = int(kwa['i'])
+    for _ in range(icount):
+        result = pexpect.run(cmd)
+        print result
+        time.sleep(1.0)
+
+
+# -----------------------------------------------------------------------------
+@dispatch.on('COMMAND')
+def rp_change(**kwa):
+    """
+    Replay COMMAND whenever its output changes.
+    """
+    if kwa['d']:
+        pdb.set_trace()
+
+    cmd = kwa['COMMAND']
+    result_a = pexpect.run(cmd)
+    print result_a
+    result_b = pexpect.run(cmd)
+    while True:
+        while result_b == result_a:
+            time.sleep(1.0)
+            result_b = pexpect.run(cmd)
+        print result_b
+        result_a = result_b
+
+
 
 
 # -----------------------------------------------------------------------------
