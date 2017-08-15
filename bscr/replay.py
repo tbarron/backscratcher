@@ -66,43 +66,53 @@ def main(args=None):
     dispatch(__doc__)
 
 
-
-    Run a command repeatedly to view its changing output on a time scheule
-    (say, once every five seconds) or to regenerate an output when a file
-    is updated.
+# -----------------------------------------------------------------------------
+@dispatch.on('-i', '-s', 'COMMAND')
+def rp_iter_ival(**kwa):
+    """
+    Replay COMMAND whenever its output changes. If -s SECONDS is specified,
+    pause for that many seconds betwen iterations. Execute the number of
+    iterations specified by -i.
     """
     if kwa['d']:
         pdb.set_trace()
 
-    try:
-        start = time.time()
-        cmd = " ".join(args)
-        old_stuff_s = ""
-        while True:
-            rbl = os.popen(cmd, "r")
-            stuff = rbl.readlines()
-            rbl.close()
-            stuff_s = " ".join(stuff)
+    cmd = kwa['COMMAND']
+    stime = int(kwa['s'])
+    iters = int(kwa['i'])
 
-            if opts.prompt:
-                report(start, cmd, stuff_s)
-                raw_input('Press ENTER to continue...')
-            elif opts.change:
-                if stuff_s != old_stuff_s:
-                    report(start, cmd, stuff_s)
-                    old_stuff_s = stuff_s
-                time.sleep(1.0)
-            elif opts.pathname != '':
-                when = U.mtime(opts.pathname)
-                report(start, cmd, stuff_s)
-                while when == U.mtime(opts.pathname):
-                    time.sleep(1.0)
-            else:
-                report(start, cmd, stuff_s)
-                time.sleep(float(opts.interval))
-    except KeyboardInterrupt:
-        print("")
-        sys.exit()
+    result_a = pexpect.run(cmd)
+    print result_a
+    iters -= 1
+    while 0 < iters:
+        time.sleep(stime)
+        result_a = pexpect.run(cmd)
+        print result_a
+        iters -= 1
+
+
+# -----------------------------------------------------------------------------
+@dispatch.on('-s', 'COMMAND')
+def rp_interval(**kwa):
+    """
+    Replay COMMAND whenever its output changes. If -s SECONDS is specified,
+    pause for that many seconds betwen iterations.
+    """
+    if kwa['d']:
+        pdb.set_trace()
+
+    cmd = kwa['COMMAND']
+    stime = int(kwa['s'])
+    # iters = int(kwa['i'])
+
+    result = pexpect.run(cmd)
+    print result
+    while True:
+        time.sleep(stime)
+        result = pexpect.run(cmd)
+        print result
+
+
 # -----------------------------------------------------------------------------
 @dispatch.on('-p', 'COMMAND')
 def rp_prompt(**kwa):
