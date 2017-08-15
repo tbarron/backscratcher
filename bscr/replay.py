@@ -50,6 +50,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
+from docopt_dispatch import dispatch
 import os
 import pdb
 import sys
@@ -58,9 +59,13 @@ import util as U
 
 
 # -----------------------------------------------------------------------------
-def main(argv=None):
+def main(args=None):
     """
-    Main entry point for replay program.
+    Let's get it started in here!
+    """
+    dispatch(__doc__)
+
+
 
     Run a command repeatedly to view its changing output on a time scheule
     (say, once every five seconds) or to regenerate an output when a file
