@@ -8,6 +8,45 @@ from bscr import util as U
 
 
 # -----------------------------------------------------------------------------
+def test_newdir(tmpdir, fx_ndexp):
+    """
+    Verify that 'pytool newdir ...' does the right thing
+    """
+    pytest.debug_func()
+    root = fx_ndexp[0]["arg"]
+    cmd = "pytool newdir {}".format(root.strpath)
+    pexpect.run(cmd)
+    for item in fx_ndexp:
+        item["op"](item["arg"])
+
+
+# -----------------------------------------------------------------------------
+def test_newdir_already(tmpdir, fx_ndexp):
+    """
+    If the target directory already exists, exit with an error
+    """
+    pytest.debug_func()
+    root = fx_ndexp[0]["arg"]
+    root.ensure(dir=True)
+    result = pexpect.run("pytool newdir {}".format(root.strpath))
+    msg = "{} already exists, please remove it first".format(root.strpath)
+    assert msg in result
+    for item in fx_ndexp[1:]:
+        assert not item["arg"].exists()
+
+
+# -----------------------------------------------------------------------------
+def test_newdir_noarg(tmpdir, fx_ndexp):
+    """
+    Verify that 'pytool newdir' with no argument produces a help message
+    """
+    pytest.debug_func()
+    result = pexpect.run("pytool newdir")
+    assert "Usage:" in result
+    assert "pytool newdir [-d] PATH" in result
+
+
+# -----------------------------------------------------------------------------
 def test_newpy_nothing():
     """
     Run 'pytool newpy' with no other arguments. Should produce pytool's
@@ -381,6 +420,9 @@ def expected_help():
                 "",
                 "    pytool help",
                 "        Display this list of command descriptions",
+                "",
+                "    pytool newdir PATH",
+                "        Create a python project in PATH",
                 "",
                 "    pytool newpy PROGRAM",
                 "        Create a new python program named PROGRAM",
