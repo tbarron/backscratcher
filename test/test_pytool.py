@@ -410,6 +410,74 @@ def fx_nopred(tmpdir):
 
 
 # -----------------------------------------------------------------------------
+@pytest.fixture
+def fx_ndexp(request, tmpdir):
+    """
+    Set up a structure to hold expected data for a newdir test
+    """
+    testname = request._pyfuncitem.name
+    cmdl = []
+    root = tmpdir.join(testname)
+    cmdl.append({"op": vfy_dir, "arg": root})
+    cmdl.append({"op": vfy_dir, "arg": root.join("test")})
+    cmdl.append({"op": vfy_dir, "arg": root.join("venv")})
+    cmdl.append({"op": vfy_file, "arg": root.join("venv/bin/activate")})
+    cmdl.append({"op": vfy_setup, "arg": root.join("setup.py")})
+    cmdl.append({"op": vfy_env, "arg": root.join(".env")})
+    cmdl.append({"op": vfy_conftest, "arg": root.join("conftest.py")})
+    return cmdl
+
+
+# -----------------------------------------------------------------------------
+def vfy_conftest(pathobj):
+    """
+    Check that pathobj represents the conftest.py we want
+    """
+    assert pathobj.isfile()
+    assert "pytest_configure" in pathobj.read()
+    assert "pytest.debug_func" in pathobj.read()
+
+
+# -----------------------------------------------------------------------------
+def vfy_dir(pathobj):
+    """
+    Check that pathobj represents a directory
+    """
+    assert pathobj.isdir()
+
+
+# -----------------------------------------------------------------------------
+def vfy_env(pathobj):
+    """
+    Check that pathobj represents a directory
+    """
+    assert pathobj.isfile()
+    pkgname = os.path.basename(pathobj.dirname)
+    assert "export PKG=\"{}\"".format(pkgname) in pathobj.read()
+    assert "source venv/bin/activate" in pathobj.read()
+    assert "export PTMP=" in pathobj.read()
+
+
+# -----------------------------------------------------------------------------
+def vfy_file(pathobj):
+    """
+    Check that pathobj represents a file
+    """
+    assert pathobj.isfile()
+
+
+# -----------------------------------------------------------------------------
+def vfy_setup(pathobj):
+    """
+    Check that pathobj represents the setup.py we want
+    """
+    assert pathobj.isfile()
+    nub = os.path.basename(pathobj.dirname)
+    assert "setup(name='{}'".format(nub) in pathobj.read()
+    assert "from setuptools import setup" in pathobj.read()
+
+
+# -----------------------------------------------------------------------------
 def toyfile(where, name, exists=False, content=None):
     """
     Create a thing for a test to play with. Verify where.strpath/name does not
