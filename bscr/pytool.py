@@ -4,6 +4,7 @@ pytool - produce skeletons for python programs
 
 Usage:
     pytool help [COMMAND]
+    pytool newdir [-d] PATH
     pytool newpy [-d] PROGRAM
     pytool newtool [-d] PROGRAM PREFIX
 
@@ -12,6 +13,9 @@ pytool examples:
 
     pytool help
         Display this list of command descriptions
+
+    pytool newdir PATH
+        Create a python project in PATH
 
     pytool newpy PROGRAM
         Create a new python program named PROGRAM
@@ -42,6 +46,8 @@ GNU General Public License for more details.
 from docopt_dispatch import dispatch
 import os
 import pdb
+import pexpect
+import py
 import re
 import sys
 
@@ -74,6 +80,37 @@ def help(**kwa):
         if "examples:" in line:
             print line
             printing = True
+
+
+# -----------------------------------------------------------------------------
+@dispatch.on('newdir', 'PATH')
+def pt_newdir(**kwa):
+    """newdir - Create a new python project
+    """
+    if kwa['d']:
+        pdb.set_trace()
+    root = py.path.local(kwa['PATH'])
+    if root.isdir():
+        msg = " ".join([root.strpath,
+                        "already exists, please remove it first"])
+        sys.exit(msg)
+    pkgname = root.basename
+    root.ensure(dir=True)
+    root.join(pkgname).ensure(dir=True)
+    root.join('test').ensure(dir=True)
+
+    venv = root.join("venv")
+    pexpect.run("virtualenv {}".format(venv.strpath))
+
+    setup = root.join("setup.py")
+    setup.write(setup_content_s(pkgname))
+
+    env = root.join(".env")
+    env.write(env_content_s(pkgname))
+
+    conftest = root.join("conftest.py")
+    conftest.write(conftest_content())
+    pass
 
 
 # ---------------------------------------------------------------------------
@@ -214,3 +251,164 @@ def are_we_overwriting(flist):
         sys.exit(1)
 
     U.safe_unlink(already)
+
+
+# ---------------------------------------------------------------------------
+def conftest_content():
+    """
+    Generate the standard content for conftest.py
+    """
+    txt = """
+import os
+import pdb
+import pytest
+import time
+from bscr.version import __version__
+
+
+# -----------------------------------------------------------------------------
+def pytest_addoption(parser):
+    \"\"\"
+    Add the --logpath option to the command line
+    \"\"\"
+    parser.addoption(\"--skip\", action=\"append\", default=[],
+                     help=\"don't run the named test(s)\")
+    parser.addoption(\"--logpath\", action=\"store\", default=\"\",
+                     help=\"where to write a test log\")
+    parser.addoption(\"--dbg\", action=\"append\", default=[],
+                     help=\"start debugger on test named or ALL\")
+    parser.addoption(\"--all\", action=\"store_true\", default=False,
+                     help=\"start debugger on test named or ALL\")
+
+
+# -----------------------------------------------------------------------------
+def pytest_report_header(config):
+    \"\"\"
+    Put marker in the log file to show where the test run started
+    \"\"\"
+
+    pytest_writelog(config, \"-\" * 60)
+    return(\"Package version %s\" % __version__)
+
+
+# -----------------------------------------------------------------------------
+def pytest_configure(config):
+    \"\"\"
+    If --all, turn off --exitfirst
+    \"\"\"
+    # pdb.set_trace()
+    if config.getoption(\"--all\"):
+        config.option.__dict__['exitfirst'] = False
+        config.option.__dict__['maxfail'] = 2000
+
+
+# -----------------------------------------------------------------------------
+def pytest_runtest_setup(item):
+    \"\"\"
+    For each test, just before it runs...
+    \"\"\"
+    skipl = item.config.getoption(\"--skip\")
+    if any([item.name in skipl,
+            any([_ in item.name for _ in skipl])]):
+        pytest.skip()
+    if any([item.name in item.config.getoption(\"--dbg\"),
+            'all' in item.config.getoption(\"--dbg\")] +
+           [_ in item.name for _ in item.config.getoption('--dbg')]):
+        pytest.debug_func = pdb.set_trace
+    else:
+        pytest.debug_func = lambda: None
+
+
+# -----------------------------------------------------------------------------
+def pytest_unconfigure(config):
+    \"\"\"
+    At the end of the run, log a summary
+    \"\"\"
+    pytest_writelog(config,
+                    \"passed: %d; FAILED: %d\" % (pytest_writelog._passcount,
+                                                  pytest_writelog._failcount))
+
+
+# -----------------------------------------------------------------------------
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    \"\"\"
+    Write a line to the log file for this test
+    \"\"\"
+    ctx = yield
+    rep = ctx.result
+    if rep.when != 'call':
+        return
+
+    if rep.outcome == 'failed':
+        status = \">>>>FAIL\"
+        pytest_writelog._failcount += 1
+    elif rep.outcome == 'passed':
+        status = \"--pass\"
+        pytest_writelog._passcount += 1
+    elif rep.outcome == 'skipped':
+        status = '**skip'
+    else:
+        status = 'other '
+
+    parent = item.parent
+    msg = \"%-8s %s:%s.%s\" % (status,
+                             os.path.basename(parent.fspath.strpath),
+                             parent.name,
+                             item.name)
+    pytest_writelog(item.config, msg)
+
+
+# -----------------------------------------------------------------------------
+def pytest_writelog(config, loggable):
+    \"\"\"
+    Here's where we actually write to the log file is one was specified
+    \"\"\"
+    logpath = config.getoption(\"logpath\")
+    if logpath == \"\":
+        return
+    f = open(logpath, 'a')
+    msg = \"%s %s\n\" % (time.strftime(\"%Y.%m%d %H:%M:%S\"),
+                     loggable)
+    f.write(msg)
+    f.close()
+
+
+pytest_writelog._passcount = 0
+pytest_writelog._failcount = 0
+    """
+    return txt
+
+
+# -----------------------------------------------------------------------------
+def env_content_s(pkgname):
+    """
+    Return the correct content for .env
+    """
+    txt = [
+        "export PKG=\"{}\"".format(pkgname),
+        "source venv/bin/activate",
+        "function chpwd() {",
+        "    deactivate",
+        "    unset -f chpwd",
+        "}",
+        "",
+        "export PTMP=/private/var/folders/4g/xhhsjk953jd8sqnvqq3fhxsc0000gp"
+        "/T/pytest-of-tbarron/pytest-tbarron"
+        ]
+    return "\n".join(txt) + "\n"
+
+
+# -----------------------------------------------------------------------------
+def setup_content_s(pkgname):
+    """
+    Return the correct content for setup.py
+    """
+    txt = [
+        "from setuptools import setup",
+        "",
+        "setup(name='{}',".format(pkgname),
+        "    packages=['{}']".format(pkgname),
+        ")"
+        ]
+    return "\n".join(txt) + "\n"
