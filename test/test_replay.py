@@ -43,7 +43,17 @@ def test_change():
     """
     'replay CMD' should display the output of CMD when it changes
     """
-    pytest.fail('construction')
+    pytest.debug_func()
+    count = 3
+    rcmd = "replay \"date '+%s xxx'\""
+    S = pexpect.spawn(rcmd)
+    last = None
+    for idx in range(count):
+        S.expect(["xxx", pexpect.EOF])
+        cur = S.before
+        assert last != cur
+        last = cur
+    S.close()
 
 
 # -----------------------------------------------------------------------------
