@@ -1,8 +1,6 @@
 from bscr import list
-# from bscr import testhelp as th
 from bscr import util as U
 import pexpect
-# import pprint
 import pytest
 
 
