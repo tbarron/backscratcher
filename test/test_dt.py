@@ -24,9 +24,11 @@ def test_epoch(fx_both):
     """
     pytest.debug_func()
     fx_both.expected = -300
+    fx_both.basetime = time.time()
     argl = [str(int(time.time()) + fx_both.expected)]
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
@@ -65,8 +67,10 @@ def test_last_saturday(fx_both):
     pytest.debug_func()
     argl = ["last", "saturday"]
     fx_both.expected = dt.time_to(argl[1], argl[0])
+    fx_both.basetime = time.time()
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
@@ -77,8 +81,10 @@ def test_last_thursday(fx_both):
     pytest.debug_func()
     argl = ["last", "thursday"]
     fx_both.expected = dt.time_to(argl[1], argl[0])
+    fx_both.basetime = time.time()
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
@@ -88,9 +94,11 @@ def test_last_tuesday(fx_both):
     """
     pytest.debug_func()
     argl = ["last", "tuesday"]
+    fx_both.basetime = time.time()
     fx_both.expected = dt.time_to(argl[1], argl[0])
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
@@ -101,8 +109,10 @@ def test_last_week(fx_both):
     pytest.debug_func()
     fx_both.expected = -7 * 24 * 3600
     argl = ["last", "week"]
+    fx_both.basetime = time.time()
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
@@ -114,7 +124,9 @@ def test_minus3hour(fx_both):
     fx_both.expected = -3 * 3600
     argl = ["-3", "hour"]
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.basetime = time.time()
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
@@ -126,7 +138,9 @@ def test_minus3month(fx_both):
     fx_both.expected = -3 * 30 * 24 * 3600
     argl = ["-3", "month"]
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.basetime = time.time()
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
@@ -152,7 +166,9 @@ def test_next_day(fx_both):
     fx_both.expected = 24 * 3600
     argl = ["next", "day"]
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.basetime = time.time()
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
@@ -164,7 +180,9 @@ def test_next_friday(fx_both):
     argl = ["next", "friday"]
     fx_both.expected = dt.time_to(argl[1], argl[0])
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.basetime = time.time()
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
@@ -176,7 +194,9 @@ def test_next_monday(fx_both):
     argl = ["next", "monday"]
     fx_both.expected = dt.time_to(argl[1], argl[0])
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.basetime = time.time()
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
@@ -201,7 +221,9 @@ def test_next_sunday(fx_both):
     argl = ["next", "sunday"]
     fx_both.expected = dt.time_to(argl[1], argl[0])
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.basetime = time.time()
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
@@ -213,7 +235,9 @@ def test_next_wednesday(fx_both):
     argl = ["next", "wednesday"]
     fx_both.expected = dt.time_to(argl[1], argl[0])
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.basetime = time.time()
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
@@ -223,9 +247,11 @@ def test_next_week(fx_both):
     """
     pytest.debug_func()
     fx_both.expected = 7 * 24 * 3600
+    fx_both.basetime = time.time()
     argl = ["next", "week"]
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
@@ -237,7 +263,9 @@ def test_plus5day(fx_both):
     fx_both.expected = 5 * 24 * 3600
     argl = ["+5", "day"]
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.basetime = time.time()
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
@@ -249,7 +277,9 @@ def test_plus2day(fx_both):
     fx_both.expected = 2 * 24 * 3600
     argl = ["+2", "day"]
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.basetime = time.time()
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
@@ -261,7 +291,9 @@ def test_today(fx_both):
     fx_both.expected = 0
     argl = ["today"]
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.basetime = time.time()
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
@@ -272,7 +304,9 @@ def test_tomorrow(fx_both):
     fx_both.expected = 24 * 3600
     argl = ["tomorrow"]
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.basetime = time.time()
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
@@ -281,9 +315,11 @@ def test_tomorrow_plus2hr(fx_both):
     tomorrow
     """
     fx_both.expected = (24+2) * 3600
+    fx_both.basetime = time.time()
     argl = ["tomorrow", "2", "hour"]
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
@@ -294,7 +330,9 @@ def test_yesterday(fx_both):
     fx_both.expected = -24 * 3600
     argl = ["yesterday"]
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.basetime = time.time()
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
@@ -305,7 +343,9 @@ def test_yesterday_plus7wk(fx_both):
     fx_both.expected = (7 * 7 - 1) * 24 * 3600
     argl = ["yesterday", "7", "week"]
     fx_both.parsed = dt.parse_whenspec(argl)
-    fx_both.reported = dt.report_date(default_format(), argl)
+    fx_both.basetime = time.time()
+    fx_both.reported = dt.report_date(default_format(), argl,
+                                      basetime=fx_both.basetime)
 
 
 # -----------------------------------------------------------------------------
