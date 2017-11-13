@@ -103,9 +103,11 @@ def fatal(msg):
 
 
 # -----------------------------------------------------------------------------
-def report_date(fmt, args):
+def report_date(fmt, args, basetime=None):
     """
-    Parse *args* to get a time and return it formatted according to *fmt*
+    Parse *args* to get a time and return it formatted according to *fmt*. If
+    *basetime* is provided, use it as the starting point. Otherwise, use
+    time.time()
     """
     # print args
     argstr = ' '.join(args).lower()
@@ -118,7 +120,9 @@ def report_date(fmt, args):
 
     # print('edited_args = ', edited_args)
     offset = parse_whenspec(edited_args)
-    when = time.time() + offset
+    if basetime is None:
+        basetime = time.time()
+    when = basetime + offset
     return time.strftime(fmt, time.localtime(when))
 
 
