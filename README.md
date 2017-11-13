@@ -40,7 +40,7 @@ that ordinarily only operate on a single file.
 
     errno
         Feed it a number from errno.h, get back the symbolic name and
-        meaning.
+        meaning, or vice versa.
 
     fab.py
         Poor man's make.
@@ -48,10 +48,13 @@ that ordinarily only operate on a single file.
     filter.py
     
     fl.py
-        File manipulation.
+        File manipulations. Copy atime to mtime, mtime to atime; diff file
+        against previous revision; revert file to previous revision; remove
+        \r from a file (or add them); display all times associated with a
+        file; make backup copy of a file; find unreadable files.
 
     fx.py
-        Command line effects.
+        Command line effects. Turbo xargs; structured batch renames; etc.
 
     hd.py
         Hexdump.
@@ -61,6 +64,9 @@ that ordinarily only operate on a single file.
     
     mag.py (magnitude)
         2384192384283 -> 2.17 Tb
+
+    mcal
+        Display analog calendar in various formats.
 
     msh
         Start ssh with a control socket so that multiple sessions can
@@ -72,7 +78,7 @@ that ordinarily only operate on a single file.
         number.
 
     plwhich
-        Which for the perl installation. Where does Data::Dumper live?
+        Which for the perl installation. eg., where does Data::Dumper live?
 
     ptidy
         Cleanup up emacs debris.
@@ -92,17 +98,17 @@ that ordinarily only operate on a single file.
     summarize.pl
         Apply "artificial ignorance" to a set of files.
 
-    testhelp.py
+    testhelp.py [deprecated -- remove]
         Testing utility routines.
 
-    toolframe.py
+    toolframe.py [deprecated -- remove]
         Easy launching for tool-style and simply python programs.
 
     tpbtools.py
         Utility routines.
 
     tps
-        Find processes.
+        Turbo-ps -- find processes.
 
     truth_table
         Generate truth tables for an arbitrary number of variables.
@@ -119,6 +125,9 @@ that ordinarily only operate on a single file.
     wxfr
         Bulk file transfer.
 
+    xclean
+        Remove emacs backup files (*~) and other debris left behind by work
+        processes
  
 You may notice that some of these are written in only perl while
 others have a python version and some are only in python. I learned
@@ -135,4 +144,4 @@ that perl can do expect-type stuff, too.
 
 ----------------------------
 
-Moving tests down into directory test
+Regression tests now live in directory test.
