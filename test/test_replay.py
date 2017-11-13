@@ -53,19 +53,20 @@ def test_filepath(tmpdir):
 
 
 # -----------------------------------------------------------------------------
-def test_change():
+def test_iterations():
     """
-    'replay CMD' should display the output of CMD when it changes
+    'replay -i 7 CMD' should run CMD and show its output 7 times
     """
     pytest.debug_func()
     count = 3
-    rcmd = "replay \"date '+%s xxx'\""
+    rcmd = "replay -i {} \"date '+%s xxx'\"".format(count)
     S = pexpect.spawn(rcmd)
     last = None
     for idx in range(count):
         S.expect(["xxx", pexpect.EOF])
-        cur = S.before
-        assert last != cur
+        cur = int(S.before)
+        if last:
+            assert cur - last <= 2
         last = cur
     S.close()
 
