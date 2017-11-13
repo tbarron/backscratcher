@@ -91,11 +91,3 @@ def test_prompt():
     S.sendline("")
     S.expect("Hit ENTER...")
     S.close()
-
-
-# -----------------------------------------------------------------------------
-def test_replayNeedsTests():
-    """
-    Need tests for replay
-    """
-    pytest.fail("replay needs tests")
