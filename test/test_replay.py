@@ -6,16 +6,20 @@ import pytest
 
 
 # -----------------------------------------------------------------------------
-def test_prompt():
+def test_change():
     """
-    'replay -p CMD' should run CMD and show its output when user hits ENTER
+    'replay CMD' should display the output of CMD when it changes
     """
     pytest.debug_func()
-    S = pexpect.spawn("replay -p ls")
-    S.expect("Hit ENTER...")
-    assert "bscr" in S.before
-    S.sendline("")
-    S.expect("Hit ENTER...")
+    count = 3
+    rcmd = "replay \"date '+%s xxx'\""
+    S = pexpect.spawn(rcmd)
+    last = None
+    for idx in range(count):
+        S.expect(["xxx", pexpect.EOF])
+        cur = S.before
+        assert last != cur
+        last = cur
     S.close()
 
 
@@ -57,11 +61,17 @@ def test_change():
 
 
 # -----------------------------------------------------------------------------
-def test_filepath():
+def test_prompt():
     """
-    'replay -t FILENAME CMD' should run CMD when timetamp on FILENAME changes
+    'replay -p CMD' should run CMD and show its output when user hits ENTER
     """
-    pytest.fail('construction')
+    pytest.debug_func()
+    S = pexpect.spawn("replay -p ls")
+    S.expect("Hit ENTER...")
+    assert "bscr" in S.before
+    S.sendline("")
+    S.expect("Hit ENTER...")
+    S.close()
 
 
 # -----------------------------------------------------------------------------
