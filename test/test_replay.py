@@ -41,13 +41,21 @@ def test_filepath(tmpdir):
     S.close()
 
 
+# -----------------------------------------------------------------------------
+def test_interval():
+    """
+    'replay -s 2 CMD' should run CMD and show its output every 2 seconds
+    """
+    pytest.debug_func()
+    count = 3
+    rcmd = "replay -s 2 \"date '+%s xxx'\""
     S = pexpect.spawn(rcmd)
     last = None
     for idx in range(count):
         S.expect(["xxx", pexpect.EOF])
         cur = int(S.before)
         if last:
-            assert cur - last <= 2
+            assert cur - last >= 2
         last = cur
     S.close()
 
