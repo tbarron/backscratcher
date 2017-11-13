@@ -1,5 +1,4 @@
 from bscr import fx
-from bscr import testhelp as th
 from bscr import util as U
 import glob
 import re
@@ -26,16 +25,13 @@ def test_batch_command_both(tmpdir, capsys):
         exp = ''
         for chunk in q:
             exp += re.sub('^echo ', "would do 'echo ", chunk) + "'\n"
-        with th.StdoutExcursion() as getval:
-            with open('tmpfile', 'r') as f:
-                fx.batch_command(v, [], f)
-            actual = getval()
-
-        assert exp == actual
+        with open("tmpfile", "r") as f:
+            fx.batch_command(v, [], f)
+        assert exp in "".join(capsys.readouterr())
 
 
 # -----------------------------------------------------------------------------
-def test_batch_command_dryrun(tmpdir):
+def test_batch_command_dryrun(tmpdir, capsys):
     """
     Test batch_command with dryrun True and quiet False.
     """
@@ -51,16 +47,13 @@ def test_batch_command_dryrun(tmpdir):
         for chunk in q:
             exp += re.sub('^echo ', "would do 'echo ", chunk) + "'\n"
 
-        with th.StdoutExcursion() as getval:
-            with open('tmpfile', 'r') as f:
-                fx.batch_command(v, [], f)
-            actual = getval()
-
-        assert exp == actual
+        with open("tmpfile", 'r') as f:
+            fx.batch_command(v, [], f)
+        assert exp in "".join(capsys.readouterr())
 
 
 # -----------------------------------------------------------------------------
-def test_batch_command_neither(tmpdir):
+def test_batch_command_neither(tmpdir, capsys):
     """
     Test batch_command with dryrun and quiet both False.
     """
@@ -77,16 +70,13 @@ def test_batch_command_neither(tmpdir):
             exp += chunk + '\n'
             exp += re.sub('^echo ', '', chunk) + '\n'
 
-        with th.StdoutExcursion() as getval:
-            with open('tmpfile', 'r') as f:
-                fx.batch_command(v, [], f)
-            actual = getval()
-
-        assert exp == actual
+        with open('tmpfile', 'r') as f:
+            fx.batch_command(v, [], f)
+        assert exp in "".join(capsys.readouterr())
 
 
 # -----------------------------------------------------------------------------
-def test_batch_command_quiet(tmpdir):
+def test_batch_command_quiet(tmpdir, capsys):
     """
     Test batch_command with dryrun False and quiet True.
     """
@@ -103,12 +93,9 @@ def test_batch_command_quiet(tmpdir):
         for chunk in q:
             exp += re.sub('^echo ', '', chunk) + '\n'
 
-        with th.StdoutExcursion() as getval:
-            with open('tmpfile', 'r') as f:
-                fx.batch_command(v, [], f)
-            actual = getval()
-
-        assert exp == actual
+        with open('tmpfile', 'r') as f:
+            fx.batch_command(v, [], f)
+        assert exp in "".join(capsys.readouterr())
 
 
 # -----------------------------------------------------------------------------
@@ -143,7 +130,7 @@ def test_fx_help():
 
 
 # -----------------------------------------------------------------------------
-def test_iterate_command_both(tmpdir):
+def test_iterate_command_both(tmpdir, capsys):
     """
     Test iterate_command() with dryrun True and quiet True.
     """
@@ -154,15 +141,12 @@ def test_iterate_command_both(tmpdir):
                              'irange': '5:10'})
         exp = "".join(["would do 'echo %d'\n" % i for i in range(5, 10)])
 
-        with th.StdoutExcursion() as getval:
-            fx.iterate_command(v, [])
-            actual = getval()
-
-        assert exp == actual
+        fx.iterate_command(v, [])
+        assert exp in "".join(capsys.readouterr())
 
 
 # -----------------------------------------------------------------------------
-def test_iterate_command_dryrun(tmpdir):
+def test_iterate_command_dryrun(tmpdir, capsys):
     """
     Test iterate_command() with dryrun True and quiet False.
     """
@@ -173,15 +157,12 @@ def test_iterate_command_dryrun(tmpdir):
                              'irange': '5:10'})
         exp = "".join(["would do 'echo %d'\n" % i for i in range(5, 10)])
 
-        with th.StdoutExcursion() as getval:
-            fx.iterate_command(v, [])
-            actual = getval()
-
-        assert exp == actual
+        fx.iterate_command(v, [])
+        assert exp in "".join(capsys.readouterr())
 
 
 # -----------------------------------------------------------------------------
-def test_iterate_command_neither(tmpdir):
+def test_iterate_command_neither(tmpdir, capsys):
     """
     Test iterate_command() with dryrun False and quiet False.
     """
@@ -192,14 +173,12 @@ def test_iterate_command_neither(tmpdir):
                              'irange': '5:10'})
         exp = "".join(["echo %d\n%d\n" % (i, i) for i in range(5, 10)])
 
-        with th.StdoutExcursion() as getval:
-            fx.iterate_command(v, [])
-            actual = getval()
-        assert exp == actual
+        fx.iterate_command(v, [])
+        assert exp in "".join(capsys.readouterr())
 
 
 # -----------------------------------------------------------------------------
-def test_iterate_command_quiet(tmpdir):
+def test_iterate_command_quiet(tmpdir, capsys):
     """
     Test iterate_command() with dryrun False and quiet True.
     """
@@ -210,50 +189,42 @@ def test_iterate_command_quiet(tmpdir):
                              'irange': '5:10'})
         exp = "".join(["%d\n" % i for i in range(5, 10)])
 
-        with th.StdoutExcursion() as getval:
-            fx.iterate_command(v, [])
-            actual = getval()
-        assert exp == actual
+        fx.iterate_command(v, [])
+        assert exp in "".join(capsys.readouterr())
 
 
 # -----------------------------------------------------------------------------
-def test_psys_both():
+def test_psys_both(capsys):
     """
     Test routine psys with dryrun True and quiet True.
     """
-    with th.StdoutExcursion() as getval:
-        v = optparse.Values({'dryrun': True, 'quiet': True})
-        fx.psys('ls -d fx.py', v)
-        actual = getval()
+    v = optparse.Values({'dryrun': True, 'quiet': True})
     expected = "would do 'ls -d fx.py'\n"
-    assert(expected == actual)
+    fx.psys('ls -d fx.py', v)
+    assert expected in "".join(capsys.readouterr())
 
 
 # -----------------------------------------------------------------------------
-def test_psys_dryrun():
+def test_psys_dryrun(capsys):
     """
     Test routine psys with dryrun True and quiet False.
     """
-    with th.StdoutExcursion() as getval:
-        v = optparse.Values({'dryrun': True, 'quiet': False})
-        fx.psys('ls -d nosuchfile', v)
-        actual = getval()
+    v = optparse.Values({'dryrun': True, 'quiet': False})
     expected = "would do 'ls -d nosuchfile'\n"
-    assert expected == actual
+    fx.psys('ls -d nosuchfile', v)
+    assert expected in "".join(capsys.readouterr())
 
 
 # -----------------------------------------------------------------------------
-def test_psys_neither():
+def test_psys_neither(capsys):
     """
     Test routine psys with dryrun False and quiet False.
     """
     root = U.findroot()
-    with th.StdoutExcursion() as getval:
-        v = optparse.Values({'dryrun': False, 'quiet': False})
-        fx.psys('ls -d %s/fx.py' % root, v)
-        actual = getval()
+    v = optparse.Values({'dryrun': False, 'quiet': False})
     expected = "ls -d %s/fx.py\n%s/fx.py\n" % (root, root)
-    assert expected == actual
+    fx.psys('ls -d %s/fx.py' % root, v)
+    assert expected in " ".join(capsys.readouterr())
 
 
 # -----------------------------------------------------------------------------
@@ -265,12 +236,11 @@ def test_psys_quiet(tmpdir, capsys, data):
         exp = "a.xyzzy\nb.xyzzy\nc.xyzzy\ntmpfile\n"
         v = optparse.Values({'dryrun': False, 'quiet': True})
         fx.psys('ls', v)
-        actual, _ = capsys.readouterr()
-        assert exp == actual
+        assert exp == "".join(capsys.readouterr())
 
 
 # -----------------------------------------------------------------------------
-def test_subst_command_both(tmpdir):
+def test_subst_command_both(tmpdir, capsys):
     """
     Test subst_command() with dryrun True and quiet True.
     """
@@ -280,15 +250,12 @@ def test_subst_command_both(tmpdir):
         exp = "".join(["would do 'ls %s'\n" % x for x in a])
         U.safe_unlink(a)
 
-        with th.StdoutExcursion() as getval:
-            fx.subst_command(v, a)
-            actual = getval()
-
-        assert exp == actual
+        fx.subst_command(v, a)
+        assert exp in "".join(capsys.readouterr())
 
 
 # -----------------------------------------------------------------------
-def test_subst_command_dryrun(tmpdir):
+def test_subst_command_dryrun(tmpdir, capsys):
     """
     Test subst_command() with dryrun True and quiet False.
     """
@@ -299,15 +266,12 @@ def test_subst_command_dryrun(tmpdir):
         exp = "".join(["would do 'ls %s'\n" % x for x in a])
         U.safe_unlink(a)
 
-        with th.StdoutExcursion() as getval:
-            fx.subst_command(v, a)
-            actual = getval()
-
-        assert exp == actual
+        fx.subst_command(v, a)
+        assert exp in " ".join(capsys.readouterr())
 
 
 # -----------------------------------------------------------------------------
-def test_subst_command_neither(tmpdir):
+def test_subst_command_neither(tmpdir, capsys):
     """
     Test subst_command() with dryrun False and quiet False.
     """
@@ -318,15 +282,12 @@ def test_subst_command_neither(tmpdir):
         exp = "".join(['ls %s\n%s\n' % (x, x) for x in a])
         U.touch(a)
 
-        with th.StdoutExcursion() as getval:
-            fx.subst_command(v, a)
-            actual = getval()
-
-        assert exp == actual
+        fx.subst_command(v, a)
+        assert exp in " ".join(capsys.readouterr())
 
 
 # -----------------------------------------------------------------------------
-def test_subst_command_quiet(tmpdir):
+def test_subst_command_quiet(tmpdir, capsys):
     """
     Test subst_command() with dryrun False and quiet True.
     """
@@ -337,15 +298,12 @@ def test_subst_command_quiet(tmpdir):
         exp = "".join(['%s\n' % x for x in a])
         U.touch(a)
 
-        with th.StdoutExcursion() as getval:
-            fx.subst_command(v, a)
-            actual = getval()
-
-        assert exp == actual
+        fx.subst_command(v, a)
+        assert exp in " ".join(capsys.readouterr())
 
 
 # -----------------------------------------------------------------------------
-def test_subst_rename_both(tmpdir):
+def test_subst_rename_both(tmpdir, capsys):
     """
     Test subst_rename() with dryrun True and quiet True.
     """
@@ -358,10 +316,8 @@ def test_subst_rename_both(tmpdir):
         v = optparse.Values({'dryrun': True, 'quiet': True,
                              'edit': 's/.pl/.xyzzy'})
 
-        with th.StdoutExcursion() as getval:
-            fx.subst_rename(v, arglist)
-            actual = getval()
-        assert expected == actual
+        fx.subst_rename(v, arglist)
+        assert expected in " ".join(capsys.readouterr())
 
         q = glob.glob('*.pl')
         q.sort()
@@ -369,7 +325,7 @@ def test_subst_rename_both(tmpdir):
 
 
 # -----------------------------------------------------------------------------
-def test_subst_rename_dryrun(tmpdir):
+def test_subst_rename_dryrun(tmpdir, capsys):
     """
     Test subst_rename() with dryrun True and quiet False.
     """
@@ -382,10 +338,8 @@ def test_subst_rename_dryrun(tmpdir):
         v = optparse.Values({'dryrun': True, 'quiet': False,
                              'edit': 's/.pl/.xyzzy'})
 
-        with th.StdoutExcursion() as getval:
-            fx.subst_rename(v, arglist)
-            actual = getval()
-        assert expected == actual
+        fx.subst_rename(v, arglist)
+        assert expected in " ".join(capsys.readouterr())
 
         q = glob.glob('*.pl')
         q.sort()
@@ -393,7 +347,7 @@ def test_subst_rename_dryrun(tmpdir):
 
 
 # -----------------------------------------------------------------------------
-def test_subst_rename_neither(tmpdir):
+def test_subst_rename_neither(tmpdir, capsys):
     """
     Test subst_rename() with dryrun False and quiet False.
     """
@@ -407,18 +361,16 @@ def test_subst_rename_neither(tmpdir):
         v = optparse.Values({'dryrun': False, 'quiet': False,
                              'edit': 's/.pl/.xyzzy'})
 
-        with th.StdoutExcursion() as getval:
-            fx.subst_rename(v, arglist)
-            actual = getval()
+        fx.subst_rename(v, arglist)
+        assert expected in " ".join(capsys.readouterr())
 
-        assert expected == actual
         q = glob.glob('*.xyzzy')
         q.sort()
         assert exp == q
 
 
 # -----------------------------------------------------------------------------
-def test_subst_rename_quiet(tmpdir):
+def test_subst_rename_quiet(tmpdir, capsys):
     """
     Test subst_rename() with dryrun False and quiet True.
     """
@@ -432,10 +384,8 @@ def test_subst_rename_quiet(tmpdir):
         v = optparse.Values({'dryrun': False, 'quiet': True,
                              'edit': 's/.pl/.xyzzy'})
 
-        with th.StdoutExcursion() as getval:
-            fx.subst_rename(v, arglist)
-            actual = getval()
-        assert expected == actual
+        fx.subst_rename(v, arglist)
+        assert expected in " ".join(capsys.readouterr())
 
         q = glob.glob('*.pl')
         q.sort()
