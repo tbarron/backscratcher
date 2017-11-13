@@ -1,7 +1,6 @@
 from bscr import align                                      # noqa: ignore=F401
 import pexpect
 import pytest
-from bscr import testhelp as th
 from bscr import util as U
 
 
@@ -32,7 +31,7 @@ def test_digit_alignment(fx_data):
         S.sendline(line)
     S.send("\004")
     S.expect(pexpect.EOF)
-    fx_data.result = th.rm_cov_warn(S.before)
+    fx_data.result = S.before
     S.close()
 
 
@@ -44,8 +43,7 @@ def test_named_input(tmpdir, fx_data):
     tfile = tmpdir.join("testdata")
     tfile.write("\n".join(fx_data.tdata) + "\n")
     script = U.script_location("align")
-    result = pexpect.run("{} {}".format(script, tfile.strpath))
-    fx_data.result = th.rm_cov_warn(result)
+    fx_data.result = pexpect.run("{} {}".format(script, tfile.strpath))
 
 
 # -----------------------------------------------------------------------------
