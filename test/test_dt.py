@@ -334,12 +334,20 @@ def fx_both():
     """
     Fixture for successful tests. That is, tests that don't involve exceptions
     being thrown.
+
+    2017-11-13: Adding fx_both.basetime because without it, tests that use this
+    fixture can fail whenif the time.time() call in the test and the
+    time.time() call in this fixture don't fall within the same second. To
+    ensure that doesn't happen, the test can set fx_both.basetime and we'll use
+    that as the starting point here.
     """
     fx_both.expected = None
     fx_both.reported = None
     fx_both.input = None
     yield fx_both
     assert fx_both.expected == fx_both.parsed
-    rptexp = time.strftime(default_format(), time.localtime(time.time() +
+    if not hasattr(fx_both, "basetime"):
+        fx_both.basetime = time.time()
+    rptexp = time.strftime(default_format(), time.localtime(fx_both.basetime +
                                                             fx_both.expected))
     assert fx_both.reported == rptexp
