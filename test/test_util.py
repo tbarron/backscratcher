@@ -1,10 +1,8 @@
 import bscr
-from bscr import testhelp as th
 from bscr import util as U
 import os
 import pytest
 import re
-import shutil
 import stat
 import time
 
