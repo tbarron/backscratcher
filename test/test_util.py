@@ -18,44 +18,13 @@ def test_standalone():
 
 
 # -----------------------------------------------------------------------------
-def cmdline_arg_list():
     """
-    Example argument structure for U.cmdline()
     """
-    clargs = [{'opts': ['-t', '--test'],
-               'action': 'store_true',
-               'default': False,
-               'dest': 'fribble',
-               'help': 'help string'
-               },
-              {'opts': ['-s', '--special'],
-               'action': 'store_true',
-               'default': False,
-               'dest': 'special',
-               'help': 'help string'
-               }
-              ]
-    return clargs
 
 
 # -----------------------------------------------------------------------------
-def simple_arg_list():
     """
-    Argument list assuming defaults
     """
-    clargs = [{'name': 'first',
-               'help': 'first option'},
-              {'name': 'second',
-               'action': 'append',
-               'help': 'second option'},
-              {'name': 'third',
-               'default': False,
-               'help': 'third option'},
-              {'name': 'Fourth',
-               'dest': 'forward',
-               'help': 'fourth option'},
-              ]
-    return clargs
 
 
 # -----------------------------------------------------------------------------
@@ -482,3 +451,44 @@ class TestUtil(th.HelpedTestCase):
         Verify that we're importing the right align module
         """
         self.assertModule('bscr.util', __file__)
+# -----------------------------------------------------------------------------
+@pytest.fixture
+def fx_arg_specified():
+    """
+    Example argument structure for testing U.cmdline(), specify everything
+    """
+    clargs = [{'opts': ['-t', '--test'],
+               'action': 'store_true',
+               'default': False,
+               'dest': 'fribble',
+               'help': 'help string'
+               },
+              {'opts': ['-s', '--special'],
+               'action': 'store_true',
+               'default': False,
+               'dest': 'special',
+               'help': 'help string'
+               }
+              ]
+    return clargs
+
+
+# -----------------------------------------------------------------------------
+@pytest.fixture
+def fx_arg_defaulted():
+    """
+    Example argument structure for testing U.cmdline(), take lots of defaults
+    """
+    clargs = [{'name': 'first',
+               'help': 'first option'},
+              {'name': 'second',
+               'action': 'append',
+               'help': 'second option'},
+              {'name': 'third',
+               'default': False,
+               'help': 'third option'},
+              {'name': 'Fourth',
+               'dest': 'forward',
+               'help': 'fourth option'},
+              ]
+    return clargs
