@@ -80,7 +80,7 @@ class cmdline(object):
                 arg['default'] = func()
 
             if 'type' not in arg:
-                if arg['action'] == 'store':
+                if arg['action'] in ['store', 'append']:
                     arg['type'] = default_type
 
             if 'dest' not in arg:
@@ -89,7 +89,7 @@ class cmdline(object):
             if '--debug' in arg['opts']:
                 debug_absent = False
 
-            kw = dict((k, arg[k]) for k in arg if k != 'opts' and k != 'name')
+            kw = dict((k, arg[k]) for k in arg if k not in ['opts', 'name'])
             self.p.add_option(*arg['opts'], **kw)
 
         if debug_absent:
