@@ -43,7 +43,6 @@ import StringIO
 import sys
 import time
 
-import toolframe
 from bscr import util as U
 
 BSCR = U.package_module(__name__)
@@ -1038,7 +1037,3 @@ def ymdhms(epoch):
     Convert epoch time to %Y.%m%d %H:%M:%S and return it
     """
     return time.strftime("%Y.%m%d %H:%M:%S", time.localtime(epoch))
-
-
-# ---------------------------------------------------------------------------
-toolframe.ez_launch(__name__, main)
