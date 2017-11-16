@@ -1,11 +1,8 @@
 import bscr.xclean
 from bscr import util as U
-import os
 import pexpect
 import pytest
 import re
-import shutil
-from bscr import testhelp as th
 
 
 # -----------------------------------------------------------------------------

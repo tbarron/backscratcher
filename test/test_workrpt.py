@@ -5,8 +5,6 @@ import time
 
 import pytest
 
-import bscr
-from bscr import testhelp as th
 from bscr import util as U
 from bscr import workrpt as wr
 
