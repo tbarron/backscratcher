@@ -5,7 +5,6 @@ import sys
 
 import pexpect
 
-import testhelp as th
 import util as U
 
 
@@ -71,7 +70,7 @@ def perl_which(module_name):
     """
     # pdb.set_trace()
     rval = ""
-    result = th.rm_cov_warn(pexpect.run("perl -E \"say for @INC\""))
+    result = pexpect.run("perl -E \"say for @INC\"")
     rlines = result.strip().split("\r\n")
     perlmod = module_name.replace("::", "/") + ".pm"
     # print("-----")

@@ -368,7 +368,6 @@ def in_bscr_repo(path=None):
 def bscr_root(filename=None):
     """
     Compute the install root for an imported module.
-    TODO: This should probably move to testhelp at some point
     """
     if filename is None:
         filename = __file__
@@ -454,7 +453,6 @@ def normalize_path(path):
 def script_location(script):
     """
     Compute where we expect to find the named script.
-    TODO: This should probably move to testhelp eventually.
     """
     rval = pexpect.which(script)
     if rval is None:
