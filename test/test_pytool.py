@@ -76,7 +76,7 @@ def test_newpy_prog_dir(tmpdir, fx_nopred):
 
     got = U.contents(fx_nopred.pname)
     exp = expected_xyzzy_py()
-    assert exp == got
+    assert got == exp
 
 
 # -----------------------------------------------------------------------------
@@ -96,7 +96,7 @@ def test_newpy_prog_pxr(tmpdir, fx_nopred):
 
     got = U.contents(fx_nopred.pname)
     exp = expected_xyzzy_py()
-    assert exp == got
+    assert got == exp
 
 
 # -----------------------------------------------------------------------------
@@ -125,11 +125,11 @@ def test_newpy_overwriting_no(tmpdir):
 
         expected = ['original xyzzy']
         got = U.contents(xyzzy.strpath)
-        assert(expected == got)
+        assert got == expected
 
         expected = ['original xyzzy.py']
         got = U.contents(xyzzy_py.strpath)
-        assert(expected == got)
+        assert got == expected
 
 
 # -----------------------------------------------------------------------------
@@ -158,11 +158,11 @@ def test_newpy_overwriting_yes(tmpdir):
 
         exp = os.path.abspath(xyzzy_py.strpath)
         got = os.readlink(xyzzy.strpath)
-        assert exp == got
+        assert got == exp
 
         expected = expected_xyzzy_py()
         got = U.contents(xyzzy_py.strpath)
-        assert expected == got
+        assert got == expected
 
 
 # -----------------------------------------------------------------------------
@@ -194,7 +194,7 @@ def test_newtool(tmpdir):
 
         expected = expected_testtool_py()
         got = toolname.read().split("\n")
-        assert expected == got
+        assert got == expected
 
 
 # -----------------------------------------------------------------------------
@@ -227,7 +227,7 @@ def test_newtool_overwriting_no(tmpdir):
         for fname in [tlink, tname]:
             exp = "original %s" % fname.basename
             got = fname.read()
-            assert exp == got
+            assert got == exp
 
 
 # -----------------------------------------------------------------------------
@@ -259,11 +259,11 @@ def test_newtool_overwriting_yes(tmpdir):
 
         exp = tname.strpath
         actual = tlink.readlink()
-        assert exp == actual
+        assert actual == exp
 
         expected = expected_testtool_py()
         got = tname.read().split("\n")
-        assert expected == got
+        assert got == expected
 
 
 # -----------------------------------------------------------------------------
@@ -288,7 +288,7 @@ def test_help(tmpdir):
             pytest.fail("unexpected exception")
 
         for file in outputs:
-            assert(not os.path.exists(file))
+            assert not os.path.exists(file)
 
 
 # -----------------------------------------------------------------------------
@@ -312,7 +312,7 @@ def test_help_newpy(tmpdir):
 
         got = S.before.split("\r\n")
         exp = expected_help()
-        assert exp == got
+        assert got == exp
 
 
 # -----------------------------------------------------------------------------
@@ -336,7 +336,7 @@ def test_help_newtool(tmpdir):
 
     got = S.before.split("\r\n")
     exp = expected_help()
-    assert exp == got
+    assert got == exp
 
 
 # -------------------------------------------------------------------------------
