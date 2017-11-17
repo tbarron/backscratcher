@@ -214,7 +214,3 @@ def nv_remove(**kwa):
     pieces = kwa['VAR'].split(':')
     result = [_ for _ in pieces if kwa['SEGMENT'] not in _]
     print(":".join(result))
-
-
-# ---------------------------------------------------------------------------
-# xtoolframe.tf_launch("nv")

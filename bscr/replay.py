@@ -203,9 +203,3 @@ def ymdhms(seconds):
         rval = "%d %s" % (days, rval)
 
     return rval
-
-# -----------------------------------------------------------------------------
-# try:
-#     toolframe.ez_launch(__name__, main)
-# except KeyboardInterrupt:
-#     sys.exit(0)

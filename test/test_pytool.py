@@ -381,7 +381,6 @@ def expected_xyzzy_py():
                 "import optparse",
                 "import pdb",
                 "import sys",
-                "from bscr import toolframe",
                 "import unittest",
                 "",
                 "def main(argv = None):",
@@ -406,7 +405,8 @@ def expected_xyzzy_py():
                 "    def test_example(self):",
                 "        pass",
                 "",
-                "toolframe.ez_launch(__name__, main)"]
+                "if __name__ == '__main__':",
+                "    main(sys.argv)"]
 
     return expected
 

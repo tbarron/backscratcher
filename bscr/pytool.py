@@ -140,7 +140,6 @@ def pt_newpy(**kwa):
                     "import optparse\n",
                     "import pdb\n",
                     "import sys\n",
-                    "from bscr import toolframe\n",
                     "import unittest\n",
                     "\n",
                     "def main(argv = None):\n",
@@ -168,7 +167,8 @@ def pt_newpy(**kwa):
                     "    def test_example(self):\n",
                     "        pass\n",
                     "\n",
-                    "toolframe.ez_launch(__name__, main)\n"])
+                    "if __name__ == '__main__':\n",
+                    "    main(sys.argv)\n"])
     wbl.close()
 
     os.chmod(pname, 0755)

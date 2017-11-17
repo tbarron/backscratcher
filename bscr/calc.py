@@ -1,5 +1,5 @@
 #!/usr/bin/python
-'''
+"""
 A simple command line calculator in Python.
 
 Whatever you type at the prompt, calc will attempt to evaluate using
@@ -25,11 +25,10 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-'''
+"""
 
 import sys
 
-import toolframe
 import util as U
 
 
@@ -60,7 +59,3 @@ def main(argv=None):
     except EOFError:
         print ''
         sys.exit(0)
-
-
-# ---------------------------------------------------------------------------
-toolframe.ez_launch(__name__, main)

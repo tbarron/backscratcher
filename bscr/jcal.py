@@ -10,7 +10,6 @@ Formats to be supported:
 import sys
 import time
 
-import toolframe
 import util as U
 
 
@@ -66,7 +65,3 @@ def parse_date(dspec, dfmt="%Y.%m%d", default_func=month_floor):
         return default_func()
 
     return time.mktime(time.strptime(dspec, dfmt))
-
-
-# -----------------------------------------------------------------------------
-toolframe.ez_launch(__name__, main)
