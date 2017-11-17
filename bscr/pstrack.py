@@ -1,8 +1,12 @@
-#!/usr/bin/env python
 """
 show lineage of the current process
 
-pstrack
+Usage:
+    pstrack [-d] [-v]
+
+Options:
+    -d          debug
+    -v          verbose
 
 Copyright (C) 1995 - <the end of time>  Tom Barron
   tom.barron@comcast.net
@@ -23,6 +27,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
 
+import docopt
 import glob
 import optparse
 import os
@@ -42,16 +47,8 @@ def main(args=None):
     Entry point
     """
     args = args or sys.argv
-    prs = optparse.OptionParser()
-    prs.add_option('-d', '--debug',
-                   action='store_true', default=False, dest='debug',
-                   help='start the debugger')
-    prs.add_option('-v', '--verbose',
-                   action='store_true', default=False, dest='verbose',
-                   help='report more of what is going on')
-    (opts, _) = prs.parse_args(args)
-
-    if (opts.debug):
+    opts = docopt.docopt(__doc__, args)
+    if opts['-d']:
         pdb.set_trace()
 
     procd = get_process_list()
