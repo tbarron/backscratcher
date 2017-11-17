@@ -24,10 +24,25 @@ def test_get_process_list():
 
 
 # -----------------------------------------------------------------------------
+def test_docopt():
+    """
+    Check that pstrack.__doc__ contains what docopt requires
+    """
+    pytest.debug_func()
+    reqs = ["Usage:",
+            "pstrack [-d] [-v]",
+            "Options:",
+            "-d          debug",
+            "-v          verbose"]
+    for strval in reqs:
+        assert any([strval in line for line in pstrack.__doc__.split("\n")])
+
+
+# -----------------------------------------------------------------------------
 def test_execution():
     """
     Does pstrack run successfully?
     """
-    pytest.skip()
+    pytest.debug_func()
     result = pexpect.run('pstrack')
     assert 'Traceback' not in result
