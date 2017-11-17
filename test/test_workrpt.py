@@ -5,6 +5,7 @@ import time
 
 import pytest
 
+import bscr
 from bscr import util as U
 from bscr import workrpt as wr
 
@@ -34,6 +35,164 @@ def test_daily_subtotal(tmpdir, fx_stddata, fx_wrprep):
 
 
 # -------------------------------------------------------------------------
+def test_day_offset():
+    """
+    Check each day offset
+    """
+    pytest.debug_func()
+    assert wr.day_offset('f') == 3
+    assert wr.day_offset('c') == 4
+    assert wr.day_offset('M') == 0
+    assert wr.day_offset('T') == 1
+    assert wr.day_offset('W') == 2
+    assert(wr.day_offset('t') == 3)
+    assert(wr.day_offset('F') == 4)
+    assert(wr.day_offset('s') == 5)
+    assert(wr.day_offset('S') == 6)
+    assert(wr.day_offset('') == 3)
+    with pytest.raises(KeyError) as err:
+        wr.day_offset('x')
+    assert "'x'" in str(err)
+
+
+# -----------------------------------------------------------------------------
+def test_default_input_filename():
+    """
+    Make sure workrpt agrees with where we think the default input file
+    should be.
+    """
+    pytest.debug_func()
+    home = os.getenv("HOME")
+    exp = U.pj(home, "Dropbox", "journal",
+               time.strftime("%Y"), "WORKLOG")
+    actual = wr.default_input_filename()
+    assert exp == actual
+
+
+# -----------------------------------------------------------------------------
+def test_hms():
+    """
+    Test the workrpt hms() routine which is supposed to convert an epoch time
+    to HH:MM:SS format
+    """
+    pytest.debug_func()
+    assert wr.hms(72) == "00:01:12"
+    assert wr.hms(120) == "00:02:00"
+    assert wr.hms(4000) == "01:06:40"
+
+
+# -----------------------------------------------------------------------------
+def test_interpret_options_defaults():
+    """
+    Check default start and end times.
+    """
+    pytest.debug_func()
+    (o, a) = wr.make_option_parser([])
+    (start, end) = wr.interpret_options(o)
+    assert not o.dayflag
+    (start_should_be, x) = wr.week_starting_last(wr.day_offset('M'), 0)
+    end_should_be = time.strftime('%Y.%m%d', time.localtime())
+    assert start == start_should_be
+    assert end == end_should_be
+
+
+# -----------------------------------------------------------------------------
+def test_interpret_options_dayflag():
+    """
+    Verify that setting the day flag does not disrupt the default start/end
+    time
+    """
+    pytest.debug_func()
+    (o, a) = wr.make_option_parser(["-d"])
+    (start, end) = wr.interpret_options(o)
+    assert o.dayflag
+    (start_should_be, x) = wr.week_starting_last(wr.day_offset('M'), 0)
+    end_should_be = time.strftime('%Y.%m%d', time.localtime())
+    assert start_should_be == start
+    assert end_should_be == end
+
+
+# -----------------------------------------------------------------------------
+def test_interpret_options_end():
+    """
+    If the user provides option -e <date>, wr.interpret_options should return a
+    start date one week before and an end date of <date>
+    """
+    pytest.debug_func()
+    (o, a) = wr.make_option_parser(['-e', '2009.0401'])
+    (start, end) = wr.interpret_options(o)
+    start_should_be = '2009.0326'
+    end_should_be = '2009.0401'
+    assert start_should_be == start
+    assert end_should_be == end
+
+
+# -----------------------------------------------------------------------------
+def test_interpret_options_last_start():
+    """
+    Verify mutual exclusion of -l and -s
+    """
+    pytest.debug_func()
+    (o, a) = wr.make_option_parser(['-l', '-s', '2009.0501'])
+    with pytest.raises(bscr.Error) as err:
+        wr.interpret_options(o)
+    assert '--last and --start or --end are not compatible' in str(err)
+
+
+# -----------------------------------------------------------------------------
+def test_interpret_options_last_end():
+    """
+    Verify mutual exclusion of -l and -e
+    """
+    pytest.debug_func()
+    (o, a) = wr.make_option_parser(['-l', '-e', '2009.0501'])
+    with pytest.raises(bscr.Error) as err:
+        wr.interpret_options(o)
+    assert '--last and --start or --end are not compatible' in str(err)
+
+
+# -----------------------------------------------------------------------------
+def test_interpret_options_since():
+    """
+    Verify that option --since works as expected
+    """
+    pytest.debug_func()
+    (o, a) = wr.make_option_parser(['--since', '2009.0501'])
+    (start, end) = wr.interpret_options(o)
+    assert start == '2009.0501'
+    assert end == time.strftime('%Y.%m%d')
+
+    (o, a) = wr.make_option_parser(['-s', '2010.0101', '-S', '2010.1231'])
+    with pytest.raises(bscr.Error) as err:
+        wr.interpret_options(o)
+    assert '--since and --start are not compatible' in str(err)
+
+
+# -----------------------------------------------------------------------------
+def test_interpret_options_week_start():
+    """
+    Verify mutual exclusion of -w and -s
+    """
+    pytest.debug_func()
+    (o, a) = wr.make_option_parser(['-w', 'M', '-s', '2009.0501'])
+    with pytest.raises(bscr.Error) as err:
+        wr.interpret_options(o)
+    assert '--week and --start or --end are not compatible' in str(err)
+
+
+# -----------------------------------------------------------------------------
+def test_interpret_options_week_end():
+    """
+    Verify mutual exclusion of -w and -e
+    """
+    pytest.debug_func()
+    (o, a) = wr.make_option_parser(['-w', 'T', '-e', '2009.0501'])
+    with pytest.raises(bscr.Error) as err:
+        wr.interpret_options(o)
+    assert '--week and --start or --end are not compatible' in str(err)
+
+
+# -----------------------------------------------------------------------------
 def test_match(tmpdir, fx_stddata, fx_wrprep):
     """
     Test that option --match/-m matches specific lines from input file
@@ -48,6 +207,72 @@ def test_match(tmpdir, fx_stddata, fx_wrprep):
     assert_includes(r, '13:35:14')
     assert_includes(r, '(13.6)')
     assert_excludes(r, 'vacation')
+
+
+# -----------------------------------------------------------------------------
+def test_next_tuesday():
+    """
+    Routine wr.next_tuesday() should return the date of next tuesday
+    """
+    pytest.debug_func()
+    now = next_wkday(wr.day_offset('T'))
+    nm = time.strftime('%Y.%m%d', time.localtime(now))
+    lm = wr.next_tuesday()
+    assert nm == lm
+
+
+# -----------------------------------------------------------------------------
+def test_next_day():
+    """
+    Test the next_day() routine
+    """
+    pytest.debug_func()
+    assert(wr.next_day('2009.1231') == '2010.0101')
+    assert(wr.next_day('2009.0228') == '2009.0301')
+    assert(wr.next_day('2008.0228') == '2008.0229')
+    assert(wr.next_day('2007.1231', '%Y.%m%d') == '2008.0101')
+    with pytest.raises(ValueError) as err:
+        wr.next_day("2006.0229")
+    assert "day is out of range for month" in str(err)
+
+
+# -----------------------------------------------------------------------------
+def test_parse_timeline():
+    """
+    test parse_timeline()
+    """
+    pytest.debug_func()
+    exp = ['2009', '05', '13', '09', '20', '26', 'admin: setup']
+    result = wr.parse_timeline('2009-05-13 09:20:26 admin: setup')
+    assert result == exp
+
+    exp = ['2009', '05', '14', '10', '20', '19', 'foobar: plugh']
+    result = wr.parse_timeline('2009.0514 10:20:19 foobar: plugh')
+    assert result == exp
+
+    exp = ['2010', '02', '07', '15', '30', '40', '3opsarst: fro-oble 8.1']
+    result = wr.parse_timeline('2010.0207 15:30:40 3opsarst: fro-oble 8.1')
+    assert result == exp
+
+
+# -----------------------------------------------------------------------------
+def test_parse_ymd():
+    """
+    test parse_ymd() for each weekday, yesterday, and tomorrow
+    """
+    pytest.debug_func()
+    s = wr.stringify(time.localtime(wr.day_plus(-1)))
+    assert wr.parse_ymd('yesterday') == s[0:3]
+    s = wr.stringify(time.localtime(wr.day_plus(1)))
+    assert wr.parse_ymd('tomorrow') == s[0:3]
+
+    parse_one_ymd('monday', 'M')
+    parse_one_ymd('tuesday', 'T')
+    parse_one_ymd('wednesday', 'W')
+    parse_one_ymd('thursday', 't')
+    parse_one_ymd('friday', 'F')
+    parse_one_ymd('saturday', 's')
+    parse_one_ymd('sunday', 'S')
 
 
 # -------------------------------------------------------------------------
@@ -179,6 +404,7 @@ def test_start_date_missing(tmpdir, fx_stddata, fx_wrprep):
     """
     Calculate a week when the first few dates are missing
     """
+    pytest.debug_func()
     opts = optparse.Values({'filename': fx_stddata.file.strpath,
                             'start': '2009.0718',
                             'end': '2009.0722',
@@ -190,10 +416,90 @@ def test_start_date_missing(tmpdir, fx_stddata, fx_wrprep):
 
 
 # -----------------------------------------------------------------------------
+def test_week_ending():
+    """
+    test calculating the beginning of a week from its end?
+    """
+    pytest.debug_func()
+    tlist = {'yesterday':   daystart(time.time() - 24*3600),
+             'today':       daystart(time.time()),
+             'tomorrow':    daystart(time.time() + 24*3600),
+             '2014.1104':   U.epoch("2014.1104"),
+             '2009.0401':   time.mktime(time.strptime('2009.0401',
+                                                      '%Y.%m%d'))}
+    for t in tlist.keys():
+        (start, end) = wr.week_ending(t)
+        tm = time.localtime(tlist[t])
+        end_exp = time.strftime('%Y.%m%d', tm)
+
+        tm = time.localtime(tlist[t] - (6*24*3600-7200))
+        start_exp = time.strftime('%Y.%m%d', tm)
+
+        assert start_exp == start
+        assert end_exp == end
+
+
+# -----------------------------------------------------------------------------
+def test_week_starting():
+    """
+    test calculating the end of a week from its start. The test for
+    2014.1031 spans the beginning of DST.
+    """
+    pytest.debug_func()
+    tlist = {'yesterday': time.time() - 24*3600,
+             'today': time.time(),
+             'tomorrow': time.time() + 24*3600,
+             '2014.1028': U.epoch("2014.1028"),
+             '2009.0401': time.mktime(time.strptime('2009.0401',
+                                                    '%Y.%m%d'))}
+    for t in tlist.keys():
+        print("t = %s" % t)
+        (start, end) = wr.week_starting(t)
+        tm = time.localtime(tlist[t])
+        start_should_be = time.strftime('%Y.%m%d', tm)
+
+        tm = time.localtime(tlist[t] + 6*24*3600 + 7200)
+        end_should_be = time.strftime('%Y.%m%d', tm)
+
+        assert start_should_be == start
+        assert end_should_be == end
+
+
+# -----------------------------------------------------------------------------
+def test_week_starting_last():
+    """
+    See docstring for wsl()
+    """
+    pytest.debug_func()
+    wsl(0, 0, 1173070800.0, '2007.0305', '2007.0311')
+    wsl(0, 0, 1177995600.0, '2007.0430', '2007.0506')
+    wsl(0, 0, 1230872400.0, '2008.1229', '2009.0104')
+
+
+# -----------------------------------------------------------------------------
+def test_weekday_num():
+    """
+    Verify the numeric correspondences of the weekdays -- monday == 0,
+    sunday == 6.
+    """
+    pytest.debug_func()
+    count = 0
+    for d in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday',
+              'saturday', 'sunday']:
+        assert wr.weekday_num(d) == count
+        count = count + 1
+
+    with pytest.raises(KeyError) as err:
+        wr.weekday_num('notaday')
+    assert "notaday" in str(err)
+
+
+# -----------------------------------------------------------------------------
 def test_workrpt_order(tmpdir, fx_wrprep):
     """
     Times or dates out of order should produce SystemExit exception
     """
+    pytest.debug_func()
     xyz = tmpdir.join('XYZ')
     xyz.write('\n'.join(['2015-01-07 10:00:00 first task',
                          '2015-01-07 10:15:00 second task',
@@ -227,6 +533,53 @@ def assert_excludes(container, content):
                                                           content,
                                                           'found in',
                                                           container)
+
+
+# -------------------------------------------------------------------------
+def daystart(mark):
+    """
+    Given *mark* compute the beginning of the day mark falls in
+    """
+    t = time.localtime(mark)
+    rval = time.mktime([t.tm_year, t.tm_mon, t.tm_mday, 0, 0, 0, 0, 0, 0])
+    return rval
+
+
+# -------------------------------------------------------------------------
+def last_wkday(weekday):
+    """
+    Brute force the last occurrence of *weekday* for verifying tests
+    """
+    now = time.time()
+    tm = time.localtime(now)
+    while tm[6] != weekday:
+        now -= 24*3600
+        tm = time.localtime(now)
+    return now
+
+
+# -------------------------------------------------------------------------
+def next_wkday(weekday):
+    """
+    Brute force the next occurrence of *weekday* for verifying tests
+    """
+    now = time.time()
+    tm = time.localtime(now)
+    while tm[6] != weekday:
+        now += 24*3600
+        tm = time.localtime(now)
+    return now
+
+
+# -------------------------------------------------------------------------
+def parse_one_ymd(target, t):
+    """
+    test parse_ymd for one day
+    """
+    n = time.localtime()
+    d = wr.week_diff(n[6], wr.day_offset(t))
+    s = wr.stringify(time.localtime(wr.day_plus(d)))
+    assert wr.parse_ymd(target) == s[0:3]
 
 
 # -------------------------------------------------------------------------
@@ -319,3 +672,16 @@ def parse_report_line(line):
     else:
         rval = (result[0][0], shms(result[0][1]))
     return rval
+
+
+# -----------------------------------------------------------------------------
+def wsl(target, offset, now, should_start, should_end):
+    """
+    Routine week_starting_last() takes time index *now*, *target* weekday
+    (0 = Monday), and *offset* seconds. It computes, say,"last Monday" from
+    *now*, adds *offset* seconds, and returns a tuple containing the day
+    indicated in %Y.%m%d format and a week later in the same format.
+    """
+    (s, e) = wr.week_starting_last(target, offset, now)
+    assert s == should_start
+    assert e == should_end
