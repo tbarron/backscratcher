@@ -128,7 +128,7 @@ def gtx_cleanup(args):
 def gtx_gerrit_issues(args):
     """gerrit_issues - report commits that we expect gerrit to complain about
 
-    TODO: needs test?
+    TODO: gtx_gerrit_issues() needs test? No, not using gerrit anymore
     """
     prs = optparse.OptionParser()
     prs.add_option('-d',  '--debug',
