@@ -202,3 +202,15 @@ def fx_mchk():
     assert fx_mchk.exp in fx_mchk.result
     expstr = "{} = {}".format(fx_mchk.inp, fx_mchk.exp)
     assert expstr in fx_mchk.result
+
+
+# -----------------------------------------------------------------------------
+@pytest.fixture
+def fx_usage():
+    """
+    Set up expected help/usage data for tests
+    """
+    rval = ["Usage:",
+            "    mag [-d] [-b] NUMBER",
+            ]
+    return rval
