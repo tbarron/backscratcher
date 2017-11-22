@@ -29,7 +29,6 @@ GNU General Public License for more details.
 
 import docopt
 import glob
-import optparse
 import os
 import pdb
 import re
