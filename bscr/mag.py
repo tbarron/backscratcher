@@ -2,9 +2,12 @@
 """
 Report the magnitude of large numbers.
 
-SYNOPSIS
+Usage:
+    mag [-d] [-b] NUMBER
 
-   mag [-b] <number>
+Options:
+    -b          use radix 1024 rather than 1000
+    -d          use the debugger
 
 EXAMPLES
    $ mag 17
@@ -37,26 +40,22 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
-import optparse
+import docopt
+import pdb
 import sys
 
 
 # ---------------------------------------------------------------------------
 def main(argv=None, testing=False):
     """
-    CLEP
+    Entry point
     """
-    if argv is None:
-        argv = sys.argv
+    argv = argv or sys.argv
+    opts = docopt.docopt(__doc__, argv)
+    if opts['-d']:
+        pdb.set_trace()
 
-    prs = optparse.OptionParser(usage=usage())
-    # define options here
-    prs.add_option('-b', '--binary',
-                   action='store_true', default=False, dest='binary',
-                   help='div=1024 rather than 1000')
-    (opts, args) = prs.parse_args(argv)
-
-    if opts.binary:
+    if opts['-b']:
         divisor = 1024
         units = ['b', 'Kib', 'Mib', 'Gib', 'Tib', 'Pib', 'Eib', 'Zib', 'Yib']
     else:
@@ -65,21 +64,23 @@ def main(argv=None, testing=False):
 
     units.reverse()
 
-    if len(args) < 2:
+    if len(argv) < 1:
         rval = usage()
-    else:
-        val = float(args[1])
+
+    try:
+        val = float(opts['NUMBER'])
         unit = units.pop()
         while divisor <= val:
             val /= divisor
             unit = units.pop()
-
-        rval = "%s = %3.2f %s" % (args[1], val, unit)
+        rval = "{} = {:3.2f} {}".format(opts['NUMBER'], val, unit)
+    except ValueError:
+        _ = docopt.docopt(__doc__, ["-x"])        # noqa: ignore=F841
 
     if testing:
         return(rval)
     else:
-        print rval
+        print(rval)
 
 
 # ---------------------------------------------------------------------------
