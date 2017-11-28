@@ -18,6 +18,8 @@ def pytest_addoption(parser):
                      help="where to write a test log")
     parser.addoption("--dbg", action="append", default=[],
                      help="start debugger on test named or ALL")
+    parser.addoption("--dbgcheck", action="store_true", default=False,
+                     help="report tests that don't call pytest.debug_func")
     parser.addoption("--all", action="store_true", default=False,
                      help="start debugger on test named or ALL")
 
@@ -50,12 +52,18 @@ def pytest_runtest_setup(item):
     if any([item.name in skipl,
             any([_ in item.name for _ in skipl])]):
         pytest.skip()
+
     if any([item.name in item.config.getoption("--dbg"),
             'all' in item.config.getoption("--dbg")] +
            [_ in item.name for _ in item.config.getoption('--dbg')]):
         pytest.debug_func = pdb.set_trace
     else:
         pytest.debug_func = lambda: None
+
+    if all([item.config.getoption("--dbgcheck"),
+            'debug_func' not in item.function.func_code.co_names]):
+        pytest.fail('Test {} lacks call to pytest.debug_func()'
+                    .format(item.function.func_name))
 
 
 # -----------------------------------------------------------------------------

@@ -7,6 +7,7 @@ This file checks for best practice compliance.
 Conveniently, pylint takes care of all of this
 """
 import pexpect
+import pytest
 
 
 # -----------------------------------------------------------------------------
@@ -15,5 +16,6 @@ def test_pylint():
     Run pylint to check the quality of the code
     """
     # result = pexpect.run("pylint -rn bscr")
+    pytest.debug_func()
     result = pexpect.run("flake8 bscr test")
     assert result == ''
