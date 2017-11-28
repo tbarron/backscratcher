@@ -84,6 +84,7 @@ def test_cleanup_ndr_np_nr(capsys, tmpdir, fx_cleanup):
     """
     xclean
     """
+    pytest.debug_func()
     bscr.xclean.cleanup(str(tmpdir))
     result = "".join(capsys.readouterr())
     assert fx_cleanup["drmsg"] not in result
@@ -102,6 +103,7 @@ def test_cleanup_ndr_np_r(capsys, tmpdir, fx_cleanup):
     """
     xclean --recursive
     """
+    pytest.debug_func()
     bscr.xclean.cleanup(str(tmpdir), recursive=True)
     result = "".join(capsys.readouterr())
     assert fx_cleanup["drmsg"] not in result
@@ -119,6 +121,7 @@ def test_cleanup_ndr_p_nr(capsys, tmpdir, fx_cleanup):
     """
     xclean --pattern 'no.*'
     """
+    pytest.debug_func()
     rgx = fx_cleanup["rgx"]
     bscr.xclean.cleanup(str(tmpdir), pattern=rgx)
     result = "".join(capsys.readouterr())
@@ -138,6 +141,7 @@ def test_cleanup_ndr_p_r(capsys, tmpdir, fx_cleanup):
     """
     xclean --pattern 'no.*' --recursive
     """
+    pytest.debug_func()
     rgx = fx_cleanup["rgx"]
     bscr.xclean.cleanup(str(tmpdir), pattern=rgx, recursive=True)
     result = "".join(capsys.readouterr())
@@ -156,6 +160,7 @@ def test_find_files(tmpdir, fx_cleanup):
     """
     Finding files without recursion
     """
+    pytest.debug_func()
     fl = bscr.xclean.find_files(str(tmpdir))
     for floc in fx_cleanup["files"]:
         if all([tmpdir.strpath == floc.dirname,
@@ -170,6 +175,7 @@ def test_find_files_r(tmpdir, fx_cleanup):
     """
     Finding files with recursion
     """
+    pytest.debug_func()
     fl = bscr.xclean.find_files(str(tmpdir), recursive=True)
     for floc in fx_cleanup["files"]:
         if all([floc.basename.endswith("~")]):
@@ -183,6 +189,7 @@ def test_find_files_p(tmpdir, fx_cleanup):
     """
     find files that match a pattern
     """
+    pytest.debug_func()
     rgx = fx_cleanup["rgx"]
     fl = bscr.xclean.find_files(str(tmpdir), pattern=rgx)
     for floc in fx_cleanup["files"]:
@@ -198,6 +205,7 @@ def test_find_files_p_r(tmpdir, fx_cleanup):
     """
     find files that match a pattern, recursively
     """
+    pytest.debug_func()
     rgx = fx_cleanup["rgx"]
     fl = bscr.xclean.find_files(str(tmpdir), pattern=rgx, recursive=True)
     for floc in fx_cleanup["files"]:
@@ -212,6 +220,7 @@ def test_main_dr_np_nr(tmpdir, capsys, fx_cleanup):
     """
     calling main: xclean --dry-run
     """
+    pytest.debug_func()
     cmd = "bin/xclean -n {}".format(str(tmpdir))
     bscr.xclean.main(cmd.split())
     result = "".join(capsys.readouterr())
@@ -230,6 +239,7 @@ def test_main_dr_p_nr(tmpdir, capsys, fx_cleanup):
     """
     calling main: xclean --dry-run --pattern 'no.*'
     """
+    pytest.debug_func()
     rgx = fx_cleanup["rgx"]
     cmd = "bin/xclean -n -p {} {}".format(rgx, str(tmpdir))
     bscr.xclean.main(cmd.split())
@@ -249,6 +259,7 @@ def test_main_dr_np_r(tmpdir, capsys, fx_cleanup):
     """
     calling main: xclean --dry-run --recursive
     """
+    pytest.debug_func()
     cmd = "bin/xclean -n -r {}".format(str(tmpdir))
     bscr.xclean.main(cmd.split())
     result = "".join(capsys.readouterr())
@@ -266,6 +277,7 @@ def test_main_dr_p_r(tmpdir, capsys, fx_cleanup):
     """
     calling main: xclean --dry-run --pattern 'no.*' --recursive
     """
+    pytest.debug_func()
     rgx = fx_cleanup["rgx"]
     cmd = "bin/xclean -n -p {} -r {}".format(rgx, str(tmpdir))
     bscr.xclean.main(cmd.split())
@@ -304,6 +316,7 @@ def test_main_ndr_p_nr(tmpdir, capsys, fx_cleanup):
     """
     calling main: xclean --pattern 'no.*'
     """
+    pytest.debug_func()
     rgx = fx_cleanup["rgx"]
     cmd = "bin/xclean -p {} {}".format(rgx, str(tmpdir))
     bscr.xclean.main(cmd.split())
@@ -324,6 +337,7 @@ def test_main_ndr_np_r(tmpdir, capsys, fx_cleanup):
     """
     calling main: xclean --recursive
     """
+    pytest.debug_func()
     cmd = "bin/xclean -r {}".format(str(tmpdir))
     bscr.xclean.main(cmd.split())
     result = "".join(capsys.readouterr())
@@ -342,6 +356,7 @@ def test_main_ndr_p_r(tmpdir, capsys, fx_cleanup):
     """
     calling main: xclean --pattern 'no.*' --recursive
     """
+    pytest.debug_func()
     rgx = fx_cleanup["rgx"]
     cmd = "bin/xclean -p {} -r {}".format(rgx, str(tmpdir))
     bscr.xclean.main(cmd.split())
@@ -361,6 +376,7 @@ def test_xclean_help():
     """
     Verify that 'xclean --help' does the right thing
     """
+    pytest.debug_func()
     exp = ["Usage:",
            "    xclean - remove files whose names match a regexp",
            "",

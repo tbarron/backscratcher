@@ -198,6 +198,7 @@ def test_psys_both(capsys):
     """
     Test routine psys with dryrun True and quiet True.
     """
+    pytest.debug_func()
     v = optparse.Values({'dryrun': True, 'quiet': True})
     expected = "would do 'ls -d fx.py'\n"
     fx.psys('ls -d fx.py', v)
@@ -209,6 +210,7 @@ def test_psys_dryrun(capsys):
     """
     Test routine psys with dryrun True and quiet False.
     """
+    pytest.debug_func()
     v = optparse.Values({'dryrun': True, 'quiet': False})
     expected = "would do 'ls -d nosuchfile'\n"
     fx.psys('ls -d nosuchfile', v)
@@ -220,6 +222,7 @@ def test_psys_neither(capsys):
     """
     Test routine psys with dryrun False and quiet False.
     """
+    pytest.debug_func()
     root = U.findroot()
     v = optparse.Values({'dryrun': False, 'quiet': False})
     expected = "ls -d %s/fx.py\n%s/fx.py\n" % (root, root)
@@ -232,6 +235,7 @@ def test_psys_quiet(tmpdir, capsys, data):
     """
     Test routine psys with dryrun False and quiet True.
     """
+    pytest.debug_func()
     with U.Chdir(tmpdir.strpath):
         exp = "a.xyzzy\nb.xyzzy\nc.xyzzy\ntmpfile\n"
         v = optparse.Values({'dryrun': False, 'quiet': True})
@@ -244,6 +248,7 @@ def test_subst_command_both(tmpdir, capsys):
     """
     Test subst_command() with dryrun True and quiet True.
     """
+    pytest.debug_func()
     with U.Chdir(tmpdir.strpath):
         v = optparse.Values({'dryrun': True, 'quiet': True, 'cmd': 'ls %'})
         a = ['a.pl', 'b.pl', 'c.pl']
@@ -259,6 +264,7 @@ def test_subst_command_dryrun(tmpdir, capsys):
     """
     Test subst_command() with dryrun True and quiet False.
     """
+    pytest.debug_func()
     with U.Chdir(tmpdir.strpath):
         v = optparse.Values({'dryrun': True, 'quiet': False,
                              'cmd': 'ls %'})
@@ -275,6 +281,7 @@ def test_subst_command_neither(tmpdir, capsys):
     """
     Test subst_command() with dryrun False and quiet False.
     """
+    pytest.debug_func()
     with U.Chdir(tmpdir.strpath):
         v = optparse.Values({'dryrun': False, 'quiet': False,
                              'cmd': 'ls %'})
@@ -291,6 +298,7 @@ def test_subst_command_quiet(tmpdir, capsys):
     """
     Test subst_command() with dryrun False and quiet True.
     """
+    pytest.debug_func()
     with U.Chdir(tmpdir.strpath):
         v = optparse.Values({'dryrun': False, 'quiet': True,
                              'cmd': 'ls %'})
@@ -307,6 +315,7 @@ def test_subst_rename_both(tmpdir, capsys):
     """
     Test subst_rename() with dryrun True and quiet True.
     """
+    pytest.debug_func()
     with U.Chdir(tmpdir.strpath):
         arglist = ['a.pl', 'b.pl', 'c.pl']
         for a in arglist:
@@ -329,6 +338,7 @@ def test_subst_rename_dryrun(tmpdir, capsys):
     """
     Test subst_rename() with dryrun True and quiet False.
     """
+    pytest.debug_func()
     with U.Chdir(tmpdir.strpath):
         arglist = ['a.pl', 'b.pl', 'c.pl']
         for a in arglist:
@@ -351,6 +361,7 @@ def test_subst_rename_neither(tmpdir, capsys):
     """
     Test subst_rename() with dryrun False and quiet False.
     """
+    pytest.debug_func()
     with U.Chdir(tmpdir.strpath):
         arglist = ['a.pl', 'b.pl', 'c.pl']
         for a in arglist:
@@ -374,6 +385,7 @@ def test_subst_rename_quiet(tmpdir, capsys):
     """
     Test subst_rename() with dryrun False and quiet True.
     """
+    pytest.debug_func()
     with U.Chdir(tmpdir.strpath):
         arglist = ['a.pl', 'b.pl', 'c.pl']
         for a in arglist:
@@ -401,6 +413,7 @@ def test_usage():
     """
     Test the Usage routine.
     """
+    pytest.debug_func()
     exp = '\n'
     exp += '    fx [-n] -c <command> <files> (% in the command becomes'
     exp += ' filename)\n'

@@ -52,6 +52,7 @@ def test_newpy_nothing():
     Run 'pytool newpy' with no other arguments. Should produce pytool's
     'Usage:' message.
     """
+    pytest.debug_func()
     result = pexpect.run("pytool newpy")
     for exp in ["Usage:",
                 "pytool help [COMMAND]",
@@ -106,6 +107,7 @@ def test_newpy_overwriting_no(tmpdir):
     that confirmation is requested. Answer 'no' and verify that
     the existing file is not overwritten.
     """
+    pytest.debug_func()
     xyzzy = toyfile(tmpdir, "xyzzy", content="original xyzzy\n")
     xyzzy_py = toyfile(tmpdir, "xyzzy.py", content="original xyzzy.py\n")
     with U.Chdir(tmpdir.strpath):
@@ -139,6 +141,7 @@ def test_newpy_overwriting_yes(tmpdir):
     Verify that confirmation is requested. Answer 'yes' and verify
     that the existing file IS overwritten.
     """
+    pytest.debug_func()
     xyzzy = toyfile(tmpdir, "xyzzy", content="original xyzzy")
     xyzzy_py = toyfile(tmpdir, "xyzzy.py", content="original xyzzy.py")
     with U.Chdir(tmpdir.strpath):
@@ -271,6 +274,7 @@ def test_help(tmpdir):
     """
     Run 'pytool help'. Verify that the output is correct
     """
+    pytest.debug_func()
     with U.Chdir(tmpdir.strpath):
         outputs = ["testtool", "testtool.py", "xyzzy", "xyzzy.py"]
         U.safe_unlink(outputs)
@@ -296,6 +300,7 @@ def test_help_newpy(tmpdir):
     """
     Run 'pytool help newpy'. Verify that the output is correct.
     """
+    pytest.debug_func()
     with U.Chdir(tmpdir.strpath):
         cmd = pexpect.which("pytool")
         S = pexpect.spawn("{} help newpy".format(cmd))
@@ -320,6 +325,7 @@ def test_help_newtool(tmpdir):
     """
     Run 'pytool help newtool'. Verify that the output is correct.
     """
+    pytest.debug_func()
     with U.Chdir(tmpdir.strpath):
         cmd = pexpect.which("pytool")
         S = pexpect.spawn("{} help newtool".format(cmd))

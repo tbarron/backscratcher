@@ -301,6 +301,7 @@ def test_tomorrow(fx_both):
     """
     tomorrow
     """
+    pytest.debug_func()
     fx_both.expected = 24 * 3600
     argl = ["tomorrow"]
     fx_both.parsed = dt.parse_whenspec(argl)
@@ -314,6 +315,7 @@ def test_tomorrow_plus2hr(fx_both):
     """
     tomorrow
     """
+    pytest.debug_func()
     fx_both.expected = (24+2) * 3600
     fx_both.basetime = time.time()
     argl = ["tomorrow", "2", "hour"]
@@ -327,6 +329,7 @@ def test_yesterday(fx_both):
     """
     yesterday
     """
+    pytest.debug_func()
     fx_both.expected = -24 * 3600
     argl = ["yesterday"]
     fx_both.parsed = dt.parse_whenspec(argl)
@@ -340,6 +343,7 @@ def test_yesterday_plus7wk(fx_both):
     """
     yesterday
     """
+    pytest.debug_func()
     fx_both.expected = (7 * 7 - 1) * 24 * 3600
     argl = ["yesterday", "7", "week"]
     fx_both.parsed = dt.parse_whenspec(argl)

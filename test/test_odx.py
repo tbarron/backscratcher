@@ -17,6 +17,7 @@ def test_decimal_good():
     """
     Verify output of odx with good decimal input
     """
+    pytest.debug_func()
     exp = "25 -> 031 / 25 / 0x19"
     assert exp == odx.odx('25')
 
@@ -26,6 +27,7 @@ def test_decimal_bad():
     """
     Verify output of odx with bad decimal input
     """
+    pytest.debug_func()
     exp = "invalid literal for int() with base 10"
     with pytest.raises(ValueError) as err:
         odx.odx("2ab")
@@ -37,6 +39,7 @@ def test_octal_good():
     """
     Verify output of odx with good octal input
     """
+    pytest.debug_func()
     exp = "0124 -> 0124 / 84 / 0x54"
     assert exp == odx.odx('0124')
 
@@ -46,6 +49,7 @@ def test_octal_bad():
     """
     Verify output of odx with bad octal input
     """
+    pytest.debug_func()
     exp = "invalid literal for int() with base 8"
     with pytest.raises(ValueError) as err:
         odx.odx("0987")
@@ -57,6 +61,7 @@ def test_hex_good():
     """
     Verify output of odx with good hex input
     """
+    pytest.debug_func()
     exp = "0x1f1f -> 017437 / 7967 / 0x1f1f"
     assert exp == odx.odx("0x1f1f")
 
@@ -66,6 +71,7 @@ def test_hex_bad():
     """
     Verify output of odx with bad hex input
     """
+    pytest.debug_func()
     exp = "invalid literal for int() with base 16"
     with pytest.raises(ValueError) as err:
         odx.odx("0x5234g7")
@@ -77,6 +83,7 @@ def test_odx_help():
     """
     Verify that 'odx --help' does the right thing
     """
+    pytest.debug_func()
     txt = ["Usage: odx {0<octal-value>|<decimal-value>|0x<hex-value>} ...",
            "",
            "    report each argument in octal, decimal, and hex format",

@@ -184,6 +184,7 @@ def test_parse_time():
     parse_time() should take a date string in a variety of formats and return
     an epoch time
     """
+    pytest.debug_func()
     assert pfind.parse_time('2016.0101') == 1451624400.0
     assert pfind.parse_time('2015.1219.175455') == 1450565695.0
 
@@ -276,6 +277,7 @@ def test_ownership(tmpdir, pfind_fx):
     find files based on ownership
     """
     pytest.skip()
+    pytest.debug_func()
     exp = list_minus(pfind_fx.data.keys(), ['ancient/two',
                                             'mature/three',
                                             'young/five'])
