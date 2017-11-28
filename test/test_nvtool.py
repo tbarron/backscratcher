@@ -166,6 +166,7 @@ def test_nv_load_dir(tmpdir, capsys):
     """
     Test nvtool.nv_load(**{'FILE': filename})
     """
+    pytest.debug_func()
     indata = ['foo, $HOME, aardvark']
     exp = ':'.join(indata)
     loadable = tmpdir.join('loadable')
@@ -180,6 +181,7 @@ def test_nv_load_pxr(tmpdir, capsys):
     """
     Test pexpect.run('nvtool load FILE')
     """
+    pytest.debug_func()
     indata = ['foo, $HOME, aardvark']
     exp = ':'.join(indata)
     loadable = tmpdir.join('loadable')
@@ -193,6 +195,7 @@ def test_nv_show_dir(capsys):
     """
     Test nv_show
     """
+    pytest.debug_func()
     indata = pathish(['foo, $HOME, aardvark'])
     exp = showish(['foo, $HOME, aardvark'], "\n    ")
     with tbx.tmpenv(XPATH=indata):

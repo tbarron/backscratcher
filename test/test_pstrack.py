@@ -48,6 +48,7 @@ def test_help(fx_usage):
     """
     Check what 'pstrack --help' produces
     """
+    pytest.debug_func()
     result = pexpect.run("pstrack --help")
     for strval in fx_usage:
         assert any([strval in line for line in result.split("\n")])

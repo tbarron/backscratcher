@@ -24,6 +24,7 @@ def test_digit_alignment(fx_data):
     Words that contain valid numeric specifications should be right
     aligned. Words containing non-numeric values should be left aligned.
     """
+    pytest.debug_func()
     script = pexpect.which("align")
     S = pexpect.spawn(script)
     S.setecho(False)
@@ -40,6 +41,7 @@ def test_named_input(tmpdir, fx_data):
     """
     Handle both input on stdin as well as input from a named file.
     """
+    pytest.debug_func()
     tfile = tmpdir.join("testdata")
     tfile.write("\n".join(fx_data.tdata) + "\n")
     script = U.script_location("align")

@@ -40,6 +40,7 @@ def test_amtime_mtoa_dir(tmpdir, fx_amtime):
     """
     Test fl_set_mtime_to_atime()
     """
+    pytest.debug_func()
     fl.fl_set_mtime_to_atime(**{"FILE": [fx_amtime.testfile.strpath],
                                 "d": False})
     fx_amtime.exptime = fx_amtime.atime
@@ -50,6 +51,7 @@ def test_amtime_mtoa_pxr(tmpdir, fx_amtime):
     """
     Test fl_set_mtime_to_atime()
     """
+    pytest.debug_func()
     cmd = "fl set_mtime_to_atime {}".format(fx_amtime.testfile.strpath)
     result = pexpect.run(cmd)
     assert result == ""
@@ -61,6 +63,7 @@ def test_command_line():
     """
     Running the command with no arguments should get help output
     """
+    pytest.debug_func()
     thisone = util.script_location("fl")
 
     result = pexpect.run(thisone)
@@ -383,6 +386,7 @@ def test_editfile_nosuch(tmpdir, fx_edit):
     fl.editfile('nosuchfile', 'foo', 'bar', None)
     => should throw an exception
     """
+    pytest.debug_func()
     with pytest.raises(IOError) as err:
         fl.editfile(fx_edit.fp.strpath, 's', 'foo', 'bar', None)
     exp = "No such file or directory: '{}'".format(fx_edit.fp.strpath)
@@ -394,6 +398,7 @@ def test_editfile_rgx(tmpdir, fx_edit):
     """
     fl.editfile('legit', 's', 'foo', 'bar', None)
     """
+    pytest.debug_func()
     xdata = [re.sub('^foo', 'bar', z) for z in fx_edit.tdata]
     fx_edit.fp.write("\n".join(fx_edit.tdata))
 
@@ -410,6 +415,7 @@ def test_editfile_suffix(tmpdir, fx_edit):
     """
     fl.editfile('legit', 's', 'foo', 'bar', 'old')
     """
+    pytest.debug_func()
     fold = tmpdir.join(fx_edit.fp.basename + ".old")
     xdata = [z.replace('foo', 'bar') for z in fx_edit.tdata]
     fx_edit.fp.write("\n".join(fx_edit.tdata))
@@ -428,6 +434,7 @@ def test_fl_help_pxr():
     """
     'fl help' should get help output
     """
+    pytest.debug_func()
     cmd = util.script_location("fl")
     result = pexpect.run('{} help'.format(cmd))
     assert "Traceback" not in result
@@ -519,6 +526,7 @@ def test_mrpm_old_nosuch_hit(tmpdir):
     Test for most_recent_prefix_match() with non-existent stem file, a ./old
     directory, and no matches in . or ./old
     """
+    pytest.debug_func()
     olddir = makefile(tmpdir, "old", ensure=True, dir=True)
     tfile = makefile(tmpdir, "mrpm", ensure=False)
     mfile = makefile(olddir, "mrpm.suffix", ensure=True)
@@ -532,6 +540,7 @@ def test_mrpm_old_nosuch_none(tmpdir):
     Test for most_recent_prefix_match() with non-existent stem file, a ./old
     directory, and no matches in . or ./old
     """
+    pytest.debug_func()
     olddir = makefile(tmpdir, "old", ensure=True, dir=True)
     tfile = makefile(tmpdir, "mrpm", ensure=False)
     makefile(olddir, "mrpm.suffix", ensure=False)

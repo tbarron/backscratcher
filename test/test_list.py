@@ -25,6 +25,7 @@ def test_list_help():
     """
     Verify that 'list --help' does the right thing
     """
+    pytest.debug_func()
     result = pexpect.run("list --help")
     exp = "usage: list {minus|union|intersect} <list-1> <list-2>"
     assert exp in result
@@ -35,6 +36,7 @@ def test_list_intersect():
     """
     Test the intersect operation
     """
+    pytest.debug_func()
     a_list = ['one', 'two', 'three', 'four', 'five']
     b_list = ['two', 'four', 'six', 'eight', 'ten']
     isect = list.list_intersect(a_list, b_list)
@@ -46,6 +48,7 @@ def test_list_minus():
     """
     Test the minus operation
     """
+    pytest.debug_func()
     a = list.list_minus(['one', 'two', 'three', 'four', 'five'],
                         ['two', 'four', 'six', 'eight'])
     assert a == ['one', 'three', 'five']
@@ -56,6 +59,7 @@ def test_list_union():
     """
     Test the union operation
     """
+    pytest.debug_func()
     a_list = ['one', 'three', 'five']
     b_list = ['two', 'four', 'five', 'six', 'two']
     union = list.list_union(a_list, b_list)
