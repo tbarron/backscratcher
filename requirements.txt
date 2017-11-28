@@ -1,6 +1,7 @@
 coverage
 docopt
 docopt-dispatch
+flake8
 pexpect==3.3
 pip
 py
