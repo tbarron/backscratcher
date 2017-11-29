@@ -26,8 +26,7 @@ install:
 # command to run tests, e.g. python setup.py test
 # script: tox
 script:
- - cat .git/description
- - git describe
+ - echo "backscratcher" > .git/description
  - py.test -vv --tb short
 
 # addons:
