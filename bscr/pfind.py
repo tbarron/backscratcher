@@ -135,11 +135,8 @@ def parse_time(dtstr):
     else:
         if not hasattr(parse_time, 'fmt_l'):
             parse_time.fmt_l = ['%Y.%m%d',
-                                '%Y.%m%d %Z',
                                 '%Y.%m%d %H:%M:%S',
-                                '%Y.%m%d %H:%M:%S %Z',
                                 '%Y.%m%d.%H%M%S',
-                                '%Y.%m%d.%H%M%S %Z',
                                 'failure']
 
         for fmt in parse_time.fmt_l:

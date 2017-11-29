@@ -185,8 +185,10 @@ def test_parse_time():
     an epoch time
     """
     pytest.debug_func()
-    assert pfind.parse_time('2016.0101 EST') == 1451624400.0
-    assert pfind.parse_time('2015.1219.175455 EST') == 1450565695.0
+    exp = time.mktime((2016, 1, 1, 0, 0, 0, 0, 0, 0))
+    assert pfind.parse_time('2016.0101') == exp
+    exp = time.mktime((2015, 12, 19, 17, 54, 55, 0, 0, 0))
+    assert pfind.parse_time('2015.1219.175455') == exp
 
 
 # -----------------------------------------------------------------------------
