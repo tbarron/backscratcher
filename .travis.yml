@@ -26,7 +26,8 @@ install:
 # command to run tests, e.g. python setup.py test
 # script: tox
 script:
- - date
+ - cat .git/description
+ - git describe
  - py.test -vv --tb short
 
 # addons:
