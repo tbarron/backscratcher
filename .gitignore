@@ -16,7 +16,7 @@ test_*.clps*
 testhome
 TAGS
 cmsg
-venv
+venv*
 pytest.ini
 .python-version
 *.org

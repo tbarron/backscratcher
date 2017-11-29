@@ -5,7 +5,7 @@ language: python
 
 python:
  - "2.7"
- - "3.5.2"
+# - "3.5.2"
 #   - TOXENV=py34
 #   - TOXENV=py33
 #   - TOXENV=py27
