@@ -262,9 +262,12 @@ def test_git_describe():
     Test running git_describe and grabbing its output
     """
     pytest.debug_func()
+    gdesc = U.git_describe()
+    if "No names found" in gdesc:
+        pytest.skip(gdesc)
     if not U.in_bscr_repo():
         pytest.skip("not in backscratcher repo")
-    assert re.findall("\d{4}\.\d{4}\w*", U.git_describe())
+    assert re.findall("\d{4}\.\d{4}\w*", gdesc)
 
 
 # -----------------------------------------------------------------------------
